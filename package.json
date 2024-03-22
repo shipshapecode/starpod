@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.5.9",
+    "@astrojs/preact": "^3.1.1",
     "@astrojs/tailwind": "^5.1.0",
+    "@preact/signals": "^1.2.1",
     "astro": "^4.5.6",
+    "preact": "^10.20.0",
     "rss-to-json": "^2.1.1",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.4.2",
