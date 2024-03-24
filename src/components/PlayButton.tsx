@@ -1,31 +1,18 @@
-import { currentTrack, isPlaying, type Track } from './state';
+import { currentEpisode, isPlaying } from './state';
+import type { Episode } from '@lib/episodes';
 
 type Props = {
-  tracks: Track[];
-  albumId: string;
-  albumName: string;
-  artist: string;
-  imageUrl: string;
+  episodes: Array<Episode>;
 };
 
-export default function PlayButton({
-  tracks,
-  albumId,
-  albumName,
-  artist,
-  imageUrl,
-}: Props) {
+export default function PlayButton({ episodes }: Props) {
   return (
     <button
       type="button"
       class="text-pink-700 bg-gray-100 hover:bg-gray-200 focus-visible:ring-2 focus:outline-none focus:ring-black font-medium rounded-lg text-lg px-10 py-3 text-center inline-flex items-center dark:focus:ring-black mr-4"
       onClick={() => {
-        currentTrack.value = {
-          ...tracks[0],
-          albumId,
-          albumName,
-          artist,
-          imageUrl,
+        currentEpisode.value = {
+          ...episodes[0],
         };
 
         isPlaying.value = true;

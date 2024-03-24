@@ -1,17 +1,14 @@
 import type { JSX } from 'preact/jsx-runtime';
-import { currentTrack, isPlaying, type Track } from '@components/state';
+import { currentEpisode, isPlaying } from '@components/state';
+import type { Episode } from '@lib/episodes';
 
 type Props = {
-  tracks: Track[];
-  albumName: string;
-  albumId: string;
-  artist: string;
-  imageUrl: string;
+  episodes: Array<Episode>;
 };
 
 const playIcon = (
   <svg
-    class="w-6 h-6 ml-1 text-pink-600"
+    class="w-6 h-6 ml-1"
     fill="currentColor"
     viewBox="0 0 20 20"
     xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +28,7 @@ const pauseIcon = (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="currentColor"
-    class="w-6 h-6 ml-1 text-pink-600"
+    class="w-6 h-6 ml-1"
     aria-hidden="true"
     focusable="false"
   >
@@ -43,52 +40,49 @@ const pauseIcon = (
   </svg>
 );
 
-function renderIcon(icon: JSX.Element, position: number) {
-  return (
-    <span>
-      {icon}
-      <span class="sr-only">{position}</span>
-    </span>
-  );
+function renderIcon(icon: JSX.Element) {
+  return <span>{icon}</span>;
 }
 
-export default function EpisodeList({ tracks }: Props) {
+export default function EpisodeList({ episodes }: Props) {
   return (
-    <ul class="text-xl" aria-label="EpisodeList">
-      {tracks.map((track, index) => {
-        const isCurrentTrack = track.id == currentTrack.value?.id;
+    <ul class="bg-card" aria-label="EpisodeList">
+      {episodes.map((episode, index) => {
+        const isCurrentEpisode = episode.id == currentEpisode.value?.id;
 
         return (
-          <li class="first:border-t border-b">
-            <button
-              type="button"
-              class="hover:bg-gray-50 focus-visible:ring-2 focus:outline-none focus:ring-black cursor-pointer px-6 py-4 flex basis grow w-full items-center"
-              aria-current={isCurrentTrack}
-              onClick={() => {
-                currentTrack.value = {
-                  ...track,
-                };
+          <li class="border-b border-border">
+            <div class="px-6 py-4 w-full" aria-current={isCurrentEpisode}>
+              <h2 class="font-bold text-lg">{episode.title}</h2>
 
-                isPlaying.value = isCurrentTrack ? !isPlaying.value : true;
-              }}
-            >
-              <span class="text-gray-500 w-8 mr-2">
-                {isCurrentTrack && !isPlaying.value
-                  ? renderIcon(pauseIcon, track.position)
-                  : isCurrentTrack && isPlaying.value
-                  ? renderIcon(playIcon, track.position)
-                  : track.position}
-              </span>
-              <span class="sr-only"> - </span>
-              <span class="font-medium">{track.title}</span>
-              <span class="sr-only"> - </span>
-              <span class="text-gray-500 ml-auto">{track.length}</span>
+              <div class="flex gap-6">
+                <button
+                  class="flex items-center"
+                  onClick={() => {
+                    currentEpisode.value = {
+                      ...episode,
+                    };
 
-              <span class="sr-only">
-                (press to{' '}
-                {isCurrentTrack && isPlaying.value ? 'pause)' : 'play)'}
-              </span>
-            </button>
+                    isPlaying.value = isCurrentEpisode
+                      ? !isPlaying.value
+                      : true;
+                  }}
+                >
+                  <span class="text-gray-500 w-8 mr-2">
+                    {isCurrentEpisode && isPlaying.value
+                      ? renderIcon(pauseIcon)
+                      : renderIcon(playIcon)}
+                  </span>
+                  Play Episode
+                  <span class="sr-only">
+                    (press to{' '}
+                    {isCurrentEpisode && isPlaying.value ? 'pause)' : 'play)'}
+                  </span>
+                </button>
+
+                <a href={`/${episode.episodeSlug}`}>Show notes</a>
+              </div>
+            </div>
           </li>
         );
       })}

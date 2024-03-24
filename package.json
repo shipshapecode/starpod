@@ -18,6 +18,7 @@
     "preact": "^10.20.0",
     "rss-to-json": "^2.1.1",
     "tailwindcss": "^3.4.1",
+    "tailwindcss-oklch": "^0.0.1",
     "typescript": "^5.4.2",
     "valibot": "^0.30.0"
   }

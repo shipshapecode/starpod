@@ -1,17 +1,10 @@
 ---
 import Layout from '@layouts/Layout.astro';
-import { currentTrack } from '@components/state';
 import EpisodeList from '@components/EpisodeList';
 const episodes = await fetch('http://localhost:4321/api/episodes/1.json');
 const page = await episodes.json();
 ---
 
 <Layout>
-  <h1>Astro</h1>
-
-  <!--Display the current page number. Astro.params.page can also be used!-->
-  <h1>Page {page.currentPage}</h1>
-  <ul>
-    <EpisodeList client:visible tracks={page.data} />
-  </ul>
+  <EpisodeList client:visible episodes={page.data} />
 </Layout>

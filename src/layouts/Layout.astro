@@ -20,21 +20,35 @@ const { title } = Astro.props;
       name="description"
       content="This site is a demo of an Astro SPA using Astro 3 with the experimental support for the View Transitions API and persistent islands."
     />
+
     <title>{title}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+
     <ViewTransitions />
   </head>
-  <body
-    class="bg-white text-gray-600 work-sans leading-normal text-base tracking-normal overflow-hidden"
-  >
-    <div class="wrapper flex flex-col h-screen">
-      <!-- <Header /> -->
-      <div class="main-content flex-1 overflow-auto">
-        <slot />
-        <!-- <Footer /> -->
+  <body class="antialiased bg-background font-inter text-text-body">
+    <header
+      class="bg-card lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
+    >
+      <div
+        class="relative z-10 mx-auto px-4 pb-4 pt-10 sm:px-6 md:max-w-2xl md:px-4 lg:min-h-full lg:flex-auto lg:border-x lg:border-slate-200 lg:px-8 lg:py-12 xl:px-12"
+      >
       </div>
+    </header>
+    <main
+      class="bg-card lg:relative lg:mb-28 lg:ml-112 lg:border-t-0 xl:ml-120"
+    >
+      <slot />
+
       <div id="audio-player">
         <Player client:load transition:persist="player" />
       </div>
-    </div>
+    </main>
   </body>
 </html>

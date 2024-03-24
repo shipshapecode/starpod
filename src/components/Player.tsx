@@ -1,4 +1,4 @@
-import { currentTrack, isPlaying } from '@components/state';
+import { currentEpisode, isPlaying } from '@components/state';
 
 import { useEffect, useState, useRef } from 'preact/hooks';
 
@@ -7,7 +7,7 @@ const PlayIcon = (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="currentColor"
-    class="w-10 h-10 sm:w-14 sm:h-14"
+    class="w-4 h-4"
     aria-hidden="true"
     focusable="false"
   >
@@ -24,7 +24,7 @@ const PauseIcon = (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="currentColor"
-    class="w-10 h-10 sm:w-14 sm:h-14"
+    class="w-4 h-4"
     aria-hidden="true"
     focusable="false"
   >
@@ -46,11 +46,12 @@ export default function Player() {
   const [songIndex, setSongIndex] = useState(4);
   const [progress, setProgress] = useState(0);
 
-  if (currentTrack.value === null) {
+  if (currentEpisode.value === null) {
     return;
   }
 
-  const { audio, title, artist, albumName, imageUrl } = currentTrack.value;
+  const { audio, episodeImage, title, artist, albumName } =
+    currentEpisode.value;
 
   function whilePlaying() {
     if (audioPlayer.current.duration) {
@@ -88,7 +89,7 @@ export default function Player() {
 
   return (
     <div
-      class="fixed bottom-0 left-0 right-0 bg-gray-100 z-10"
+      class="bg-player fixed inset-x-0 bottom-0 z-10 lg:left-112 xl:left-120"
       role="region"
       aria-labelledby="audio-player-heading"
       style={{ viewTransitionName: 'player' }}
@@ -123,7 +124,7 @@ export default function Player() {
       </div>
       <div class="container mx-auto max-w-screen-lg px-3 py-2 sm:px-6 sm:py-4 flex items-center gap-5">
         <img
-          src={imageUrl}
+          src={episodeImage ?? 'http://whiskeywebandwhatnot.fm/images/www.png'}
           alt={`${artist} - ${albumName} album cover`}
           aria-hidden="true"
           width="60"
@@ -155,7 +156,7 @@ export default function Player() {
             >
               <path d="M9.195 18.44c1.25.713 2.805-.19 2.805-1.629v-2.34l6.945 3.968c1.25.714 2.805-.188 2.805-1.628V8.688c0-1.44-1.555-2.342-2.805-1.628L12 11.03v-2.34c0-1.44-1.555-2.343-2.805-1.629l-7.108 4.062c-1.26.72-1.26 2.536 0 3.256l7.108 4.061z" />
             </svg>
-            <span class="sr-only">Previous track</span>
+            <span class="sr-only">Previous episode</span>
           </button>
 
           <button
@@ -182,7 +183,7 @@ export default function Player() {
             >
               <path d="M5.055 7.06c-1.25-.714-2.805.189-2.805 1.628v8.123c0 1.44 1.555 2.342 2.805 1.628L12 14.471v2.34c0 1.44 1.555 2.342 2.805 1.628l7.108-4.061c1.26-.72 1.26-2.536 0-3.256L14.805 7.06C13.555 6.346 12 7.25 12 8.688v2.34L5.055 7.06z" />
             </svg>
-            <span class="sr-only">Next track</span>
+            <span class="sr-only">Next episode</span>
           </button>
         </div>
       </div>

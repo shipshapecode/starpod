@@ -12,6 +12,7 @@ export interface Episode {
   content: string;
   episodeImage?: string;
   episodeNumber?: string | number;
+  episodeSlug: string;
   audio: {
     src: string;
     type: string;
@@ -40,7 +41,7 @@ export async function getAllEpisodes() {
   });
 
   let feed = (await parseFeed.parse(
-    'https://anchor.fm/s/e329dea0/podcast/rss'
+    import.meta.env.PUBLIC_PODCAST_RSS_FEED
   )) as unknown;
   let items = parse(FeedSchema, feed).items;
 

@@ -29,6 +29,9 @@ dependencies:
   tailwindcss:
     specifier: ^3.4.1
     version: 3.4.1
+  tailwindcss-oklch:
+    specifier: ^0.0.1
+    version: 0.0.1
   typescript:
     specifier: ^5.4.2
     version: 5.4.2
@@ -1545,6 +1548,10 @@ packages:
       color-string: 1.9.1
     dev: false
     optional: true
+
+  /colorjs.io@0.4.5:
+    resolution: {integrity: sha512-yCtUNCmge7llyfd/Wou19PMAcf5yC3XXhgFoAh6zsO2pGswhUPBaaUh8jzgHnXtXuZyFKzXZNAnyF5i+apICow==}
+    dev: false
 
   /combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
@@ -3829,6 +3836,12 @@ packages:
   /supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+    dev: false
+
+  /tailwindcss-oklch@0.0.1:
+    resolution: {integrity: sha512-8IAlXtPOUCnp+14mZKFwWkB7lDzbXlG61g1TtJtF0BkpEUOgnBRWBmxCpRRfAbp2BmqlGyNq2sklzMRg4Gu1qg==}
+    dependencies:
+      colorjs.io: 0.4.5
     dev: false
 
   /tailwindcss@3.4.1:
