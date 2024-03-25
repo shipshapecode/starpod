@@ -46,18 +46,20 @@ function renderIcon(icon: JSX.Element) {
 
 export default function EpisodeList({ episodes }: Props) {
   return (
-    <ul class="bg-card" aria-label="EpisodeList">
+    <ul aria-label="EpisodeList">
       {episodes.map((episode, index) => {
         const isCurrentEpisode = episode.id == currentEpisode.value?.id;
 
         return (
-          <li class="border-b border-border">
-            <div class="w-full px-6 py-4" aria-current={isCurrentEpisode}>
-              <h2 class="text-lg font-bold">{episode.title}</h2>
+          <li class="dark:border-dark-border border-b">
+            <div class="w-full py-12" aria-current={isCurrentEpisode}>
+              <h2 class="mb-2 text-lg font-bold dark:text-white">
+                {episode.episodeNumber}: {episode.title}
+              </h2>
 
               <div class="flex items-center gap-6">
                 <button
-                  class="bg-button flex items-center rounded-full p-2"
+                  class="dark:bg-dark-button bg-white text-light-text-heading flex items-center rounded-full p-2 pr-4 font-bold dark:text-white"
                   onClick={() => {
                     currentEpisode.value = {
                       ...episode
@@ -68,7 +70,7 @@ export default function EpisodeList({ episodes }: Props) {
                       : true;
                   }}
                 >
-                  <span class="mr-3 w-8 text-gray-500">
+                  <span class="text-light-text-heading mr-3 w-8 dark:text-white">
                     {isCurrentEpisode && isPlaying.value
                       ? renderIcon(pauseIcon)
                       : renderIcon(playIcon)}
@@ -80,7 +82,12 @@ export default function EpisodeList({ episodes }: Props) {
                   </span>
                 </button>
 
-                <a href={`/${episode.episodeSlug}`}>Show notes</a>
+                <a
+                  class="text-light-text-heading font-bold dark:text-white"
+                  href={`/${episode.episodeSlug}`}
+                >
+                  Show notes
+                </a>
               </div>
             </div>
           </li>
