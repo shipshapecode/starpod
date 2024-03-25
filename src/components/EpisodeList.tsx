@@ -8,7 +8,7 @@ type Props = {
 
 const playIcon = (
   <svg
-    class="h-7 w-7"
+    class="h-9 w-9"
     fill="currentColor"
     viewBox="0 0 20 20"
     xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +28,7 @@ const pauseIcon = (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="currentColor"
-    class="h-7 w-7"
+    class="h-9 w-9"
     aria-hidden="true"
     focusable="false"
   >
@@ -55,9 +55,9 @@ export default function EpisodeList({ episodes }: Props) {
             <div class="w-full px-6 py-4" aria-current={isCurrentEpisode}>
               <h2 class="text-lg font-bold">{episode.title}</h2>
 
-              <div class="flex gap-6">
+              <div class="flex items-center gap-6">
                 <button
-                  class="flex items-center"
+                  class="bg-button flex items-center rounded-full p-2"
                   onClick={() => {
                     currentEpisode.value = {
                       ...episode
@@ -68,7 +68,7 @@ export default function EpisodeList({ episodes }: Props) {
                       : true;
                   }}
                 >
-                  <span class="mr-2 w-8 text-gray-500">
+                  <span class="mr-3 w-8 text-gray-500">
                     {isCurrentEpisode && isPlaying.value
                       ? renderIcon(pauseIcon)
                       : renderIcon(playIcon)}

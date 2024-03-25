@@ -5,6 +5,6 @@ const episodes = await fetch('http://localhost:4321/api/episodes/1.json');
 const page = await episodes.json();
 ---
 
-<Layout>
+<Layout title="Starpod">
   <EpisodeList client:visible episodes={page.data} />
 </Layout>

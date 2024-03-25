@@ -16,6 +16,6 @@ export async function getStaticPaths() {
 const { episode } = Astro.props;
 ---
 
-<Layout>
+<Layout title={episode.title}>
   <h1>{episode.title}</h1>
 </Layout>
