@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getAllEpisodes } from '@lib/episodes';
+import { getAllEpisodes } from '@lib/rss';
 
 export async function getStaticPaths({ paginate }) {
   const allEpisodes = await getAllEpisodes();

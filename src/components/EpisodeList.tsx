@@ -1,6 +1,6 @@
 import type { JSX } from 'preact/jsx-runtime';
 import { currentEpisode, isPlaying } from '@components/state';
-import type { Episode } from '@lib/episodes';
+import type { Episode } from '@lib/rss';
 
 type Props = {
   episodes: Array<Episode>;

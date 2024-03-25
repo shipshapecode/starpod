@@ -1,6 +1,6 @@
 ---
 import Layout from '@layouts/Layout.astro';
-import { getAllEpisodes } from '@lib/episodes';
+import { getAllEpisodes } from '@lib/rss';
 
 export async function getStaticPaths() {
   const allEpisodes = await getAllEpisodes();
@@ -25,3 +25,4 @@ const { episode } = Astro.props;
 <Layout title={episode.title}>
   <h1>{episode.title}</h1>
 </Layout>
+@lib/rss

@@ -4,6 +4,13 @@ import { array, number, object, optional, parse, string } from 'valibot';
 import { dasherize } from '@utils/dasherize';
 import { truncate } from '@utils/truncate';
 
+export interface Show {
+  title: string;
+  description: string;
+  image: string;
+  link: string;
+}
+
 export interface Episode {
   id: string;
   title: string;
@@ -17,6 +24,12 @@ export interface Episode {
     src: string;
     type: string;
   };
+}
+
+export async function getShowInfo() {
+  return (await parseFeed.parse(
+    import.meta.env.PUBLIC_PODCAST_RSS_FEED
+  )) as Show;
 }
 
 export async function getAllEpisodes() {
@@ -42,7 +55,7 @@ export async function getAllEpisodes() {
 
   let feed = (await parseFeed.parse(
     import.meta.env.PUBLIC_PODCAST_RSS_FEED
-  )) as unknown;
+  )) as Show;
   let items = parse(FeedSchema, feed).items;
 
   let episodes: Array<Episode> = items
