@@ -5,18 +5,10 @@
     "baseUrl": "/Users/rwwagner90/shipshape/starpod",
     "esModuleInterop": true,
     "paths": {
-      "@components/*": [
-        "src/components/*"
-      ],
-      "@layouts/*": [
-        "src/layouts/*"
-      ],
-      "@lib/*": [
-        "src/lib/*"
-      ],
-      "@utils/*": [
-        "src/utils/*"
-      ]
+      "@components/*": ["src/components/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@lib/*": ["src/lib/*"],
+      "@utils/*": ["src/utils/*"]
     },
     "strictNullChecks": true,
     "verbatimModuleSyntax": true,
