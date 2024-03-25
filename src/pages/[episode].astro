@@ -5,11 +5,17 @@ import { getAllEpisodes } from '@lib/episodes';
 export async function getStaticPaths() {
   const allEpisodes = await getAllEpisodes();
 
-  return allEpisodes.map((episode) => {
-    return {
-      params: { slug: episode.episodeSlug },
-      props: { episode }
-    };
+  return allEpisodes.flatMap((episode) => {
+    return [
+      {
+        params: { episode: episode.episodeNumber },
+        props: { episode }
+      },
+      {
+        params: { episode: episode.episodeSlug },
+        props: { episode }
+      }
+    ];
   });
 }
 
