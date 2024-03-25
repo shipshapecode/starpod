@@ -8,7 +8,7 @@ export async function getStaticPaths() {
   return allEpisodes.map((episode) => {
     return {
       params: { slug: episode.episodeSlug },
-      props: { episode },
+      props: { episode }
     };
   });
 }

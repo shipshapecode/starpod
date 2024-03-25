@@ -9,17 +9,17 @@ export default function PlayButton({ episodes }: Props) {
   return (
     <button
       type="button"
-      class="text-pink-700 bg-gray-100 hover:bg-gray-200 focus-visible:ring-2 focus:outline-none focus:ring-black font-medium rounded-lg text-lg px-10 py-3 text-center inline-flex items-center dark:focus:ring-black mr-4"
+      class="mr-4 inline-flex items-center rounded-lg px-10 py-3 text-center text-lg font-medium bg-gray-100 text-pink-700 hover:bg-gray-200 focus:outline-none focus:ring-black focus-visible:ring-2 dark:focus:ring-black"
       onClick={() => {
         currentEpisode.value = {
-          ...episodes[0],
+          ...episodes[0]
         };
 
         isPlaying.value = true;
       }}
     >
       <svg
-        class="w-6 h-6 mr-2 -ml-1 text-pink-700"
+        class="-ml-1 mr-2 h-6 w-6 text-pink-700"
         fill="currentColor"
         viewBox="0 0 20 20"
         xmlns="http://www.w3.org/2000/svg"

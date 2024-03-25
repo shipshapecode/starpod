@@ -7,7 +7,7 @@ const PlayIcon = (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="currentColor"
-    class="w-4 h-4"
+    class="h-4 w-4"
     aria-hidden="true"
     focusable="false"
   >
@@ -24,7 +24,7 @@ const PauseIcon = (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="currentColor"
-    class="w-4 h-4"
+    class="h-4 w-4"
     aria-hidden="true"
     focusable="false"
   >
@@ -89,7 +89,7 @@ export default function Player() {
 
   return (
     <div
-      class="bg-player fixed inset-x-0 bottom-0 z-10 lg:left-112 xl:left-120"
+      class="fixed inset-x-0 bottom-0 z-10 bg-player lg:left-112 xl:left-120"
       role="region"
       aria-labelledby="audio-player-heading"
       style={{ viewTransitionName: 'player' }}
@@ -97,7 +97,7 @@ export default function Player() {
       <h2 id="audio-player-heading" class="sr-only">
         Audio player
       </h2>
-      <div class="flex-1 bg-gray-200 h-1.5 dark:bg-gray-700">
+      <div class="h-1.5 flex-1 bg-gray-200 dark:bg-gray-700">
         <div
           aria-orientation="horizontal"
           role="slider"
@@ -118,11 +118,11 @@ export default function Player() {
               ? Math.floor(audioPlayer.current.currentTime)
               : 0
           } seconds`}
-          class="bg-pink-700 h-1.5"
+          class="h-1.5 bg-pink-700"
           style={`width: ${progress}%`}
         ></div>
       </div>
-      <div class="container mx-auto max-w-screen-lg px-3 py-2 sm:px-6 sm:py-4 flex items-center gap-5">
+      <div class="container mx-auto flex max-w-screen-lg items-center gap-5 px-3 py-2 sm:px-6 sm:py-4">
         <img
           src={episodeImage ?? 'http://whiskeywebandwhatnot.fm/images/www.png'}
           alt={`${artist} - ${albumName} album cover`}
@@ -131,26 +131,26 @@ export default function Player() {
           height="60"
           class="block rounded-md"
         />
-        <div class="flex-1 min-w-0">
-          <div class="text-xl text-black font-medium overflow-hidden text-ellipsis whitespace-nowrap">
+        <div class="min-w-0 flex-1">
+          <div class="overflow-hidden text-ellipsis whitespace-nowrap text-xl font-medium text-black">
             {title}
           </div>
-          <div class="text-xl text-gray-700 overflow-hidden text-ellipsis whitespace-nowrap">
+          <div class="overflow-hidden text-ellipsis whitespace-nowrap text-xl text-gray-700">
             {artist}
           </div>
         </div>
         <audio ref={audioPlayer} />
-        <div class="flex gap-6 items-center text-black">
+        <div class="flex items-center gap-6 text-black">
           <button
             type="button"
             disabled
-            class="opacity-50 focus-visible:ring-2 focus:outline-none focus:ring-black"
+            class="opacity-50 focus:outline-none focus:ring-black focus-visible:ring-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              class="w-10 h-10 hidden sm:block"
+              class="hidden h-10 w-10 sm:block"
               aria-hidden="true"
               focusable="false"
             >
@@ -161,7 +161,7 @@ export default function Player() {
 
           <button
             type="button"
-            class="focus-visible:ring-2 focus:outline-none focus:ring-black"
+            class="focus:outline-none focus:ring-black focus-visible:ring-2"
             onClick={() => (isPlaying.value = !isPlaying.value)}
           >
             {isPlaying.value ? PauseIcon : PlayIcon}
@@ -171,13 +171,13 @@ export default function Player() {
           <button
             type="button"
             disabled
-            class="opacity-50 focus-visible:ring-2 focus:outline-none focus:ring-black"
+            class="opacity-50 focus:outline-none focus:ring-black focus-visible:ring-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              class="w-10 h-10 hidden sm:block"
+              class="hidden h-10 w-10 sm:block"
               aria-hidden="true"
               focusable="false"
             >

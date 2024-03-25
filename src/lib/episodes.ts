@@ -33,11 +33,11 @@ export async function getAllEpisodes() {
         enclosures: array(
           object({
             url: string(),
-            type: string(),
+            type: string()
           })
-        ),
+        )
       })
-    ),
+    )
   });
 
   let feed = (await parseFeed.parse(
@@ -56,7 +56,7 @@ export async function getAllEpisodes() {
         published,
         itunes_episode,
         itunes_episodeType,
-        itunes_image,
+        itunes_image
       }) => {
         const episodeNumber =
           itunes_episodeType === 'bonus' ? 'Bonus' : itunes_episode;
@@ -73,8 +73,8 @@ export async function getAllEpisodes() {
           published,
           audio: enclosures.map((enclosure) => ({
             src: enclosure.url,
-            type: enclosure.type,
-          }))[0],
+            type: enclosure.type
+          }))[0]
         };
       }
     );
