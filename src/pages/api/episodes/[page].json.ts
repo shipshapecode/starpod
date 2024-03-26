@@ -1,11 +1,15 @@
 import type { APIRoute } from 'astro';
 import { getAllEpisodes } from '@lib/rss';
 
+const episodesPerPage = 15;
+const allEpisodes = await getAllEpisodes();
+
 export async function getStaticPaths({ paginate }) {
-  const allEpisodes = await getAllEpisodes();
-  return paginate(allEpisodes, { pageSize: 15 });
+  return paginate(allEpisodes, { pageSize: episodesPerPage });
 }
 
 export const GET: APIRoute = async ({ props }) => {
-  return new Response(JSON.stringify(props.page));
+  const page = props.page.currentPage;
+  const canLoadMore = page * episodesPerPage < allEpisodes.length;
+  return new Response(JSON.stringify({ canLoadMore, episodes: props.page }));
 };

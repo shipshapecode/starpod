@@ -11,6 +11,6 @@ const page = await episodes.json();
       Episodes
     </h1>
 
-    <EpisodeList client:visible episodes={page.data} />
+    <EpisodeList client:visible episodes={page.episodes.data} />
   </div>
 </Layout>

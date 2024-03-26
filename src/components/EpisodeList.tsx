@@ -1,4 +1,5 @@
 import type { JSX } from 'preact/jsx-runtime';
+import { useEffect, useState } from 'preact/hooks';
 import { currentEpisode, isPlaying } from '@components/state';
 import type { Episode } from '@lib/rss';
 
@@ -45,9 +46,56 @@ function renderIcon(icon: JSX.Element) {
 }
 
 export default function EpisodeList({ episodes }: Props) {
+  const [recentEpisodes, setRecentEpisodes] = useState(episodes);
+  const [canLoadMore, setCanLoadMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  // starting from page 2 due to static props fetch of page 1
+  const [page, setPage] = useState(2);
+
+  async function fetchMoreEpisodes() {
+    if (canLoadMore) {
+      setIsLoading(true);
+
+      const episodeResponse = await fetch(`http://localhost:4321/api/episodes/${page}.json`);
+      const { canLoadMore, episodes } = await episodeResponse.json();
+
+      setIsLoading(false);
+      setCanLoadMore(canLoadMore);
+
+      setRecentEpisodes([...recentEpisodes, ...episodes.data]);
+      setPage(page + 1);
+    }
+  }
+
+  useEffect(() => {
+    const debounce = (callback, wait) => {
+      let timeoutId = null;
+      return (...args) => {
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => {
+          callback.apply(null, args);
+        }, wait);
+      };
+    };
+    const handleScroll = debounce((ev) => {
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 500
+      ) {
+        fetchMoreEpisodes();
+      }
+    }, 250);
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  });
+
   return (
     <ul aria-label="EpisodeList">
-      {episodes.map((episode, index) => {
+      {recentEpisodes.map((episode, index) => {
         const isCurrentEpisode = episode.id == currentEpisode.value?.id;
 
         return (
@@ -59,7 +107,7 @@ export default function EpisodeList({ episodes }: Props) {
 
               <div class="flex items-center gap-6">
                 <button
-                  class="dark:bg-dark-button bg-white text-light-text-heading flex items-center rounded-full p-2 pr-4 font-bold dark:text-white"
+                  class="dark:bg-dark-button text-light-text-heading flex items-center rounded-full p-2 pr-4 font-bold bg-white dark:text-white"
                   onClick={() => {
                     currentEpisode.value = {
                       ...episode
