@@ -89,7 +89,7 @@ export default function Player() {
 
   return (
     <div
-      class="fixed inset-x-0 bottom-0 z-10 dark:bg-dark-player lg:left-112 xl:left-120"
+      class="bg-light-player dark:bg-dark-player fixed inset-x-0 bottom-0 z-10 lg:left-112 xl:left-120"
       role="region"
       aria-labelledby="audio-player-heading"
       style={{ viewTransitionName: 'player' }}

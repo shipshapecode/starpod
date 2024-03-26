@@ -6,17 +6,11 @@ const page = await episodes.json();
 ---
 
 <Layout title="Starpod">
-  <div class="relative pt-10">
-    <div
-      class="bg-gradient-light absolute left-0 right-0 top-0 z-0 h-80 w-full opacity-30 dark:bg-gradient-dark"
-    >
-    </div>
-    <div class="relative z-10 px-8 lg:px-18">
-      <h1 class="text-light-text-heading text-4xl font-bold dark:text-white">
-        Episodes
-      </h1>
+  <div class="relative z-10 px-8 lg:px-18">
+    <h1 class="text-light-text-heading text-4xl font-bold dark:text-white">
+      Episodes
+    </h1>
 
-      <EpisodeList client:visible episodes={page.data} />
-    </div>
+    <EpisodeList client:visible episodes={page.data} />
   </div>
 </Layout>

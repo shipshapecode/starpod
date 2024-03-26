@@ -1,0 +1,18 @@
+---
+// import DotsSmallDark from '../svgs/dots-small-dark.svg?raw';
+// import DotsSmallLight from '../svgs/dots-small-light.svg?raw';
+import DotsLargeDark from '../svgs/dots-large-dark.svg?raw';
+import DotsLargeLight from '../svgs/dots-large-light.svg?raw';
+---
+
+<div
+  class="absolute left-0 top-0 hidden h-20 w-full justify-center pt-2 lg:dark:flex"
+>
+  <Fragment set:html={DotsLargeDark} />
+</div>
+
+<div
+  class="absolute left-0 top-0 hidden h-20 w-full justify-center pt-2 lg:flex lg:dark:hidden"
+>
+  <Fragment set:html={DotsLargeLight} />
+</div>
