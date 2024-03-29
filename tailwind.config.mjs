@@ -19,6 +19,7 @@ export default {
 
         'light-card': 'oklch(97.65% 0.005 274.97 / <alpha-value>)',
         'light-player': 'oklch(95.94% 0.009 279.69 / <alpha-value>)',
+        'light-text-body': 'oklch(59.68% 0.017 285.89 / <alpha-value>)',
         'light-text-heading': 'oklch(30.55% 0.052 292.57 / <alpha-value>)'
       },
       fontFamily: {

@@ -56,7 +56,9 @@ export default function EpisodeList({ episodes }: Props) {
     if (canLoadMore) {
       setIsLoading(true);
 
-      const episodeResponse = await fetch(`http://localhost:4321/api/episodes/${page}.json`);
+      const episodeResponse = await fetch(
+        `http://localhost:4321/api/episodes/${page}.json`
+      );
       const { canLoadMore, episodes } = await episodeResponse.json();
 
       setIsLoading(false);
@@ -99,15 +101,17 @@ export default function EpisodeList({ episodes }: Props) {
         const isCurrentEpisode = episode.id == currentEpisode.value?.id;
 
         return (
-          <li class="dark:border-dark-border border-b">
+          <li class="border-b dark:border-dark-border">
             <div class="w-full py-12" aria-current={isCurrentEpisode}>
-              <h2 class="mb-2 text-lg font-bold dark:text-white">
+              <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
                 {episode.episodeNumber}: {episode.title}
               </h2>
 
+              <p class="mb-5">{episode.description}</p>
+
               <div class="flex items-center gap-6">
                 <button
-                  class="dark:bg-dark-button text-light-text-heading flex items-center rounded-full p-2 pr-4 font-bold bg-white dark:text-white"
+                  class="flex items-center rounded-full p-2 pr-4 font-bold shadow-md shadow-[#D9E4F0E5] bg-white text-light-text-heading dark:shadow-black dark:bg-dark-button dark:text-white"
                   onClick={() => {
                     currentEpisode.value = {
                       ...episode
@@ -118,7 +122,7 @@ export default function EpisodeList({ episodes }: Props) {
                       : true;
                   }}
                 >
-                  <span class="text-light-text-heading mr-3 w-8 dark:text-white">
+                  <span class="mr-3 w-8 text-light-text-heading dark:text-white">
                     {isCurrentEpisode && isPlaying.value
                       ? renderIcon(pauseIcon)
                       : renderIcon(playIcon)}
@@ -131,7 +135,7 @@ export default function EpisodeList({ episodes }: Props) {
                 </button>
 
                 <a
-                  class="text-light-text-heading font-bold dark:text-white"
+                  class="font-bold text-light-text-heading dark:text-white"
                   href={`/${episode.episodeSlug}`}
                 >
                   Show notes
