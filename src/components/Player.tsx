@@ -50,8 +50,7 @@ export default function Player() {
     return;
   }
 
-  const { audio, episodeImage, title, artist, albumName } =
-    currentEpisode.value;
+  const { audio, episodeImage, title } = currentEpisode.value;
 
   function whilePlaying() {
     if (audioPlayer.current.duration) {
@@ -89,7 +88,7 @@ export default function Player() {
 
   return (
     <div
-      class="bg-light-player dark:bg-dark-player fixed inset-x-0 bottom-0 z-10 lg:left-112 xl:left-120"
+      class="fixed inset-x-0 bottom-0 z-10 bg-light-player lg:left-112 xl:left-120 dark:bg-dark-player"
       role="region"
       aria-labelledby="audio-player-heading"
       style={{ viewTransitionName: 'player' }}
@@ -123,20 +122,9 @@ export default function Player() {
         ></div>
       </div>
       <div class="container mx-auto flex max-w-screen-lg items-center gap-5 px-3 py-2 sm:px-6 sm:py-4">
-        <img
-          src={episodeImage ?? 'http://whiskeywebandwhatnot.fm/images/www.png'}
-          alt={`${artist} - ${albumName} album cover`}
-          aria-hidden="true"
-          width="60"
-          height="60"
-          class="block rounded-md"
-        />
         <div class="min-w-0 flex-1">
           <div class="overflow-hidden text-ellipsis whitespace-nowrap text-xl font-medium text-black">
             {title}
-          </div>
-          <div class="overflow-hidden text-ellipsis whitespace-nowrap text-xl text-gray-700">
-            {artist}
           </div>
         </div>
         <audio ref={audioPlayer} />

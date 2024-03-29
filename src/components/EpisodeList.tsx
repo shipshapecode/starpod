@@ -2,6 +2,7 @@ import type { JSX } from 'preact/jsx-runtime';
 import { useEffect, useState } from 'preact/hooks';
 import { currentEpisode, isPlaying } from '@components/state';
 import type { Episode } from '@lib/rss';
+import FormattedDate from '@components/FormattedDate';
 
 type Props = {
   episodes: Array<Episode>;
@@ -102,44 +103,57 @@ export default function EpisodeList({ episodes }: Props) {
 
         return (
           <li class="border-b dark:border-dark-border">
-            <div class="w-full py-12" aria-current={isCurrentEpisode}>
-              <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
-                {episode.episodeNumber}: {episode.title}
-              </h2>
+            <div class="flex w-full py-12" aria-current={isCurrentEpisode}>
+              <img
+                alt={`${episode.title} - episode art`}
+                aria-hidden="true"
+                class="mr-6 block h-20 w-20 rounded-md"
+                height={80}
+                src={episode.episodeImage ?? '/images/www.png'}
+                width={80}
+              />
 
-              <p class="mb-5">{episode.description}</p>
+              <div>
+                <FormattedDate date={new Date(episode.published)} />
 
-              <div class="flex items-center gap-6">
-                <button
-                  class="flex items-center rounded-full p-2 pr-4 font-bold shadow-md shadow-[#D9E4F0E5] bg-white text-light-text-heading dark:shadow-black dark:bg-dark-button dark:text-white"
-                  onClick={() => {
-                    currentEpisode.value = {
-                      ...episode
-                    };
+                <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
+                  {episode.episodeNumber}: {episode.title}
+                </h2>
 
-                    isPlaying.value = isCurrentEpisode
-                      ? !isPlaying.value
-                      : true;
-                  }}
-                >
-                  <span class="mr-3 w-8 text-light-text-heading dark:text-white">
-                    {isCurrentEpisode && isPlaying.value
-                      ? renderIcon(pauseIcon)
-                      : renderIcon(playIcon)}
-                  </span>
-                  Play Episode
-                  <span class="sr-only">
-                    (press to{' '}
-                    {isCurrentEpisode && isPlaying.value ? 'pause)' : 'play)'}
-                  </span>
-                </button>
+                <p class="mb-5">{episode.description}</p>
 
-                <a
-                  class="font-bold text-light-text-heading dark:text-white"
-                  href={`/${episode.episodeSlug}`}
-                >
-                  Show notes
-                </a>
+                <div class="flex items-center gap-6">
+                  <button
+                    class="flex items-center rounded-full p-2 pr-4 font-bold shadow-md shadow-[#D9E4F0E5] bg-white text-light-text-heading dark:shadow-black dark:bg-dark-button dark:text-white"
+                    onClick={() => {
+                      currentEpisode.value = {
+                        ...episode
+                      };
+
+                      isPlaying.value = isCurrentEpisode
+                        ? !isPlaying.value
+                        : true;
+                    }}
+                  >
+                    <span class="mr-3 w-8 text-light-text-heading dark:text-white">
+                      {isCurrentEpisode && isPlaying.value
+                        ? renderIcon(pauseIcon)
+                        : renderIcon(playIcon)}
+                    </span>
+                    Play Episode
+                    <span class="sr-only">
+                      (press to{' '}
+                      {isCurrentEpisode && isPlaying.value ? 'pause)' : 'play)'}
+                    </span>
+                  </button>
+
+                  <a
+                    class="font-bold text-light-text-heading dark:text-white"
+                    href={`/${episode.episodeSlug}`}
+                  >
+                    Show notes
+                  </a>
+                </div>
               </div>
             </div>
           </li>
