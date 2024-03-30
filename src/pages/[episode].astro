@@ -1,4 +1,5 @@
 ---
+import FormattedDate from '@components/FormattedDate';
 import Layout from '@layouts/Layout.astro';
 import { getAllEpisodes } from '@lib/rss';
 
@@ -23,7 +24,15 @@ const { episode } = Astro.props;
 ---
 
 <Layout title={episode.title}>
-  <h1 class="text-5xl font-bold text-light-text-heading dark:text-white">
-    {episode.episodeNumber}: {episode.title}
-  </h1>
+  <div class="relative z-10 px-8 lg:px-18">
+    <FormattedDate date={new Date(episode.published)} />
+
+    <h1
+      class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
+    >
+      {episode.episodeNumber}: {episode.title}
+    </h1>
+
+    <p class="mb-5">{episode.description}</p>
+  </div>
 </Layout>

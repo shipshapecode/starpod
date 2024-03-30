@@ -8,6 +8,7 @@
       "@components/*": ["src/components/*"],
       "@layouts/*": ["src/layouts/*"],
       "@lib/*": ["src/lib/*"],
+      "@svgs/*": ["src/svgs/*"],
       "@utils/*": ["src/utils/*"]
     },
     "strictNullChecks": true,
