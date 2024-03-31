@@ -1,4 +1,4 @@
-import { currentEpisode, isPlaying } from '@components/state';
+import { currentEpisode, isPlaying } from '../components/state';
 
 import { useEffect, useState, useRef } from 'preact/hooks';
 

@@ -4,13 +4,6 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": "/Users/rwwagner90/shipshape/starpod",
     "esModuleInterop": true,
-    "paths": {
-      "@components/*": ["src/components/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@lib/*": ["src/lib/*"],
-      "@svgs/*": ["src/svgs/*"],
-      "@utils/*": ["src/utils/*"]
-    },
     "strictNullChecks": true,
     "verbatimModuleSyntax": true,
     "jsx": "react-jsx",

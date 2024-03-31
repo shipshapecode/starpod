@@ -1,7 +1,7 @@
 ---
-import FormattedDate from '@components/FormattedDate';
-import Layout from '@layouts/Layout.astro';
-import { getAllEpisodes } from '@lib/rss';
+import FormattedDate from '../components/FormattedDate';
+import Layout from '../layouts/Layout.astro';
+import { getAllEpisodes } from '../lib/rss';
 
 export async function getStaticPaths() {
   const allEpisodes = await getAllEpisodes();

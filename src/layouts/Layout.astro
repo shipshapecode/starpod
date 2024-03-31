@@ -1,13 +1,13 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
 
-import Dots from '@components/Dots.astro';
-import Hosts from '@components/Hosts.astro';
-import InfoCard from '@components/InfoCard.astro';
-import Platforms from '@components/Platforms.astro';
-import Player from '@components/Player';
+import Dots from '../components/Dots.astro';
+import Hosts from '../components/Hosts.astro';
+import InfoCard from '../components/InfoCard.astro';
+import Platforms from '../components/Platforms.astro';
+import Player from '../components/Player';
 
-import { getShowInfo } from '@lib/rss';
+import { getShowInfo } from '../lib/rss';
 
 const show = await getShowInfo();
 

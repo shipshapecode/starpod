@@ -1,5 +1,5 @@
 import { currentEpisode, isPlaying } from './state';
-import type { Episode } from '@lib/rss';
+import type { Episode } from '../lib/rss';
 
 type Props = {
   episodes: Array<Episode>;

@@ -1,8 +1,8 @@
 import parseFeed from 'rss-to-json';
 import { array, number, object, optional, parse, string } from 'valibot';
 
-import { dasherize } from '@utils/dasherize';
-import { truncate } from '@utils/truncate';
+import { dasherize } from '../utils/dasherize';
+import { truncate } from '../utils/truncate';
 
 export interface Show {
   title: string;
