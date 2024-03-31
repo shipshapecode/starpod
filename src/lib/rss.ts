@@ -3,7 +3,7 @@ import { array, number, object, optional, parse, string } from 'valibot';
 
 import { dasherize } from '../utils/dasherize';
 import { truncate } from '../utils/truncate';
-import starpodConfig from 'starpod.config.mjs';
+import starpodConfig from 'starpod.config';
 
 export interface Show {
   title: string;
@@ -29,9 +29,7 @@ export interface Episode {
 
 export async function getShowInfo() {
   // @ts-expect-error
-  return (await parseFeed.parse(
-    starpodConfig.rssFeed
-  )) as Show;
+  return (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
 }
 
 export async function getAllEpisodes() {
@@ -56,9 +54,7 @@ export async function getAllEpisodes() {
   });
 
   // @ts-expect-error
-  let feed = (await parseFeed.parse(
-    starpodConfig.rssFeed
-  )) as Show;
+  let feed = (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
   let items = parse(FeedSchema, feed).items;
 
   let episodes: Array<Episode> = items
