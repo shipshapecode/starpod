@@ -1,11 +1,14 @@
+---
+import starpodConfig from 'starpod.config.mjs';
+---
+
 <h3 class="mb-6 mt-12 text-xs font-bold uppercase">Hosted By</h3>
 
-<div class="mb-4 flex items-center">
-  <img class="mr-4 h-12 w-12" height={48} src="" width={48} />
-  Robbie Wagner
-</div>
-
-<div class="flex items-center">
-  <img class="mr-4 h-12 w-12" height={48} src="" width={48} />
-  Chuck Carpenter
-</div>
+{
+  starpodConfig.hosts.map((host) => (
+    <div class="mb-4 flex items-center">
+      <img class="mr-4 h-12 w-12" height={48} src={host.img} width={48} />
+      {host.name}
+    </div>
+  ))
+}
