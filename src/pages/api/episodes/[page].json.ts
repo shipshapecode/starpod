@@ -4,7 +4,7 @@ import { getAllEpisodes } from '@lib/rss';
 const episodesPerPage = 15;
 const allEpisodes = await getAllEpisodes();
 
-export async function getStaticPaths({ paginate }) {
+export async function getStaticPaths({ paginate }: { paginate: any }) {
   return paginate(allEpisodes, { pageSize: episodesPerPage });
 }
 

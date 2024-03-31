@@ -36,14 +36,9 @@ const PauseIcon = (
   </svg>
 );
 
-// This app doesn't have real songs, it only has a few songs
-// that we will play over and over as the user uses the app.
-const MAX_SONGS = 4;
-
 export default function Player() {
-  const audioPlayer = useRef<HTMLAudioElement>(null);
-  const progressRef = useRef(null);
-  const [songIndex, setSongIndex] = useState(4);
+  const audioPlayer = useRef<HTMLAudioElement | null>(null);
+  const progressRef = useRef<number | null>(null);
   const [progress, setProgress] = useState(0);
 
   if (currentEpisode.value === null) {
@@ -53,7 +48,7 @@ export default function Player() {
   const { audio, episodeImage, title } = currentEpisode.value;
 
   function whilePlaying() {
-    if (audioPlayer.current.duration) {
+    if (audioPlayer.current?.duration) {
       const percentage =
         (audioPlayer.current.currentTime * 100) / audioPlayer.current.duration;
       setProgress(percentage);
@@ -62,11 +57,11 @@ export default function Player() {
   }
 
   useEffect(() => {
-    const newIndex = (songIndex % MAX_SONGS) + 1;
-    audioPlayer.current.src = audio.src;
-    audioPlayer.current.currentTime = 0;
-    audioPlayer.current.play();
-    setSongIndex(newIndex);
+    if (audioPlayer.current) {
+      audioPlayer.current.src = audio.src;
+      audioPlayer.current.currentTime = 0;
+      audioPlayer.current.play();
+    }
   }, [audio]);
 
   useEffect(() => {
@@ -75,7 +70,7 @@ export default function Player() {
       progressRef.current = requestAnimationFrame(whilePlaying);
     } else {
       audioPlayer.current?.pause();
-      cancelAnimationFrame(progressRef.current);
+      cancelAnimationFrame(progressRef.current as number);
     }
   }, [isPlaying.value]);
 

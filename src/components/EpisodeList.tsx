@@ -71,16 +71,16 @@ export default function EpisodeList({ episodes }: Props) {
   }
 
   useEffect(() => {
-    const debounce = (callback, wait) => {
-      let timeoutId = null;
-      return (...args) => {
+    const debounce = (callback: any, wait: number) => {
+      let timeoutId: number;
+      return (...args: any) => {
         window.clearTimeout(timeoutId);
         timeoutId = window.setTimeout(() => {
           callback.apply(null, args);
         }, wait);
       };
     };
-    const handleScroll = debounce((ev) => {
+    const handleScroll = debounce(() => {
       if (
         window.innerHeight + window.scrollY >=
         document.body.offsetHeight - 500

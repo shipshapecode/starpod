@@ -27,6 +27,7 @@ export interface Episode {
 }
 
 export async function getShowInfo() {
+  // @ts-expect-error
   return (await parseFeed.parse(
     import.meta.env.PUBLIC_PODCAST_RSS_FEED
   )) as Show;
@@ -53,6 +54,7 @@ export async function getAllEpisodes() {
     )
   });
 
+  // @ts-expect-error
   let feed = (await parseFeed.parse(
     import.meta.env.PUBLIC_PODCAST_RSS_FEED
   )) as Show;
