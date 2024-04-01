@@ -6,6 +6,7 @@ import FormattedDate from '../components/FormattedDate';
 
 type Props = {
   episodes: Array<Episode>;
+  url: URL;
 };
 
 const playIcon = (
@@ -46,7 +47,7 @@ function renderIcon(icon: JSX.Element) {
   return <span>{icon}</span>;
 }
 
-export default function EpisodeList({ episodes }: Props) {
+export default function EpisodeList({ episodes, url }: Props) {
   const [recentEpisodes, setRecentEpisodes] = useState(episodes);
   const [canLoadMore, setCanLoadMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,9 +58,7 @@ export default function EpisodeList({ episodes }: Props) {
     if (canLoadMore) {
       setIsLoading(true);
 
-      const episodeResponse = await fetch(
-        `http://localhost:4321/api/episodes/${page}.json`
-      );
+      const episodeResponse = await fetch(`${url}api/episodes/${page}.json`);
       const { canLoadMore, episodes } = await episodeResponse.json();
 
       setIsLoading(false);

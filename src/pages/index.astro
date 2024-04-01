@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import EpisodeList from '../components/EpisodeList';
-const episodes = await fetch('http://localhost:4321/api/episodes/1.json');
+const episodes = await fetch(`${Astro.url}api/episodes/1.json`);
 const page = await episodes.json();
 ---
 
@@ -11,6 +11,6 @@ const page = await episodes.json();
       Episodes
     </h1>
 
-    <EpisodeList client:visible episodes={page.episodes.data} />
+    <EpisodeList client:visible episodes={page.episodes.data} url={Astro.url} />
   </div>
 </Layout>
