@@ -2,11 +2,12 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "/Users/rwwagner90/shipshape/starpod",
+    "baseUrl": ".",
     "esModuleInterop": true,
     "strictNullChecks": true,
     "verbatimModuleSyntax": true,
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
-  }
+  },
+  "exclude": ["dist"]
 }

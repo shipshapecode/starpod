@@ -27,6 +27,7 @@ const { episode } = Astro.props;
 let Transcript;
 
 if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
+  // @ts-expect-error TODO: investigate this type error more
   Transcript = await getEntry('transcripts', episode.episodeNumber);
   if (Transcript) {
     const { Content } = await Transcript.render();
@@ -47,8 +48,12 @@ if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
 
     <p class="mb-5">{episode.description}</p>
 
-    <article class="prose prose-stone dark:prose-invert">
-      <Transcript />
-    </article>
+    {
+      Transcript && (
+        <article class="prose prose-stone dark:prose-invert">
+          <Transcript />
+        </article>
+      )
+    }
   </div>
 </Layout>
