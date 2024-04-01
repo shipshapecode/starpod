@@ -45,7 +45,7 @@ export default function Player() {
     return;
   }
 
-  const { audio, episodeImage, title } = currentEpisode.value;
+  const { audio, title } = currentEpisode.value;
 
   function whilePlaying() {
     if (audioPlayer.current?.duration) {

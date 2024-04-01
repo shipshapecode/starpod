@@ -97,7 +97,7 @@ export default function EpisodeList({ episodes, url }: Props) {
 
   return (
     <ul aria-label="EpisodeList">
-      {recentEpisodes.map((episode, index) => {
+      {recentEpisodes.map((episode) => {
         const isCurrentEpisode = episode.id == currentEpisode.value?.id;
 
         return (
