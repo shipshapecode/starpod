@@ -32,5 +32,5 @@ export default {
       }
     }
   },
-  plugins: [require('tailwindcss-oklch')()]
+  plugins: [require('tailwindcss-oklch')(), require('@tailwindcss/typography')]
 };

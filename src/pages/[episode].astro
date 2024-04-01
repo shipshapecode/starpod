@@ -1,4 +1,6 @@
 ---
+import { getEntry } from 'astro:content';
+
 import FormattedDate from '../components/FormattedDate';
 import Layout from '../layouts/Layout.astro';
 import { getAllEpisodes } from '../lib/rss';
@@ -21,6 +23,16 @@ export async function getStaticPaths() {
 }
 
 const { episode } = Astro.props;
+
+let Transcript;
+
+if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
+  Transcript = await getEntry('transcripts', episode.episodeNumber);
+  if (Transcript) {
+    const { Content } = await Transcript.render();
+    Transcript = Content;
+  }
+}
 ---
 
 <Layout title={episode.title}>
@@ -34,5 +46,9 @@ const { episode } = Astro.props;
     </h1>
 
     <p class="mb-5">{episode.description}</p>
+
+    <article class="prose prose-stone dark:prose-invert">
+      <Transcript />
+    </article>
   </div>
 </Layout>
