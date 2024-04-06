@@ -69,31 +69,31 @@ export default function EpisodeList({ episodes, url }: Props) {
     }
   }
 
-  useEffect(() => {
-    const debounce = (callback: any, wait: number) => {
-      let timeoutId: number;
-      return (...args: any) => {
-        window.clearTimeout(timeoutId);
-        timeoutId = window.setTimeout(() => {
-          callback.apply(null, args);
-        }, wait);
-      };
-    };
-    const handleScroll = debounce(() => {
-      if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 500
-      ) {
-        fetchMoreEpisodes();
-      }
-    }, 250);
+  // useEffect(() => {
+  //   const debounce = (callback: any, wait: number) => {
+  //     let timeoutId: number;
+  //     return (...args: any) => {
+  //       window.clearTimeout(timeoutId);
+  //       timeoutId = window.setTimeout(() => {
+  //         callback.apply(null, args);
+  //       }, wait);
+  //     };
+  //   };
+  //   const handleScroll = debounce(() => {
+  //     if (
+  //       window.innerHeight + window.scrollY >=
+  //       document.body.offsetHeight - 500
+  //     ) {
+  //       fetchMoreEpisodes();
+  //     }
+  //   }, 250);
 
-    window.addEventListener('scroll', handleScroll);
+  //   window.addEventListener('scroll', handleScroll);
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  });
+  //   return () => {
+  //     window.removeEventListener('scroll', handleScroll);
+  //   };
+  // });
 
   return (
     <ul aria-label="EpisodeList">
@@ -114,7 +114,6 @@ export default function EpisodeList({ episodes, url }: Props) {
 
               <div>
                 <FormattedDate date={new Date(episode.published)} />
-
                 <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
                   {episode.episodeNumber}: {episode.title}
                 </h2>
@@ -123,7 +122,7 @@ export default function EpisodeList({ episodes, url }: Props) {
 
                 <div class="flex items-center gap-6">
                   <button
-                    class="flex items-center rounded-full p-2 pr-4 font-bold shadow-md shadow-[#D9E4F0E5] bg-white text-light-text-heading dark:shadow-black dark:bg-dark-button dark:text-white"
+                    class="bg-gradient-light flex rounded-full p-[1px] font-bold shadow-md shadow-[#D9E4F0E5] dark:bg-gradient-dark dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]"
                     onClick={() => {
                       currentEpisode.value = {
                         ...episode
@@ -134,15 +133,19 @@ export default function EpisodeList({ episodes, url }: Props) {
                         : true;
                     }}
                   >
-                    <span class="mr-3 w-8 text-light-text-heading dark:text-white">
-                      {isCurrentEpisode && isPlaying.value
-                        ? renderIcon(pauseIcon)
-                        : renderIcon(playIcon)}
-                    </span>
-                    Play Episode
-                    <span class="sr-only">
-                      (press to{' '}
-                      {isCurrentEpisode && isPlaying.value ? 'pause)' : 'play)'}
+                    <span class="flex w-full items-center rounded-full p-2 pr-4 bg-white text-light-text-heading dark:bg-dark-button dark:text-white">
+                      <span class="mr-3 w-8 text-light-text-heading dark:text-white">
+                        {isCurrentEpisode && isPlaying.value
+                          ? renderIcon(pauseIcon)
+                          : renderIcon(playIcon)}
+                      </span>
+                      Play Episode
+                      <span class="sr-only">
+                        (press to{' '}
+                        {isCurrentEpisode && isPlaying.value
+                          ? 'pause)'
+                          : 'play)'}
+                      </span>
                     </span>
                   </button>
 
