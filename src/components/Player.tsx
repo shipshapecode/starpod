@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'preact/hooks';
 
 import { currentEpisode, isPlaying } from '../components/state';
+import MuteButton from './player/MuteButton';
 import PlayButton from './player/PlayButton';
 import ForwardButton from './player/ForwardButton';
 import RewindButton from './player/RewindButton';
@@ -73,7 +74,7 @@ export default function Player() {
 
           <div class="flex justify-between gap-6">
             <div class="flex items-center md:hidden">
-              {/* <MuteButton player={player} /> */}
+              <MuteButton />
             </div>
             <div class="flex flex-none items-center gap-4">
               <RewindButton />
@@ -88,7 +89,7 @@ export default function Player() {
                 {/* <PlaybackRateButton player={player} /> */}
               </div>
               <div class="hidden items-center md:flex">
-                {/* <MuteButton player={player} /> */}
+                <MuteButton />
               </div>
             </div>
           </div>
