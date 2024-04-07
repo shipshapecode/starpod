@@ -1,7 +1,33 @@
 export default {
+  /**
+   * A very short description of your show.
+   */
+  blurb: 'A whiskey fueled fireside chat with your favorite web developers.',
+  /**
+   * A somewhat longer description of what your show is about.
+   */
+  description:
+    'Veteran web developers RobbieTheWagner and Charles William Carpenter III host this informal, whiskey-fueled fireside chat with your favorite web devs. They discuss all things web development including JavaScript, TypeScript, EmberJS, React, Astro, SolidJS, CSS, HTML, Web3, and more. They take a unique approach and focus on getting to know the human side of developers and their hobbies outside of work, all while sampling a new whiskey that they rate on their unique tentacle scale.',
+  /**
+   * A list of hosts and their info
+   */
   hosts: [
-    { name: 'RobbieTheWagner', img: '/hosts/robbie.png' },
-    { name: 'Charles William Carpenter III', img: '/hosts/chuck.png' }
+    {
+      name: 'RobbieTheWagner',
+      bio: '',
+      img: '/hosts/robbie.png',
+      github: 'https://github.com/RobbieTheWagner',
+      twitter: 'https://twitter.com/RobbieTheWagner',
+      website: 'https://robbiethewagner.dev'
+    },
+    {
+      name: 'Charles William Carpenter III',
+      bio: '',
+      img: '/hosts/chuck.png',
+      github: '',
+      twitter: '',
+      website: ''
+    }
   ],
   platforms: {
     apple:

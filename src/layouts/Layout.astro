@@ -1,6 +1,7 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
 
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Dots from '../components/Dots.astro';
 import Hosts from '../components/Hosts.astro';
 import InfoCard from '../components/InfoCard.astro';
@@ -8,6 +9,7 @@ import Platforms from '../components/Platforms.astro';
 import Player from '../components/Player';
 
 import { getShowInfo } from '../lib/rss';
+import starpodConfig from 'starpod.config';
 
 const show = await getShowInfo();
 
@@ -64,7 +66,7 @@ const { title } = Astro.props;
           </p>
 
           <p class="mt-2 text-center text-lg lg:text-left">
-            A whiskey fueled fireside chat with your favorite web developers.
+            {starpodConfig.blurb}
           </p>
 
           <div class="hidden lg:block">
@@ -90,6 +92,17 @@ const { title } = Astro.props;
         </div>
 
         <Dots />
+
+        <div
+          class:list={[
+            'relative z-20 mb-12 border-b pb-6 lg:mb-16 lg:pb-10 dark:border-dark-border',
+            Astro.url.pathname === '/' && 'hidden'
+          ]}
+        >
+          <div class="ml-8 lg:ml-18">
+            <Breadcrumbs title={title} />
+          </div>
+        </div>
 
         <slot />
       </div>
