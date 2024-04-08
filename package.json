@@ -10,12 +10,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.5.9",
-    "@astrojs/preact": "^3.1.1",
+    "@astrojs/check": "^0.5.10",
+    "@astrojs/preact": "^3.1.2",
     "@astrojs/tailwind": "^5.1.0",
     "@preact/signals": "^1.2.1",
-    "astro": "^4.5.6",
-    "preact": "^10.20.0",
+    "astro": "^4.5.16",
+    "preact": "^10.20.1",
     "rss-to-json": "^2.1.1",
     "tailwindcss": "^3.4.1",
     "tailwindcss-oklch": "^0.0.1",
@@ -26,7 +26,7 @@
     "@tailwindcss/typography": "^0.5.12",
     "prettier": "^3.2.5",
     "prettier-plugin-astro": "^0.13.0",
-    "prettier-plugin-tailwindcss": "^0.5.12",
+    "prettier-plugin-tailwindcss": "^0.5.13",
     "sharp": "^0.33.3"
   }
 }
