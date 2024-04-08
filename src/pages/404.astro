@@ -1,0 +1,12 @@
+---
+import { Image } from 'astro:assets';
+
+import Layout from '../layouts/Layout.astro';
+import FourZeroFour from '../svgs/404.svg';
+---
+
+<Layout title="404 - Not found">
+  <div class="relative z-10 flex justify-center px-8 lg:px-18">
+    <Image src={FourZeroFour} alt="" />
+  </div>
+</Layout>
