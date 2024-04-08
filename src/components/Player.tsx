@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'preact/hooks';
 
-import { currentEpisode, isPlaying } from '../components/state';
+import { currentEpisode, isMuted, isPlaying } from '../components/state';
 import MuteButton from './player/MuteButton';
 import PlayButton from './player/PlayButton';
 import ForwardButton from './player/ForwardButton';
@@ -95,7 +95,7 @@ export default function Player() {
           </div>
 
           <div class="container mx-auto flex max-w-screen-lg items-center gap-5 px-3 py-2 sm:px-6 sm:py-4">
-            <audio ref={audioPlayer} />
+            <audio muted={isMuted} ref={audioPlayer} />
           </div>
         </div>
       </div>
