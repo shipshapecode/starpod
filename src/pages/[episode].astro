@@ -46,7 +46,10 @@ if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
       {episode.episodeNumber}: {episode.title}
     </h1>
 
-    <p class="mb-5">{episode.description}</p>
+    <p
+      class="prose prose-stone mb-5 dark:prose-invert"
+      set:html={episode.content}
+    />
 
     {
       Transcript && (

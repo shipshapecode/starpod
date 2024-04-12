@@ -1,3 +1,4 @@
+import { htmlToText } from 'html-to-text';
 import parseFeed from 'rss-to-json';
 import { array, number, object, optional, parse, string } from 'valibot';
 
@@ -78,7 +79,7 @@ export async function getAllEpisodes() {
           id,
           title: `${title}`,
           content: description,
-          description: truncate(description, 260),
+          description: truncate(htmlToText(description), 260),
           episodeImage: itunes_image?.href,
           episodeNumber,
           episodeSlug,
