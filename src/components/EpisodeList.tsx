@@ -69,98 +69,84 @@ export default function EpisodeList({ episodes, url }: Props) {
     }
   }
 
-  // useEffect(() => {
-  //   const debounce = (callback: any, wait: number) => {
-  //     let timeoutId: number;
-  //     return (...args: any) => {
-  //       window.clearTimeout(timeoutId);
-  //       timeoutId = window.setTimeout(() => {
-  //         callback.apply(null, args);
-  //       }, wait);
-  //     };
-  //   };
-  //   const handleScroll = debounce(() => {
-  //     if (
-  //       window.innerHeight + window.scrollY >=
-  //       document.body.offsetHeight - 500
-  //     ) {
-  //       fetchMoreEpisodes();
-  //     }
-  //   }, 250);
-
-  //   window.addEventListener('scroll', handleScroll);
-
-  //   return () => {
-  //     window.removeEventListener('scroll', handleScroll);
-  //   };
-  // });
-
   return (
-    <ul aria-label="EpisodeList">
-      {recentEpisodes.map((episode) => {
-        const isCurrentEpisode = episode.id == currentEpisode.value?.id;
+    <>
+      <ul aria-label="EpisodeList">
+        {recentEpisodes.map((episode) => {
+          const isCurrentEpisode = episode.id == currentEpisode.value?.id;
 
-        return (
-          <li class="border-b dark:border-dark-border">
-            <div class="flex w-full py-12" aria-current={isCurrentEpisode}>
-              <img
-                alt={`${episode.title} - episode art`}
-                aria-hidden="true"
-                class="mr-6 block h-20 w-20 rounded-md"
-                height={80}
-                src={episode.episodeImage ?? '/images/www.png'}
-                width={80}
-              />
+          return (
+            <li class="border-b dark:border-dark-border">
+              <div class="flex w-full py-12" aria-current={isCurrentEpisode}>
+                <img
+                  alt={`${episode.title} - episode art`}
+                  aria-hidden="true"
+                  class="mr-6 block h-20 w-20 rounded-md"
+                  height={80}
+                  src={episode.episodeImage ?? '/images/www.png'}
+                  width={80}
+                />
 
-              <div>
-                <FormattedDate date={new Date(episode.published)} />
-                <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
-                  {episode.episodeNumber}: {episode.title}
-                </h2>
+                <div>
+                  <FormattedDate date={new Date(episode.published)} />
+                  <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
+                    {episode.episodeNumber}: {episode.title}
+                  </h2>
 
-                <p class="mb-5">{episode.description}</p>
+                  <p class="mb-5">{episode.description}</p>
 
-                <div class="flex items-center gap-6">
-                  <button
-                    class="bg-gradient-light flex rounded-full p-[1px] font-bold shadow-md shadow-[#D9E4F0E5] dark:bg-gradient-dark dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]"
-                    onClick={() => {
-                      currentEpisode.value = {
-                        ...episode
-                      };
+                  <div class="flex items-center gap-6">
+                    <button
+                      class="bg-gradient-light flex rounded-full p-[1px] font-bold shadow-md shadow-[#D9E4F0E5] dark:bg-gradient-dark dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]"
+                      onClick={() => {
+                        currentEpisode.value = {
+                          ...episode
+                        };
 
-                      isPlaying.value = isCurrentEpisode
-                        ? !isPlaying.value
-                        : true;
-                    }}
-                  >
-                    <span class="flex w-full items-center rounded-full p-2 pr-4 bg-white text-light-text-heading dark:bg-dark-button dark:text-white">
-                      <span class="mr-3 w-8 text-light-text-heading dark:text-white">
-                        {isCurrentEpisode && isPlaying.value
-                          ? renderIcon(pauseIcon)
-                          : renderIcon(playIcon)}
+                        isPlaying.value = isCurrentEpisode
+                          ? !isPlaying.value
+                          : true;
+                      }}
+                    >
+                      <span class="flex w-full items-center rounded-full p-2 pr-4 bg-white text-light-text-heading dark:bg-dark-button dark:text-white">
+                        <span class="mr-3 w-8 text-light-text-heading dark:text-white">
+                          {isCurrentEpisode && isPlaying.value
+                            ? renderIcon(pauseIcon)
+                            : renderIcon(playIcon)}
+                        </span>
+                        Play Episode
+                        <span class="sr-only">
+                          (press to{' '}
+                          {isCurrentEpisode && isPlaying.value
+                            ? 'pause)'
+                            : 'play)'}
+                        </span>
                       </span>
-                      Play Episode
-                      <span class="sr-only">
-                        (press to{' '}
-                        {isCurrentEpisode && isPlaying.value
-                          ? 'pause)'
-                          : 'play)'}
-                      </span>
-                    </span>
-                  </button>
+                    </button>
 
-                  <a
-                    class="font-bold text-light-text-heading dark:text-white"
-                    href={`/${episode.episodeSlug}`}
-                  >
-                    Show notes
-                  </a>
+                    <a
+                      class="font-bold text-light-text-heading dark:text-white"
+                      href={`/${episode.episodeSlug}`}
+                    >
+                      Show notes
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+            </li>
+          );
+        })}
+      </ul>
+      <div class="mb-16 mt-8 flex justify-center">
+        <button
+          class="bg-gradient-light flex rounded-full p-[1px] font-bold shadow-md shadow-[#D9E4F0E5] dark:bg-gradient-dark dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]"
+          onClick={fetchMoreEpisodes}
+        >
+          <span class="rounded-full p-4 text-center bg-white text-light-text-heading dark:bg-dark-button dark:text-white">
+            More episodes
+          </span>
+        </button>
+      </div>
+    </>
   );
 }
