@@ -142,7 +142,7 @@ export default function EpisodeList({ episodes, url }: Props) {
           class="bg-gradient-light flex rounded-full p-[1px] font-bold shadow-md shadow-[#D9E4F0E5] dark:bg-gradient-dark dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]"
           onClick={fetchMoreEpisodes}
         >
-          <span class="rounded-full p-4 text-center bg-white text-light-text-heading dark:bg-dark-button dark:text-white">
+          <span class="rounded-full px-8 py-4 text-center bg-white text-light-text-heading dark:bg-dark-button dark:text-white">
             More episodes
           </span>
         </button>
