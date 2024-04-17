@@ -1,12 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import EpisodeList from '../components/EpisodeList';
-import { getAllEpisodes } from '../lib/rss';
+import { getAllEpisodes, getShowInfo } from '../lib/rss';
+import starpodConfig from 'starpod.config';
 const allEpisodes = await getAllEpisodes();
 const episodes = allEpisodes.slice(0, 15);
+const show = await getShowInfo();
+const title = `${show.title} - ${starpodConfig.blurb}`;
 ---
 
-<Layout title="Starpod">
+<Layout title={title}>
   <div class="relative z-10 px-8 lg:px-18">
     <h1 class="text-4xl font-bold text-light-text-heading dark:text-white">
       Episodes

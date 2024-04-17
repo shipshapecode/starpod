@@ -14,10 +14,14 @@ import starpodConfig from 'starpod.config';
 const show = await getShowInfo();
 
 export interface Props {
+  description?: string;
+  imageUrl?: string;
   title: string;
 }
 
-const { title } = Astro.props;
+const { imageUrl, title } = Astro.props;
+
+const description = Astro.props.description ?? starpodConfig.description;
 ---
 
 <!doctype html>
@@ -26,12 +30,23 @@ const { title } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <meta
-      name="description"
-      content="This site is a demo of an Astro SPA using Astro 3 with the experimental support for the View Transitions API and persistent islands."
-    />
 
+    <!-- Title -->
     <title>{title}</title>
+    <meta content={title} name="og:title" />
+    <meta content={title} name="twitter:title" />
+
+    <!-- Description -->
+    <meta content={description} name="description" />
+    <meta content={description} name="og:description" />
+    <meta content={description} name="twitter:description" />
+
+    <!-- Image -->
+    <meta content={imageUrl ?? show.image} name="og:image" />
+    <meta content="summary" name="twitter:card" />
+    <meta content={imageUrl ?? show.image} name="twitter:image:src" />
+
+    <meta property="og:site_name" content={show.title} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

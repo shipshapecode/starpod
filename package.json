@@ -7,7 +7,8 @@
     "start": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test:e2e": "pnpm exec playwright test"
   },
   "dependencies": {
     "@astrojs/check": "^0.5.10",
@@ -23,6 +24,7 @@
     "valibot": "^0.30.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.41.2",
     "@tailwindcss/typography": "^0.5.12",
     "@types/html-to-text": "^9.0.4",
     "html-to-text": "^9.0.5",

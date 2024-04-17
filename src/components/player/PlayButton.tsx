@@ -2,7 +2,6 @@ import { isPlaying } from '../state';
 
 const PlayIcon = (
   <svg
-    class="h-14 w-14"
     fill="currentColor"
     viewBox="0 0 20 20"
     xmlns="http://www.w3.org/2000/svg"
@@ -22,7 +21,6 @@ const PauseIcon = (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="currentColor"
-    class="h-14 w-14"
     aria-hidden="true"
     focusable="false"
   >
@@ -37,7 +35,7 @@ const PauseIcon = (
 export default function PlayButton() {
   return (
     <button
-      class="mr-3 w-8 text-light-text-heading dark:text-white"
+      class="h-14 w-14 text-light-text-heading dark:text-white"
       type="button"
       onClick={() => (isPlaying.value = !isPlaying.value)}
     >

@@ -3,7 +3,9 @@ import { getEntry } from 'astro:content';
 
 import FormattedDate from '../components/FormattedDate';
 import Layout from '../layouts/Layout.astro';
-import { getAllEpisodes } from '../lib/rss';
+import { getAllEpisodes, getShowInfo } from '../lib/rss';
+
+const show = await getShowInfo();
 
 export async function getStaticPaths() {
   const allEpisodes = await getAllEpisodes();
@@ -34,9 +36,15 @@ if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
     Transcript = Content;
   }
 }
+
+const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumber}`;
 ---
 
-<Layout title={episode.title}>
+<Layout
+  description={episode.description}
+  imageUrl={episode.episodeImage}
+  title={title}
+>
   <div class="relative z-10 px-8 lg:px-18">
     <FormattedDate date={new Date(episode.published)} />
 

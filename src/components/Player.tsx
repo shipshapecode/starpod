@@ -59,7 +59,7 @@ export default function Player() {
         role="region"
         style={{ viewTransitionName: 'player' }}
       >
-        <div class="hidden md:block">
+        <div class="hidden self-start md:block">
           <PlayButton />
         </div>
 
@@ -94,7 +94,7 @@ export default function Player() {
             </div>
           </div>
 
-          <div class="container mx-auto flex max-w-screen-lg items-center gap-5 px-3 py-2 sm:px-6 sm:py-4">
+          <div class="hidden">
             <audio muted={isMuted} ref={audioPlayer} />
           </div>
         </div>
