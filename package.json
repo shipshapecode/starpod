@@ -27,6 +27,7 @@
     "@playwright/test": "^1.41.2",
     "@tailwindcss/typography": "^0.5.12",
     "@types/html-to-text": "^9.0.4",
+    "@types/node": "^20.12.7",
     "html-to-text": "^9.0.5",
     "prettier": "^3.2.5",
     "prettier-plugin-astro": "^0.13.0",
