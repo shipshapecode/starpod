@@ -77,11 +77,11 @@ export default function Player() {
               <MuteButton />
             </div>
             <div class="flex flex-none items-center gap-4">
-              <RewindButton />
+              <RewindButton audioPlayer={audioPlayer} />
               <div class="md:hidden">
                 <PlayButton />
               </div>
-              <ForwardButton />
+              <ForwardButton audioPlayer={audioPlayer} />
             </div>
             <Slider audioPlayer={audioPlayer} progress={progress} />
             <div class="flex items-center gap-4">
