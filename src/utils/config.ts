@@ -27,17 +27,20 @@ export type Host = {
 
 export type StarpodConfig = {
   /**
-   * A very short description of your show
+   * A very short tagline for your show. Generally, no more than one sentence. Less is more here.
    */
   blurb: string;
   /**
-   * A somewhat longer description of what your show is about
+   * A somewhat longer description of what your show is about. This should still ideally be fairly short, and should usually be 2-4 sentences.
    */
   description: string;
   /**
-   * A list of hosts and their info
+   * A list of your show's hosts and their info.
    */
   hosts: Array<Host>;
+  /**
+   * Links to the platforms your show is available on.
+   */
   platforms: {
     apple?: string;
     overcast?: string;
@@ -45,7 +48,7 @@ export type StarpodConfig = {
     youtube?: string;
   };
   /**
-   * The url to the RSS feed where your podcast is hosted
+   * The url to the RSS feed where your podcast is hosted.
    */
   rssFeed: string;
 };
