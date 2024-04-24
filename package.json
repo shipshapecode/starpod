@@ -2,6 +2,11 @@
   "name": "starpod",
   "type": "module",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shipshapecode/starpod.git"
+  },
+  "license": "MIT",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -18,9 +23,6 @@
     "astro": "^4.5.16",
     "preact": "^10.20.1",
     "rss-to-json": "^2.1.1",
-    "tailwindcss": "^3.4.1",
-    "tailwindcss-oklch": "^0.0.1",
-    "typescript": "^5.4.2",
     "valibot": "^0.30.0"
   },
   "devDependencies": {
@@ -32,6 +34,12 @@
     "prettier": "^3.2.5",
     "prettier-plugin-astro": "^0.13.0",
     "prettier-plugin-tailwindcss": "^0.5.13",
-    "sharp": "^0.33.3"
+    "sharp": "^0.33.3",
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-oklch": "^0.0.1",
+    "typescript": "^5.4.2"
+  },
+  "engines": {
+    "node": ">= 20"
   }
 }
