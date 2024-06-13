@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import starpodConfig from '../../starpod.config';
+import LargePlatforms from '../components/LargePlatforms.astro';
 ---
 
 <Layout title="About">
@@ -12,5 +13,7 @@ import starpodConfig from '../../starpod.config';
     </h1>
 
     <p class="mb-5">{starpodConfig.description}</p>
+
+    <LargePlatforms />
   </div>
 </Layout>

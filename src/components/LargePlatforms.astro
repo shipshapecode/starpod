@@ -1,0 +1,78 @@
+---
+import { Image } from 'astro:assets';
+
+import starpodConfig from '../../starpod.config';
+import AppleIcon from '../svgs/apple.svg';
+import OvercastIcon from '../svgs/overcast.svg';
+import SpotifyIcon from '../svgs/spotify.svg';
+import YouTubeIcon from '../svgs/youtube.svg';
+
+const { platforms, rssFeed } = starpodConfig;
+---
+
+<div
+  class="mt-7 grid grid-cols-2 gap-6 lg:mt-11 lg:grid-cols-3 lg:justify-start"
+>
+  {
+    platforms?.apple && (
+      <a
+        class="border-b pb-4 font-bold text-light-text-heading dark:border-dark-border dark:text-white"
+        href={platforms.apple}
+      >
+        <span class="flex items-center">
+          Apple Podcasts
+          <Image class="ml-3 h-4 w-4" src={AppleIcon} alt="" />
+        </span>
+      </a>
+    )
+  }
+  {
+    platforms?.spotify && (
+      <a
+        class="border-b pb-4 font-bold text-light-text-heading dark:border-dark-border dark:text-white"
+        href={platforms.spotify}
+      >
+        <span class="flex items-center">
+          Spotify
+          <Image class="ml-3 h-4 w-4" src={SpotifyIcon} alt="" />
+        </span>
+      </a>
+    )
+  }
+  {
+    platforms?.overcast && (
+      <a
+        class="border-b pb-4 font-bold text-light-text-heading dark:border-dark-border dark:text-white"
+        href={platforms.overcast}
+      >
+        <span class="flex items-center">
+          Overcast
+          <Image class="ml-3 h-4 w-4" src={OvercastIcon} alt="" />
+        </span>
+      </a>
+    )
+  }
+  {
+    platforms?.youtube && (
+      <a
+        class="border-b pb-4 font-bold text-light-text-heading dark:border-dark-border dark:text-white"
+        href={platforms.youtube}
+      >
+        <span class="flex items-center">
+          YouTube
+          <Image class="ml-3 h-4 w-4" src={YouTubeIcon} alt="" />
+        </span>
+      </a>
+    )
+  }
+  {
+    rssFeed && (
+      <a
+        class="border-b pb-4 font-bold text-light-text-heading dark:border-dark-border dark:text-white"
+        href={rssFeed}
+      >
+        <span class="flex items-center">RSS Feed</span>
+      </a>
+    )
+  }
+</div>
