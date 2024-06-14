@@ -1,3 +1,3 @@
 .animated-bottom-border {
-  @apply border-b after:block after:h-[1px] after:w-0 after:bg-gradient-to-r after:from-cyan-500 after:to-blue-500 after:transition-all hover:after:w-full dark:border-dark-border;
+  @apply border-b after:block after:h-[1px] after:w-0 after:bg-gradient-to-r after:from-[#C6B2FF] after:to-[#8D67FF] after:transition-all hover:after:w-full dark:border-dark-border dark:after:from-[#43C9F5] dark:after:to-[#B4EDFF];
 }

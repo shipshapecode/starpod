@@ -25,6 +25,7 @@ export default defineStarpodConfig({
     apple:
       'https://podcasts.apple.com/us/podcast/whiskey-web-and-whatnot/id1552776603?uo=4?mt=2&ls=1',
     overcast: 'https://overcast.fm/itunes1552776603',
+    pocketCasts: 'https://pca.st/bezzctzj',
     spotify: 'https://open.spotify.com/show/19jiuHAqzeKnkleQUpZxDf',
     youtube: 'https://www.youtube.com/@WhiskeyWebAndWhatnot/'
   },

@@ -1,11 +1,9 @@
 ---
-import { Image } from 'astro:assets';
-
 import starpodConfig from '../../starpod.config';
-import AppleIcon from '../svgs/apple.svg';
-import OvercastIcon from '../svgs/overcast.svg';
-import SpotifyIcon from '../svgs/spotify.svg';
-import YouTubeIcon from '../svgs/youtube.svg';
+import AppleIcon from '../svgs/apple.svg?raw';
+import OvercastIcon from '../svgs/overcast.svg?raw';
+import SpotifyIcon from '../svgs/spotify.svg?raw';
+import YouTubeIcon from '../svgs/youtube.svg?raw';
 
 const { platforms, rssFeed } = starpodConfig;
 ---
@@ -21,7 +19,9 @@ const { platforms, rssFeed } = starpodConfig;
       >
         <span class="flex items-center">
           Apple Podcasts
-          <Image class="ml-3 h-4 w-4" src={AppleIcon} alt="" />
+          <span class="ml-3 flex h-4 w-4 items-center">
+            <Fragment set:html={AppleIcon} />
+          </span>
         </span>
       </a>
     )
@@ -34,7 +34,9 @@ const { platforms, rssFeed } = starpodConfig;
       >
         <span class="flex items-center">
           Spotify
-          <Image class="ml-3 h-4 w-4" src={SpotifyIcon} alt="" />
+          <span class="ml-3 flex h-4 w-4 items-center">
+            <Fragment set:html={SpotifyIcon} />
+          </span>
         </span>
       </a>
     )
@@ -47,7 +49,9 @@ const { platforms, rssFeed } = starpodConfig;
       >
         <span class="flex items-center">
           Overcast
-          <Image class="ml-3 h-4 w-4" src={OvercastIcon} alt="" />
+          <span class="ml-3 flex h-4 w-4 items-center">
+            <Fragment set:html={OvercastIcon} />
+          </span>
         </span>
       </a>
     )
@@ -60,7 +64,9 @@ const { platforms, rssFeed } = starpodConfig;
       >
         <span class="flex items-center">
           YouTube
-          <Image class="ml-3 h-4 w-4" src={YouTubeIcon} alt="" />
+          <span class="ml-3 flex h-4 w-4 items-center">
+            <Fragment set:html={YouTubeIcon} />
+          </span>
         </span>
       </a>
     )

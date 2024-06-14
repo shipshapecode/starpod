@@ -44,6 +44,7 @@ export type StarpodConfig = {
   platforms: {
     apple?: string;
     overcast?: string;
+    pocketCasts?: string;
     spotify?: string;
     youtube?: string;
   };

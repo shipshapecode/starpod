@@ -1,10 +1,9 @@
 ---
-import { Image } from 'astro:assets';
 import starpodConfig from '../../starpod.config';
-import AppleIcon from '../svgs/apple.svg';
-import OvercastIcon from '../svgs/overcast.svg';
-import SpotifyIcon from '../svgs/spotify.svg';
-import YouTubeIcon from '../svgs/youtube.svg';
+import AppleIcon from '../svgs/apple.svg?raw';
+import OvercastIcon from '../svgs/overcast.svg?raw';
+import SpotifyIcon from '../svgs/spotify.svg?raw';
+import YouTubeIcon from '../svgs/youtube.svg?raw';
 
 const { platforms } = starpodConfig;
 ---
@@ -17,28 +16,28 @@ const { platforms } = starpodConfig;
   {
     platforms?.spotify && (
       <a href={platforms.spotify}>
-        <Image src={SpotifyIcon} alt="" />
+        <Fragment set:html={SpotifyIcon} />
       </a>
     )
   }
   {
     platforms?.apple && (
       <a href={platforms.apple}>
-        <Image src={AppleIcon} alt="" />
+        <Fragment set:html={AppleIcon} />
       </a>
     )
   }
   {
     platforms?.overcast && (
       <a href={platforms.overcast}>
-        <Image src={OvercastIcon} alt="" />
+        <Fragment set:html={OvercastIcon} />
       </a>
     )
   }
   {
     platforms?.youtube && (
       <a href={platforms.youtube}>
-        <Image src={YouTubeIcon} alt="" />
+        <Fragment set:html={YouTubeIcon} />
       </a>
     )
   }
