@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import starpodConfig from '../../starpod.config';
 import LargePlatforms from '../components/LargePlatforms.astro';
+
+const { hosts } = starpodConfig;
 ---
 
 <Layout title="About">
@@ -15,5 +17,30 @@ import LargePlatforms from '../components/LargePlatforms.astro';
     <p class="mb-5">{starpodConfig.description}</p>
 
     <LargePlatforms />
+
+    <h2 class="section-heading-underlined mt-16 lg:mt-24">Meet the hosts</h2>
+
+    <div class="mt-9 lg:mt-12">
+      {
+        hosts.map((host) => (
+          <div class="mb-4 flex flex-col lg:flex-row">
+            <img
+              class="mb-4 mr-6 h-12 w-12 lg:h-20 lg:w-20"
+              height={80}
+              src={host.img}
+              width={80}
+            />
+
+            <div>
+              <h3 class="text-lg font-bold text-light-text-heading lg:text-2xl dark:text-white">
+                {host.name}
+              </h3>
+
+              <p class="mt-2 lg:mt-3">{host.bio}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
   </div>
 </Layout>

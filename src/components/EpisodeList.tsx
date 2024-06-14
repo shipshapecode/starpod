@@ -89,6 +89,7 @@ export default function EpisodeList({ episodes, url }: Props) {
 
                 <div>
                   <FormattedDate date={new Date(episode.published)} />
+
                   <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
                     {episode.episodeNumber}: {episode.title}
                   </h2>

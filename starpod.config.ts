@@ -7,7 +7,7 @@ export default defineStarpodConfig({
   hosts: [
     {
       name: 'RobbieTheWagner',
-      bio: '',
+      bio: 'Huge Ember and Tailwind fanboy. I work at Amazon btw.',
       img: '/hosts/robbie.png',
       github: 'https://github.com/RobbieTheWagner',
       twitter: 'https://twitter.com/RobbieTheWagner',
@@ -15,7 +15,7 @@ export default defineStarpodConfig({
     },
     {
       name: 'Charles William Carpenter III',
-      bio: '',
+      bio: 'Third of his name, user of gifs, hater of ESM.',
       img: '/hosts/chuck.png',
       github: 'https://github.com/chuckcarpenter',
       twitter: 'https://twitter.com/CharlesWthe3rd'
