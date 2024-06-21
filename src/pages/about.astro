@@ -37,6 +37,35 @@ const { hosts } = starpodConfig;
               </h3>
 
               <p class="mt-2 lg:mt-3">{host.bio}</p>
+
+              <div class="mt-6 flex gap-4">
+                {host?.twitter && (
+                  <a
+                    class="animated-bottom-border font-bold text-light-text-heading after:mt-1 dark:text-white"
+                    href={host.twitter}
+                  >
+                    Twitter
+                  </a>
+                )}
+
+                {host?.github && (
+                  <a
+                    class="animated-bottom-border font-bold text-light-text-heading after:mt-1 dark:text-white"
+                    href={host.github}
+                  >
+                    GitHub
+                  </a>
+                )}
+
+                {host?.website && (
+                  <a
+                    class="animated-bottom-border font-bold text-light-text-heading after:mt-1 dark:text-white"
+                    href={host.website}
+                  >
+                    Website
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         ))
