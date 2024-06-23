@@ -9,7 +9,12 @@ const { hosts } = starpodConfig;
 {
   hosts.map((host) => (
     <div class="mb-4 flex items-center">
-      <img class="mr-4 h-12 w-12" height={48} src={host.img} width={48} />
+      <img
+        class="mr-4 h-12 w-12 rounded-lg"
+        height={48}
+        src={host.img}
+        width={48}
+      />
       {host.name}
     </div>
   ))
