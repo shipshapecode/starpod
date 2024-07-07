@@ -2,45 +2,49 @@ import { isPlaying } from '../state';
 
 const PlayIcon = (
   <svg
-    fill="currentColor"
-    viewBox="0 0 20 20"
+    class="ml-1 h-4 w-4"
+    fill="none"
+    height="14"
+    viewBox="0 0 13 14"
+    width="13"
     xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-    focusable="false"
   >
     <path
-      fill-rule="evenodd"
-      d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
       clip-rule="evenodd"
+      d="m.367882.443158c0-.065142.07026-.106046.126866-.073861l11.541952 6.562623c.0573.03256.0573.11515 0 .14772l-11.541949 6.56266c-.056606.0321-.126865-.0088-.126865-.0739z"
+      fill="currentColor"
+      fill-rule="evenodd"
     />
   </svg>
 );
 
 const PauseIcon = (
   <svg
+    class="h-4 w-4"
+    fill="none"
+    height="18"
+    viewBox="0 0 14 18"
+    width="14"
     xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden="true"
-    focusable="false"
   >
-    <path
-      fill-rule="evenodd"
-      d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zM9 8.25a.75.75 0 00-.75.75v6c0 .414.336.75.75.75h.75a.75.75 0 00.75-.75V9a.75.75 0 00-.75-.75H9zm5.25 0a.75.75 0 00-.75.75v6c0 .414.336.75.75.75H15a.75.75 0 00.75-.75V9a.75.75 0 00-.75-.75h-.75z"
-      clip-rule="evenodd"
-    />
+    <g fill="currentColor">
+      <rect height="16.8" rx="1.07692" width="5.6" y=".799805" />
+      <rect height="16.8" rx="1.07692" width="5.6" x="8.40039" y=".799805" />
+    </g>
   </svg>
 );
 
 export default function PlayButton() {
   return (
-    <button
-      class="h-14 w-14 text-light-text-heading dark:text-white"
-      type="button"
-      onClick={() => (isPlaying.value = !isPlaying.value)}
-    >
-      {isPlaying.value ? PauseIcon : PlayIcon}
-      <span class="sr-only">{isPlaying.value ? 'Pause' : 'Play'}</span>
-    </button>
+    <div class="flex h-16 w-16 items-center justify-center">
+      <button
+        class="flex h-14 w-14 items-center justify-center rounded-full transition-all duration-500 bg-light-text-heading text-white hover:h-16 hover:w-16 hover:bg-gradient-to-r hover:from-[#D8CCFF] hover:to-[#8A63FF] dark:bg-white dark:text-[#24263D] dark:hover:from-[#42C8F3] dark:hover:to-[#B6EDFF]"
+        type="button"
+        onClick={() => (isPlaying.value = !isPlaying.value)}
+      >
+        {isPlaying.value ? PauseIcon : PlayIcon}
+        <span class="sr-only">{isPlaying.value ? 'Pause' : 'Play'}</span>
+      </button>
+    </div>
   );
 }
