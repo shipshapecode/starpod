@@ -7,30 +7,103 @@ type Props = {
 function RewindIcon() {
   return (
     <svg
-      class="h-6 w-6 stroke-slate-500 group-hover:stroke-slate-700"
-      fill="none"
+      width="24"
       height="24"
       viewBox="0 0 24 24"
-      width="24"
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="m9 10v5"
+        class="group-hover:stroke-[url(#paint0_linear_201_22852)] dark:group-hover:stroke-[url(#paint0_linear_201_20128)]"
+        d="M9 10L9 15"
         stroke="#9da3af"
+        stroke-width="1.5"
         stroke-linecap="square"
-        stroke-width="1.5"
       />
       <path
-        d="m13.75 10h-.5c-.6904 0-1.25.5596-1.25 1.25v2.5c0 .6904.5596 1.25 1.25 1.25h.5c.6904 0 1.25-.5596 1.25-1.25v-2.5c0-.6904-.5596-1.25-1.25-1.25z"
+        class="group-hover:stroke-[url(#paint1_linear_201_22852)] dark:group-hover:stroke-[url(#paint1_linear_201_20128)]"
+        d="M13.75 10H13.25C12.5596 10 12 10.5596 12 11.25V13.75C12 14.4404 12.5596 15 13.25 15H13.75C14.4404 15 15 14.4404 15 13.75V11.25C15 10.5596 14.4404 10 13.75 10Z"
         stroke="#9da3af"
         stroke-width="1.5"
       />
       <path
-        clip-rule="evenodd"
-        d="m20.75 12c0-4.83249-3.9175-8.75-8.75-8.75-2.2529 0-4.30634.85071-5.85784 2.25h2.35784v1.5h-4.75v-4.75h1.5v2.03624c1.80264-1.57851 4.16484-2.53624 6.75-2.53624 5.6609 0 10.25 4.58908 10.25 10.25 0 5.6609-4.5891 10.25-10.25 10.25-5.66092 0-10.25-4.5891-10.25-10.25 0-1.2606.2279-2.4695.64527-3.58671l1.3942.5544c-.34874.9439-.53947 1.96511-.53947 3.03231 0 4.8325 3.91751 8.75 8.75 8.75 4.8325 0 8.75-3.9175 8.75-8.75z"
+        class="group-hover:fill-[url(#paint2_linear_201_22852)] dark:group-hover:fill-[url(#paint2_linear_201_20128)]"
         fill="#9da3af"
         fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M20.75 12C20.75 7.16751 16.8325 3.25 12 3.25C9.7471 3.25 7.69366 4.10071 6.14216 5.5H8.5V7H3.75V2.25H5.25V4.28624C7.05264 2.70773 9.41484 1.75 12 1.75C17.6609 1.75 22.25 6.33908 22.25 12C22.25 17.6609 17.6609 22.25 12 22.25C6.33908 22.25 1.75 17.6609 1.75 12C1.75 10.7394 1.9779 9.5305 2.39527 8.41329L3.78947 8.96769C3.44073 9.91159 3.25 10.9328 3.25 12C3.25 16.8325 7.16751 20.75 12 20.75C16.8325 20.75 20.75 16.8325 20.75 12Z"
       />
+      <defs>
+        {/* Light */}
+        <linearGradient
+          id="paint0_linear_201_22852"
+          x1="9.5"
+          y1="10"
+          x2="9.5"
+          y2="15"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#BBA4FF" />
+          <stop offset="1" stop-color="#9D7BFF" />
+        </linearGradient>
+        <linearGradient
+          id="paint1_linear_201_22852"
+          x1="13.5"
+          y1="10"
+          x2="13.5"
+          y2="15"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#BBA4FF" />
+          <stop offset="1" stop-color="#9D7BFF" />
+        </linearGradient>
+        <linearGradient
+          id="paint2_linear_201_22852"
+          x1="12"
+          y1="1.75"
+          x2="12"
+          y2="22.25"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#C0ABFF" />
+          <stop offset="1" stop-color="#9571FF" />
+        </linearGradient>
+
+        {/* Dark */}
+        <linearGradient
+          id="paint0_linear_201_20128"
+          x1="9.5"
+          y1="10"
+          x2="9.5"
+          y2="15"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#A3E8FE" />
+          <stop offset="1" stop-color="#4ECDF6" />
+        </linearGradient>
+        <linearGradient
+          id="paint1_linear_201_20128"
+          x1="13.5"
+          y1="10"
+          x2="13.5"
+          y2="15"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#A3E8FE" />
+          <stop offset="1" stop-color="#4ECDF6" />
+        </linearGradient>
+        <linearGradient
+          id="paint2_linear_201_20128"
+          x1="12"
+          y1="1.75"
+          x2="12"
+          y2="22.25"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stop-color="#9DE6FE" />
+          <stop offset="1" stop-color="#4ACBF5" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 }
