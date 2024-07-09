@@ -31,8 +31,8 @@
     var(--gradient-stop) 100%
   );
   transition:
-    --gradient-start 0.5s,
-    --gradient-stop 0.5s;
+    --gradient-start 300ms,
+    --gradient-stop 300ms;
 }
 
 .gradient-icon:hover {

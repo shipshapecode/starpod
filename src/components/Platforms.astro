@@ -1,9 +1,5 @@
 ---
 import starpodConfig from '../../starpod.config';
-import AppleIcon from '../svgs/apple.svg?raw';
-import OvercastIcon from '../svgs/overcast.svg?raw';
-import SpotifyIcon from '../svgs/spotify.svg?raw';
-import YouTubeIcon from '../svgs/youtube.svg?raw';
 
 const { platforms } = starpodConfig;
 ---
@@ -15,30 +11,39 @@ const { platforms } = starpodConfig;
 >
   {
     platforms?.spotify && (
-      <a href={platforms.spotify}>
-        <Fragment set:html={SpotifyIcon} />
-      </a>
+      <a class="gradient-icon spotify h-6 w-6" href={platforms.spotify} />
     )
   }
   {
     platforms?.apple && (
-      <a href={platforms.apple}>
-        <Fragment set:html={AppleIcon} />
-      </a>
+      <a class="gradient-icon apple h-6 w-6" href={platforms.apple} />
     )
   }
   {
     platforms?.overcast && (
-      <a href={platforms.overcast}>
-        <Fragment set:html={OvercastIcon} />
-      </a>
+      <a class="gradient-icon overcast h-6 w-6" href={platforms.overcast} />
     )
   }
   {
     platforms?.youtube && (
-      <a href={platforms.youtube}>
-        <Fragment set:html={YouTubeIcon} />
-      </a>
+      <a class="gradient-icon youtube h-7 w-7" href={platforms.youtube} />
     )
   }
 </div>
+
+<style>
+  .apple {
+    mask-image: url(images/apple.svg);
+  }
+
+  .overcast {
+    mask-image: url(images/overcast.svg);
+  }
+  .spotify {
+    mask-image: url(images/spotify.svg);
+  }
+
+  .youtube {
+    mask-image: url(images/youtube.svg);
+  }
+</style>
