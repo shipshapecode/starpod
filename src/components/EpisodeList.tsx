@@ -98,7 +98,7 @@ export default function EpisodeList({ episodes, url }: Props) {
 
                   <div class="flex items-center gap-6">
                     <button
-                      class="bg-gradient-light flex rounded-full p-[1px] font-bold shadow-md shadow-[#D9E4F0E5] dark:bg-gradient-dark dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]"
+                      class="flex rounded-full border p-[1px] font-bold shadow-sm shadow-[#D9E4F0E5] bg-white border-[#E3E8EB] dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] dark:bg-dark-button/30 dark:border-dark-button"
                       onClick={() => {
                         currentEpisode.value = {
                           ...episode
@@ -109,7 +109,7 @@ export default function EpisodeList({ episodes, url }: Props) {
                           : true;
                       }}
                     >
-                      <span class="flex w-full items-center rounded-full p-2 pr-4 bg-white text-light-text-heading dark:bg-dark-button dark:text-white">
+                      <span class="flex w-full items-center rounded-full p-2 pr-4 text-light-text-heading dark:text-white">
                         <span class="mr-3 w-8 text-light-text-heading dark:text-white">
                           {isCurrentEpisode && isPlaying.value
                             ? renderIcon(pauseIcon)
@@ -141,10 +141,10 @@ export default function EpisodeList({ episodes, url }: Props) {
       {canLoadMore && (
         <div class="mt-8 flex justify-center pb-16">
           <button
-            class="bg-gradient-light flex rounded-full p-[1px] font-bold shadow-md shadow-[#D9E4F0E5] dark:bg-gradient-dark dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)]"
+            class="flex rounded-full border p-[1px] font-bold shadow-sm shadow-[#D9E4F0E5] bg-white border-[#E3E8EB] dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] dark:bg-dark-button/30 dark:border-dark-button"
             onClick={fetchMoreEpisodes}
           >
-            <span class="rounded-full px-8 py-4 text-center bg-white text-light-text-heading dark:bg-dark-button dark:text-white">
+            <span class="rounded-full px-8 py-4 text-center text-light-text-heading dark:text-white">
               More episodes
             </span>
           </button>
