@@ -7,6 +7,7 @@ import Hosts from '../components/Hosts.astro';
 import InfoCard from '../components/InfoCard.astro';
 import Platforms from '../components/Platforms.astro';
 import Player from '../components/Player';
+import ShowArtwork from '../components/ShowArtwork.astro';
 
 import { getShowInfo } from '../lib/rss';
 import starpodConfig from 'starpod.config';
@@ -65,44 +66,41 @@ const description = Astro.props.description ?? starpodConfig.description;
     <header
       class="lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
     >
-      <div
-        class="relative z-10 mx-auto border-8 bg-light-card lg:min-h-full lg:flex-auto dark:bg-dark-card dark:border-dark-background"
-      >
-        <div class="px-4 pb-4 pt-10 sm:px-6 md:px-4 lg:px-16 lg:pb-12 lg:pt-16">
-          <a
-            href="/"
-            class="relative mx-auto block w-48 overflow-hidden rounded-lg sm:w-64 sm:rounded-xl lg:w-auto lg:rounded-2xl"
-            aria-label="Homepage"
-          >
-            <img class="w-full" src={show.image} alt="" />
-          </a>
-          <p
-            class="mt-8 text-center text-2xl font-bold text-light-text-heading lg:text-left dark:text-white"
-          >
-            {show.title}
-          </p>
+      <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
+        <div
+          class="m-2 rounded-lg pb-4 pt-10 bg-light-card lg:pb-12 lg:pt-16 dark:bg-dark-card"
+        >
+          <ShowArtwork image={show.image} />
 
-          <p class="mt-2 text-center text-lg lg:text-left">
-            {starpodConfig.blurb}
-          </p>
+          <div class="px-4 sm:px-6 md:px-4 lg:px-16">
+            <p
+              class="mt-8 text-center text-2xl font-bold text-light-text-heading lg:text-left dark:text-white"
+            >
+              {show.title}
+            </p>
+
+            <p class="mt-2 text-center text-lg lg:text-left">
+              {starpodConfig.blurb}
+            </p>
+          </div>
 
           <div class="hidden lg:block">
             <Hosts />
           </div>
-          <Platforms />
+          <div class="px-4 sm:px-6 md:px-4 lg:px-16">
+            <Platforms />
+          </div>
         </div>
 
-        <div
-          class="hidden px-4 pb-4 pt-10 sm:px-6 md:px-4 lg:block lg:border-t-8 lg:px-8 lg:py-12 xl:px-12 dark:bg-dark-card lg:dark:border-dark-background"
-        >
+        <div class="hidden lg:block">
           <InfoCard />
         </div>
       </div>
     </header>
     <main
-      class="min-h-screen border-x-8 bg-light-card lg:relative lg:mb-28 lg:ml-112 lg:border-x-0 lg:border-t-8 xl:ml-120 dark:bg-dark-card dark:border-dark-background"
+      class="mx-2 min-h-screen rounded-lg bg-light-card lg:relative lg:mb-28 lg:ml-112 xl:ml-120 dark:bg-dark-card"
     >
-      <div class="relative pt-16">
+      <div class="relative mt-2 pt-16">
         <div
           class="bg-gradient-light absolute left-0 right-0 top-0 z-0 h-80 w-full opacity-30 dark:bg-gradient-dark"
         >
@@ -124,9 +122,7 @@ const description = Astro.props.description ?? starpodConfig.description;
         <slot />
       </div>
     </main>
-    <footer
-      class="block border-x-8 px-8 bg-light-card lg:hidden dark:bg-dark-card dark:border-dark-background"
-    >
+    <footer class="block lg:hidden">
       <Hosts />
       <InfoCard />
     </footer>
