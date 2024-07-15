@@ -5,12 +5,14 @@ export default function ContactForm() {
 
   async function submit(e: SubmitEvent) {
     e.preventDefault();
+
     const formData = new FormData(e.target as HTMLFormElement);
     const response = await fetch('/api/contact', {
       method: 'POST',
       body: formData
     });
     const data = await response.json();
+
     if (data.message) {
       setResponseMessage(data.message);
     }
@@ -42,7 +44,14 @@ export default function ContactForm() {
         placeholder="Write a message"
         required
       />
-      <button>Submit</button>
+
+      <div class="mt-6 flex w-full justify-end">
+        <button class="btn w-full justify-center lg:w-auto">
+          <span class="rounded-full px-10 py-4 text-center text-light-text-heading dark:text-white">
+            Submit
+          </span>
+        </button>
+      </div>
     </form>
   );
 }

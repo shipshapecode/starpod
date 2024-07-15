@@ -98,7 +98,7 @@ export default function EpisodeList({ episodes, url }: Props) {
 
                   <div class="flex items-center gap-6">
                     <button
-                      class="flex rounded-full border p-[1px] font-bold shadow-sm shadow-[#D9E4F0E5] bg-white border-[#E3E8EB] dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] dark:bg-dark-button/30 dark:border-dark-button"
+                      class="btn"
                       onClick={() => {
                         currentEpisode.value = {
                           ...episode
@@ -141,7 +141,7 @@ export default function EpisodeList({ episodes, url }: Props) {
       {canLoadMore && (
         <div class="mt-8 flex justify-center pb-16">
           <button
-            class="flex rounded-full border p-[1px] font-bold shadow-sm shadow-[#D9E4F0E5] bg-white border-[#E3E8EB] dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] dark:bg-dark-button/30 dark:border-dark-button"
+            class="btn"
             onClick={fetchMoreEpisodes}
           >
             <span class="rounded-full px-8 py-4 text-center text-light-text-heading dark:text-white">
