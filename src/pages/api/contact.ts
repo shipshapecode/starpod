@@ -18,7 +18,7 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  await fetch(process.env.SLACK_WEBHOOK as string, {
+  await fetch(import.meta.env.SLACK_WEBHOOK, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
