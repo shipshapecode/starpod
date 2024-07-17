@@ -53,7 +53,7 @@ export default function Player() {
   }, [progress]);
 
   return (
-    <div class="fixed inset-x-0 bottom-0 z-10 lg:left-112 xl:left-120">
+    <div class="fixed inset-x-0 bottom-0 z-50 lg:left-112 xl:left-120">
       <div
         class="flex items-center gap-6 px-4 py-4 backdrop-blur-sm bg-light-player/90 md:px-6 dark:bg-dark-player/90"
         role="region"
