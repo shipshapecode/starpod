@@ -77,11 +77,14 @@ export default function EpisodeList({ episodes, url }: Props) {
 
           return (
             <li class="border-b dark:border-dark-border">
-              <div class="flex w-full py-12" aria-current={isCurrentEpisode}>
+              <div
+                class="flex w-full flex-col py-12 lg:flex-row"
+                aria-current={isCurrentEpisode}
+              >
                 <img
                   alt={`${episode.title} - episode art`}
                   aria-hidden="true"
-                  class="mr-6 block h-20 w-20 rounded-md"
+                  class="block h-20 w-20 rounded-md lg:mr-6"
                   height={80}
                   src={episode.episodeImage ?? '/images/www.png'}
                   width={80}
@@ -98,7 +101,7 @@ export default function EpisodeList({ episodes, url }: Props) {
 
                   <p class="mb-5">{episode.description}</p>
 
-                  <div class="flex items-center gap-6">
+                  <div class="flex items-center gap-6 text-sm">
                     <button
                       class="btn"
                       onClick={() => {
@@ -117,7 +120,8 @@ export default function EpisodeList({ episodes, url }: Props) {
                             ? renderIcon(pauseIcon)
                             : renderIcon(playIcon)}
                         </span>
-                        Play Episode
+                        {isCurrentEpisode && isPlaying.value ? 'Pause' : 'Play'}{' '}
+                        Episode
                         <span class="sr-only">
                           (press to{' '}
                           {isCurrentEpisode && isPlaying.value
