@@ -75,15 +75,15 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
         </article>
       ) : (
         <div class="flex flex-col items-center">
-          <div class="block h-auto w-full max-w-80">
+          <div class="h-auto w-full max-w-80">
             <div class="atropos">
               <div class="atropos-scale">
                 <div class="atropos-rotate">
                   <div class="atropos-inner">
-                    <div class="block dark:hidden">
+                    <div class="block h-auto w-full dark:hidden">
                       <Fragment set:html={UFOLight} />
                     </div>
-                    <div class="hidden dark:block">
+                    <div class="hidden h-auto w-full dark:block">
                       <Fragment set:html={UFODark} />
                     </div>
                   </div>
