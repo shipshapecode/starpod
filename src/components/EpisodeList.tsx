@@ -91,7 +91,9 @@ export default function EpisodeList({ episodes, url }: Props) {
                   <FormattedDate date={new Date(episode.published)} />
 
                   <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
-                    {episode.episodeNumber}: {episode.title}
+                    <a href={`/${episode.episodeSlug}`}>
+                      {episode.episodeNumber}: {episode.title}
+                    </a>
                   </h2>
 
                   <p class="mb-5">{episode.description}</p>
@@ -140,10 +142,7 @@ export default function EpisodeList({ episodes, url }: Props) {
       </ul>
       {canLoadMore && (
         <div class="mt-8 flex justify-center pb-16">
-          <button
-            class="btn"
-            onClick={fetchMoreEpisodes}
-          >
+          <button class="btn" onClick={fetchMoreEpisodes}>
             <span class="rounded-full px-8 py-4 text-center text-light-text-heading dark:text-white">
               More episodes
             </span>
