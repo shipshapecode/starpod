@@ -4,6 +4,8 @@ import { getEntry } from 'astro:content';
 import FormattedDate from '../components/FormattedDate';
 import Layout from '../layouts/Layout.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
+import UFODark from '../svgs/ufo-dark.svg?raw';
+import UFOLight from '../svgs/ufo-light.svg?raw';
 
 const show = await getShowInfo();
 
@@ -67,11 +69,45 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
     <h3 class="section-heading-underlined mb-8 mt-16">Episode Transcript</h3>
 
     {
-      Transcript && (
+      Transcript ? (
         <article class="prose prose-neutral dark:prose-invert">
           <Transcript />
         </article>
+      ) : (
+        <div class="flex flex-col items-center">
+          <div class="block h-auto w-full max-w-80">
+            <div class="atropos">
+              <div class="atropos-scale">
+                <div class="atropos-rotate">
+                  <div class="atropos-inner">
+                    <div class="block dark:hidden">
+                      <Fragment set:html={UFOLight} />
+                    </div>
+                    <div class="hidden dark:block">
+                      <Fragment set:html={UFODark} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="py-10 text-lg font-bold text-light-text-heading dark:text-white">
+            No transcript available for this episode.
+          </p>
+        </div>
       )
     }
   </div>
 </Layout>
+
+<script>
+  import Atropos from 'atropos';
+
+  // Initialize
+  const myAtropos = Atropos({
+    el: '.atropos',
+    highlight: false,
+    shadow: false
+  });
+</script>
