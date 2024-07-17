@@ -2,6 +2,8 @@
 import { getEntry } from 'astro:content';
 
 import FormattedDate from '../components/FormattedDate';
+import CreatorsAndGuests from '../components/episode/CreatorsAndGuests.astro';
+import PlayButton from '../components/player/PlayButton';
 import Layout from '../layouts/Layout.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
 import UFODark from '../svgs/ufo-dark.svg?raw';
@@ -48,56 +50,70 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
   title={title}
 >
   <div class="relative z-10 px-8 lg:px-18">
-    <FormattedDate date={new Date(episode.published)} />
+    <div class="flex">
+      <div class="mr-11 mt-4 hidden lg:block">
+        <PlayButton client:load episode={episode} />
+      </div>
 
-    <h1
-      class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
-    >
-      {episode.episodeNumber}: {episode.title}
-    </h1>
+      <div>
+        <FormattedDate date={new Date(episode.published)} />
 
-    <h3 class="mb-6 text-3xl font-bold text-light-text-heading dark:text-white">
-      Show Notes
-    </h3>
+        <h1
+          class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
+        >
+          {episode.episodeNumber}: {episode.title}
+        </h1>
 
-    <div
-      class="prose prose-neutral mb-5 dark:prose-invert [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:pl-5"
-    >
-      <Fragment set:html={episode.content} />
-    </div>
+        <CreatorsAndGuests />
 
-    <h3 class="section-heading-underlined mb-8 mt-16">Episode Transcript</h3>
+        <h3
+          class="mb-6 text-3xl font-bold text-light-text-heading dark:text-white"
+        >
+          Show Notes
+        </h3>
 
-    {
-      Transcript ? (
-        <article class="prose prose-neutral dark:prose-invert">
-          <Transcript />
-        </article>
-      ) : (
-        <div class="flex flex-col items-center">
-          <div class="h-auto w-full max-w-80">
-            <div class="atropos">
-              <div class="atropos-scale">
-                <div class="atropos-rotate">
-                  <div class="atropos-inner">
-                    <div class="block h-auto w-full dark:hidden">
-                      <Fragment set:html={UFOLight} />
-                    </div>
-                    <div class="hidden h-auto w-full dark:block">
-                      <Fragment set:html={UFODark} />
+        <div
+          class="prose prose-neutral mb-5 dark:prose-invert [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:pl-5"
+        >
+          <Fragment set:html={episode.content} />
+        </div>
+
+        <h3 class="section-heading-underlined mb-8 mt-16">
+          Episode Transcript
+        </h3>
+
+        {
+          Transcript ? (
+            <article class="prose prose-neutral dark:prose-invert">
+              <Transcript />
+            </article>
+          ) : (
+            <div class="flex flex-col items-center">
+              <div class="h-auto w-full max-w-80">
+                <div class="atropos">
+                  <div class="atropos-scale">
+                    <div class="atropos-rotate">
+                      <div class="atropos-inner">
+                        <div class="block h-auto w-full dark:hidden">
+                          <Fragment set:html={UFOLight} />
+                        </div>
+                        <div class="hidden h-auto w-full dark:block">
+                          <Fragment set:html={UFODark} />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <p class="py-10 text-lg font-bold text-light-text-heading dark:text-white">
-            No transcript available for this episode.
-          </p>
-        </div>
-      )
-    }
+              <p class="py-10 text-lg font-bold text-light-text-heading dark:text-white">
+                No transcript available for this episode.
+              </p>
+            </div>
+          )
+        }
+      </div>
+    </div>
   </div>
 </Layout>
 

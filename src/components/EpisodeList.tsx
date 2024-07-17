@@ -84,7 +84,7 @@ export default function EpisodeList({ episodes, url }: Props) {
                 <img
                   alt={`${episode.title} - episode art`}
                   aria-hidden="true"
-                  class="block h-20 w-20 rounded-md lg:mr-6"
+                  class="block h-20 mb-1 w-20 rounded-md lg:mr-6"
                   height={80}
                   src={episode.episodeImage ?? '/images/www.png'}
                   width={80}
