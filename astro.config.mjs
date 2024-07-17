@@ -16,7 +16,14 @@ export default defineConfig({
     }
   }),
   site: 'https://starpod.dev',
-  integrations: [tailwind(), preact()],
+  integrations: [
+    tailwind({
+      applyBaseStyles: false,
+      nesting: true
+    }),
+    ,
+    preact()
+  ],
   redirects: {
     '/hot-takes-tan-stack-and-open-source-with-tanner-linsley':
       '/hot-takes-tanstack-and-open-source-with-tanner-linsley',

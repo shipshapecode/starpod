@@ -24,22 +24,24 @@
   }
 }
 
-.gradient-icon {
-  background: linear-gradient(
-    180deg,
-    var(--gradient-start) 0%,
-    var(--gradient-stop) 100%
-  );
-  transition:
-    --gradient-start 300ms,
-    --gradient-stop 300ms;
-}
+@layer utilities {
+  .gradient-icon {
+    background: linear-gradient(
+      180deg,
+      var(--gradient-start) 0%,
+      var(--gradient-stop) 100%
+    );
+    transition:
+      --gradient-start 300ms,
+      --gradient-stop 300ms;
+  }
 
-.gradient-icon:hover {
-  --gradient-start: oklch(77.32% 0.129 294.81);
-  --gradient-stop: oklch(67.59% 0.18851878808119876 292.4954219580293);
-  @media (prefers-color-scheme: dark) {
-    --gradient-start: oklch(88.52% 0.079 220.53);
-    --gradient-stop: oklch(78.86% 0.125 223.67);
+  .gradient-icon:hover {
+    --gradient-start: oklch(77.32% 0.129 294.81);
+    --gradient-stop: oklch(67.59% 0.18851878808119876 292.4954219580293);
+    @media (prefers-color-scheme: dark) {
+      --gradient-start: oklch(88.52% 0.079 220.53);
+      --gradient-stop: oklch(78.86% 0.125 223.67);
+    }
   }
 }

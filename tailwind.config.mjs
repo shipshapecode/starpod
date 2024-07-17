@@ -12,7 +12,7 @@ export default {
       colors: {
         'dark-background': 'oklch(13.85% 0.025 273.24 / <alpha-value>)',
         'dark-border': 'oklch(23.8% 0.04 266.76 / <alpha-value>)',
-        'dark-button': 'oklch(28.08% 0.048 281.19 / <alpha-value>)',
+        'dark-button': 'oklch(21.57% 0.029 280.68 / <alpha-value>)',
         'dark-card': 'oklch(18.74% 0.024 280.08 / <alpha-value>)',
         'dark-icon': 'oklch(71.44% 0.019 264.45 / <alpha-value>)',
         'dark-input-bg': 'oklch(21.63% 0.031 280.68 / <alpha-value>)',

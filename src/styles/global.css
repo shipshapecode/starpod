@@ -1,11 +1,9 @@
+@import './tailwind.css';
 @import './gradient-icon.css';
+@import './buttons.css';
 
 .animated-bottom-border {
   @apply border-b after:block after:h-[1px] after:w-0 after:bg-gradient-to-r after:from-[#C6B2FF] after:to-[#8D67FF] after:transition-all after:duration-300 after:ease-in-out hover:after:w-full dark:border-dark-border dark:after:from-[#43C9F5] dark:after:to-[#B4EDFF];
-}
-
-.btn {
-  @apply flex rounded-full border p-[1px] font-bold shadow-sm shadow-[#D9E4F0E5] bg-white border-[#E3E8EB] dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] dark:bg-dark-button/30 dark:border-dark-button;
 }
 
 .input {

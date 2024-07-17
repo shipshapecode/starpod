@@ -1,0 +1,57 @@
+@property --gradient-btn-start {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: oklch(88.09% 0.018 234.53);
+}
+
+@property --gradient-btn-stop {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: oklch(88.09% 0.018 234.53);
+}
+
+@media (prefers-color-scheme: dark) {
+  @property --gradient-btn-start {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: oklch(28.08% 0.048 281.19);
+  }
+
+  @property --gradient-btn-stop {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: oklch(28.08% 0.048 281.19);
+  }
+}
+
+@layer utilities {
+  .gradient-btn-border {
+    background: linear-gradient(
+      180deg,
+      var(--gradient-btn-start) 0%,
+      var(--gradient-btn-stop) 100%
+    );
+    transition:
+      --gradient-btn-start 300ms,
+      --gradient-btn-stop 300ms;
+  }
+
+  .gradient-btn-border:hover {
+    --gradient-btn-start: oklch(77.32% 0.129 294.81);
+    --gradient-btn-stop: oklch(67.59% 0.18851878808119876 292.4954219580293);
+    @media (prefers-color-scheme: dark) {
+      --gradient-btn-start: oklch(88.52% 0.079 220.53);
+      --gradient-btn-stop: oklch(78.86% 0.125 223.67);
+    }
+  }
+}
+
+.btn {
+  @apply relative box-border flex rounded-full border bg-clip-padding p-[1px] font-bold shadow-sm shadow-[#D9E4F0E5] bg-white border-transparent dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] dark:bg-dark-button;
+  @apply before:absolute before:inset-0 before:-z-[1] before:-m-[1px] before:block before:rounded-[inherit] before:content-[''];
+  @apply before:transition-all before:duration-300 before:ease-in-out;
+
+  &::before {
+    @apply gradient-btn-border;
+  }
+}
