@@ -147,7 +147,7 @@ export default function EpisodeList({ episodes, url }: Props) {
       {canLoadMore && (
         <div class="mt-8 flex justify-center pb-16">
           <button class="btn" onClick={fetchMoreEpisodes}>
-            <span class="rounded-full px-8 py-4 text-center text-light-text-heading dark:text-white">
+            <span class="rounded-full px-8 py-4 text-center text-sm text-light-text-heading dark:text-white">
               More episodes
             </span>
           </button>

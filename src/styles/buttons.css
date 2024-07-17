@@ -47,7 +47,7 @@
 }
 
 .btn {
-  @apply relative box-border flex rounded-full border bg-clip-padding p-[1px] font-bold shadow-sm shadow-[#D9E4F0E5] bg-white border-transparent dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] dark:bg-dark-button;
+  @apply relative box-border flex rounded-full border bg-clip-padding p-[1px] text-sm font-bold shadow-sm shadow-[#D9E4F0E5] bg-white border-transparent dark:shadow-[0_4px_4px_0_rgba(0,0,0,0.25)] dark:bg-dark-button;
   @apply before:absolute before:inset-0 before:-z-[1] before:-m-[1px] before:block before:rounded-[inherit] before:content-[''];
   @apply before:transition-all before:duration-300 before:ease-in-out;
 
