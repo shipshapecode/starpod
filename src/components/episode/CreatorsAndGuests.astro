@@ -1,1 +1,22 @@
+---
+export interface Props {
+  hostsAndGuests: Array<{
+    isHost: boolean;
+    name: string;
+  }>;
+}
+
+const { hostsAndGuests } = Astro.props;
+---
+
 <h3 class="section-heading pb-6">Creators and Guests</h3>
+
+{
+  hostsAndGuests?.length ? (
+    hostsAndGuests.map((person) => {
+      return <div>{person.name}</div>;
+    })
+  ) : (
+    <div>No creators or guests listed for this episode.</div>
+  )
+}
