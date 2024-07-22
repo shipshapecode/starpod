@@ -11,7 +11,6 @@ export default async function seed() {
   const allEpisodes = await getAllEpisodes();
   const episodes = allEpisodes.map((episode) => {
     return {
-      episodeNumber: episode.episodeNumber,
       episodeSlug: episode.episodeSlug
     };
   });
@@ -19,8 +18,8 @@ export default async function seed() {
   await db.insert(Episode).values(episodes);
 
   for (let episode of episodes) {
-    if (peoplePerEpisode[episode.episodeNumber]?.length) {
-      for (let person of peoplePerEpisode[episode.episodeNumber]) {
+    if (peoplePerEpisode[episode.episodeSlug]?.length) {
+      for (let person of peoplePerEpisode[episode.episodeSlug]) {
         await db.insert(HostOrGuest).values([
           {
             episodeSlug: episode.episodeSlug,

@@ -2,7 +2,6 @@ import { defineDb, defineTable, column } from 'astro:db';
 
 const Episode = defineTable({
   columns: {
-    episodeNumber: column.number({ optional: true }),
     episodeSlug: column.text({ primaryKey: true })
   }
 });
