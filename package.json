@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build --remote",
     "preview": "astro preview",
     "astro": "astro",
     "test:e2e": "pnpm exec playwright test"
