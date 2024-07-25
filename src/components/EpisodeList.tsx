@@ -1,5 +1,5 @@
 import type { JSX } from 'preact/jsx-runtime';
-import { useEffect, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
 import { currentEpisode, isPlaying } from '../components/state';
 import type { Episode } from '../lib/rss';
 import FormattedDate from '../components/FormattedDate';

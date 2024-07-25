@@ -88,3 +88,12 @@ The url to the RSS feed where your podcast is hosted.
 ```ts
 rssFeed: 'https://anchor.fm/s/e329dea0/podcast/rss';
 ```
+
+#### Setting up the contact form
+
+The contact form hits an APIRoute at `/api/contact`. It is currently configured
+to send the form data to a Slack channel webhook I had setup. It reads the url
+from `import.meta.env.SLACK_WEBHOOK`, so if you define a `SLACK_WEBHOOK`
+environment variable it should work for you. Of course, feel free to customize
+the code [here](./src/pages/api/contact.ts) to send the data elsewhere as you
+see fit.
