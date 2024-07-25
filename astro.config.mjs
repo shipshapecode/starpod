@@ -3,6 +3,8 @@ import tailwind from '@astrojs/tailwind';
 import preact from '@astrojs/preact';
 import vercel from '@astrojs/vercel/serverless';
 
+import sitemap from '@astrojs/sitemap';
+
 // https://astro.build/config
 export default defineConfig({
   output: 'hybrid',
@@ -17,13 +19,14 @@ export default defineConfig({
   }),
   site: 'https://starpod.dev',
   integrations: [
+    preact(),
+    sitemap(),
     tailwind({
       applyBaseStyles: false,
       nesting: true
-    }),
-    ,
-    preact()
+    })
   ],
+  // These were specific redirects we needed for our podcast, if you do not have any routes to redirect, you can safely remove this.
   redirects: {
     '/hot-takes-tan-stack-and-open-source-with-tanner-linsley':
       '/hot-takes-tanstack-and-open-source-with-tanner-linsley',
