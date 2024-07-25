@@ -68,6 +68,8 @@ const description = Astro.props.description ?? starpodConfig.description;
       rel="stylesheet"
     />
 
+    <slot name="head" />
+
     <ViewTransitions />
   </head>
   <body

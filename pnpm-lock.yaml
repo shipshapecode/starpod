@@ -32,6 +32,9 @@ importers:
       astro:
         specifier: ^4.12.2
         version: 4.12.2(@types/node@20.14.12)(typescript@5.5.4)
+      astro-seo-schema:
+        specifier: ^4.0.2
+        version: 4.0.2(astro@4.12.2(@types/node@20.14.12)(typescript@5.5.4))(schema-dts@1.1.2(typescript@5.5.4))
       atropos:
         specifier: ^2.0.2
         version: 2.0.2
@@ -41,6 +44,9 @@ importers:
       rss-to-json:
         specifier: ^2.1.1
         version: 2.1.1
+      schema-dts:
+        specifier: ^1.1.2
+        version: 1.1.2(typescript@5.5.4)
       valibot:
         specifier: ^0.31.1
         version: 0.31.1
@@ -884,6 +890,12 @@ packages:
 
   array-iterate@2.0.1:
     resolution: {integrity: sha512-I1jXZMjAgCMmxT4qxXfPXa6SthSoE8h6gkSI9BGGNv8mP8G/v0blc+qFnZu6K42vTOiuME596QaLO0TP3Lk0xg==}
+
+  astro-seo-schema@4.0.2:
+    resolution: {integrity: sha512-OI9DWasORMpIzKsAmF4s6ghVX8F1INROla4JKBT8WDm/du25jxQsoQcJx99NY3gOQJ7Rv9a+cFPAfr17LsYXEg==}
+    peerDependencies:
+      astro: ^4.0.0
+      schema-dts: ^1.1.0
 
   astro@4.12.2:
     resolution: {integrity: sha512-l6OmqlL+FiuSi9x6F+EGZitteOznq1JffOil7st7cdqeMCTEIym4oagI1a6zp6QekliKWEEZWdplGhgh1k1f7Q==}
@@ -2207,6 +2219,11 @@ packages:
   sax@1.4.1:
     resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==}
 
+  schema-dts@1.1.2:
+    resolution: {integrity: sha512-MpNwH0dZJHinVxk9bT8XUdjKTxMYrA5bLtrrGmFA6PTLwlOKnhi67XoRd6/ty+Djt6ZC0slR57qFhZDNMI6DhQ==}
+    peerDependencies:
+      typescript: '>=4.1.0'
+
   section-matter@1.0.0:
     resolution: {integrity: sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==}
     engines: {node: '>=4'}
@@ -3519,6 +3536,11 @@ snapshots:
       dequal: 2.0.3
 
   array-iterate@2.0.1: {}
+
+  astro-seo-schema@4.0.2(astro@4.12.2(@types/node@20.14.12)(typescript@5.5.4))(schema-dts@1.1.2(typescript@5.5.4)):
+    dependencies:
+      astro: 4.12.2(@types/node@20.14.12)(typescript@5.5.4)
+      schema-dts: 1.1.2(typescript@5.5.4)
 
   astro@4.12.2(@types/node@20.14.12)(typescript@5.5.4):
     dependencies:
@@ -5082,6 +5104,10 @@ snapshots:
       suf-log: 2.5.3
 
   sax@1.4.1: {}
+
+  schema-dts@1.1.2(typescript@5.5.4):
+    dependencies:
+      typescript: 5.5.4
 
   section-matter@1.0.0:
     dependencies:

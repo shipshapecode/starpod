@@ -1,6 +1,8 @@
 ---
 import { getEntry } from 'astro:content';
 
+import { Schema } from 'astro-seo-schema';
+
 import FormattedDate from '../components/FormattedDate';
 import CreatorsAndGuests from '../components/episode/CreatorsAndGuests.astro';
 import PlayButton from '../components/player/PlayButton';
@@ -49,6 +51,18 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
   imageUrl={episode.episodeImage}
   title={title}
 >
+  <Schema
+    slot="head"
+    item={{
+      '@context': 'https://schema.org',
+      '@type': 'PodcastEpisode',
+      name: episode.title,
+      datePublished: new Date(episode.published).toISOString(),
+      description: episode.description,
+      episodeNumber: episode.episodeNumber
+    }}
+  />
+
   <div class="relative z-10 px-8 lg:px-18">
     <div class="flex">
       <div class="mr-11 mt-4 hidden lg:block">
