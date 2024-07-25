@@ -1,27 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import FourZeroFourDark from '../svgs/404-dark.svg?raw';
-import FourZeroFourLight from '../svgs/404-light.svg?raw';
+import FourZeroFourIllustration from '../components/illustrations/404Illustration.astro';
 ---
 
 <Layout title="404 - Not found">
   <div
     class="relative z-10 flex flex-col items-center justify-center px-8 lg:px-18"
   >
-    <div class="atropos">
-      <div class="atropos-scale">
-        <div class="atropos-rotate">
-          <div class="atropos-inner">
-            <div class="block h-auto w-full dark:hidden">
-              <Fragment set:html={FourZeroFourLight} />
-            </div>
-            <div class="hidden h-auto w-full dark:block">
-              <Fragment set:html={FourZeroFourDark} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <FourZeroFourIllustration />
 
     <div class="mt-12 flex justify-center pb-16">
       <button class="btn" onclick="history.back()">
@@ -34,14 +20,3 @@ import FourZeroFourLight from '../svgs/404-light.svg?raw';
     </div>
   </div>
 </Layout>
-
-<script>
-  import Atropos from 'atropos';
-
-  // Initialize
-  const myAtropos = Atropos({
-    el: '.atropos',
-    highlight: false,
-    shadow: false
-  });
-</script>

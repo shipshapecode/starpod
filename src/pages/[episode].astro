@@ -4,10 +4,10 @@ import { getEntry } from 'astro:content';
 import FormattedDate from '../components/FormattedDate';
 import CreatorsAndGuests from '../components/episode/CreatorsAndGuests.astro';
 import PlayButton from '../components/player/PlayButton';
+import FullPlayButton from '../components/FullPlayButton';
+import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
 import Layout from '../layouts/Layout.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
-import UFODark from '../svgs/ufo-dark.svg?raw';
-import UFOLight from '../svgs/ufo-light.svg?raw';
 
 const show = await getShowInfo();
 
@@ -64,6 +64,14 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
           {episode.episodeNumber}: {episode.title}
         </h1>
 
+        <p class="mb-8 lg:mb-12">
+          {episode.description}
+        </p>
+
+        <div class="mb-8 block lg:hidden">
+          <FullPlayButton client:load episode={episode} />
+        </div>
+
         <CreatorsAndGuests />
 
         <h3
@@ -90,20 +98,7 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
           ) : (
             <div class="flex flex-col items-center">
               <div class="h-auto w-full max-w-80">
-                <div class="atropos">
-                  <div class="atropos-scale">
-                    <div class="atropos-rotate">
-                      <div class="atropos-inner">
-                        <div class="block h-auto w-full dark:hidden">
-                          <Fragment set:html={UFOLight} />
-                        </div>
-                        <div class="hidden h-auto w-full dark:block">
-                          <Fragment set:html={UFODark} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <UFOIllustration />
               </div>
 
               <p class="py-10 text-lg font-bold text-light-text-heading dark:text-white">
@@ -116,14 +111,3 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
     </div>
   </div>
 </Layout>
-
-<script>
-  import Atropos from 'atropos';
-
-  // Initialize
-  const myAtropos = Atropos({
-    el: '.atropos',
-    highlight: false,
-    shadow: false
-  });
-</script>

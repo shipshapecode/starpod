@@ -1,0 +1,31 @@
+---
+import FourZeroFourDark from '../../svgs/404-dark.svg?raw';
+import FourZeroFourLight from '../../svgs/404-light.svg?raw';
+---
+
+<div class="atropos four-zero-four">
+  <div class="atropos-scale">
+    <div class="atropos-rotate">
+      <div class="atropos-inner">
+        <div class="block h-auto w-full dark:hidden">
+          <Fragment set:html={FourZeroFourLight} />
+        </div>
+        <div class="hidden h-auto w-full dark:block">
+          <Fragment set:html={FourZeroFourDark} />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import Atropos from 'atropos';
+
+  document.addEventListener('astro:page-load', () => {
+    Atropos({
+      el: '.four-zero-four',
+      highlight: false,
+      shadow: false
+    });
+  });
+</script>

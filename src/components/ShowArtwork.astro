@@ -12,12 +12,12 @@ const { image } = Astro.props;
       <div class="atropos-rotate">
         <div class="atropos-inner">
           <a
-          href="/"
-          class="relative mx-auto block w-48 overflow-hidden rounded-lg sm:w-64 sm:rounded-xl lg:w-auto lg:rounded-2xl"
-          aria-label="Homepage"
-        >
-          <img class="w-full" src={image} alt="" />
-        </a>
+            href="/"
+            class="relative mx-auto block w-48 overflow-hidden rounded-lg sm:w-64 sm:rounded-xl lg:w-auto lg:rounded-2xl"
+            aria-label="Homepage"
+          >
+            <img class="w-full" src={image} alt="" />
+          </a>
         </div>
       </div>
     </div>
@@ -27,8 +27,9 @@ const { image } = Astro.props;
 <script>
   import Atropos from 'atropos';
 
-  // Initialize
-  const myAtropos = Atropos({
-    el: '.show-art'
+  document.addEventListener('astro:page-load', () => {
+    Atropos({
+      el: '.show-art'
+    });
   });
 </script>
