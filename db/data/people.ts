@@ -15,17 +15,17 @@ export default [
     id: 'mansona',
     name: 'Chris Manson',
     img: ''
-  },    
+  },
   {
     id: 'mnagdi',
     name: 'Michael Nagdi',
     img: ''
-  },  
+  },
   {
     id: 'ntonchev',
     name: 'Nas Tonchev',
     img: ''
-  },  
+  },
   {
     id: 'nvenditto',
     name: 'Natalia Venditto',
@@ -36,5 +36,6 @@ export default [
     name: 'ThePrimeagen',
     img: ''
   },
+  { id: 'robbiethewagner', name: 'RobbieTheWagner', img: '' },
   { id: 'wesbos', name: 'Wes Bos', img: '' }
 ];

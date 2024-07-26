@@ -17,17 +17,18 @@ export default async function seed() {
 
   await db.insert(Episode).values(episodes);
 
+  const hostsOrGuestsToInsert = [];
   for (let episode of episodes) {
     if (peoplePerEpisode[episode.episodeSlug]?.length) {
       for (let person of peoplePerEpisode[episode.episodeSlug]) {
-        await db.insert(HostOrGuest).values([
-          {
-            episodeSlug: episode.episodeSlug,
-            isHost: person.host ?? false,
-            personId: person.id
-          }
-        ]);
+        hostsOrGuestsToInsert.push({
+          episodeSlug: episode.episodeSlug,
+          isHost: person.host ?? false,
+          personId: person.id
+        });
       }
     }
   }
+
+  await db.insert(HostOrGuest).values(hostsOrGuestsToInsert);
 }
