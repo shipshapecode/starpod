@@ -1,41 +1,45 @@
 export default [
-  { id: 'argyleink', name: 'Adam Argyle', img: '' },
-  { id: 'chuckcarpenter', name: 'Charles William Carpenter III', img: '' },
+  { id: 'argyleink', name: 'Adam Argyle', img: 'argyleink.jpg' },
+  {
+    id: 'chuckcarpenter',
+    name: 'Charles William Carpenter III',
+    img: 'chuckcarpenter.jpg'
+  },
   {
     id: 'diegogonzales',
-    name: 'Diego Gonzales',
-    img: ''
+    name: 'Diego Gonzales'
   },
   {
     id: 'kvlly',
     name: 'Kelly Vaughn',
-    img: ''
+    img: 'kvlly.jpg'
   },
   {
     id: 'mansona',
     name: 'Chris Manson',
-    img: ''
+    img: 'mansona.jpg'
   },
   {
     id: 'mnagdi',
-    name: 'Michael Nagdi',
-    img: ''
+    name: 'Michael Nagdi'
   },
   {
     id: 'ntonchev',
-    name: 'Nas Tonchev',
-    img: ''
+    name: 'Nas Tonchev'
   },
   {
     id: 'nvenditto',
-    name: 'Natalia Venditto',
-    img: ''
+    name: 'Natalia Venditto'
   },
   {
     id: 'theprimeagen',
     name: 'ThePrimeagen',
-    img: ''
+    img: 'theprimeagen.jpg'
   },
-  { id: 'robbiethewagner', name: 'RobbieTheWagner', img: '' },
-  { id: 'wesbos', name: 'Wes Bos', img: '' }
+  {
+    id: 'robbiethewagner',
+    name: 'RobbieTheWagner',
+    img: 'robbiethewagner.jpg'
+  },
+  { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' }
 ];

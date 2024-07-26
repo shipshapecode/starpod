@@ -49,13 +49,16 @@ const dbEpisode = await db
   .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
 
 const hostsAndGuests = await db
-  .select({ isHost: HostOrGuest.isHost, name: Person.name })
+  .select({
+    id: Person.id,
+    img: Person.img,
+    isHost: HostOrGuest.isHost,
+    name: Person.name
+  })
   .from(HostOrGuest)
   .innerJoin(DbEpisode, eq(HostOrGuest.episodeSlug, DbEpisode.episodeSlug))
   .innerJoin(Person, eq(HostOrGuest.personId, Person.id))
   .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
-
-console.log('Hosts and guests:', hostsAndGuests);
 
 const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumber}`;
 ---
@@ -100,7 +103,11 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
           <FullPlayButton client:load episode={episode} />
         </div>
 
-        <CreatorsAndGuests hostsAndGuests={hostsAndGuests} />
+        {
+          hostsAndGuests?.length ? (
+            <CreatorsAndGuests hostsAndGuests={hostsAndGuests} />
+          ) : undefined
+        }
 
         <h3
           class="mb-6 text-3xl font-bold text-light-text-heading dark:text-white"

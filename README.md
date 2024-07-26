@@ -47,16 +47,16 @@ A list of your show's hosts and their info.
 hosts: [
   {
     name: 'RobbieTheWagner',
-    bio: '',
-    img: '/hosts/robbie.png',
+    bio: 'Huge Ember and Tailwind fanboy. I work at Amazon btw.',
+    img: '/src/img/robbiethewagner.jpg',
     github: 'https://github.com/RobbieTheWagner',
     twitter: 'https://twitter.com/RobbieTheWagner',
     website: 'https://robbiethewagner.dev'
   },
   {
     name: 'Charles William Carpenter III',
-    bio: '',
-    img: '/hosts/chuck.png',
+    bio: 'Third of his name, user of gifs, hater of ESM.',
+    img: '/src/img/chuckcarpenter.jpg',
     github: 'https://github.com/chuckcarpenter',
     twitter: 'https://twitter.com/CharlesWthe3rd'
   }
@@ -97,3 +97,7 @@ from `import.meta.env.SLACK_WEBHOOK`, so if you define a `SLACK_WEBHOOK`
 environment variable it should work for you. Of course, feel free to customize
 the code [here](./src/pages/api/contact.ts) to send the data elsewhere as you
 see fit.
+
+#### Configuring guests
+
+We are experimenting with storing guest info in Astro DB, which is currently in closed beta, so it may not be accessible to you if you did not get a beta invite.
