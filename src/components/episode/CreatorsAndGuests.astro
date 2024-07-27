@@ -1,1 +1,55 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+export interface Props {
+  hostsAndGuests: Array<{
+    id: string;
+    img: string | null;
+    isHost: boolean;
+    name: string;
+  }>;
+}
+
+const { hostsAndGuests } = Astro.props;
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/img/*.{jpeg,jpg,png}'
+);
+---
+
 <h3 class="section-heading pb-6">Creators and Guests</h3>
+
+<div class="mb-12 grid grid-cols-1 gap-4 lg:mb-20 lg:grid-cols-2">
+  {
+    hostsAndGuests.map((person) => {
+      return (
+        <div class="flex items-center">
+          {person.img ?
+            <Image
+              class="mr-4 h-12 w-12 rounded-lg"
+              height={48}
+              src={images[`/src/img/${person.img}`]()}
+              alt=""
+              width={48}
+            />
+            :
+            <Image
+              class="mr-4 h-12 w-12 rounded-lg dark:hidden"
+              height={48}
+              src={images['/src/img/avatar-light.png']()}
+              alt=""
+              width={48}
+            />
+            <Image
+              class="mr-4 hidden h-12 w-12 rounded-lg dark:block"
+              height={48}
+              src={images['/src/img/avatar-dark.png']()}
+              alt=""
+              width={48}
+            />}
+          {person.name}
+        </div>
+      );
+    })
+  }
+</div>

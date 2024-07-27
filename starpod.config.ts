@@ -8,7 +8,7 @@ export default defineStarpodConfig({
     {
       name: 'RobbieTheWagner',
       bio: 'Huge Ember and Tailwind fanboy. I work at Amazon btw.',
-      img: '/hosts/robbie.jpeg',
+      img: 'robbiethewagner.jpg',
       github: 'https://github.com/RobbieTheWagner',
       twitter: 'https://twitter.com/RobbieTheWagner',
       website: 'https://robbiethewagner.dev'
@@ -16,7 +16,7 @@ export default defineStarpodConfig({
     {
       name: 'Charles William Carpenter III',
       bio: 'Third of his name, user of gifs, hater of ESM.',
-      img: '/hosts/chuck.jpeg',
+      img: 'chuckcarpenter.jpg',
       github: 'https://github.com/chuckcarpenter',
       twitter: 'https://twitter.com/CharlesWthe3rd'
     }

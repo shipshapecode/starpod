@@ -20,7 +20,7 @@ export interface Episode {
   description: string;
   content: string;
   episodeImage?: string;
-  episodeNumber?: string | number;
+  episodeNumber?: string;
   episodeSlug: string;
   audio: {
     src: string;
@@ -72,7 +72,7 @@ export async function getAllEpisodes() {
         itunes_image
       }) => {
         const episodeNumber =
-          itunes_episodeType === 'bonus' ? 'Bonus' : itunes_episode;
+          itunes_episodeType === 'bonus' ? 'Bonus' : `${itunes_episode}`;
         const episodeSlug = dasherize(title);
 
         return {

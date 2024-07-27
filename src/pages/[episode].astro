@@ -1,5 +1,6 @@
 ---
 import { getEntry } from 'astro:content';
+import { db, eq, Episode as DbEpisode, HostOrGuest, Person } from 'astro:db';
 
 import { Schema } from 'astro-seo-schema';
 
@@ -35,13 +36,29 @@ const { episode } = Astro.props;
 let Transcript;
 
 if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
-  // @ts-expect-error TODO: investigate this type error more
   Transcript = await getEntry('transcripts', episode.episodeNumber);
   if (Transcript) {
     const { Content } = await Transcript.render();
     Transcript = Content;
   }
 }
+
+const dbEpisode = await db
+  .select()
+  .from(DbEpisode)
+  .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+
+const hostsAndGuests = await db
+  .select({
+    id: Person.id,
+    img: Person.img,
+    isHost: HostOrGuest.isHost,
+    name: Person.name
+  })
+  .from(HostOrGuest)
+  .innerJoin(DbEpisode, eq(HostOrGuest.episodeSlug, DbEpisode.episodeSlug))
+  .innerJoin(Person, eq(HostOrGuest.personId, Person.id))
+  .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
 
 const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumber}`;
 ---
@@ -86,7 +103,11 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
           <FullPlayButton client:load episode={episode} />
         </div>
 
-        <CreatorsAndGuests />
+        {
+          hostsAndGuests?.length ? (
+            <CreatorsAndGuests hostsAndGuests={hostsAndGuests} />
+          ) : undefined
+        }
 
         <h3
           class="mb-6 text-3xl font-bold text-light-text-heading dark:text-white"

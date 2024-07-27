@@ -1,9 +1,9 @@
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
+import db from '@astrojs/db';
 import preact from '@astrojs/preact';
-import vercel from '@astrojs/vercel/serverless';
-
 import sitemap from '@astrojs/sitemap';
+import tailwind from '@astrojs/tailwind';
+import vercel from '@astrojs/vercel/serverless';
 
 // https://astro.build/config
 export default defineConfig({
@@ -19,6 +19,7 @@ export default defineConfig({
   }),
   site: 'https://starpod.dev',
   integrations: [
+    db(),
     preact(),
     sitemap(),
     tailwind({
