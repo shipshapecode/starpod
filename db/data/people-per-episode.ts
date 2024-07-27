@@ -8,7 +8,7 @@ export default {
   'edge-browser-and-pwas-a-new-era-in-web-development-with-diego-gonzales': [
     { id: 'chuckcarpenter', host: true },
     { id: 'argyleink', host: true },
-    { id: 'diegogonzales', host: false }
+    { id: 'diegogonzalez', host: false }
   ],
   // 150
   'secrets-of-a-javascript-guru-natalia-venditto-on-ai-graphql-and-more': [

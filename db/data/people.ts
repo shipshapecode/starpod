@@ -26,8 +26,14 @@ export default [
     img: 'davidfowl.jpg'
   },
   {
-    id: 'diegogonzales',
-    name: 'Diego Gonzales'
+    id: 'diegogonzalez',
+    name: 'Diego Gonzalez',
+    img: 'diegogonzalez.jpg'
+  },
+  {
+    id: 'ken_wheeler',
+    name: 'Ken Wheeler',
+    img: 'ken_wheeler.jpg'
   },
   {
     id: 'kvlly',
