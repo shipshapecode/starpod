@@ -1,9 +1,15 @@
 ---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
 import Layout from '../layouts/Layout.astro';
 import starpodConfig from '../../starpod.config';
 import LargePlatforms from '../components/LargePlatforms.astro';
 
 const { hosts } = starpodConfig;
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/img/*.{jpeg,jpg,png}'
+);
 ---
 
 <Layout title="About">
@@ -24,11 +30,12 @@ const { hosts } = starpodConfig;
       {
         hosts.map((host) => (
           <div class="mb-4 flex flex-col lg:flex-row">
-            <img
+            <Image
               class="mb-4 mr-6 h-12 w-12 rounded-lg lg:h-20 lg:w-20"
               height={80}
-              src={host.img}
+              src={images[`/src/img/${host.img}`]()}
               width={80}
+              alt=""
             />
 
             <div>
