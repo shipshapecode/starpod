@@ -51,16 +51,16 @@ export default function EpisodeList({ episodes, url }: Props) {
                 <img
                   alt={`${episode.title} - episode art`}
                   aria-hidden="true"
-                  class="mb-1 block h-20 w-20 rounded-md lg:mr-6"
+                  class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
                   height={80}
                   src={episode.episodeImage ?? '/images/www.png'}
                   width={80}
                 />
 
-                <div>
+                <div class="flex flex-col">
                   <FormattedDate date={new Date(episode.published)} />
 
-                  <h2 class="mb-2 text-lg font-bold text-light-text-heading dark:text-white">
+                  <h2 class="my-2 text-lg font-bold text-light-text-heading dark:text-white">
                     <a href={`/${episode.episodeSlug}`}>
                       {episode.episodeNumber}: {episode.title}
                     </a>
