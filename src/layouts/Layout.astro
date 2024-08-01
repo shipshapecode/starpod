@@ -120,18 +120,20 @@ const description = Astro.props.description ?? starpodConfig.description;
 
         <Dots />
 
-        <div
-          class:list={[
-            'relative z-20 mb-12 border-b pb-6 lg:mb-16 lg:pb-10 dark:border-dark-border',
-            Astro.url.pathname === '/' && 'hidden'
-          ]}
-        >
-          <div class="ml-8 lg:ml-18">
-            <Breadcrumbs title={title} />
+        <div class="max-w-4xl">
+          <div
+            class:list={[
+              'relative z-20 mb-12 border-b pb-6 lg:mb-16 lg:pb-10 dark:border-dark-border',
+              Astro.url.pathname === '/' && 'hidden'
+            ]}
+          >
+            <div class="ml-8 lg:ml-18">
+              <Breadcrumbs title={title} />
+            </div>
           </div>
-        </div>
 
-        <slot />
+          <slot />
+        </div>
       </div>
     </main>
     <footer class="block lg:hidden">
