@@ -60,7 +60,7 @@ export default function FullPlayButton({ episode }: Props) {
       }}
     >
       <span class="flex w-full items-center rounded-full p-2 pr-4 text-light-text-heading dark:text-white">
-        <span class="mr-3 flex h-7 w-7 items-center justify-center rounded-full bg-light-text-heading text-black dark:bg-white">
+        <span class="mr-3 flex h-7 w-7 items-center justify-center rounded-full bg-light-text-heading text-white dark:bg-white dark:text-dark-button">
           {isCurrentEpisode && isPlaying.value
             ? renderIcon(PauseIcon)
             : renderIcon(PlayIcon)}
