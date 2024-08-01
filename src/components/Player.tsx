@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'preact/hooks';
 import { currentEpisode, isMuted, isPlaying } from '../components/state';
 import MuteButton from './player/MuteButton';
 import PlayButton from './player/PlayButton';
+import PlaybackRateButton from './player/PlaybackRateButton';
 import ForwardButton from './player/ForwardButton';
 import RewindButton from './player/RewindButton';
 import Slider from './player/Slider';
@@ -55,7 +56,7 @@ export default function Player() {
   return (
     <div class="fixed inset-x-0 bottom-0 z-50 lg:left-112 xl:left-120">
       <div
-        class="flex items-center gap-6 px-4 py-4 backdrop-blur-sm bg-light-player/90 md:px-6 dark:bg-dark-player/90"
+        class="flex items-center gap-6 bg-light-player/90 px-4 py-4 backdrop-blur-sm md:px-6 dark:bg-dark-player/90"
         role="region"
         style={{ viewTransitionName: 'player' }}
       >
@@ -86,7 +87,7 @@ export default function Player() {
             <Slider audioPlayer={audioPlayer} progress={progress} />
             <div class="flex items-center gap-4">
               <div class="flex items-center">
-                {/* <PlaybackRateButton player={player} /> */}
+                <PlaybackRateButton audioPlayer={audioPlayer} />
               </div>
               <div class="hidden items-center md:flex">
                 <MuteButton />

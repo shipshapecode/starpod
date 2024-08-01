@@ -4,7 +4,7 @@ import './styles.css';
 export default function MuteButton() {
   return (
     <button
-      class={`gradient-icon group h-4 w-4 relative md:order-none ${isMuted.value ? 'unmute-button' : 'mute-button'}`}
+      class={`gradient-icon group relative h-[18px] w-[18px] md:order-none ${isMuted.value ? 'unmute-button' : 'mute-button'}`}
       type="button"
       onClick={() => (isMuted.value = !isMuted.value)}
       aria-label={isMuted.value ? 'Unmute' : 'Mute'}
