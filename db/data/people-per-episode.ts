@@ -96,5 +96,40 @@ export default {
       { id: 'robbiethewagner', host: true },
       { id: 'chuckcarpenter', host: true },
       { id: 'malware_yml', host: false }
-    ]
+    ],
+  // 137
+  'unleash-developer-superpowers-tracksuits-productivity-hacks-wordpress-on-vercel-w-joel-griffith':
+    [],
+  // Bonus
+  'fehh-x-www-ai-vr-and-the-future-of-web-development': [],
+  // 136
+  'curling-coding-and-deno-with-kevin-whinnery': [],
+  // 135
+  'from-react-miami-to-fly-fishing-diving-deep-with-theprimeagen-and-friends': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'theprimeagen', host: false }
+  ]
+  // 134
+  // 133
+  // 132
+  // 131
+  // 130
+  // 129
+  // 128
+  // 127
+  // 126
+  // 125
+  // 124
+  // 123
+  // 122
+  // 121
+  // 120
+  // 119
+  // 118
+  // 117
+  // 116
+  // 115
+  // 114
+  // 113
 } as { [key: string]: Array<{ id: string; host?: boolean }> };
