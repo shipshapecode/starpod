@@ -44,7 +44,6 @@ export default {
   },
   plugins: [
     require('@tailwindcss/forms'),
-    require('tailwindcss-oklch')(),
     require('@tailwindcss/typography')
   ]
 };
