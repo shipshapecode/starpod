@@ -73,14 +73,14 @@ const description = Astro.props.description ?? starpodConfig.description;
     <ViewTransitions />
   </head>
   <body
-    class="font-inter antialiased text-light-text-body dark:bg-dark-background dark:text-dark-text-body"
+    class="font-inter text-light-text-body antialiased dark:bg-dark-background dark:text-dark-text-body"
   >
     <header
       class="lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
     >
       <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
         <div
-          class="m-2 rounded-lg pb-4 pt-10 bg-light-card lg:pb-12 lg:pt-16 dark:bg-dark-card"
+          class="m-2 rounded-lg bg-light-card pb-4 pt-10 lg:pb-12 lg:pt-16 dark:bg-dark-card"
         >
           <ShowArtwork image={show.image} />
 
