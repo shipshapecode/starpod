@@ -4,6 +4,8 @@ export default {
   theme: {
     extend: {
       backgroundImage: {
+        'dots-dark': "url('/images/dots-dark.svg')",
+        'dots-light': "url('/images/dots-light.svg')",
         'gradient-light':
           'background: radial-gradient(77% 77% at 50% 0%, #EDECFC 0%, rgba(237, 236, 252, 0) 100%)',
         'gradient-dark':
@@ -42,8 +44,5 @@ export default {
       }
     }
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/typography')
-  ]
+  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')]
 };
