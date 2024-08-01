@@ -1,4 +1,9 @@
 export default {
+  // 153
+  'disappointing-whiskey-pizza-debates-and-tech-conference-adventures': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true }
+  ],
   // 152
   'the-future-of-ember-and-modern-build-tools-with-chris-manson': [
     { id: 'robbiethewagner', host: true },
