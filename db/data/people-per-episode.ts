@@ -101,7 +101,12 @@ export default {
   'unleash-developer-superpowers-tracksuits-productivity-hacks-wordpress-on-vercel-w-joel-griffith':
     [],
   // Bonus
-  'fehh-x-www-ai-vr-and-the-future-of-web-development': [],
+  'fehh-x-www-ai-vr-and-the-future-of-web-development': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'burgessdryan', host: false },
+    { id: 'jemyoung', host: false }
+  ],
   // 136
   'curling-coding-and-deno-with-kevin-whinnery': [],
   // 135

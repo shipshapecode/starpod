@@ -1,6 +1,11 @@
 export default [
   { id: 'argyleink', name: 'Adam Argyle', img: 'argyleink.jpg' },
   {
+    id: 'burgessdryan',
+    name: 'Ryan Burgess',
+    img: 'burgessdryan.jpg'
+  },
+  {
     id: 'chuckcarpenter',
     name: 'Charles William Carpenter III',
     img: 'chuckcarpenter.jpg'
@@ -29,6 +34,11 @@ export default [
     id: 'diegogonzalez',
     name: 'Diego Gonzalez',
     img: 'diegogonzalez.jpg'
+  },
+  {
+    id: 'jemyoung',
+    name: 'Jem Young',
+    img: 'jemyoung.png'
   },
   {
     id: 'ken_wheeler',
