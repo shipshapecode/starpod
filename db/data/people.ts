@@ -46,6 +46,11 @@ export default [
     img: 'ken_wheeler.jpg'
   },
   {
+    id: 'kevinwhinnery',
+    name: 'Kevin Whinnery',
+    img: 'kevinwhinnery.jpg'
+  },
+  {
     id: 'kvlly',
     name: 'Kelly Vaughn',
     img: 'kvlly.jpg'

@@ -28,7 +28,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
             <Image
               class="mr-4 h-12 w-12 rounded-lg"
               height={48}
-              src={images[`/src/img/people/${person.img}`]()}
+              src={images[`/src/img/${person.img}`]()}
               alt=""
               width={48}
             />

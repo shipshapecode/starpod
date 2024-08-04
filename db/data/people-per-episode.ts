@@ -108,7 +108,11 @@ export default {
     { id: 'jemyoung', host: false }
   ],
   // 136
-  'curling-coding-and-deno-with-kevin-whinnery': [],
+  'curling-coding-and-deno-with-kevin-whinnery': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'kevinwhinnery', host: true }
+  ],
   // 135
   'from-react-miami-to-fly-fishing-diving-deep-with-theprimeagen-and-friends': [
     { id: 'robbiethewagner', host: true },
