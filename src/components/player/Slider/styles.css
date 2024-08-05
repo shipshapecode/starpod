@@ -1,0 +1,45 @@
+.slider {
+  @apply relative m-0 block h-1.5 w-full appearance-none rounded-none p-0 outline-none;
+
+  &::-webkit-slider-runnable-track {
+    @apply h-1.5 w-full cursor-pointer border-none bg-gray-200 outline-none dark:bg-gray-700;
+  }
+  &::before {
+    @apply h-1.5 bg-gradient-to-r from-[#D8CCFF] to-[#8A63FF] dark:from-[#42C8F3] dark:to-[#B6EDFF];
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    width: var(--seek-before-width);
+    cursor: pointer;
+  }
+  &::-webkit-slider-thumb {
+    @apply relative -mt-[5px] box-content h-4 w-4 cursor-pointer appearance-none bg-contain bg-no-repeat transition-opacity duration-300 lg:opacity-0;
+    background-image: url('/images/rocket-dark.svg');
+    background-position: center center;
+  }
+  &::-moz-range-track {
+    @apply h-1.5 w-full cursor-pointer border-none bg-gray-200 outline-none dark:bg-gray-700;
+  }
+  &::-moz-range-progress {
+    @apply h-1.5 bg-gradient-to-r from-[#D8CCFF] to-[#8A63FF] dark:from-[#42C8F3] dark:to-[#B6EDFF];
+  }
+  &::-moz-focus-outer {
+    border: 0;
+  }
+  &::-moz-range-thumb {
+    @apply h-4 w-4 cursor-pointer appearance-none border-0 bg-transparent bg-contain bg-no-repeat outline-none transition-opacity duration-300 lg:opacity-0;
+    background-image: url('/images/rocket-dark.svg');
+    background-position: center center;
+  }
+
+  &:hover {
+    &::-webkit-slider-thumb {
+      @apply opacity-100;
+    }
+
+    &::-moz-range-thumb {
+      @apply opacity-100;
+    }
+  }
+}

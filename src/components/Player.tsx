@@ -22,8 +22,16 @@ export default function Player() {
   function whilePlaying() {
     if (audioPlayer.current?.duration) {
       const percentage =
-        (audioPlayer.current.currentTime * 100) / audioPlayer.current.duration;
+        (audioPlayer.current.currentTime / audioPlayer.current.duration) * 100;
       setProgress(percentage);
+      const slider = document.querySelector('.slider');
+      if (slider) {
+        console.log(percentage);
+        (slider as HTMLElement).style.setProperty(
+          '--seek-before-width',
+          `${percentage}%`
+        );
+      }
     }
     progressRef.current = requestAnimationFrame(whilePlaying);
   }
