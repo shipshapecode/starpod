@@ -99,7 +99,11 @@ export default {
     ],
   // 137
   'unleash-developer-superpowers-tracksuits-productivity-hacks-wordpress-on-vercel-w-joel-griffith':
-    [],
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'joelgriffith', host: false },
+    ],
   // Bonus
   'fehh-x-www-ai-vr-and-the-future-of-web-development': [
     { id: 'robbiethewagner', host: true },
