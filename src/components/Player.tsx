@@ -62,7 +62,7 @@ export default function Player() {
   }, [progress]);
 
   return (
-    <div class="fixed inset-x-0 bottom-0 z-50 lg:left-112 xl:left-120">
+    <div class="player fixed inset-x-0 bottom-0 z-50 lg:left-112 xl:left-120">
       <div
         class="flex items-center gap-6 bg-light-player/90 px-4 py-4 backdrop-blur-sm md:px-6 dark:bg-dark-player/90"
         role="region"
@@ -72,7 +72,7 @@ export default function Player() {
           <PlayButton />
         </div>
 
-        <div class="mb-[env(safe-area-inset-bottom)] flex flex-1 flex-col gap-3 overflow-hidden p-1">
+        <div class="flex flex-1 flex-col gap-3 overflow-hidden p-1">
           <a
             href={`/${episodeNumber}`}
             class="truncate text-center text-sm font-bold leading-6 md:text-left"
