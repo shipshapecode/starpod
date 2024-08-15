@@ -17,7 +17,7 @@ export default defineConfig({
       enabled: true
     }
   }),
-  site: 'https://starpod.dev',
+  site: 'https://whiskey.fm',
   integrations: [
     db(),
     preact(),
