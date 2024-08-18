@@ -1,6 +1,8 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
 
+import { Schema } from 'astro-seo-schema';
+
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Dots from '../components/Dots.astro';
 import Hosts from '../components/Hosts.astro';
@@ -17,6 +19,10 @@ import '../styles/global.css';
 const show = await getShowInfo();
 
 export interface Props {
+  /**
+   * If defined, this will override the default canonical URL.
+   */
+  canonicalURL?: URL;
   description?: string;
   imageUrl?: string;
   title: string;
@@ -24,6 +30,8 @@ export interface Props {
 
 const { imageUrl, title } = Astro.props;
 
+const canonicalURL =
+  Astro.props.canonicalURL ?? new URL(Astro.url.pathname, Astro.site);
 const description = Astro.props.description ?? starpodConfig.description;
 ---
 
@@ -33,6 +41,7 @@ const description = Astro.props.description ?? starpodConfig.description;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- Favicons -->
@@ -68,19 +77,31 @@ const description = Astro.props.description ?? starpodConfig.description;
       rel="stylesheet"
     />
 
+    <Schema
+      slot="head"
+      item={{
+        '@context': 'https://schema.org',
+        '@type': 'PodcastSeries',
+        name: show.title,
+        about: starpodConfig.blurb,
+        description: show.description,
+        webFeed: starpodConfig.rssFeed
+      }}
+    />
+
     <slot name="head" />
 
     <ViewTransitions />
   </head>
   <body
-    class="font-inter antialiased text-light-text-body dark:bg-dark-background dark:text-dark-text-body"
+    class="font-inter text-light-text-body antialiased dark:bg-dark-background dark:text-dark-text-body"
   >
     <header
       class="scrollbar-thin lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
     >
       <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
         <div
-          class="m-2 rounded-lg pb-4 pt-10 bg-light-card lg:pb-12 lg:pt-16 dark:bg-dark-card"
+          class="m-2 rounded-lg bg-light-card pb-4 pt-10 lg:pb-12 lg:pt-16 dark:bg-dark-card"
         >
           <ShowArtwork image={show.image} />
 
