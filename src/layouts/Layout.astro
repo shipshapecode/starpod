@@ -1,6 +1,8 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
 
+import { Schema } from 'astro-seo-schema';
+
 import SpeedInsights from '@vercel/speed-insights/astro';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
@@ -19,6 +21,10 @@ import '../styles/global.css';
 const show = await getShowInfo();
 
 export interface Props {
+  /**
+   * If defined, this will override the default canonical URL.
+   */
+  canonicalURL?: URL;
   description?: string;
   imageUrl?: string;
   title: string;
@@ -26,6 +32,8 @@ export interface Props {
 
 const { imageUrl, title } = Astro.props;
 
+const canonicalURL =
+  Astro.props.canonicalURL ?? new URL(Astro.url.pathname, Astro.site);
 const description = Astro.props.description ?? starpodConfig.description;
 ---
 
@@ -35,6 +43,7 @@ const description = Astro.props.description ?? starpodConfig.description;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!-- Favicons -->
@@ -68,6 +77,18 @@ const description = Astro.props.description ?? starpodConfig.description;
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
       rel="stylesheet"
+    />
+
+    <Schema
+      slot="head"
+      item={{
+        '@context': 'https://schema.org',
+        '@type': 'PodcastSeries',
+        name: show.title,
+        about: starpodConfig.blurb,
+        description: show.description,
+        webFeed: starpodConfig.rssFeed
+      }}
     />
 
     <slot name="head" />
