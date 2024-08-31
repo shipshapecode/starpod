@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AdPackageCard from '../components/AdPackageCard.astro';
 ---
 
 <Layout title="Sponsor">
@@ -7,7 +8,12 @@ import Layout from '../layouts/Layout.astro';
     <h1
       class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
     >
-      Give us $$$$$
+      Sponsor Our Show
     </h1>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <AdPackageCard heading="30 second ad" price="$500" />
+      <AdPackageCard heading="60 second ad" price="$1,000" />
+    </div>
   </div>
 </Layout>
