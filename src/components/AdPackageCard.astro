@@ -1,28 +1,49 @@
 ---
 export interface Props {
+  bullets: Array<string>;
   heading: string;
   price: string;
 }
 
-const { heading, price } = Astro.props;
+const { bullets, heading, price } = Astro.props;
 ---
 
-<div class="rounded-lg bg-white p-1 dark:bg-dark-background">
+<div class="relative z-10 mb-6 rounded-lg bg-white p-1 dark:bg-dark-background">
   <h2
-    class="bg-dark-card px-5 py-4 font-bold text-light-text-heading lg:py-6 dark:text-white"
+    class="bg-light-card px-5 py-4 font-bold text-light-text-heading lg:py-6 dark:bg-dark-card dark:text-white"
   >
     {heading}
   </h2>
 
   <ul class="list-disc px-8">
-    <li class="border-b py-6 dark:border-dark-border">Item 1</li>
-    <li class="border-b py-6 dark:border-dark-border">Item 2</li>
-    <li class="border-b py-6 dark:border-dark-border">Item 3</li>
-  </ul>
+    {
+      bullets.map((bullet) => {
+        return <li class="border-b py-6 dark:border-dark-border">{bullet}</li>;
+      })
+    }
 
-  <h3
-    class="mb-12 mt-8 px-5 text-4xl font-bold text-light-text-heading dark:text-white"
-  >
-    {price}
-  </h3>
+    <h3
+      class="mb-12 mt-8 px-5 text-4xl font-bold tabular-nums text-light-text-heading dark:text-white"
+    >
+      {price}
+      <span
+        class="text-3xl font-light text-light-text-body dark:text-dark-text-body"
+      >
+        /
+      </span>
+      <span class="text-2xl text-light-text-body dark:text-dark-text-body">
+        per episode
+      </span>
+    </h3>
+
+    <div class="flex w-full">
+      <button class="btn mb-8 w-full justify-center">
+        <span
+          class="rounded-full px-8 py-3 text-center text-sm text-light-text-heading dark:text-white"
+        >
+          Become a sponsor
+        </span>
+      </button>
+    </div>
+  </ul>
 </div>
