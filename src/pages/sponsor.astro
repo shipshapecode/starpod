@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AdPackageCard from '../components/AdPackageCard.astro';
 ---
 
 <Layout title="Sponsor">
@@ -7,7 +8,64 @@ import Layout from '../layouts/Layout.astro';
     <h1
       class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
     >
-      Give us $$$$$
+      Sponsor Our Show
     </h1>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <AdPackageCard
+        bullets={['Host read ad']}
+        heading="30 second ad"
+        price="$500"
+      />
+      <AdPackageCard
+        bullets={['Host read ad']}
+        heading="60 second ad"
+        price="$1,000"
+      />
+    </div>
+
+    <AdPackageCard
+      bullets={['Bundle and save!', '10% off for 3+']}
+      heading="3+ ad package"
+      price="$1,000"
+    />
+
+    <AdPackageCard
+      bullets={['Bundle and save!', '20% off for 6+']}
+      heading="6+ ad package"
+      price="$1,000"
+    />
+
+    <h2
+      class="mb-4 mt-16 text-2xl font-bold text-light-text-heading lg:mb-6 lg:mt-20 lg:text-5xl dark:text-white"
+    >
+      Your overall ad reach
+    </h2>
+
+    <h3 class="section-heading-underlined mb-8 mt-8 lg:mt-12">
+      Listener Metrics
+    </h3>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2">
+      <figure>
+        <span
+          class="text-6xl font-bold tabular-nums text-light-text-heading dark:text-white"
+        >
+          1,000
+        </span>
+
+        <figcaption class="font-bold">listeners per episode</figcaption>
+      </figure>
+
+      <figure>
+        <span
+          class="text-6xl font-bold tabular-nums text-light-text-heading dark:text-white"
+        >
+          15,000
+        </span>
+
+        <figcaption class="font-bold">listeners per 90 days</figcaption>
+      </figure>
+    </div>
   </div>
 </Layout>
