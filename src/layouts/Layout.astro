@@ -43,8 +43,19 @@ const description = Astro.props.description ?? starpodConfig.description;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="canonical" href={canonicalURL} />
+    <meta content={canonicalURL} property="og:url" />
+    <meta content="website" property="og:type" />
+    {
+      starpodConfig.platforms.appleIdNumber && (
+        <meta
+          name="apple-itunes-app"
+          content={`app-id=${starpodConfig.platforms.appleIdNumber}`}
+        />
+      )
+    }
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -57,16 +68,16 @@ const description = Astro.props.description ?? starpodConfig.description;
 
     <!-- Title -->
     <title>{title}</title>
-    <meta content={title} name="og:title" />
+    <meta content={title} property="og:title" />
     <meta content={title} name="twitter:title" />
 
     <!-- Description -->
     <meta content={description} name="description" />
-    <meta content={description} name="og:description" />
+    <meta content={description} property="og:description" />
     <meta content={description} name="twitter:description" />
 
     <!-- Image -->
-    <meta content={imageUrl ?? show.image} name="og:image" />
+    <meta content={imageUrl ?? show.image} property="og:image" />
     <meta content="summary" name="twitter:card" />
     <meta content={imageUrl ?? show.image} name="twitter:image:src" />
 

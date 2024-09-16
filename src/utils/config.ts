@@ -43,6 +43,7 @@ export type StarpodConfig = {
    */
   platforms: {
     apple?: string;
+    appleIdNumber?: string;
     overcast?: string;
     pocketCasts?: string;
     spotify?: string;
