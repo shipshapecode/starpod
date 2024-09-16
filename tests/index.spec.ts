@@ -1,8 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 const indexMeta = {
-  title:
-    'Whiskey Web and Whatnot: Web Development, Neat - A whiskey fueled fireside chat with your favorite web developers.',
+  title: 'Whiskey Web and Whatnot: Web Development, Neat',
   description:
     /^Veteran web developers RobbieTheWagner and Charles William Carpenter III host this informal, whiskey-fueled fireside chat with your favorite web devs/,
   image:
