@@ -7,11 +7,22 @@ export default function ContactForm() {
     e.preventDefault();
 
     const formData = new FormData(e.target as HTMLFormElement);
+    const submitButton: HTMLButtonElement | null =
+      document.querySelector('button');
+
+    if (submitButton) {
+      submitButton.disabled = true;
+    }
+
     const response = await fetch('/api/contact', {
       method: 'POST',
       body: formData
     });
     const data = await response.json();
+
+    if (submitButton) {
+      submitButton.disabled = false;
+    }
 
     if (data.message) {
       setResponseMessage(data.message);
