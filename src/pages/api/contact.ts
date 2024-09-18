@@ -54,7 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
   // Do something with the data, then return a success response
   return new Response(
     JSON.stringify({
-      message: 'Success!'
+      message: `Thanks for contacting us! We'll be in touch soon.`
     }),
     { status: 200 }
   );
