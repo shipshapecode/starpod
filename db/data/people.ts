@@ -1,4 +1,5 @@
 export default [
+  { id: 'amerawhite2', name: 'Amera White', img: 'amerawhite2.jpg' },
   { id: 'argyleink', name: 'Adam Argyle', img: 'argyleink.jpg' },
   {
     id: 'burgessdryan',
@@ -90,7 +91,13 @@ export default [
   },
   {
     id: 'nvenditto',
-    name: 'Natalia Venditto'
+    name: 'Natalia Venditto',
+    img: 'nvenditto.jpg'
+  },
+  {
+    id: 'pbwinston',
+    name: 'Philip Winston',
+    img: 'pbwinston.jpg'
   },
   {
     id: 'rich_harris',
@@ -106,6 +113,11 @@ export default [
     id: 'robbyrussell',
     name: 'Robby Russell',
     img: 'robbyrussell.jpg'
+  },
+  {
+    id: 'shaundai',
+    name: 'Shaundai Person',
+    img: 'shaundai.jpg'
   },
   {
     id: 'tdesseyn',
