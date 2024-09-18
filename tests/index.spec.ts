@@ -13,7 +13,7 @@ test('index page has correct meta', async ({ page }) => {
 
   await expect(page).toHaveTitle(indexMeta.title);
 
-  const ogTitle = page.locator('meta[name="og:title"]');
+  const ogTitle = page.locator('meta[property="og:title"]');
   await expect(ogTitle).toHaveAttribute('content', indexMeta.title);
 
   const twitterTitle = page.locator('meta[name="twitter:title"]');
@@ -22,7 +22,7 @@ test('index page has correct meta', async ({ page }) => {
   const description = page.locator('meta[name="description"]');
   await expect(description).toHaveAttribute('content', indexMeta.description);
 
-  const ogImage = page.locator('meta[name="og:image"]');
+  const ogImage = page.locator('meta[property="og:image"]');
   await expect(ogImage).toHaveAttribute('content', indexMeta.image);
 
   const twitterImage = page.locator('meta[name="twitter:image:src"]');
