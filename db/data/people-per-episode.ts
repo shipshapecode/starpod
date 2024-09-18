@@ -21,13 +21,20 @@ export default {
     { id: 'robbiethewagner', host: true },
     { id: 'chuckcarpenter', host: true },
     { id: 'typecraft_dev', host: false }
-  ],  
+  ],
   // 155
   'htmx-open-source-retro-tech-and-dev-tools-with-carson-gross': [
     { id: 'robbiethewagner', host: true },
     { id: 'chuckcarpenter', host: true },
     { id: 'htmx_org', host: false }
   ],
+  // 154
+  'coding-languages-ai-and-the-evolution-of-game-development-with-philip-winston':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'pbwinston', host: false }
+    ],
   // 153
   'disappointing-whiskey-pizza-debates-and-tech-conference-adventures': [
     { id: 'robbiethewagner', host: true },
@@ -151,9 +158,21 @@ export default {
     { id: 'robbiethewagner', host: true },
     { id: 'chuckcarpenter', host: true },
     { id: 'theprimeagen', host: false }
-  ]
+  ],
   // 134
+  'empowering-black-women-in-tech-shaundais-insightful-discussion-on-self-promotion-and-career-growth':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'shaundai', host: false }
+    ],
   // 133
+  'inclusive-experiences-in-react-applications-championing-neurodivergent-accessibility-w-amera-white':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'amerawhite2', host: false }
+    ]
   // 132
   // 131
   // 130
