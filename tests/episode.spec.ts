@@ -23,7 +23,7 @@ test('works with episode numbers', async ({ page }) => {
 
   await expect(page).toHaveTitle(episode1.title);
 
-  const ogTitle = page.locator('meta[name="og:title"]');
+  const ogTitle = page.locator('meta[property="og:title"]');
   await expect(ogTitle).toHaveAttribute('content', episode1.title);
 
   const twitterTitle = page.locator('meta[name="twitter:title"]');
@@ -32,7 +32,7 @@ test('works with episode numbers', async ({ page }) => {
   const description = page.locator('meta[name="description"]');
   await expect(description).toHaveAttribute('content', episode1.description);
 
-  const ogImage = page.locator('meta[name="og:image"]');
+  const ogImage = page.locator('meta[property="og:image"]');
   await expect(ogImage).toHaveAttribute('content', episode1.image);
 
   const twitterImage = page.locator('meta[name="twitter:image:src"]');
@@ -46,7 +46,7 @@ test('works with episode slugs', async ({ page }) => {
 
   await expect(page).toHaveTitle(episode1.title);
 
-  const ogTitle = page.locator('meta[name="og:title"]');
+  const ogTitle = page.locator('meta[property="og:title"]');
   await expect(ogTitle).toHaveAttribute('content', episode1.title);
 
   const twitterTitle = page.locator('meta[name="twitter:title"]');
@@ -55,7 +55,7 @@ test('works with episode slugs', async ({ page }) => {
   const description = page.locator('meta[name="description"]');
   await expect(description).toHaveAttribute('content', episode1.description);
 
-  const ogImage = page.locator('meta[name="og:image"]');
+  const ogImage = page.locator('meta[property="og:image"]');
   await expect(ogImage).toHaveAttribute('content', episode1.image);
 
   const twitterImage = page.locator('meta[name="twitter:image:src"]');
@@ -67,7 +67,7 @@ test('works for bonus episodes with no episode number', async ({ page }) => {
 
   await expect(page).toHaveTitle(episode2.title);
 
-  const ogTitle = page.locator('meta[name="og:title"]');
+  const ogTitle = page.locator('meta[property="og:title"]');
   await expect(ogTitle).toHaveAttribute('content', episode2.title);
 
   const twitterTitle = page.locator('meta[name="twitter:title"]');
@@ -76,7 +76,7 @@ test('works for bonus episodes with no episode number', async ({ page }) => {
   const description = page.locator('meta[name="description"]');
   await expect(description).toHaveAttribute('content', episode2.description);
 
-  const ogImage = page.locator('meta[name="og:image"]');
+  const ogImage = page.locator('meta[property="og:image"]');
   await expect(ogImage).toHaveAttribute('content', episode2.image);
 
   const twitterImage = page.locator('meta[name="twitter:image:src"]');

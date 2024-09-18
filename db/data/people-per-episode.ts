@@ -1,4 +1,33 @@
 export default {
+  // 159
+  'dev-jobs-burgers-and-ai-with-spotifys-taylor-poindexter': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'engineering_bae', host: false }
+  ],
+  // 158
+  'woodford-reserve-air-conditioning-in-europe-podcasting-typescript-and-taxes':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true }
+    ],
+  // 157
+  'italian-culture-css-remote-work-gen-z-career-advice-and-more': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true }
+  ],
+  // 156
+  'typecraft-typescript-vim-foodie-youtube-linux-and-more': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'typecraft_dev', host: false }
+  ],  
+  // 155
+  'htmx-open-source-retro-tech-and-dev-tools-with-carson-gross': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'htmx_org', host: false }
+  ],
   // 153
   'disappointing-whiskey-pizza-debates-and-tech-conference-adventures': [
     { id: 'robbiethewagner', host: true },
@@ -102,7 +131,7 @@ export default {
     [
       { id: 'robbiethewagner', host: true },
       { id: 'chuckcarpenter', host: true },
-      { id: 'joelgriffith', host: false },
+      { id: 'joelgriffith', host: false }
     ],
   // Bonus
   'fehh-x-www-ai-vr-and-the-future-of-web-development': [

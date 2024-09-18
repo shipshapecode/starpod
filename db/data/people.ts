@@ -36,6 +36,16 @@ export default [
     img: 'diegogonzalez.jpg'
   },
   {
+    id: 'engineering_bae',
+    name: 'Taylor Poindexter',
+    img: 'engineering_bae.jpg'
+  },
+  {
+    id: 'htmx_org',
+    name: 'Carson Gross',
+    img: 'htmx_org.jpg'
+  },
+  {
     id: 'jemyoung',
     name: 'Jem Young',
     img: 'jemyoung.png'
@@ -111,6 +121,11 @@ export default [
     id: 'theprimeagen',
     name: 'ThePrimeagen',
     img: 'theprimeagen.jpg'
+  },
+  {
+    id: 'typecraft_dev',
+    name: 'Typecraft',
+    img: 'typecraft_dev.jpg'
   },
   { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' }
 ];
