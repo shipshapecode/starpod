@@ -1,0 +1,12 @@
+name: Rebuild Astro Site
+on:
+  schedule:
+    - cron: "0 8 * * *"
+
+jobs:
+  trigger_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger webhook to rebuild daily
+        run: |
+          curl -X POST ${{secrets.REBUILD_WEBHOOK}}
