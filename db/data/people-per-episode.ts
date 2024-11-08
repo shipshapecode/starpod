@@ -1,4 +1,21 @@
 export default {
+  // 162
+  'developer-communities-career-growth-and-front-end-hot-takes-with-madison-kanna': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'madisonkanna', host: false }
+  ],  
+  // 161
+  'frameworks-ai-and-the-complexities-of-the-gig-economy': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true }
+  ],
+  // 160
+  'frameworks-football-and-fast-cars-with-kelly-vaughn': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'kvlly', host: false }
+  ],
   // 159
   'dev-jobs-burgers-and-ai-with-spotifys-taylor-poindexter': [
     { id: 'robbiethewagner', host: true },

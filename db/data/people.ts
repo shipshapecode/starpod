@@ -72,6 +72,11 @@ export default [
     img: 'kvlly.jpg'
   },
   {
+    id: 'madisonkanna',
+    name: 'Madison Kanna',
+    img: 'madisonkanna.jpg'
+  },
+  {
     id: 'malware_yml',
     name: 'Mal',
     img: 'malware_yml.jpg'
