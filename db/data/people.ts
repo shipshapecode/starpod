@@ -27,6 +27,11 @@ export default [
     img: 'dantelex.jpg'
   },
   {
+    id: 'davideast',
+    name: 'David East',
+    img: 'davideast.jpg'
+  },
+  {
     id: 'davidfowl',
     name: 'David Fowler',
     img: 'davidfowl.jpg'
@@ -87,6 +92,11 @@ export default [
     img: 'mansona.jpg'
   },
   {
+    id: 'michellebakels',
+    name: 'Michelle Bakels',
+    img: 'michellebakels.jpg'
+  },
+  {
     id: 'mnagdi',
     name: 'Michael Nagdi'
   },
@@ -144,5 +154,6 @@ export default [
     name: 'Typecraft',
     img: 'typecraft_dev.jpg'
   },
+  { id: 'wagslane', name: 'Lane Wagner', img: 'wagslane.jpg' },
   { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' }
 ];

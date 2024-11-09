@@ -1,10 +1,37 @@
 export default {
-  // 162
-  'developer-communities-career-growth-and-front-end-hot-takes-with-madison-kanna': [
+  // 166
+  'front-end-adventures-with-bad-at-css-david-east-and-adam-argyle': [
     { id: 'robbiethewagner', host: true },
     { id: 'chuckcarpenter', host: true },
-    { id: 'madisonkanna', host: false }
-  ],  
+    { id: 'argyleink', host: false },
+    { id: 'davideast', host: false }
+  ],
+  // 165
+  'shepherdjs-the-future-of-open-source-capitalism-and-corporate-responsibility':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true }
+    ],
+  // 164
+  'from-frontend-to-backend-lane-wagners-journey-to-bootdev': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'wagslane', host: false }
+  ],
+  // 163
+  'balancing-code-and-wellbeing-michelle-bakels-on-react-and-developer-health':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'michellebakels', host: false }
+    ],
+  // 162
+  'developer-communities-career-growth-and-front-end-hot-takes-with-madison-kanna':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'madisonkanna', host: false }
+    ],
   // 161
   'frameworks-ai-and-the-complexities-of-the-gig-economy': [
     { id: 'robbiethewagner', host: true },
