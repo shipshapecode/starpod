@@ -6,7 +6,7 @@ import peoplePerEpisode from './data/people-per-episode';
 
 // https://astro.build/db/seed
 export default async function seed() {
-  await db.insert(Person).values(people);
+  await db.insert(Person).values(people).onConflictDoNothing();
 
   const allEpisodes = await getAllEpisodes();
   const episodes = allEpisodes.map((episode) => {
@@ -15,7 +15,7 @@ export default async function seed() {
     };
   });
 
-  await db.insert(Episode).values(episodes);
+  await db.insert(Episode).values(episodes).onConflictDoNothing();
 
   const hostsOrGuestsToInsert = [];
   for (let episode of episodes) {
@@ -30,5 +30,8 @@ export default async function seed() {
     }
   }
 
-  await db.insert(HostOrGuest).values(hostsOrGuestsToInsert);
+  await db
+    .insert(HostOrGuest)
+    .values(hostsOrGuestsToInsert)
+    .onConflictDoNothing();
 }
