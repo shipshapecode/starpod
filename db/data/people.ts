@@ -7,6 +7,11 @@ export default [
     img: 'burgessdryan.jpg'
   },
   {
+    id: 'chriscoyier',
+    name: 'Chris Coyier',
+    img: 'chriscoyier.jpg'
+  },
+  {
     id: 'chuckcarpenter',
     name: 'Charles William Carpenter III',
     img: 'chuckcarpenter.jpg'
@@ -27,6 +32,11 @@ export default [
     img: 'dantelex.jpg'
   },
   {
+    id: 'davideast',
+    name: 'David East',
+    img: 'davideast.jpg'
+  },
+  {
     id: 'davidfowl',
     name: 'David Fowler',
     img: 'davidfowl.jpg'
@@ -45,6 +55,16 @@ export default [
     id: 'htmx_org',
     name: 'Carson Gross',
     img: 'htmx_org.jpg'
+  },
+  {
+    id: 'jamesqquick',
+    name: 'James Q Quick',
+    img: 'jamesqquick.jpg'
+  },
+  {
+    id: 'jeffpcma',
+    name: 'Jeff Cronstrom',
+    img: 'jeffpcma.jpg'
   },
   {
     id: 'jemyoung',
@@ -72,6 +92,11 @@ export default [
     img: 'kvlly.jpg'
   },
   {
+    id: 'madisonkanna',
+    name: 'Madison Kanna',
+    img: 'madisonkanna.jpg'
+  },
+  {
     id: 'malware_yml',
     name: 'Mal',
     img: 'malware_yml.jpg'
@@ -80,6 +105,11 @@ export default [
     id: 'mansona',
     name: 'Chris Manson',
     img: 'mansona.jpg'
+  },
+  {
+    id: 'michellebakels',
+    name: 'Michelle Bakels',
+    img: 'michellebakels.jpg'
   },
   {
     id: 'mnagdi',
@@ -139,5 +169,6 @@ export default [
     name: 'Typecraft',
     img: 'typecraft_dev.jpg'
   },
+  { id: 'wagslane', name: 'Lane Wagner', img: 'wagslane.jpg' },
   { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' }
 ];

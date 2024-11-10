@@ -1,4 +1,55 @@
 export default {
+  // 167
+  'live-from-that-conf-web-frameworks-and-developer-experience-with-james-quick':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'jamesqquick', host: false }
+    ],
+  // 166
+  'front-end-adventures-with-bad-at-css-david-east-and-adam-argyle': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'argyleink', host: false },
+    { id: 'davideast', host: false }
+  ],
+  // 165
+  'shepherdjs-the-future-of-open-source-capitalism-and-corporate-responsibility':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true }
+    ],
+  // 164
+  'from-frontend-to-backend-lane-wagners-journey-to-bootdev': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'wagslane', host: false }
+  ],
+  // 163
+  'balancing-code-and-wellbeing-michelle-bakels-on-react-and-developer-health':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'michellebakels', host: false }
+    ],
+  // 162
+  'developer-communities-career-growth-and-front-end-hot-takes-with-madison-kanna':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'madisonkanna', host: false }
+    ],
+  // 161
+  'frameworks-ai-and-the-complexities-of-the-gig-economy': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true }
+  ],
+  // 160
+  'frameworks-football-and-fast-cars-with-kelly-vaughn': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'kvlly', host: false }
+  ],
   // 159
   'dev-jobs-burgers-and-ai-with-spotifys-taylor-poindexter': [
     { id: 'robbiethewagner', host: true },
@@ -172,14 +223,47 @@ export default {
       { id: 'robbiethewagner', host: true },
       { id: 'chuckcarpenter', host: true },
       { id: 'amerawhite2', host: false }
-    ]
+    ],
   // 132
+  'nextjss-speed-vs-redwoodjss-strength-the-web-development-drama-you-cant-ignore':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true }
+    ],
   // 131
+  'chris-coyier-on-embracing-technology-and-the-future-of-web-development': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'chriscoyier', host: false }
+  ],
   // 130
+  'upgrade-your-lifestyle-from-the-ballmer-peak-to-high-tech-toilet-seats': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true }
+  ],
   // 129
+  'a-deep-dive-into-managed-dns-with-jeff-cronstrom': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'jeffpcma', host: false }
+  ],
   // 128
+  'the-missteps-of-graphql-and-the-promise-of-progressive-enhancement': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true }
+  ],
   // 127
+  'monthly-malarkey-javascript-modules-html-and-ryan-reynolds': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true }
+  ],
   // 126
+  'bearded-talks-on-beardless-hosts-vscode-sidebars-ai-and-graphql-with-kelly-vaughn':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'kvlly', host: false }
+    ]
   // 125
   // 124
   // 123
