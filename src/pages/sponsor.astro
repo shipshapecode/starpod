@@ -1,6 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AdPackageCard from '../components/AdPackageCard.astro';
+
+const countries = [
+  { name: 'United States', flag: '', percentage: 52 },
+  { name: 'United Kingdom', flag: '', percentage: 7 },
+  { name: 'Canada', flag: '', percentage: 5 },
+  { name: 'Germany', flag: '', percentage: 4 },
+  { name: 'Australia', flag: '', percentage: 4 }
+];
 ---
 
 <Layout title="Sponsor">
@@ -30,9 +38,7 @@ import AdPackageCard from '../components/AdPackageCard.astro';
       Your overall ad reach
     </h2>
 
-    <h3 class="section-heading-underlined mb-8 mt-8 lg:mt-12">
-      Listener Metrics
-    </h3>
+    <h3 class="section-heading mb-8 mt-8 lg:mt-12">Listener Metrics</h3>
 
     <div class="grid grid-cols-1 lg:grid-cols-2">
       <figure>
@@ -42,7 +48,7 @@ import AdPackageCard from '../components/AdPackageCard.astro';
           1,000
         </span>
 
-        <figcaption class="font-bold">listeners per episode</figcaption>
+        <figcaption class="mt-2 font-bold">listeners per episode</figcaption>
       </figure>
 
       <figure>
@@ -52,8 +58,24 @@ import AdPackageCard from '../components/AdPackageCard.astro';
           15,000
         </span>
 
-        <figcaption class="font-bold">listeners per 90 days</figcaption>
+        <figcaption class="mt-2 font-bold">listeners per 90 days</figcaption>
       </figure>
     </div>
+
+    <h3 class="section-heading mb-8 mt-8 lg:mt-12">
+      Top Listeners By Location
+    </h3>
+
+    {
+      countries.map((country) => {
+        return (
+          <div class="border-b py-6 text-light-text-heading dark:border-dark-border dark:text-white">
+            <span>{country.name}</span>
+
+            <span>{country.percentage}%</span>
+          </div>
+        );
+      })
+    }
   </div>
 </Layout>
