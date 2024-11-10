@@ -100,4 +100,4 @@ see fit.
 
 #### Configuring guests
 
-We use Turso and Astro DB to setup guests per episode. If you would also like to do this, you will need a Turso account.
+We are experimenting with storing guest info in Astro DB, which is currently in closed beta, so it may not be accessible to you if you did not get a beta invite.
