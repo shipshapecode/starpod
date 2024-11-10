@@ -7,6 +7,11 @@ export default [
     img: 'burgessdryan.jpg'
   },
   {
+    id: 'chriscoyier',
+    name: 'Chris Coyier',
+    img: 'chriscoyier.jpg'
+  },
+  {
     id: 'chuckcarpenter',
     name: 'Charles William Carpenter III',
     img: 'chuckcarpenter.jpg'
@@ -50,6 +55,16 @@ export default [
     id: 'htmx_org',
     name: 'Carson Gross',
     img: 'htmx_org.jpg'
+  },
+  {
+    id: 'jamesqquick',
+    name: 'James Q Quick',
+    img: 'jamesqquick.jpg'
+  },
+  {
+    id: 'jeffpcma',
+    name: 'Jeff Cronstrom',
+    img: 'jeffpcma.jpg'
   },
   {
     id: 'jemyoung',
