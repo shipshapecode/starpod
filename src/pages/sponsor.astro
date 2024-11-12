@@ -1,13 +1,19 @@
 ---
+import { Image } from 'astro:assets';
+
 import Layout from '../layouts/Layout.astro';
 import AdPackageCard from '../components/AdPackageCard.astro';
 
+const countryFlags = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/img/countries/*.{jpeg,jpg,png}'
+);
+
 const countries = [
-  { name: 'United States', flag: '', percentage: 52 },
-  { name: 'United Kingdom', flag: '', percentage: 7 },
-  { name: 'Canada', flag: '', percentage: 5 },
-  { name: 'Germany', flag: '', percentage: 4 },
-  { name: 'Australia', flag: '', percentage: 4 }
+  { name: 'United States', flag: 'USA.png', percentage: 52 },
+  { name: 'United Kingdom', flag: 'UK.png', percentage: 7 },
+  { name: 'Canada', flag: 'Canada.png', percentage: 5 },
+  { name: 'Germany', flag: 'Germany.png', percentage: 4 },
+  { name: 'Australia', flag: 'Australia.png', percentage: 4 }
 ];
 ---
 
@@ -69,10 +75,29 @@ const countries = [
     {
       countries.map((country) => {
         return (
-          <div class="border-b py-6 text-light-text-heading dark:border-dark-border dark:text-white">
-            <span>{country.name}</span>
+          <div class="grid grid-cols-4 gap-6 border-b py-6 text-light-text-heading dark:border-dark-border dark:text-white">
+            <div class="flex items-center">
+              <Image
+                class="mr-4 h-6 w-6 rounded-sm"
+                height={24}
+                src={countryFlags[`/src/img/countries/${country.flag}`]()}
+                alt=""
+                width={24}
+              />
+              {country.name}
+            </div>
 
-            <span>{country.percentage}%</span>
+            <div class="relative col-span-2 flex items-center">
+              <div class="absolute z-0 h-1 w-full rounded-lg bg-gray-200 outline-none dark:bg-gray-700" />
+              <div
+                class="absolute z-10 h-1 rounded-lg bg-gradient-to-r from-[#D8CCFF] to-[#8A63FF] dark:from-[#42C8F3] dark:to-[#B6EDFF]"
+                style={`width:${country.percentage}%`}
+              />
+            </div>
+
+            <div class="flex items-center justify-end">
+              {country.percentage}%
+            </div>
           </div>
         );
       })
