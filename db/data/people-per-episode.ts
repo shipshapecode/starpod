@@ -1,4 +1,11 @@
 export default {
+  // 168
+  'building-a-better-web-open-source-simplicity-and-speed-with-jason-lengstorf':
+    [
+      { id: 'robbiethewagner', host: true },
+      { id: 'chuckcarpenter', host: true },
+      { id: 'jlengstorf', host: false }
+    ],
   // 167
   'live-from-that-conf-web-frameworks-and-developer-experience-with-james-quick':
     [

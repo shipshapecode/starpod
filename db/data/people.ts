@@ -72,6 +72,11 @@ export default [
     img: 'jemyoung.png'
   },
   {
+    id: 'jlengstorf',
+    name: 'Jason Lengstorf',
+    img: 'jlengstorf.jpg'
+  },
+  {
     id: 'joelgriffith',
     name: 'Joel Griffith',
     img: 'joelgriffith.jpg'
