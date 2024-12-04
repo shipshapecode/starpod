@@ -1,5 +1,5 @@
 ---
-import { ViewTransitions } from 'astro:transitions';
+import { ClientRouter } from 'astro:transitions';
 
 import { Schema } from 'astro-seo-schema';
 
@@ -105,7 +105,7 @@ const description = Astro.props.description ?? starpodConfig.description;
     <slot name="head" />
 
     <SpeedInsights />
-    <ViewTransitions />
+    <ClientRouter />
   </head>
   <body
     class="font-inter text-light-text-body antialiased dark:bg-dark-background dark:text-dark-text-body"
