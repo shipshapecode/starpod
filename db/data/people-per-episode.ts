@@ -1,4 +1,16 @@
 export default {
+  // 171
+  // 170
+  'open-source-ethics-and-monetization-with-chris-coyier': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true },
+    { id: 'chriscoyier', host: false }
+  ],
+  // 169
+  'faang-is-dead-long-live-manamana': [
+    { id: 'robbiethewagner', host: true },
+    { id: 'chuckcarpenter', host: true }
+  ],
   // 168
   'building-a-better-web-open-source-simplicity-and-speed-with-jason-lengstorf':
     [
