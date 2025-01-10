@@ -160,6 +160,11 @@ export default [
     img: 'shaundai.jpg'
   },
   {
+    id: 'tasonjorres',
+    name: 'Jason Torres',
+    img: 'tasonjorres.jpg'
+  },
+  {
     id: 'tdesseyn',
     name: 'Taylor Desseyn',
     img: 'tdesseyn.jpg'

@@ -1,4 +1,10 @@
 export default {
+  // 172
+  'balance-and-burnout-in-tech-with-jason-torres': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'tasonjorres' }
+  ],
   // 171
   'breaking-down-open-source-licensing-with-carlo-piana': [
     { id: 'robbiethewagner' },
