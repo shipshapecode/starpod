@@ -7,6 +7,11 @@ export default [
     img: 'burgessdryan.jpg'
   },
   {
+    id: 'carlopiana',
+    name: 'Carlo Piana',
+    img: 'carlopiana.jpg'
+  },
+  {
     id: 'chriscoyier',
     name: 'Chris Coyier',
     img: 'chriscoyier.jpg'

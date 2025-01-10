@@ -6,6 +6,14 @@ const Episode = defineTable({
   }
 });
 
+const Person = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    img: column.text({ optional: true }),
+    name: column.text()
+  }
+});
+
 const HostOrGuest = defineTable({
   columns: {
     episodeSlug: column.text({
@@ -13,15 +21,8 @@ const HostOrGuest = defineTable({
     }),
     isHost: column.boolean(),
     personId: column.text({ references: () => Person.columns.id })
-  }
-});
-
-const Person = defineTable({
-  columns: {
-    id: column.text({ primaryKey: true }),
-    img: column.text({ optional: true }),
-    name: column.text()
-  }
+  },
+  indexes: [{ on: ['episodeSlug', 'personId'], unique: true }]
 });
 
 export default defineDb({

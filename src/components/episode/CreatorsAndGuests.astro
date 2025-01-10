@@ -15,13 +15,42 @@ const { hostsAndGuests } = Astro.props;
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/*.{jpeg,jpg,png}'
 );
+const priorityNames = ['RobbieTheWagner', 'Charles William Carpenter III'];
 ---
 
 <h3 class="section-heading pb-6">Creators and Guests</h3>
 
 <div class="mb-12 grid grid-cols-1 gap-4 lg:mb-20 lg:grid-cols-2">
   {
-    hostsAndGuests.map((person) => {
+    hostsAndGuests.sort((a, b) => {
+    // Check if `a` or `b` are in the priority list
+    const aPriorityIndex = priorityNames.indexOf(a.name);
+    const bPriorityIndex = priorityNames.indexOf(b.name);
+
+    if (aPriorityIndex !== -1 && bPriorityIndex !== -1) {
+      // If both names are in the priority list, maintain the priority order
+      return aPriorityIndex - bPriorityIndex;
+    }
+    if (aPriorityIndex !== -1) {
+      // If only `a` is in the priority list, it comes first
+      return -1;
+    }
+    if (bPriorityIndex !== -1) {
+      // If only `b` is in the priority list, it comes first
+      return 1;
+    }
+
+    // Check for `isHost` flag
+    if (a.isHost && !b.isHost) {
+      return -1; // Hosts come before non-hosts
+    }
+    if (!a.isHost && b.isHost) {
+      return 1; // Non-hosts come after hosts
+    }
+
+    // Sort remaining users alphabetically
+    return a.name.localeCompare(b.name);
+  }).map((person) => {
       return (
         <div class="flex items-center">
           {person.img ?
