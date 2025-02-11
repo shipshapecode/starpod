@@ -1,4 +1,18 @@
 export default {
+  // 180
+  'the-react-debate-no-one-wants-to-have-but-should-with-ken-wheeler-and-typecraft':
+    [
+      { id: 'robbiethewagner' },
+      { id: 'chuckcarpenter' },
+      { id: 'ken_wheeler' },
+      { id: 'typecraft_dev' }
+    ],
+  // 178
+  'is-cereal-soup-the-fg-scale-and-js-vs-css-with-adam-argyle': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'argyleink' }
+  ],
   // 172
   'balance-and-burnout-in-tech-with-jason-torres': [
     { id: 'robbiethewagner' },
