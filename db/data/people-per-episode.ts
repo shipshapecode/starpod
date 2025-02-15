@@ -1,4 +1,9 @@
 export default {
+  // 181
+  'the-future-of-web-dev-are-we-overcomplicating-everything': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
   // 180
   'the-react-debate-no-one-wants-to-have-but-should-with-ken-wheeler-and-typecraft':
     [
@@ -13,6 +18,30 @@ export default {
     { id: 'chuckcarpenter' },
     { id: 'argyleink' }
   ],
+  // 177
+  'authenticity-in-a-world-of-algorithms': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
+  // 176
+  'what-makes-a-christmas-movie-plus-a-toast-to-new-beginnings': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
+  // 175
+  'decentralized-identity-the-future-of-privacy-and-security-with-angie-jones':
+    [
+      { id: 'robbiethewagner' },
+      { id: 'chuckcarpenter' },
+      { id: 'techgirl1908' }
+    ],
+  // 174
+  'navigating-career-pivots-and-politics-with-kelly-vaughn': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'kvlly' }
+  ],
+  // 173
   // 172
   'balance-and-burnout-in-tech-with-jason-torres': [
     { id: 'robbiethewagner' },

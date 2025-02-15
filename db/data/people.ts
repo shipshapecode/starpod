@@ -165,6 +165,11 @@ export default [
     img: 'tasonjorres.jpg'
   },
   {
+    id: 'techgirl1908',
+    name: 'Angie Jones',
+    img: 'techgirl1908.jpg'
+  },
+  {
     id: 'tdesseyn',
     name: 'Taylor Desseyn',
     img: 'tdesseyn.jpg'
