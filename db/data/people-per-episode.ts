@@ -1,4 +1,10 @@
 export default {
+  // 182
+  'from-javascript-to-php-josh-cirres-unexpected-dev-journey': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'joshcirre' }
+  ],
   // 181
   'the-future-of-web-dev-are-we-overcomplicating-everything': [
     { id: 'robbiethewagner' },
@@ -12,6 +18,12 @@ export default {
       { id: 'ken_wheeler' },
       { id: 'typecraft_dev' }
     ],
+  // 179
+  'how-to-make-a-podcast-worth-listening-to-with-dan-blumberg': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'dblums' }
+  ],
   // 178
   'is-cereal-soup-the-fg-scale-and-js-vs-css-with-adam-argyle': [
     { id: 'robbiethewagner' },
@@ -42,6 +54,12 @@ export default {
     { id: 'kvlly' }
   ],
   // 173
+  'building-reputation-in-tech-with-adam-stacoviak-and-jerod-santo': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'adamstac' },
+    { id: 'jerodsanto' }
+  ],
   // 172
   'balance-and-burnout-in-tech-with-jason-torres': [
     { id: 'robbiethewagner' },
@@ -307,8 +325,14 @@ export default {
   ],
   // 126
   'bearded-talks-on-beardless-hosts-vscode-sidebars-ai-and-graphql-with-kelly-vaughn':
-    [{ id: 'robbiethewagner' }, { id: 'chuckcarpenter' }, { id: 'kvlly' }]
+    [{ id: 'robbiethewagner' }, { id: 'chuckcarpenter' }, { id: 'kvlly' }],
   // 125
+  'tech-conferences-remote-work-and-the-intersection-of-ai-and-web-design-with-clark-sell':
+    [
+      { id: 'robbiethewagner' },
+      { id: 'chuckcarpenter' },
+      { id: 'theclarksell' }
+    ]
   // 124
   // 123
   // 122

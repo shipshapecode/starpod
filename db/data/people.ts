@@ -1,4 +1,5 @@
 export default [
+  { id: 'adamstac', name: 'Adam Stacoviak', img: 'adamstac.jpg' },
   { id: 'amerawhite2', name: 'Amera White', img: 'amerawhite2.jpg' },
   { id: 'argyleink', name: 'Adam Argyle', img: 'argyleink.jpg' },
   {
@@ -47,6 +48,11 @@ export default [
     img: 'davidfowl.jpg'
   },
   {
+    id: 'dblums',
+    name: 'Dan Blumberg',
+    img: 'dblums.jpg'
+  },
+  {
     id: 'diegogonzalez',
     name: 'Diego Gonzalez',
     img: 'diegogonzalez.jpg'
@@ -77,6 +83,11 @@ export default [
     img: 'jemyoung.png'
   },
   {
+    id: 'jerodsanto',
+    name: 'Jerod Santo',
+    img: 'jerodsanto,jpg'
+  },
+  {
     id: 'jlengstorf',
     name: 'Jason Lengstorf',
     img: 'jlengstorf.jpg'
@@ -85,6 +96,11 @@ export default [
     id: 'joelgriffith',
     name: 'Joel Griffith',
     img: 'joelgriffith.jpg'
+  },
+  {
+    id: 'joshcirre',
+    name: 'Josh Cirre',
+    img: 'joshcirre.jpg'
   },
   {
     id: 'ken_wheeler',
@@ -178,6 +194,11 @@ export default [
     id: 'theaprilyoho',
     name: 'April Yoho',
     img: 'theaprilyoho.jpg'
+  },  
+  {
+    id: 'theclarksell',
+    name: 'Clark Sell',
+    img: 'theclarksell.jpg'
   },
   {
     id: 'theprimeagen',
