@@ -85,7 +85,7 @@ export default [
   {
     id: 'jerodsanto',
     name: 'Jerod Santo',
-    img: 'jerodsanto,jpg'
+    img: 'jerodsanto.jpg'
   },
   {
     id: 'jlengstorf',
