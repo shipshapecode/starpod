@@ -1,8 +1,18 @@
-import { db, Episode, HostOrGuest, Person, sql } from 'astro:db';
+import {
+  db,
+  Episode,
+  HostOrGuest,
+  Person,
+  Sponsor,
+  SponsorForEpisode,
+  sql
+} from 'astro:db';
 
 import { getAllEpisodes } from '../src/lib/rss';
 import people from './data/people';
 import peoplePerEpisode from './data/people-per-episode';
+import sponsors from './data/sponsors';
+import sponsorsPerEpisode from './data/sponsors-per-episode';
 
 // https://astro.build/db/seed
 export default async function seed() {
@@ -12,6 +22,18 @@ export default async function seed() {
     .onConflictDoUpdate({
       target: Person.id,
       set: { name: sql`excluded.name`, img: sql`excluded.img` }
+    });
+
+  await db
+    .insert(Sponsor)
+    .values(sponsors)
+    .onConflictDoUpdate({
+      target: Sponsor.id,
+      set: {
+        name: sql`excluded.name`,
+        img: sql`excluded.img`,
+        url: sql`excluded.url`
+      }
     });
 
   const allEpisodes = await getAllEpisodes();
@@ -24,6 +46,7 @@ export default async function seed() {
   await db.insert(Episode).values(episodes).onConflictDoNothing();
 
   const hostsOrGuestsToInsert = [];
+  const sponsorsForEpisodesToInsert = [];
   for (let episode of episodes) {
     if (peoplePerEpisode[episode.episodeSlug]?.length) {
       for (let person of peoplePerEpisode[episode.episodeSlug]) {
@@ -38,10 +61,24 @@ export default async function seed() {
         });
       }
     }
+
+    if (sponsorsPerEpisode[episode.episodeSlug]?.length) {
+      for (let sponsor of sponsorsPerEpisode[episode.episodeSlug]) {
+        sponsorsForEpisodesToInsert.push({
+          episodeSlug: episode.episodeSlug,
+          sponsorId: sponsor.id
+        });
+      }
+    }
   }
 
   await db
     .insert(HostOrGuest)
     .values(hostsOrGuestsToInsert)
+    .onConflictDoNothing();
+
+  await db
+    .insert(SponsorForEpisode)
+    .values(sponsorsForEpisodesToInsert)
     .onConflictDoNothing();
 }

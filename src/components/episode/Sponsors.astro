@@ -1,0 +1,42 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+export interface Props {
+  sponsors: Array<{
+    id: string;
+    img: string | null;
+    name: string;
+    url: string;
+  }>;
+}
+
+const { sponsors } = Astro.props;
+const svgs = import.meta.glob('/src/img/sponsors/*.svg', {
+  query: '?raw',
+  import: 'default'
+});
+---
+
+<h3 class="section-heading pb-6">Sponsors</h3>
+
+<div class="mb-12 grid grid-cols-1 gap-4 lg:mb-20 lg:grid-cols-2">
+  {
+    sponsors.map((sponsor) => {
+      return (
+        <a href={sponsor.url} target="_blank">
+          <div class="flex items-center">
+            <div class="mr-4 h-12 w-12 rounded-lg">
+              <Fragment
+                height="48"
+                width="48"
+                set:html={svgs[`/src/img/sponsors/${sponsor.img}`]()}
+              />
+            </div>
+            {sponsor.name}
+          </div>
+        </a>
+      );
+    })
+  }
+</div>

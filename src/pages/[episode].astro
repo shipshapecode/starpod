@@ -1,11 +1,20 @@
 ---
 import { getEntry } from 'astro:content';
-import { db, eq, Episode as DbEpisode, HostOrGuest, Person } from 'astro:db';
+import {
+  db,
+  eq,
+  Episode as DbEpisode,
+  HostOrGuest,
+  Person,
+  Sponsor,
+  SponsorForEpisode
+} from 'astro:db';
 
 import { Schema } from 'astro-seo-schema';
 
 import FormattedDate from '../components/FormattedDate';
 import CreatorsAndGuests from '../components/episode/CreatorsAndGuests.astro';
+import Sponsors from '../components/episode/Sponsors.astro';
 import PlayButton from '../components/player/PlayButton';
 import FullPlayButton from '../components/FullPlayButton';
 import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
@@ -57,6 +66,21 @@ const hostsAndGuests = await db
   .innerJoin(Person, eq(HostOrGuest.personId, Person.id))
   .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
 
+const sponsors = await db
+  .select({
+    id: Sponsor.id,
+    img: Sponsor.img,
+    name: Sponsor.name,
+    url: Sponsor.url
+  })
+  .from(SponsorForEpisode)
+  .innerJoin(
+    DbEpisode,
+    eq(SponsorForEpisode.episodeSlug, DbEpisode.episodeSlug)
+  )
+  .innerJoin(Sponsor, eq(SponsorForEpisode.sponsorId, Sponsor.id))
+  .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+
 const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumber}`;
 ---
 
@@ -106,6 +130,8 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
             <CreatorsAndGuests hostsAndGuests={hostsAndGuests} />
           ) : undefined
         }
+
+        {sponsors?.length ? <Sponsors sponsors={sponsors} /> : undefined}
 
         <h3 class="section-heading-underlined mb-8 mt-16">Show Notes</h3>
 
