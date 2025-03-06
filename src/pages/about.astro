@@ -8,7 +8,7 @@ import LargePlatforms from '../components/LargePlatforms.astro';
 
 const { hosts } = starpodConfig;
 const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/img/*.{jpeg,jpg,png}'
+  '/src/img/people/*.{jpeg,jpg,png}'
 );
 ---
 
@@ -33,7 +33,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
             <Image
               class="mb-4 mr-6 h-12 w-12 rounded-lg lg:h-20 lg:w-20"
               height={80}
-              src={images[`/src/img/${host.img}`]()}
+              src={images[`/src/img/people/${host.img}`]()}
               width={80}
               alt=""
             />

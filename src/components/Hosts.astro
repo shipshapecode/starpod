@@ -6,7 +6,7 @@ import starpodConfig from '../../starpod.config';
 
 const { hosts } = starpodConfig;
 const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/img/*.{jpeg,jpg,png}'
+  '/src/img/people/*.{jpeg,jpg,png}'
 );
 ---
 
@@ -21,7 +21,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
         <Image
           class="mr-4 h-12 w-12 rounded-lg"
           height={48}
-          src={images[`/src/img/${host.img}`]()}
+          src={images[`/src/img/people/${host.img}`]()}
           width={48}
           alt=""
         />

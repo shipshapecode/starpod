@@ -48,7 +48,7 @@ hosts: [
   {
     name: 'RobbieTheWagner',
     bio: 'Huge Ember and Tailwind fanboy. I work at Amazon btw.',
-    img: '/src/img/robbiethewagner.jpg',
+    img: '/src/img/people/robbiethewagner.jpg',
     github: 'https://github.com/RobbieTheWagner',
     twitter: 'https://twitter.com/RobbieTheWagner',
     website: 'https://robbiethewagner.dev'
@@ -56,7 +56,7 @@ hosts: [
   {
     name: 'Charles William Carpenter III',
     bio: 'Third of his name, user of gifs, hater of ESM.',
-    img: '/src/img/chuckcarpenter.jpg',
+    img: '/src/img/people/chuckcarpenter.jpg',
     github: 'https://github.com/chuckcarpenter',
     twitter: 'https://twitter.com/CharlesWthe3rd'
   }

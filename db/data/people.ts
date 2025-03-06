@@ -186,6 +186,11 @@ export default [
     img: 'techgirl1908.jpg'
   },
   {
+    id: 'techsavvytravvy',
+    name: 'Travis Wagner',
+    img: 'techsavvytravvy.jpg'
+  },
+  {
     id: 'tdesseyn',
     name: 'Taylor Desseyn',
     img: 'tdesseyn.jpg'
@@ -194,11 +199,16 @@ export default [
     id: 'theaprilyoho',
     name: 'April Yoho',
     img: 'theaprilyoho.jpg'
-  },  
+  },
   {
     id: 'theclarksell',
     name: 'Clark Sell',
     img: 'theclarksell.jpg'
+  },
+  {
+    id: 'thdxr',
+    name: 'Dax Raad',
+    img: 'thdxr.jpg'
   },
   {
     id: 'theprimeagen',

@@ -13,7 +13,7 @@ export interface Props {
 
 const { hostsAndGuests } = Astro.props;
 const images = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/img/*.{jpeg,jpg,png}'
+  '/src/img/people/*.{jpeg,jpg,png}'
 );
 const priorityNames = ['RobbieTheWagner', 'Charles William Carpenter III'];
 ---
@@ -57,7 +57,7 @@ const priorityNames = ['RobbieTheWagner', 'Charles William Carpenter III'];
             <Image
               class="mr-4 h-12 w-12 rounded-lg"
               height={48}
-              src={images[`/src/img/${person.img}`]()}
+              src={images[`/src/img/people/${person.img}`]()}
               alt=""
               width={48}
             />
@@ -65,14 +65,14 @@ const priorityNames = ['RobbieTheWagner', 'Charles William Carpenter III'];
             <Image
               class="mr-4 h-12 w-12 rounded-lg dark:hidden"
               height={48}
-              src={images['/src/img/avatar-light.png']()}
+              src={images['/src/img/people/avatar-light.png']()}
               alt=""
               width={48}
             />
             <Image
               class="mr-4 hidden h-12 w-12 rounded-lg dark:block"
               height={48}
-              src={images['/src/img/avatar-dark.png']()}
+              src={images['/src/img/people/avatar-dark.png']()}
               alt=""
               width={48}
             />}

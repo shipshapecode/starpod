@@ -1,4 +1,16 @@
 export default {
+  // 184
+  'is-jquery-really-dead-and-other-hot-takes-w-travis-wagner': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'techsavvytravvy' }
+  ],
+  // 183
+  'is-this-the-end-of-tech-conferences-w-dax-raad': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'thdxr' }
+  ],
   // 182
   'from-javascript-to-php-josh-cirres-unexpected-dev-journey': [
     { id: 'robbiethewagner' },
