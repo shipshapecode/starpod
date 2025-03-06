@@ -5,4 +5,4 @@ export default {
   ],
   // 183
   'is-this-the-end-of-tech-conferences-w-dax-raad': [{ id: 'norlan' }]
-};
+} as { [key: string]: Array<{ id: string }> };
