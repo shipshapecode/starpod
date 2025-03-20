@@ -1,4 +1,15 @@
 export default {
+  // 186
+  'why-most-developers-overcomplicate-everything-w-aaron-francis': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'aarondfrancis' }
+  ],
+  // 185
+  'tailwind-4-deepseek-ai-and-the-end-of-the-old-web': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
   // 184
   'is-jquery-really-dead-and-other-hot-takes-w-travis-wagner': [
     { id: 'robbiethewagner' },

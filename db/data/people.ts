@@ -1,4 +1,5 @@
 export default [
+  { id: 'aarondfrancis', name: 'Aaron Francis', img: 'aarondfrancis.jpg' },
   { id: 'adamstac', name: 'Adam Stacoviak', img: 'adamstac.jpg' },
   { id: 'amerawhite2', name: 'Amera White', img: 'amerawhite2.jpg' },
   { id: 'argyleink', name: 'Adam Argyle', img: 'argyleink.jpg' },
