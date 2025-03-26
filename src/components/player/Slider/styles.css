@@ -1,3 +1,5 @@
+@reference '../../../styles/tailwind.css';
+
 .slider {
   @apply relative m-0 block h-1.5 w-full appearance-none rounded-none p-0 outline-none;
 
@@ -28,7 +30,7 @@
     border: 0;
   }
   &::-moz-range-thumb {
-    @apply h-4 w-4 cursor-pointer appearance-none border-0 bg-transparent bg-contain bg-no-repeat outline-none transition-opacity duration-300 lg:opacity-0;
+    @apply h-4 w-4 cursor-pointer appearance-none border-0 bg-transparent bg-contain bg-no-repeat transition-opacity duration-300 outline-none lg:opacity-0;
     background-image: url('/images/rocket-dark.svg');
     background-position: center center;
   }
