@@ -24,10 +24,10 @@ footer:has(+ #audio-player .player) {
   @apply rounded border border-light-input-border bg-light-input-bg p-4 !outline-none !ring-0 transition-colors focus:border-light-input-border-focused dark:border-dark-input-border dark:bg-dark-input-bg dark:focus:border-dark-input-border-focused;
 }
 
-.section-heading {
+@utility section-heading {
   @apply text-xs font-bold uppercase tracking-wide;
 }
 
-.section-heading-underlined {
+@utility section-heading-underlined {
   @apply section-heading border-b pb-4 dark:border-dark-border;
 }

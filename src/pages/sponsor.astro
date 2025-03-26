@@ -88,7 +88,7 @@ const countries = [
         return (
             <div class="flex items-center">
               <Image
-                class="mr-4 h-6 w-6 rounded-sm"
+                class="mr-4 h-6 w-6 rounded-xs"
                 height={24}
                 src={countryFlags[`/src/img/countries/${country.flag}`]()}
                 alt=""
@@ -98,9 +98,9 @@ const countries = [
             </div>
 
             <div class="relative flex items-center">
-              <div class="absolute z-0 h-1 w-full rounded-lg bg-gray-200 outline-none dark:bg-gray-700" />
+              <div class="absolute z-0 h-1 w-full rounded-lg bg-gray-200 outline-hidden dark:bg-gray-700" />
               <div
-                class="absolute z-10 h-1 rounded-lg bg-gradient-to-r from-[#D8CCFF] to-[#8A63FF] dark:from-[#42C8F3] dark:to-[#B6EDFF]"
+                class="absolute z-10 h-1 rounded-lg bg-linear-to-r from-[#D8CCFF] to-[#8A63FF] dark:from-[#42C8F3] dark:to-[#B6EDFF]"
                 style={`width:${country.percentage}%`}
               />
             </div>
