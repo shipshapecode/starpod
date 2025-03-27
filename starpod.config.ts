@@ -30,5 +30,5 @@ export default defineStarpodConfig({
     spotify: 'https://open.spotify.com/show/19jiuHAqzeKnkleQUpZxDf',
     youtube: 'https://www.youtube.com/@WhiskeyWebAndWhatnot/'
   },
-  rssFeed: 'https://anchor.fm/s/e329dea0/podcast/rss'
+  rssFeed: 'https://feeds.simplecast.com/llahLm34'
 });

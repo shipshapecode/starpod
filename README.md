@@ -86,7 +86,7 @@ The url to the RSS feed where your podcast is hosted.
 **Example:**
 
 ```ts
-rssFeed: 'https://anchor.fm/s/e329dea0/podcast/rss';
+rssFeed: 'https://feeds.simplecast.com/llahLm34';
 ```
 
 #### Setting up the contact form
