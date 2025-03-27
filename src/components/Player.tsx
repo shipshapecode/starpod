@@ -64,7 +64,7 @@ export default function Player() {
   return (
     <div class="player fixed inset-x-0 bottom-0 z-50 lg:left-112 xl:left-120">
       <div
-        class="flex items-center gap-6 bg-light-player/90 px-4 py-4 backdrop-blur-sm md:px-6 dark:bg-dark-player/90"
+        class="flex items-center gap-6 bg-light-player/90 px-4 py-4 backdrop-blur-xs md:px-6 dark:bg-dark-player/90"
         role="region"
         style={{ viewTransitionName: 'player' }}
       >

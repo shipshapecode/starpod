@@ -43,7 +43,7 @@ export default function PlayButton({ episode }: Props) {
   return (
     <div class="flex h-16 w-16 items-center justify-center">
       <button
-        class="flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 bg-light-text-heading text-white hover:h-16 hover:w-16 hover:bg-gradient-to-r hover:from-[#D8CCFF] hover:to-[#8A63FF] dark:bg-white dark:text-[#24263D] dark:hover:from-[#42C8F3] dark:hover:to-[#B6EDFF]"
+        class="flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 bg-light-text-heading text-white hover:h-16 hover:w-16 hover:bg-linear-to-r hover:from-[#D8CCFF] hover:to-[#8A63FF] dark:bg-white dark:text-[#24263D] dark:hover:from-[#42C8F3] dark:hover:to-[#B6EDFF]"
         type="button"
         onClick={() => {
           if (episode) {

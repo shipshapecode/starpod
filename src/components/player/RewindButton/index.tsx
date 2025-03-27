@@ -9,7 +9,7 @@ export default function RewindButton({ audioPlayer }: Props) {
   return (
     <button
       type="button"
-      className="rewind-button gradient-icon relative h-6 w-6 rounded-full focus:outline-none"
+      className="rewind-button gradient-icon relative h-6 w-6 rounded-full focus:outline-hidden"
       onClick={() => {
         if (audioPlayer.current) {
           audioPlayer.current.currentTime -= 10;

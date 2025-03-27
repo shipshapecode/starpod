@@ -12,7 +12,7 @@ export default function PlaybackRateButton({ audioPlayer }: Props) {
   return (
     <button
       type="button"
-      className="gradient-icon relative flex h-[18px] w-[18px] items-center justify-center rounded-md transition-colors focus:outline-none"
+      className="gradient-icon relative flex h-[18px] w-[18px] items-center justify-center rounded-md transition-colors focus:outline-hidden"
       onClick={() => {
         setPlaybackRate((rate) => {
           let existingIdx = playbackRates.indexOf(rate);
@@ -29,7 +29,7 @@ export default function PlaybackRateButton({ audioPlayer }: Props) {
       aria-label="Playback rate"
     >
       <div class="absolute -inset-4 md:hidden" />
-      <div class="flex h-[18px] w-[18px] items-center justify-center rounded p-2 text-[6px] font-black text-light-player/90 transition-colors dark:text-dark-player/90">
+      <div class="flex h-[18px] w-[18px] items-center justify-center rounded-sm p-2 text-[6px] font-black text-light-player/90 transition-colors dark:text-dark-player/90">
         {playbackRate}
         <span class="ml-[1px] flex items-end">x</span>
       </div>
