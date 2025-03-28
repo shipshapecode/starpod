@@ -5,7 +5,7 @@ const indexMeta = {
   description:
     /^Veteran web developers RobbieTheWagner and Charles William Carpenter III host this informal, whiskey-fueled fireside chat with your favorite web devs/,
   image:
-    'https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/38011720/b40498aacdad2076.png'
+    'https://image.simplecastcdn.com/images/52773714-0345-45e1-b421-a089414e7921/379e24dd-059a-4c09-aa37-8ed48fcaadac/3000x3000/b40498aacdad2076.png?aid=rss_feed'
 };
 
 test('index page has correct meta', async ({ page }) => {

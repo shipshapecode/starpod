@@ -80,7 +80,8 @@ export async function getAllEpisodes() {
           title: `${title}`,
           content: description,
           description: truncate(htmlToText(description), 260),
-          episodeImage: itunes_image?.href,
+          // If the image path includes 3000x3000 we can probably replace the size with 160x160 and save bytes.
+          episodeImage: itunes_image?.href?.replace('3000x3000', '160x160'),
           episodeNumber,
           episodeSlug,
           published,
