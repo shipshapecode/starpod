@@ -6,7 +6,7 @@ const episode1 = {
   description:
     /^Have you ever reflected on the tools that shaped your journey as a developer?/,
   image:
-    'https://image.simplecastcdn.com/images/527737/52773714-0345-45e1-b421-a089414e7921/0d131833-4b4a-40b9-a85f-2318c6549b7a/200x200/38011720-1701997934575-fecf6a7bb5123.jpg?aid=rss_feed'
+    'https://content.production.cdn.art19.com/images/e9/7a/78/16/e97a7816-1ca2-4fcd-8409-1a02e316b81a/03e2640740b7dea50ee910533c52edd18c88e77189b1ebbbde4e2af3558df57d0e2f4153148176d1f748fd8585ca7f4c6107adaaf585712da966012f033c6603.jpeg'
 };
 
 const episode2 = {
@@ -15,7 +15,7 @@ const episode2 = {
   description:
     /^In this crossover episode, Chuck and Robbie join Jem Young and Ryan Burgess from/,
   image:
-    'https://image.simplecastcdn.com/images/527737/52773714-0345-45e1-b421-a089414e7921/d2849c13-48c2-4e5e-85a3-56b27cc5b95c/200x200/38011720-1711587157968-e5f343f7e36cd.jpg?aid=rss_feed'
+    'https://content.production.cdn.art19.com/images/2c/b5/34/ed/2cb534ed-fda4-4af2-84b0-f95365ea53d3/b7880054d69de3799ab4a66c709bbd0d6076b8066c9bf82e558f54a153bea321ae8623f681f4a454dc911c92209e676833daf42c4f9f61bfdc1b7189d3c3f158.jpeg'
 };
 
 test('works with episode numbers', async ({ page }) => {

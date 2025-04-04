@@ -86,7 +86,7 @@ The url to the RSS feed where your podcast is hosted.
 **Example:**
 
 ```ts
-rssFeed: 'https://feeds.simplecast.com/llahLm34';
+rssFeed: 'https://rss.art19.com/whiskey-web-and-whatnot';
 ```
 
 #### Setting up the contact form
