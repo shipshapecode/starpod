@@ -10,10 +10,6 @@ type Props = {
   url: URL;
 };
 
-function renderIcon(icon: JSX.Element) {
-  return <span>{icon}</span>;
-}
-
 export default function EpisodeList({ episodes, url }: Props) {
   const [recentEpisodes, setRecentEpisodes] = useState(episodes);
   const [canLoadMore, setCanLoadMore] = useState(true);
