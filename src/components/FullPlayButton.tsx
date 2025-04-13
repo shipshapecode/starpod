@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'preact/hooks';
 import type { JSX } from 'preact/jsx-runtime';
 
 import type { Episode } from '../lib/rss';
@@ -9,10 +10,10 @@ type Props = {
 
 const PlayIcon = (
   <svg
-    class="ml-[2px] h-2 w-2"
+    class="h-2 w-2"
     fill="none"
     height="14"
-    viewBox="0 0 13 14"
+    viewBox="0 0 11 14"
     width="13"
     xmlns="http://www.w3.org/2000/svg"
   >
@@ -41,12 +42,19 @@ const PauseIcon = (
   </svg>
 );
 
-function renderIcon(icon: JSX.Element) {
-  return <span>{icon}</span>;
+function renderIcon(icon: JSX.Element, key?: string) {
+  return <span key={key}>{icon}</span>;
 }
 
 export default function FullPlayButton({ episode }: Props) {
-  const isCurrentEpisode = episode.id == currentEpisode.value?.id;
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  const isCurrentEpisode = episode.id === currentEpisode.value?.id;
+  const showPauseIcon = isCurrentEpisode && isPlaying.value;
 
   return (
     <button
@@ -59,16 +67,19 @@ export default function FullPlayButton({ episode }: Props) {
         isPlaying.value = isCurrentEpisode ? !isPlaying.value : true;
       }}
     >
-      <span class="flex w-full items-center rounded-full p-2 pr-4 text-light-text-heading dark:text-white">
-        <span class="mr-3 flex h-7 w-7 items-center justify-center rounded-full bg-light-text-heading text-white dark:bg-white dark:text-dark-button">
-          {isCurrentEpisode && isPlaying.value
-            ? renderIcon(PauseIcon)
-            : renderIcon(PlayIcon)}
+      <span class="text-light-text-heading flex w-full items-center rounded-full p-2 pr-4 dark:text-white">
+        <span class="bg-light-text-heading dark:text-dark-button mr-3 flex h-7 w-7 items-center justify-center rounded-full text-white dark:bg-white">
+          {hasMounted &&
+            (showPauseIcon
+              ? renderIcon(PauseIcon, 'pause')
+              : renderIcon(PlayIcon, 'play'))}
         </span>
-        {isCurrentEpisode && isPlaying.value ? 'Pause' : 'Play'} Episode
-        <span class="sr-only">
-          (press to {isCurrentEpisode && isPlaying.value ? 'pause)' : 'play)'}
-        </span>
+        {hasMounted && (showPauseIcon ? 'Pause' : 'Play')} Episode
+        {hasMounted && (
+          <span class="sr-only">
+            (press to {showPauseIcon ? 'pause' : 'play'})
+          </span>
+        )}
       </span>
     </button>
   );
