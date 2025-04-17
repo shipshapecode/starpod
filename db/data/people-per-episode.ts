@@ -1,4 +1,26 @@
 export default {
+  // 190
+  'vibe-podcasting-app-rewrites-ai-assistants-pbjs-and-more': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
+  // 189
+  'your-terminal-is-getting-smarter-with-ben-holmes': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'bholmesdev' }
+  ],
+  // 188
+  'inside-sagamore-the-revival-of-maryland-rye-with-clint-spotleson': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'theonlyspotty' }
+  ],
+  // 187
+  'what-makes-a-good-job-in-tech': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
   // 186
   'why-most-developers-overcomplicate-everything-w-aaron-francis': [
     { id: 'robbiethewagner' },
