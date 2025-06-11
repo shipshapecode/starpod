@@ -1,4 +1,28 @@
 export default {
+  // 194
+  'static-dynamic-generative-whats-next-for-the-web-w-guillermo-rauch': [
+    { id: 'chuckcarpenter' },
+    { id: 'aarondfrancis', host: true },
+    { id: 'rauchg' }
+  ],
+  // 193
+  'why-you-cant-skip-the-fundamentals-w-henri-helvetica': [
+    { id: 'chuckcarpenter' },
+    { id: 'aarondfrancis', host: true },
+    { id: 'henrihelvetica' }
+  ],
+  // 192
+  'are-frameworks-still-worth-the-tradeoffs-w-adam-rackis': [
+    { id: 'chuckcarpenter' },
+    { id: 'aarondfrancis', host: true },
+    { id: 'adamrackis' }
+  ],
+  // 191
+  'wtf-is-mcp-w-david-cramer': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'zeeg' }
+  ],
   // 190
   'vibe-podcasting-app-rewrites-ai-assistants-pbjs-and-more': [
     { id: 'robbiethewagner' },

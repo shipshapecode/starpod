@@ -1,5 +1,6 @@
 export default [
   { id: 'aarondfrancis', name: 'Aaron Francis', img: 'aarondfrancis.jpg' },
+  { id: 'adamrackis', name: 'Adam Rackis', img: 'adamrackis.jpg' },
   { id: 'adamstac', name: 'Adam Stacoviak', img: 'adamstac.jpg' },
   { id: 'amerawhite2', name: 'Amera White', img: 'amerawhite2.jpg' },
   { id: 'argyleink', name: 'Adam Argyle', img: 'argyleink.jpg' },
@@ -8,6 +9,11 @@ export default [
     id: 'burgessdryan',
     name: 'Ryan Burgess',
     img: 'burgessdryan.jpg'
+  },
+  {
+    id: 'bytesofbree',
+    name: 'Bree Hall',
+    img: 'bytesofbree.jpg'
   },
   {
     id: 'carlopiana',
@@ -63,6 +69,11 @@ export default [
     id: 'engineering_bae',
     name: 'Taylor Poindexter',
     img: 'engineering_bae.jpg'
+  },
+  {
+    id: 'henrihelvetica',
+    name: 'Henri Helvetica',
+    img: 'henrihelvetica.jpg'
   },
   {
     id: 'htmx_org',
@@ -158,6 +169,11 @@ export default [
     img: 'pbwinston.jpg'
   },
   {
+    id: 'rauchg',
+    name: 'Guillermo Rauch',
+    img: 'rauchg.jpg'
+  },
+  {
     id: 'rich_harris',
     name: 'Rich Harris',
     img: 'rich_harris.jpg'
@@ -228,5 +244,6 @@ export default [
     img: 'typecraft_dev.jpg'
   },
   { id: 'wagslane', name: 'Lane Wagner', img: 'wagslane.jpg' },
-  { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' }
+  { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' },
+  { id: 'zeeg', name: 'David Cramer', img: 'zeeg.jpg' }
 ];
