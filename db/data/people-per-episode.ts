@@ -1,4 +1,26 @@
 export default {
+  // 198
+  'will-ai-kill-the-joy-of-coding': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
+  // 197
+  'stop-fixing-things-that-arent-broken': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
+  // 196
+  'the-myth-of-perfect-code-w-marc-backes': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'themarcba' }
+  ],
+  // 195
+  'should-you-learn-tailwind-before-css-w-bree-hall': [
+    { id: 'chuckcarpenter' },
+    { id: 'aarondfrancis', host: true },
+    { id: 'bytesofbree' }
+  ],
   // 194
   'static-dynamic-generative-whats-next-for-the-web-w-guillermo-rauch': [
     { id: 'chuckcarpenter' },

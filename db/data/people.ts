@@ -229,6 +229,11 @@ export default [
     img: 'thdxr.jpg'
   },
   {
+    id: 'themarcba',
+    name: 'Marc Backes',
+    img: 'themarcba.jpg'
+  },
+  {
     id: 'theonlyspotty',
     name: 'Clint Spotleson',
     img: 'theonlyspotty.jpg'
