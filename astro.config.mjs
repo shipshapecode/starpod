@@ -16,18 +16,6 @@ export default defineConfig({
     }
   }),
   site: 'https://whiskey.fm',
-  image: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**'
-      },
-      {
-        protocol: 'http',
-        hostname: '**'
-      }
-    ]
-  },
   integrations: [db(), preact(), sitemap()],
   // These were specific redirects we needed for our podcast, if you do not have any routes to redirect, you can safely remove this.
   redirects: {
