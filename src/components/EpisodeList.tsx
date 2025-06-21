@@ -3,7 +3,6 @@ import { useState } from 'preact/hooks';
 import FormattedDate from '../components/FormattedDate';
 import FullPlayButton from '../components/FullPlayButton';
 import { currentEpisode } from '../components/state';
-import { getOptimizedImageUrl } from '../lib/image-utils';
 import type { Episode } from '../lib/rss';
 
 type Props = {
@@ -50,9 +49,12 @@ export default function EpisodeList({ episodes, url }: Props) {
                   aria-hidden="true"
                   class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
                   height={80}
-                  src={getOptimizedImageUrl(episode.episodeImage, 160, 160)}
+                  src={
+                    episode.episodeImage
+                      ? `/api/image?src=${encodeURIComponent(episode.episodeImage)}`
+                      : '/images/www.png'
+                  }
                   width={80}
-                  loading="lazy"
                 />
 
                 <div class="flex flex-col">
