@@ -22,6 +22,7 @@ export interface Episode {
   episodeImage?: string;
   episodeNumber?: string;
   episodeSlug: string;
+  optimizedImageThumbnail?: string;
   audio: {
     src: string;
     type: string;

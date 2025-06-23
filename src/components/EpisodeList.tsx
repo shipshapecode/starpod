@@ -1,4 +1,3 @@
-import type { JSX } from 'preact/jsx-runtime';
 import { useState } from 'preact/hooks';
 import FormattedDate from '../components/FormattedDate';
 import FullPlayButton from '../components/FullPlayButton';
@@ -50,11 +49,12 @@ export default function EpisodeList({ episodes, url }: Props) {
                   class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
                   height={80}
                   src={
-                    episode.episodeImage
-                      ? `/api/image?src=${encodeURIComponent(episode.episodeImage)}`
-                      : '/images/www.png'
+                    episode.optimizedImageThumbnail ??
+                    episode.episodeImage ??
+                    '/images/www.png'
                   }
                   width={80}
+                  loading="lazy"
                 />
 
                 <div class="flex flex-col">

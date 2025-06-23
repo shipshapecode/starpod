@@ -1,6 +1,10 @@
 # build output
 .vercel/
 dist/
+
+# Optimized images (generated during build)
+public/opt-images/
+
 # generated types
 .astro/
 
