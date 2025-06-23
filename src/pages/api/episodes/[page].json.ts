@@ -30,7 +30,12 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
 export const GET: APIRoute = async ({ props }) => {
   const page = props.page.currentPage;
   const canLoadMore = page * episodesPerPage < processedEpisodes.length;
-  return new Response(JSON.stringify({ canLoadMore, episodes: props.page }));
+  return new Response(
+    JSON.stringify({
+      canLoadMore,
+      episodes: props.page.data // Return the actual episode data, not the page object
+    })
+  );
 };
 
 /**
