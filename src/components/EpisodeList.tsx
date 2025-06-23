@@ -48,11 +48,7 @@ export default function EpisodeList({ episodes, url }: Props) {
                   aria-hidden="true"
                   class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
                   height={80}
-                  src={
-                    episode.optimizedImageThumbnail ??
-                    episode.episodeImage ??
-                    '/images/www.png'
-                  }
+                  src={episode.episodeImage ?? '/images/www.png'}
                   width={80}
                   loading="lazy"
                 />
