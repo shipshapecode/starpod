@@ -1,21 +1,13 @@
 import type { APIRoute } from 'astro';
 import { getImage } from 'astro:assets';
 import { getAllEpisodes } from '../../../lib/rss';
+import { optimizeEpisodeImage } from '../../../lib/optimize-episode-image';
 
 const episodesPerPage = 15;
 const allEpisodes = await getAllEpisodes();
 
 for (const episode of allEpisodes) {
-  if (episode.episodeImage) {
-    const optimizedImage = await getImage({
-      src: episode.episodeImage,
-      format: 'avif',
-      height: 160,
-      width: 160,
-      quality: 75
-    });
-    episode.episodeImage = optimizedImage.src;
-  }
+  await optimizeEpisodeImage(episode);
 }
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {

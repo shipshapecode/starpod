@@ -2,15 +2,20 @@
 import Layout from '../layouts/Layout.astro';
 import EpisodeList from '../components/EpisodeList';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
+import { optimizeEpisodeImage } from '../lib/optimize-episode-image';
 const allEpisodes = await getAllEpisodes();
 const episodes = allEpisodes.slice(0, 15);
 const show = await getShowInfo();
 const title = `${show.title}`;
+
+for (const episode of episodes) {
+  await optimizeEpisodeImage(episode);
+}
 ---
 
 <Layout title={title}>
   <div class="relative z-10 px-8 lg:px-18">
-    <h1 class="text-4xl font-bold text-light-text-heading dark:text-white">
+    <h1 class="text-light-text-heading text-4xl font-bold dark:text-white">
       Episodes
     </h1>
 
