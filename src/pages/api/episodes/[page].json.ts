@@ -1,5 +1,4 @@
 import type { APIRoute } from 'astro';
-import { getImage } from 'astro:assets';
 import { getAllEpisodes } from '../../../lib/rss';
 import { optimizeEpisodeImage } from '../../../lib/optimize-episode-image';
 
