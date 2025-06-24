@@ -12,6 +12,7 @@ export default defineConfig({
     imageService: true,
     devImageService: 'sharp',
     imagesConfig: {
+      domains: [],
       formats: ['image/avif'],
       minimumCacheTTL: 60,
       sizes: [160, 320, 640, 1280]
