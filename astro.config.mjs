@@ -21,6 +21,7 @@ export default defineConfig({
     }
   }),
   image: {
+    domains: [],
     remotePatterns: [
       {
         protocol: 'https'
