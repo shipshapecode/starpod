@@ -2,6 +2,7 @@ import { htmlToText } from 'html-to-text';
 import parseFeed from 'rss-to-json';
 import { array, number, object, optional, parse, string } from 'valibot';
 
+import { optimizeEpisodeImage } from './optimize-episode-image';
 import { dasherize } from '../utils/dasherize';
 import { truncate } from '../utils/truncate';
 import starpodConfig from '../../starpod.config';
@@ -91,6 +92,10 @@ export async function getAllEpisodes() {
         };
       }
     );
+
+  for (const episode of episodes) {
+    await optimizeEpisodeImage(episode);
+  }
 
   return episodes;
 }
