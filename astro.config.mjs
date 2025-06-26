@@ -9,20 +9,20 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   output: 'static',
   adapter: vercel({
-    // imageService: true,
-    // imagesConfig: {
-    //   formats: ['image/avif'],
-    //   minimumCacheTTL: 60,
-    //   remotePatterns: [
-    //     {
-    //       protocol: 'https'
-    //     },
-    //     {
-    //       protocol: 'http'
-    //     }
-    //   ],
-    //   sizes: [160, 320, 640, 1280]
-    // },
+    imageService: true,
+    imagesConfig: {
+      formats: ['image/avif'],
+      minimumCacheTTL: 60,
+      remotePatterns: [
+        {
+          protocol: 'https'
+        },
+        {
+          protocol: 'http'
+        }
+      ],
+      sizes: [160, 320, 640, 1280]
+    },
     webAnalytics: {
       enabled: true
     }
