@@ -12,9 +12,16 @@ export default defineConfig({
     imageService: true,
     devImageService: 'sharp',
     imagesConfig: {
-      domains: [],
       formats: ['image/avif'],
       minimumCacheTTL: 60,
+      remotePatterns: [
+        {
+          protocol: 'https'
+        },
+        {
+          protocol: 'http'
+        }
+      ],
       sizes: [160, 320, 640, 1280]
     },
     webAnalytics: {
@@ -22,7 +29,6 @@ export default defineConfig({
     }
   }),
   image: {
-    domains: [],
     remotePatterns: [
       {
         protocol: 'https'

@@ -20,7 +20,7 @@
     "@astrojs/db": "^0.14.10",
     "@astrojs/preact": "^4.1.0",
     "@astrojs/sitemap": "^3.4.1",
-    "@astrojs/vercel": "^8.2.0",
+    "@astrojs/vercel": "https://pkg.pr.new/@astrojs/vercel@14014",
     "@preact/signals": "^2.0.3",
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
