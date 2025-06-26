@@ -9,7 +9,7 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   output: 'static',
   adapter: vercel({
-    imageService: true,
+    // imageService: true,
     // imagesConfig: {
     //   formats: ['image/avif'],
     //   minimumCacheTTL: 60,
