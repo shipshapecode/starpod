@@ -59,43 +59,41 @@ export async function getAllEpisodes() {
   let feed = (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
   let items = parse(FeedSchema, feed).items;
 
-  let episodes: Array<Episode> = items
-    .filter((item) => item.itunes_episodeType !== 'trailer')
-    .map(
-      ({
-        description,
-        id,
-        title,
-        enclosures,
-        published,
-        itunes_episode,
-        itunes_episodeType,
-        itunes_image
-      }) => {
-        const episodeNumber =
-          itunes_episodeType === 'bonus' ? 'Bonus' : `${itunes_episode}`;
-        const episodeSlug = dasherize(title);
-
-        return {
+  let episodes: Array<Episode> = await Promise.all(
+    items
+      .filter((item) => item.itunes_episodeType !== 'trailer')
+      .map(
+        async ({
+          description,
           id,
-          title: `${title}`,
-          content: description,
-          description: truncate(htmlToText(description), 260),
-          episodeImage: itunes_image?.href,
-          episodeNumber,
-          episodeSlug,
+          title,
+          enclosures,
           published,
-          audio: enclosures.map((enclosure) => ({
-            src: enclosure.url,
-            type: enclosure.type
-          }))[0]
-        };
-      }
-    );
+          itunes_episode,
+          itunes_episodeType,
+          itunes_image
+        }) => {
+          const episodeNumber =
+            itunes_episodeType === 'bonus' ? 'Bonus' : `${itunes_episode}`;
+          const episodeSlug = dasherize(title);
 
-  for (const episode of episodes) {
-    await optimizeEpisodeImage(episode);
-  }
+          return {
+            id,
+            title: `${title}`,
+            content: description,
+            description: truncate(htmlToText(description), 260),
+            episodeImage: await optimizeEpisodeImage(itunes_image?.href),
+            episodeNumber,
+            episodeSlug,
+            published,
+            audio: enclosures.map((enclosure) => ({
+              src: enclosure.url,
+              type: enclosure.type
+            }))[0]
+          };
+        }
+      )
+  );
 
   return episodes;
 }
