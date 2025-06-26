@@ -26,7 +26,6 @@ export default function Player() {
       setProgress(percentage);
       const slider = document.querySelector('.slider');
       if (slider) {
-        console.log(percentage);
         (slider as HTMLElement).style.setProperty(
           '--seek-before-width',
           `${percentage}%`
