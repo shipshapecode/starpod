@@ -1,4 +1,3 @@
-import type { JSX } from 'preact/jsx-runtime';
 import { useState } from 'preact/hooks';
 import FormattedDate from '../components/FormattedDate';
 import FullPlayButton from '../components/FullPlayButton';
@@ -21,7 +20,7 @@ export default function EpisodeList({ episodes, url }: Props) {
     if (canLoadMore) {
       setIsLoading(true);
 
-      const episodeResponse = await fetch(`${url}api/episodes/${page}.json`);
+      const episodeResponse = await fetch(`/api/episodes/${page}.json`);
       const { canLoadMore, episodes } = await episodeResponse.json();
 
       setIsLoading(false);
@@ -39,7 +38,7 @@ export default function EpisodeList({ episodes, url }: Props) {
           const isCurrentEpisode = episode.id == currentEpisode.value?.id;
 
           return (
-            <li class="border-b dark:border-dark-border">
+            <li class="dark:border-dark-border border-b">
               <div
                 class="flex w-full flex-col py-12 lg:flex-row"
                 aria-current={isCurrentEpisode}
@@ -49,14 +48,15 @@ export default function EpisodeList({ episodes, url }: Props) {
                   aria-hidden="true"
                   class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
                   height={80}
-                  src={episode.episodeImage ?? '/images/www.png'}
+                  src={episode.episodeThumbnail ?? '/images/www.png'}
                   width={80}
+                  loading="lazy"
                 />
 
                 <div class="flex flex-col">
                   <FormattedDate date={new Date(episode.published)} />
 
-                  <h2 class="my-2 text-lg font-bold text-light-text-heading dark:text-white">
+                  <h2 class="text-light-text-heading my-2 text-lg font-bold dark:text-white">
                     <a href={`/${episode.episodeSlug}`}>
                       {episode.episodeNumber}: {episode.title}
                     </a>
@@ -68,7 +68,7 @@ export default function EpisodeList({ episodes, url }: Props) {
                     <FullPlayButton episode={episode} />
 
                     <a
-                      class="font-bold text-light-text-heading dark:text-white"
+                      class="text-light-text-heading font-bold dark:text-white"
                       href={`/${episode.episodeSlug}`}
                     >
                       Show notes
@@ -83,7 +83,7 @@ export default function EpisodeList({ episodes, url }: Props) {
       {canLoadMore && (
         <div class="mt-8 flex justify-center pb-16">
           <button class="btn" onClick={fetchMoreEpisodes}>
-            <span class="rounded-full px-8 py-4 text-center text-sm text-light-text-heading dark:text-white">
+            <span class="text-light-text-heading rounded-full px-8 py-4 text-center text-sm dark:text-white">
               More episodes
             </span>
           </button>

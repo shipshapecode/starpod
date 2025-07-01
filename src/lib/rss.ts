@@ -2,6 +2,7 @@ import { htmlToText } from 'html-to-text';
 import parseFeed from 'rss-to-json';
 import { array, number, object, optional, parse, string } from 'valibot';
 
+import { optimizeEpisodeImage } from './optimize-episode-image';
 import { dasherize } from '../utils/dasherize';
 import { truncate } from '../utils/truncate';
 import starpodConfig from '../../starpod.config';
@@ -22,6 +23,7 @@ export interface Episode {
   episodeImage?: string;
   episodeNumber?: string;
   episodeSlug: string;
+  episodeThumbnail?: string;
   audio: {
     src: string;
     type: string;
@@ -58,40 +60,42 @@ export async function getAllEpisodes() {
   let feed = (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
   let items = parse(FeedSchema, feed).items;
 
-  let episodes: Array<Episode> = items
-    .filter((item) => item.itunes_episodeType !== 'trailer')
-    .map(
-      ({
-        description,
-        id,
-        title,
-        enclosures,
-        published,
-        itunes_episode,
-        itunes_episodeType,
-        itunes_image
-      }) => {
-        const episodeNumber =
-          itunes_episodeType === 'bonus' ? 'Bonus' : `${itunes_episode}`;
-        const episodeSlug = dasherize(title);
-
-        return {
+  let episodes: Array<Episode> = await Promise.all(
+    items
+      .filter((item) => item.itunes_episodeType !== 'trailer')
+      .map(
+        async ({
+          description,
           id,
-          title: `${title}`,
-          content: description,
-          description: truncate(htmlToText(description), 260),
-          // If the image path includes 3000x3000 we can probably replace the size with 200x200 and save bytes.
-          episodeImage: itunes_image?.href?.replace('3000x3000', '200x200'),
-          episodeNumber,
-          episodeSlug,
+          title,
+          enclosures,
           published,
-          audio: enclosures.map((enclosure) => ({
-            src: enclosure.url,
-            type: enclosure.type
-          }))[0]
-        };
-      }
-    );
+          itunes_episode,
+          itunes_episodeType,
+          itunes_image
+        }) => {
+          const episodeNumber =
+            itunes_episodeType === 'bonus' ? 'Bonus' : `${itunes_episode}`;
+          const episodeSlug = dasherize(title);
+
+          return {
+            id,
+            title: `${title}`,
+            content: description,
+            description: truncate(htmlToText(description), 260),
+            episodeImage: itunes_image?.href,
+            episodeNumber,
+            episodeSlug,
+            episodeThumbnail: await optimizeEpisodeImage(itunes_image?.href),
+            published,
+            audio: enclosures.map((enclosure) => ({
+              src: enclosure.url,
+              type: enclosure.type
+            }))[0]
+          };
+        }
+      )
+  );
 
   return episodes;
 }

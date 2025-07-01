@@ -9,7 +9,6 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
 }
 
 export const GET: APIRoute = async ({ props }) => {
-  const page = props.page.currentPage;
-  const canLoadMore = page * episodesPerPage < allEpisodes.length;
+  const canLoadMore = props.page.currentPage < props.page.lastPage;
   return new Response(JSON.stringify({ canLoadMore, episodes: props.page }));
 };

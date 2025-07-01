@@ -27,4 +27,12 @@ test('index page has correct meta', async ({ page }) => {
 
   const twitterImage = page.locator('meta[name="twitter:image:src"]');
   await expect(twitterImage).toHaveAttribute('content', indexMeta.image);
+
+  const firstEpisodeThumbnail = page.locator(
+    '[aria-label="EpisodeList"] li:first-of-type > div > img'
+  );
+  await expect(firstEpisodeThumbnail).toHaveAttribute(
+    'src',
+    RegExp('^/_image[?]href=')
+  );
 });

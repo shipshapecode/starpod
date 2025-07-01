@@ -10,10 +10,33 @@ export default defineConfig({
   output: 'static',
   adapter: vercel({
     imageService: true,
+    imagesConfig: {
+      formats: ['image/avif'],
+      minimumCacheTTL: 60,
+      remotePatterns: [
+        {
+          protocol: 'https'
+        },
+        {
+          protocol: 'http'
+        }
+      ],
+      sizes: [160, 320, 640, 1280]
+    },
     webAnalytics: {
       enabled: true
     }
   }),
+  image: {
+    remotePatterns: [
+      {
+        protocol: 'https'
+      },
+      {
+        protocol: 'http'
+      }
+    ]
+  },
   site: 'https://whiskey.fm',
   integrations: [db(), preact(), sitemap()],
   // These were specific redirects we needed for our podcast, if you do not have any routes to redirect, you can safely remove this.
