@@ -16,19 +16,14 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
     })
   );
 
-  const paginated = paginate(allEpisodes, { pageSize: episodesPerPage });
-
-  console.log('**********PAGINATED HERE:************');
-  for (const page of paginated) {
-    for (const episode of page.props.page.data) {
-      console.log(episode.episodeThumbnail);
-    }
-  }
-
-  return paginated;
+  return paginate(allEpisodes, { pageSize: episodesPerPage });
 }
 
 export const GET: APIRoute = async ({ props }) => {
   const canLoadMore = props.page.currentPage < props.page.lastPage;
+  console.log('**********GET HERE:************');
+  for (const episode of props.page.data) {
+    console.log(episode.episodeThumbnail);
+  }
   return new Response(JSON.stringify({ canLoadMore, episodes: props.page }));
 };
