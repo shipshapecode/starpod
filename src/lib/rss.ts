@@ -23,6 +23,7 @@ export interface Episode {
   episodeImage?: string;
   episodeNumber?: string;
   episodeSlug: string;
+  episodeThumbnail?: string;
   audio: {
     src: string;
     type: string;
@@ -82,9 +83,10 @@ export async function getAllEpisodes() {
             title: `${title}`,
             content: description,
             description: truncate(htmlToText(description), 260),
-            episodeImage: await optimizeEpisodeImage(itunes_image?.href),
+            episodeImage: itunes_image?.href,
             episodeNumber,
             episodeSlug,
+            episodeThumbnail: await optimizeEpisodeImage(itunes_image?.href),
             published,
             audio: enclosures.map((enclosure) => ({
               src: enclosure.url,
