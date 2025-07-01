@@ -20,7 +20,7 @@ export default function EpisodeList({ episodes, url }: Props) {
     if (canLoadMore) {
       setIsLoading(true);
 
-      const episodeResponse = await fetch(`${url}api/episodes/${page}.json`);
+      const episodeResponse = await fetch(`/api/episodes/${page}.json`);
       const { canLoadMore, episodes } = await episodeResponse.json();
 
       setIsLoading(false);

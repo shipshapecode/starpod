@@ -4,26 +4,13 @@ import { getAllEpisodes } from '../../../lib/rss';
 import type { Episode } from '../../../lib/rss';
 
 const episodesPerPage = 15;
+const allEpisodes = await getAllEpisodes();
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {
-  let allEpisodes = await getAllEpisodes();
-  allEpisodes = await Promise.all(
-    allEpisodes.map(async (episode: Episode) => {
-      episode.episodeThumbnail = await optimizeEpisodeImage(
-        episode.episodeImage
-      );
-      return episode;
-    })
-  );
-
   return paginate(allEpisodes, { pageSize: episodesPerPage });
 }
 
 export const GET: APIRoute = async ({ props }) => {
   const canLoadMore = props.page.currentPage < props.page.lastPage;
-  console.log('**********GET HERE:************');
-  for (const episode of props.page.data) {
-    console.log(episode.episodeThumbnail);
-  }
   return new Response(JSON.stringify({ canLoadMore, episodes: props.page }));
 };
