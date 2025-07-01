@@ -1,12 +1,15 @@
 import { getImage } from 'astro:assets';
 
-export async function optimizeEpisodeImage(episodeImage?: string) {
-  if (episodeImage) {
+export async function optimizeImage(
+  image?: string,
+  options?: { height?: number; width?: number }
+) {
+  if (image) {
     const optimizedImage = await getImage({
-      src: episodeImage,
+      src: image,
       format: 'avif',
-      height: 160,
-      width: 160,
+      height: options?.height ?? 160,
+      width: options?.width ?? 160,
       quality: 75
     });
 

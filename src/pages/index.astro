@@ -14,6 +14,6 @@ const title = `${show.title}`;
       Episodes
     </h1>
 
-    <EpisodeList client:load episodes={episodes} url={Astro.url} />
+    <EpisodeList client:load episodes={episodes} show={show} />
   </div>
 </Layout>

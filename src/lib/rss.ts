@@ -2,7 +2,7 @@ import { htmlToText } from 'html-to-text';
 import parseFeed from 'rss-to-json';
 import { array, number, object, optional, parse, string } from 'valibot';
 
-import { optimizeEpisodeImage } from './optimize-episode-image';
+import { optimizeImage } from './optimize-episode-image';
 import { dasherize } from '../utils/dasherize';
 import { truncate } from '../utils/truncate';
 import starpodConfig from '../../starpod.config';
@@ -32,7 +32,12 @@ export interface Episode {
 
 export async function getShowInfo() {
   // @ts-expect-error
-  return (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
+  const showInfo = (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
+  showInfo.image = (await optimizeImage(showInfo.image, {
+    height: 640,
+    width: 640
+  })) as string;
+  return showInfo;
 }
 
 export async function getAllEpisodes() {
@@ -86,7 +91,7 @@ export async function getAllEpisodes() {
             episodeImage: itunes_image?.href,
             episodeNumber,
             episodeSlug,
-            episodeThumbnail: await optimizeEpisodeImage(itunes_image?.href),
+            episodeThumbnail: await optimizeImage(itunes_image?.href),
             published,
             audio: enclosures.map((enclosure) => ({
               src: enclosure.url,

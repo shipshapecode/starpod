@@ -2,14 +2,14 @@ import { useState } from 'preact/hooks';
 import FormattedDate from '../components/FormattedDate';
 import FullPlayButton from '../components/FullPlayButton';
 import { currentEpisode } from '../components/state';
-import type { Episode } from '../lib/rss';
+import type { Episode, Show } from '../lib/rss';
 
 type Props = {
   episodes: Array<Episode>;
-  url: URL;
+  show: Show;
 };
 
-export default function EpisodeList({ episodes, url }: Props) {
+export default function EpisodeList({ episodes, show }: Props) {
   const [recentEpisodes, setRecentEpisodes] = useState(episodes);
   const [canLoadMore, setCanLoadMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +48,7 @@ export default function EpisodeList({ episodes, url }: Props) {
                   aria-hidden="true"
                   class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
                   height={80}
-                  src={episode.episodeThumbnail ?? '/images/www.png'}
+                  src={episode.episodeThumbnail ?? show.image}
                   width={80}
                   loading="lazy"
                 />

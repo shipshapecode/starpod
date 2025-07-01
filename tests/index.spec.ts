@@ -23,16 +23,22 @@ test('index page has correct meta', async ({ page }) => {
   await expect(description).toHaveAttribute('content', indexMeta.description);
 
   const ogImage = page.locator('meta[property="og:image"]');
-  await expect(ogImage).toHaveAttribute('content', indexMeta.image);
+  await expect(ogImage).toHaveAttribute(
+    'content',
+    `/_image?href=${encodeURIComponent(indexMeta.image)}&w=640&q=75`
+  );
 
   const twitterImage = page.locator('meta[name="twitter:image:src"]');
-  await expect(twitterImage).toHaveAttribute('content', indexMeta.image);
+  await expect(twitterImage).toHaveAttribute(
+    'content',
+    `/_image?href=${encodeURIComponent(indexMeta.image)}&w=640&q=75`
+  );
 
   const firstEpisodeThumbnail = page.locator(
     '[aria-label="EpisodeList"] li:first-of-type > div > img'
   );
   await expect(firstEpisodeThumbnail).toHaveAttribute(
     'src',
-    RegExp('^/_image[?]href=')
+    RegExp('^/_image[?]href=.*w=160&q=75$')
   );
 });
