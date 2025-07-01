@@ -16,6 +16,10 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
     })
   );
 
+  for (const episode of allEpisodes) {
+    console.log(episode?.episodeThumbnail);
+  }
+
   return paginate(allEpisodes, { pageSize: episodesPerPage });
 }
 
