@@ -21,15 +21,15 @@
     "@astrojs/preact": "^4.1.0",
     "@astrojs/sitemap": "^3.4.1",
     "@astrojs/vercel": "https://pkg.pr.new/@astrojs/vercel@14014",
-    "@preact/signals": "^2.0.3",
+    "@preact/signals": "^2.2.1",
     "@vercel/analytics": "^1.4.1",
     "@vercel/speed-insights": "^1.1.0",
-    "astro": "^5.10.0",
+    "astro": "^5.11.0",
     "astro-seo-schema": "^5.0.0",
     "atropos": "^2.0.2",
-    "preact": "^10.26.5",
+    "preact": "^10.26.9",
     "rss-to-json": "^2.1.1",
-    "schema-dts": "^1.1.2",
+    "schema-dts": "^1.1.5",
     "valibot": "^0.31.1"
   },
   "devDependencies": {
@@ -52,5 +52,5 @@
   "engines": {
     "node": "^22.0.0"
   },
-  "packageManager": "pnpm@10.7.0"
+  "packageManager": "pnpm@10.12.4"
 }
