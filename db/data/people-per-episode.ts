@@ -1,4 +1,25 @@
+import people from './people';
+
+type PersonId = (typeof people)[number]['id'];
+
 export default {
+  // 201
+  'from-faang-to-fired-the-illusion-of-stability-in-big-tech-w-adam-argyle': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink', host: true }
+  ],
+  // 200
+  'the-one-rye-to-rule-them-all-w-kendall-miller-rishi-malik': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'kendallmiller' },
+    { id: 'rishimalik' }
+  ],
+  // 199
+  'fathers-day-drinking-w-typecraft': [
+    { id: 'robbiethewagner' },
+    { id: 'typecraft_dev', host: true }
+  ],
   // 198
   'will-ai-kill-the-joy-of-coding': [
     { id: 'robbiethewagner' },
@@ -436,4 +457,4 @@ export default {
   // 115
   // 114
   // 113
-} as { [key: string]: Array<{ id: string; host?: boolean }> };
+} as { [key: string]: Array<{ id: PersonId; host?: boolean }> };

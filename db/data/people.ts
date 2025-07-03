@@ -1,4 +1,4 @@
-export default [
+export const people = [
   { id: 'aarondfrancis', name: 'Aaron Francis', img: 'aarondfrancis.jpg' },
   { id: 'adamrackis', name: 'Adam Rackis', img: 'adamrackis.jpg' },
   { id: 'adamstac', name: 'Adam Stacoviak', img: 'adamstac.jpg' },
@@ -121,6 +121,11 @@ export default [
     img: 'ken_wheeler.jpg'
   },
   {
+    id: 'kendallmiller',
+    name: 'Kendall Miller',
+    img: 'kendallmiller.jpg'
+  },
+  {
     id: 'kevinwhinnery',
     name: 'Kevin Whinnery',
     img: 'kevinwhinnery.jpg'
@@ -177,6 +182,11 @@ export default [
     id: 'rich_harris',
     name: 'Rich Harris',
     img: 'rich_harris.jpg'
+  },
+  {
+    id: 'rishimalik',
+    name: 'Rishi Malik',
+    img: 'rishimalik.jpg'
   },
   {
     id: 'robbiethewagner',
@@ -251,4 +261,6 @@ export default [
   { id: 'wagslane', name: 'Lane Wagner', img: 'wagslane.jpg' },
   { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' },
   { id: 'zeeg', name: 'David Cramer', img: 'zeeg.jpg' }
-];
+] as const;
+
+export default people;
