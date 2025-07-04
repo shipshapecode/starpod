@@ -18,7 +18,7 @@ import sponsorsPerEpisode from './data/sponsors-per-episode';
 export default async function seed() {
   await db
     .insert(Person)
-    .values(people)
+    .values(people as any)
     .onConflictDoUpdate({
       target: Person.id,
       set: { name: sql`excluded.name`, img: sql`excluded.img` }
@@ -53,10 +53,9 @@ export default async function seed() {
         hostsOrGuestsToInsert.push({
           episodeSlug: episode.episodeSlug,
           isHost:
-            (person.id === 'chuckcarpenter' ||
-              person.id === 'robbiethewagner' ||
-              person.host) ??
-            false,
+            person.id === 'chuckcarpenter' ||
+            person.id === 'robbiethewagner' ||
+            Boolean(person.host),
           personId: person.id
         });
       }
