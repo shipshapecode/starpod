@@ -42,7 +42,7 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       preact:
-        specifier: ^10.27.0
+        specifier: ^10.26.9
         version: 10.27.0
       rss-to-json:
         specifier: ^2.1.1
@@ -55,7 +55,7 @@ importers:
         version: 0.31.1
     devDependencies:
       '@playwright/test':
-        specifier: ^1.54.1
+        specifier: ^1.53.2
         version: 1.54.1
       '@tailwindcss/forms':
         specifier: ^0.5.10
@@ -70,7 +70,7 @@ importers:
         specifier: ^9.0.4
         version: 9.0.4
       '@types/node':
-        specifier: ^22.17.0
+        specifier: ^22.16.0
         version: 22.17.0
       html-to-text:
         specifier: ^9.0.5
@@ -82,7 +82,7 @@ importers:
         specifier: ^0.14.1
         version: 0.14.1
       prettier-plugin-tailwindcss:
-        specifier: ^0.6.14
+        specifier: ^0.6.13
         version: 0.6.14(prettier-plugin-astro@0.14.1)(prettier@3.6.2)
       sharp:
         specifier: ^0.33.5
