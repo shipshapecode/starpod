@@ -104,24 +104,23 @@ const description = Astro.props.description ?? starpodConfig.description;
 
     <slot name="head" />
 
-    <SpeedInsights />
     <ClientRouter />
   </head>
   <body
-    class="font-inter text-light-text-body antialiased dark:bg-dark-background dark:text-dark-text-body"
+    class="font-inter text-light-text-body dark:bg-dark-background dark:text-dark-text-body antialiased"
   >
     <header
       class="scrollbar-thin lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
     >
       <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
         <div
-          class="m-2 rounded-lg bg-light-card pb-4 pt-10 lg:pb-12 lg:pt-16 dark:bg-dark-card"
+          class="bg-light-card dark:bg-dark-card m-2 rounded-lg pt-10 pb-4 lg:pt-16 lg:pb-12"
         >
           <ShowArtwork image={show.image} />
 
           <div class="px-4 sm:px-6 md:px-4 lg:px-16">
             <p
-              class="mt-8 text-center text-2xl font-bold text-light-text-heading lg:text-left dark:text-white"
+              class="text-light-text-heading mt-8 text-center text-2xl font-bold lg:text-left dark:text-white"
             >
               {show.title}
             </p>
@@ -145,11 +144,11 @@ const description = Astro.props.description ?? starpodConfig.description;
       </div>
     </header>
     <main
-      class="mx-2 rounded-lg bg-light-card lg:relative lg:ml-112 lg:min-h-screen xl:ml-120 dark:bg-dark-card"
+      class="bg-light-card dark:bg-dark-card mx-2 rounded-lg lg:relative lg:ml-112 lg:min-h-screen xl:ml-120"
     >
       <div class="relative mt-2 pt-16">
         <div
-          class="bg-gradient-light absolute left-0 right-0 top-0 z-0 h-80 w-full opacity-30 dark:bg-gradient-dark"
+          class="bg-gradient-light dark:bg-gradient-dark absolute top-0 right-0 left-0 z-0 h-80 w-full opacity-30"
         >
         </div>
 
@@ -158,7 +157,7 @@ const description = Astro.props.description ?? starpodConfig.description;
         <div class="max-w-4xl">
           <div
             class:list={[
-              'relative z-20 mb-12 border-b pb-6 lg:mb-16 lg:pb-10 dark:border-dark-border',
+              'dark:border-dark-border relative z-20 mb-12 border-b pb-6 lg:mb-16 lg:pb-10',
               Astro.url.pathname === '/' && 'hidden'
             ]}
           >
@@ -178,5 +177,6 @@ const description = Astro.props.description ?? starpodConfig.description;
     <div id="audio-player">
       <Player client:only="preact" transition:persist="player" />
     </div>
+    <SpeedInsights />
   </body>
 </html>
