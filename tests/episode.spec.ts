@@ -6,7 +6,7 @@ const episode1 = {
   description:
     /^Have you ever reflected on the tools that shaped your journey as a developer?/,
   image:
-    'https://content.production.cdn.art19.com/images/e9/7a/78/16/e97a7816-1ca2-4fcd-8409-1a02e316b81a/03e2640740b7dea50ee910533c52edd18c88e77189b1ebbbde4e2af3558df57d0e2f4153148176d1f748fd8585ca7f4c6107adaaf585712da966012f033c6603.jpeg'
+    'https://play.cdnstream1.com/zjb/image/download/d6/c4/9e/d6c49e16-ed89-45f9-b5d4-60dac61e44b0_1400.jpg'
 };
 
 const episode2 = {
@@ -15,7 +15,7 @@ const episode2 = {
   description:
     /^In this crossover episode, Chuck and Robbie join Jem Young and Ryan Burgess from/,
   image:
-    'https://content.production.cdn.art19.com/images/2c/b5/34/ed/2cb534ed-fda4-4af2-84b0-f95365ea53d3/b7880054d69de3799ab4a66c709bbd0d6076b8066c9bf82e558f54a153bea321ae8623f681f4a454dc911c92209e676833daf42c4f9f61bfdc1b7189d3c3f158.jpeg'
+    'https://play.cdnstream1.com/zjb/image/download/07/33/c2/0733c291-7cba-4455-a0f9-01761eb1e6bd_1400.jpg'
 };
 
 test('works with episode numbers', async ({ page }) => {
