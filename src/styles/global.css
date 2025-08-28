@@ -10,7 +10,11 @@ main:has(+ * + #audio-player .player) {
   }
 }
 
-.scrollbar-thin {
+html {
+  color-scheme: light dark;
+}
+
+html, .custom-scrollbar {
   scrollbar-color: var(--color-light-input-border) transparent;
 
   @media (prefers-color-scheme: dark) {
