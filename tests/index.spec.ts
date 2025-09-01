@@ -5,7 +5,7 @@ const indexMeta = {
   description:
     /^Veteran web developers RobbieTheWagner and Charles William Carpenter III host this informal, whiskey-fueled fireside chat with your favorite web devs/,
   image:
-    'https://content.production.cdn.art19.com/images/68/ab/83/a8/68ab83a8-c791-4d25-bca6-c0c7e2b16306/6b4c27783b4d53afdc6b82c0d44991f8fac363f181cbc7e6905933cf064b5831271186d9efe568d4bf138e059dc9195f6143993ceab5288c21e5ef47ee532e5f.jpeg'
+    'https://play.cdnstream1.com/zjb/image/download/c7/ad/57/c7ad5763-26d4-49e8-9b51-37f448a8bad1_1400.jpg'
 };
 
 test('index page has correct meta', async ({ page }) => {
