@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 
 @plugin '@tailwindcss/forms';
-@plugin 'tailwind-scrollbar';
 @plugin '@tailwindcss/typography';
 
 @theme {

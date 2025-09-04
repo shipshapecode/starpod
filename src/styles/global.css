@@ -10,9 +10,34 @@ main:has(+ * + #audio-player .player) {
   }
 }
 
+html {
+  color-scheme: light dark;
+}
+
+html, .custom-scrollbar {
+  scrollbar-color: var(--color-light-input-border) transparent;
+
+  @media (prefers-color-scheme: dark) {
+    scrollbar-color: var(--color-dark-input-border) transparent;
+  }
+}
+
 footer:has(+ #audio-player .player) {
   @media (max-width: 1024px) {
     @apply mb-40;
+  }
+}
+
+[aria-label="EpisodeList"] li {
+  animation: episode-in linear both;
+  animation-timeline: view();
+  animation-range: entry 10% cover 25%;
+}
+
+@keyframes episode-in {
+  from {
+    opacity: 0;
+    translate: 0 25px;
   }
 }
 
