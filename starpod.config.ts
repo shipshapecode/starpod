@@ -18,14 +18,16 @@ export default defineStarpodConfig({
       bio: 'Third of his name, user of gifs, hater of ESM.',
       img: 'chuckcarpenter.jpg',
       github: 'https://github.com/chuckcarpenter',
-      twitter: 'https://x.com/CharlesWthe3rd'
+      twitter: 'https://x.com/CharlesWthe3rd',
+      website: 'https://shipshape.io'
     },
     {
       name: 'Adam Argyle',
       bio: 'Devigner unicorn, CSS dork, punky but nice.',
       img: 'argyleink.jpg',
       github: 'https://github.com/argyleink',
-      twitter: 'https://x.com/argyleink'
+      twitter: 'https://x.com/argyleink',
+      website: 'https://nerdy.dev'
     }
   ],
   platforms: {
