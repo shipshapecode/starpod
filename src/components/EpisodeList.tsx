@@ -3,6 +3,7 @@ import FormattedDate from '../components/FormattedDate';
 import FullPlayButton from '../components/FullPlayButton';
 import { currentEpisode } from '../components/state';
 import type { Episode, Show } from '../lib/rss';
+import { dasherize } from '../utils/dasherize';
 
 type Props = {
   episodes: Array<Episode>;
@@ -57,7 +58,7 @@ export default function EpisodeList({ episodes, show }: Props) {
                   <FormattedDate date={new Date(episode.published)} />
 
                   <h2 class="text-light-text-heading my-2 text-lg font-bold dark:text-white">
-                    <a href={`/${episode.episodeSlug}`}>
+                    <a href={`/${episode.episodeSlug}`} style={"view-transition-name: vt-"+ dasherize(episode.title)}>
                       {episode.episodeNumber}: {episode.title}
                     </a>
                   </h2>

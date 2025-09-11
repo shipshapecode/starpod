@@ -25,7 +25,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
           width={48}
           alt=""
         />
-        {host.name}
+        <a href={host.website}>{host.name}</a>
       </div>
     ))
   }

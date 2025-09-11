@@ -20,6 +20,7 @@ import FullPlayButton from '../components/FullPlayButton';
 import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
 import Layout from '../layouts/Layout.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
+import { dasherize } from '../utils/dasherize';
 
 const show = await getShowInfo();
 
@@ -113,6 +114,7 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
 
         <h1
           class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
+          style={"view-transition-name: vt-"+ dasherize(episode.title)}>
         >
           {episode.episodeNumber}: {episode.title}
         </h1>
