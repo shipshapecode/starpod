@@ -59,6 +59,14 @@ hosts: [
     img: '/src/img/people/chuckcarpenter.jpg',
     github: 'https://github.com/chuckcarpenter',
     twitter: 'https://twitter.com/CharlesWthe3rd'
+  },
+  {
+    name: 'Adam Argyle',
+    bio: 'Devigner unicorn, CSS dork, punky but nice.',
+    img: 'argyleink.jpg',
+    github: 'https://github.com/argyleink',
+    twitter: 'https://x.com/argyleink',
+    website: 'https://nerdy.dev'
   }
 ],
 ```
