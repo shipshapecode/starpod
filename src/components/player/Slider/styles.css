@@ -19,6 +19,8 @@
     @apply relative -mt-[5px] box-content h-4 w-4 cursor-pointer appearance-none bg-contain bg-no-repeat transition-opacity duration-300 lg:opacity-0;
     background-image: url('/images/rocket-dark.svg');
     background-position: center center;
+    box-shadow: none;
+    background-color: #0000;
   }
   &::-moz-range-track {
     @apply h-1.5 w-full cursor-pointer border-none bg-gray-200 outline-none dark:bg-gray-700;
