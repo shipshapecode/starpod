@@ -58,7 +58,7 @@ export default function FullPlayButton({ episode }: Props) {
 
   return (
     <button
-      class="btn"
+      class="btn cursor-pointer"
       onClick={() => {
         currentEpisode.value = {
           ...episode
