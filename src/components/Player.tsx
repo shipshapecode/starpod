@@ -24,11 +24,22 @@ export default function Player() {
       const percentage =
         (audioPlayer.current.currentTime / audioPlayer.current.duration) * 100;
       setProgress(percentage);
+
       const slider = document.querySelector('.slider');
+      const particles = document.querySelector('.ship-particles');
+
       if (slider) {
         (slider as HTMLElement).style.setProperty(
           '--seek-before-width',
           `${percentage}%`
+        );
+      }
+
+      if (particles && slider) {
+        const pxOffset = slider.clientWidth * (percentage / 100);
+        (particles as HTMLElement).style.setProperty(
+          '--seek-particles-left',
+          `${pxOffset}px`
         );
       }
     }
