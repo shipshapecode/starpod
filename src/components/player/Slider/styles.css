@@ -37,6 +37,15 @@
     background-position: center center;
   }
 
+  @media (prefers-color-scheme: light) {
+    &::-webkit-slider-thumb {
+      background-image: url('/images/rocket-light.svg');
+    }
+    &::-moz-range-thumb {
+      background-image: url('/images/rocket-light.svg');
+    }
+  }
+
   &:hover {
     &::-webkit-slider-thumb {
       @apply opacity-100;
