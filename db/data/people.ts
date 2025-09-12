@@ -253,6 +253,7 @@ export const people = [
     name: 'ThePrimeagen',
     img: 'theprimeagen.jpg'
   },
+  { id: 'tom_barrasso', name: 'Tom Barrasso', img: 'tom_barrasso.jpg' },
   {
     id: 'typecraft_dev',
     name: 'Typecraft',
