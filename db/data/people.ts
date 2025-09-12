@@ -198,6 +198,11 @@ export const people = [
     name: 'Robby Russell',
     img: 'robbyrussell.jpg'
   },
+   {
+    id: 'rwjblue',
+    name: 'Robert Jackson',
+    img: 'rwjblue.jpg'
+  },
   {
     id: 'shaundai',
     name: 'Shaundai Person',

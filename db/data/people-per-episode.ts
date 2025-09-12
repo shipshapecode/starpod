@@ -18,7 +18,7 @@ export default {
     [
       { id: 'robbiethewagner' },
       { id: 'chuckcarpenter' },
-      { id: 'typecraft', host: true },
+      { id: 'typecraft_dev', host: true },
       { id: 'rwjblue' }
     ],
   // 206
@@ -26,7 +26,7 @@ export default {
     [
       { id: 'robbiethewagner' },
       { id: 'aarondfrancis' },
-      { id: 'typecraft' },
+      { id: 'typecraft_dev' },
       { id: 'ken_wheeler' }
     ],
   // 205
