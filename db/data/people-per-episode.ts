@@ -3,6 +3,53 @@ import people from './people';
 type PersonId = (typeof people)[number]['id'];
 
 export default {
+  // 209
+  'is-cracker-barrel-a-js-framework': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' }
+  ],
+  // 208
+  'dial-up-is-dead-long-live-adam-argyle': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' }
+  ],
+  // 207
+  'will-frameworks-survive-web-development-in-an-ai-driven-world-w-typecraft-and-robert-jackson':
+    [
+      { id: 'robbiethewagner' },
+      { id: 'chuckcarpenter' },
+      { id: 'typecraft_dev', host: true },
+      { id: 'rwjblue' }
+    ],
+  // 206
+  'live-from-big-sky-dev-con-code-debates-content-insights-and-whats-next-for-web-development':
+    [
+      { id: 'robbiethewagner' },
+      { id: 'aarondfrancis' },
+      { id: 'typecraft_dev' },
+      { id: 'ken_wheeler' }
+    ],
+  // 205
+  'error-500-our-lives': [{ id: 'robbiethewagner' }, { id: 'chuckcarpenter' }],
+  // 204
+  'modern-web-dev-meets-2000s-flip-phone-what-could-go-wrong': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'tom_barrasso' }
+  ],
+  // 203
+  'from-the-rickhouse-tech-talk-social-media-use-and-netflix-with-the-primeagen':
+    [
+      { id: 'robbiethewagner' },
+      { id: 'chuckcarpenter' },
+      { id: 'theprimeagen' }
+    ],
+  // 202
+  'from-the-rickhouse-why-svelte-might-just-outdo-react-w-rich-harris': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'rich_harris' }
+  ],
   // 201
   'from-faang-to-fired-the-illusion-of-stability-in-big-tech-w-adam-argyle': [
     { id: 'robbiethewagner' },
@@ -140,7 +187,7 @@ export default {
   'is-cereal-soup-the-fg-scale-and-js-vs-css-with-adam-argyle': [
     { id: 'robbiethewagner' },
     { id: 'chuckcarpenter' },
-    { id: 'argyleink' }
+    { id: 'argyleink', host: false }
   ],
   // 177
   'authenticity-in-a-world-of-algorithms': [
@@ -209,7 +256,7 @@ export default {
   'front-end-adventures-with-bad-at-css-david-east-and-adam-argyle': [
     { id: 'robbiethewagner' },
     { id: 'chuckcarpenter' },
-    { id: 'argyleink' },
+    { id: 'argyleink', host: false },
     { id: 'davideast' }
   ],
   // 165

@@ -53,9 +53,11 @@ export default async function seed() {
         hostsOrGuestsToInsert.push({
           episodeSlug: episode.episodeSlug,
           isHost:
-            person.id === 'chuckcarpenter' ||
-            person.id === 'robbiethewagner' ||
-            Boolean(person.host),
+            person.host !== undefined
+              ? Boolean(person.host)
+              : ['argyleink', 'chuckcarpenter', 'robbiethewagner'].includes(
+                  person.id
+                ),
           personId: person.id
         });
       }

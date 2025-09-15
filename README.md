@@ -47,7 +47,7 @@ A list of your show's hosts and their info.
 hosts: [
   {
     name: 'RobbieTheWagner',
-    bio: 'Huge Ember and Tailwind fanboy. I work at Amazon btw.',
+    bio: 'Huge Ember and Tailwind fanboy. I used to work at Netflix btw.',
     img: '/src/img/people/robbiethewagner.jpg',
     github: 'https://github.com/RobbieTheWagner',
     twitter: 'https://twitter.com/RobbieTheWagner',
