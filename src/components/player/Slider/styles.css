@@ -62,7 +62,7 @@
 }
 
 .ship-particles {
-  left: calc(var(--seek-particles-left) - 15px);
+  left: max(0px, var(--seek-particles-left));
 
   > div {
     animation:
@@ -70,6 +70,7 @@
       ship-particles-y 1s ease infinite;
     animation-composition: add;
     background-color: #B0ECFF;
+    opacity: 0;
 
     @media (prefers-color-scheme: light) {
       background-color: #906BFF;
