@@ -39,7 +39,7 @@ export default function Player() {
         const pxOffset = slider.clientWidth * (percentage / 100);
         (particles as HTMLElement).style.setProperty(
           '--seek-particles-left',
-          `${pxOffset}px`
+          `${pxOffset - 10}px` // -5 to put the dots into the track
         );
       }
     }
