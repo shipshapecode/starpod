@@ -54,12 +54,12 @@ export default function Slider({ audioPlayer, progress }: Props) {
           }
         }}
       />
-      <div className={"ship-particles absolute h-full -top-[1px] grid place-items-center place-content-center"}>
-        <div className="w-1 h-1 rounded-full row-start-1 col-start-1 pointer-events-none"></div>
-        <div className="w-1 h-1 rounded-full row-start-1 col-start-1 pointer-events-none"></div>
-        <div className="w-1 h-1 rounded-full row-start-1 col-start-1 pointer-events-none"></div>
-        <div className="w-1 h-1 rounded-full row-start-1 col-start-1 pointer-events-none"></div>
-        <div className="w-1 h-1 rounded-full row-start-1 col-start-1 pointer-events-none"></div>
+      <div className={"ship-particles absolute h-full -top-[1px] grid place-items-center place-content-center pointer-events-none"}>
+        <div className="w-1 h-1 rounded-full row-start-1 col-start-1"></div>
+        <div className="w-1 h-1 rounded-full row-start-1 col-start-1"></div>
+        <div className="w-1 h-1 rounded-full row-start-1 col-start-1"></div>
+        <div className="w-1 h-1 rounded-full row-start-1 col-start-1"></div>
+        <div className="w-1 h-1 rounded-full row-start-1 col-start-1"></div>
       </div>
       <span class="hidden text-nowrap text-sm tabular-nums md:inline-block">
         {formatTime(currentTime, totalTime)} / {formatTime(totalTime)}
