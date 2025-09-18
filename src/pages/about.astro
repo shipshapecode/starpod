@@ -15,7 +15,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 <Layout title="About">
   <div class="relative z-10 px-8 lg:px-18">
     <h1
-      class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
+      class="text-light-text-heading mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl dark:text-white"
     >
       About the show
     </h1>
@@ -26,12 +26,15 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 
     <h2 class="section-heading-underlined mt-16 lg:mt-24">Meet the hosts</h2>
 
-    <div class="mb-5 lg:mt-12 pb-9">
+    <div class="mt-9 pb-9 lg:mt-12">
       {
-        hosts.map((host) => (
-          <div class="mb-4 flex flex-col lg:flex-row">
+        hosts.map((host, index) => (
+          <div
+            class="flex flex-col lg:flex-row"
+            class:list={[index < hosts.length - 1 ? 'mb-4' : '']}
+          >
             <Image
-              class="mb-4 mr-6 h-12 w-12 rounded-lg lg:h-20 lg:w-20"
+              class="mr-6 mb-4 h-12 w-12 rounded-lg lg:h-20 lg:w-20"
               height={80}
               src={images[`/src/img/people/${host.img}`]()}
               width={80}
@@ -39,7 +42,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
             />
 
             <div>
-              <h3 class="text-lg font-bold text-light-text-heading lg:text-2xl dark:text-white">
+              <h3 class="text-light-text-heading text-lg font-bold lg:text-2xl dark:text-white">
                 {host.name}
               </h3>
 
@@ -48,7 +51,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
               <div class="mt-6 flex gap-4">
                 {host?.twitter && (
                   <a
-                    class="animated-bottom-border font-bold text-light-text-heading after:mt-1 dark:text-white"
+                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
                     href={host.twitter}
                   >
                     Twitter
@@ -57,7 +60,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 
                 {host?.github && (
                   <a
-                    class="animated-bottom-border font-bold text-light-text-heading after:mt-1 dark:text-white"
+                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
                     href={host.github}
                   >
                     GitHub
@@ -66,7 +69,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 
                 {host?.website && (
                   <a
-                    class="animated-bottom-border font-bold text-light-text-heading after:mt-1 dark:text-white"
+                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
                     href={host.website}
                   >
                     Website

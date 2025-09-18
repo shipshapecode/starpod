@@ -105,7 +105,7 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
 
   <div class="relative z-10 px-8 lg:px-18">
     <div class="block lg:flex">
-      <div class="mr-11 mt-4 hidden lg:block">
+      <div class="mt-4 mr-11 hidden lg:block">
         <PlayButton client:only="preact" episode={episode} />
       </div>
 
@@ -113,8 +113,8 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
         <FormattedDate date={new Date(episode.published)} />
 
         <h1
-          class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
-          style={"view-transition-name: vt-"+ dasherize(episode.title)}>
+          class="text-light-text-heading mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl dark:text-white"
+          style={'view-transition-name: vt-' + dasherize(episode.title)}
         >
           {episode.episodeNumber}: {episode.title}
         </h1>
@@ -135,22 +135,22 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
 
         {sponsors?.length ? <Sponsors sponsors={sponsors} /> : undefined}
 
-        <h3 class="section-heading-underlined mb-8 mt-16">Show Notes</h3>
+        <h3 class="section-heading-underlined mt-16 mb-8">Show Notes</h3>
 
         <div
-          class="prose prose-neutral mb-5 dark:prose-invert [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:font-medium [&>h2]:leading-7 [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>ul]:mt-6 [&>ul]:pl-5"
+          class="prose prose-neutral dark:prose-invert mb-5 [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:leading-7 [&>h2]:font-medium [&>h2]:text-slate-900 [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>ul]:mt-6 [&>ul]:pl-5"
         >
           <Fragment set:html={episode.content} />
         </div>
 
-        <h3 class="section-heading-underlined mb-8 mt-16">
+        <h3 class="section-heading-underlined mt-16 mb-8">
           Episode Transcript
         </h3>
 
         {
           Transcript ? (
             <div class="mb-20">
-              <article class="transcript prose prose-neutral line-clamp-4 dark:prose-invert">
+              <article class="transcript prose prose-neutral dark:prose-invert line-clamp-4">
                 <Transcript />
               </article>
 
@@ -168,7 +168,7 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
                 <UFOIllustration />
               </div>
 
-              <p class="py-10 text-lg font-bold text-light-text-heading dark:text-white">
+              <p class="text-light-text-heading py-10 text-lg font-bold dark:text-white">
                 No transcript available for this episode.
               </p>
             </div>

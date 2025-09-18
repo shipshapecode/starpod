@@ -8,9 +8,9 @@ export interface Props {
 const { bullets, heading, price } = Astro.props;
 ---
 
-<div class="relative z-10 mb-6 rounded-lg bg-white p-1 dark:bg-dark-background">
+<div class="dark:bg-dark-background relative z-10 mb-6 rounded-lg bg-white p-1">
   <h2
-    class="bg-light-card px-5 py-4 font-bold text-light-text-heading lg:py-6 dark:bg-dark-card dark:text-white"
+    class="bg-light-card text-light-text-heading dark:bg-dark-card px-5 py-4 font-bold lg:py-6 dark:text-white"
   >
     {heading}
   </h2>
@@ -18,20 +18,20 @@ const { bullets, heading, price } = Astro.props;
   <ul class="list-disc px-8">
     {
       bullets.map((bullet) => {
-        return <li class="border-b py-6 dark:border-dark-border">{bullet}</li>;
+        return <li class="dark:border-dark-border border-b py-6">{bullet}</li>;
       })
     }
 
     <h3
-      class="mb-12 mt-8 px-5 text-4xl font-bold tabular-nums text-light-text-heading dark:text-white"
+      class="text-light-text-heading mt-8 mb-12 px-5 text-4xl font-bold tabular-nums dark:text-white"
     >
       {price}
       <span
-        class="text-3xl font-light text-light-text-body dark:text-dark-text-body"
+        class="text-light-text-body dark:text-dark-text-body text-3xl font-light"
       >
         /
       </span>
-      <span class="text-2xl text-light-text-body dark:text-dark-text-body">
+      <span class="text-light-text-body dark:text-dark-text-body text-2xl">
         per episode
       </span>
     </h3>
@@ -39,7 +39,7 @@ const { bullets, heading, price } = Astro.props;
     <div class="flex w-full">
       <a class="btn mb-8 w-full justify-center" href="/contact">
         <span
-          class="rounded-full px-8 py-3 text-center text-sm text-light-text-heading dark:text-white"
+          class="text-light-text-heading rounded-full px-8 py-3 text-center text-sm dark:text-white"
         >
           Become a sponsor
         </span>

@@ -3,7 +3,7 @@ import { defineStarpodConfig } from 'src/utils/config';
 export default defineStarpodConfig({
   blurb: 'A whiskey fueled fireside chat with your favorite web developers.',
   description:
-    'Veteran web developers RobbieTheWagner, Charles William Carpenter III and Adam Argyle host this informal, whiskey-fueled fireside chat with your favorite web devs. They discuss all things web development including JavaScript, TypeScript, EmberJS, React, Astro, SolidJS, CSS, HTML, Web3, and more. They take a unique approach and focus on getting to know the human side of developers and their hobbies outside of work, all while sampling a new whiskey that they rate on their unique tentacle scale.',
+    'Veteran web developers RobbieTheWagner, Charles William Carpenter III, and Adam Argyle host this informal, whiskey-fueled fireside chat with your favorite web devs. They discuss all things web development including JavaScript, TypeScript, EmberJS, React, Astro, SolidJS, CSS, HTML, Web3, and more. They take a unique approach and focus on getting to know the human side of developers and their hobbies outside of work, all while sampling a new whiskey that they rate on their unique tentacle scale.',
   hosts: [
     {
       name: 'RobbieTheWagner',

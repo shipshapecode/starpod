@@ -58,7 +58,7 @@ export default function ContactForm() {
 
           <div class="my-6 flex w-full justify-end">
             <button class="btn w-full justify-center lg:w-auto">
-              <span class="rounded-full px-12 py-3 text-center text-sm text-light-text-heading dark:text-white">
+              <span class="text-light-text-heading rounded-full px-12 py-3 text-center text-sm dark:text-white">
                 Submit
               </span>
             </button>

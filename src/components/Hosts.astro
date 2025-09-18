@@ -11,7 +11,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 ---
 
 <div
-  class="mx-2 mt-2 rounded-lg px-4 pb-12 pt-12 bg-light-card sm:px-6 md:px-4 lg:mx-0 lg:mt-0 lg:px-16 lg:pb-0 dark:bg-dark-card"
+  class="bg-light-card dark:bg-dark-card mx-2 mt-2 rounded-lg px-4 pt-12 pb-12 sm:px-6 md:px-4 lg:mx-0 lg:mt-0 lg:px-16 lg:pb-0"
 >
   <h3 class="section-heading pb-6">Hosted By</h3>
 
@@ -25,7 +25,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
           width={48}
           alt=""
         />
-        <a href={host.website}>{host.name}</a>
+        {host.name}
       </div>
     ))
   }
