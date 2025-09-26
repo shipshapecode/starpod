@@ -39,7 +39,16 @@ export default defineConfig({
   },
   site: 'https://whiskey.fm',
   trailingSlash: 'never',
-  integrations: [db(), preact(), sitemap()],
+  integrations: [
+    db(),
+    preact(),
+    sitemap({
+      filter: (page) => {
+        // Exclude episode number pages and only include slug pages.
+        return !/^\/\d+\/?$/.test(page);
+      }
+    })
+  ],
   // These were specific redirects we needed for our podcast, if you do not have any routes to redirect, you can safely remove this.
   redirects: {
     '/hot-takes-tan-stack-and-open-source-with-tanner-linsley':
