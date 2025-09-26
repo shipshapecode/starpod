@@ -44,8 +44,9 @@ export default defineConfig({
     preact(),
     sitemap({
       filter: (page) => {
+        const pathname = new URL(page).pathname;
         // Exclude episode number pages and only include slug pages.
-        return !/^\/\d+\/?$/.test(page);
+        return !/^\/\d+\/?$/.test(pathname);
       }
     })
   ],
