@@ -38,6 +38,7 @@ export default defineConfig({
     ]
   },
   site: 'https://whiskey.fm',
+  trailingSlash: 'never',
   integrations: [db(), preact(), sitemap()],
   // These were specific redirects we needed for our podcast, if you do not have any routes to redirect, you can safely remove this.
   redirects: {
