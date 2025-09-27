@@ -17,7 +17,7 @@ const breadcrumbSchema = {
       '@type': 'ListItem',
       position: 1,
       name: 'Home',
-      item: Astro.site?.toString()
+      item: Astro.site?.toString() || '/'
     },
     {
       '@type': 'ListItem',
