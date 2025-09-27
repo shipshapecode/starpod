@@ -24,6 +24,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
           src={images[`/src/img/people/${host.img}`]()}
           width={48}
           alt=""
+          loading="lazy"
         />
         {host.name}
       </div>
