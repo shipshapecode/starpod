@@ -102,7 +102,7 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
       episodeNumber: episode.episodeNumber,
       url: canonicalURL.toString(),
       image: episode.episodeImage || show.image,
-      duration: episode.duration,
+      duration: `PT${Math.floor(episode.duration / 60)}M${episode.duration % 60}S`,
       associatedMedia: {
         '@type': 'MediaObject',
         contentUrl: episode.audio?.src,
