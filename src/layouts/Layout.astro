@@ -86,11 +86,12 @@ const description = Astro.props.description ?? starpodConfig.description;
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- @ts-ignore: TypeScript false positive on inline JavaScript -->
     <link
       rel="preload"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
       as="style"
-      onload="this.onload=null;this.rel='stylesheet'"
+      onload={"this.onload=null;this.rel='stylesheet'"}
     />
     <noscript>
       <link
