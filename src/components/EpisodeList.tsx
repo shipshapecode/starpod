@@ -38,7 +38,7 @@ export default function EpisodeList({ episodes, show }: Props) {
                   <a
                     href={`/${episode.episodeSlug}`}
                     style={
-                      'view-transition-name: vt-' + dasherize(episode.title)
+                      'view-transition-name: var(--should-vt); --vt-name: vt-' + dasherize(episode.title)
                     }
                   >
                     {episode.episodeNumber}: {episode.title}

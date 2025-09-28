@@ -12,6 +12,7 @@ main:has(+ * + #audio-player .player) {
 
 html {
   color-scheme: light dark;
+  view-transition-name: none;
 }
 
 html, .custom-scrollbar {
@@ -34,7 +35,12 @@ footer:has(+ #audio-player .player) {
   animation-range: entry 10% cover 25%;
 
   content-visibility: auto;
-  contain-intrinsic-size: 45vh;
+  contain-intrinsic-block-size: 45vh;
+
+  & h2 > a {
+    animation: toggle-vt-names linear both;
+    animation-timeline: view();
+  }
 }
 
 @keyframes episode-in {
@@ -42,6 +48,19 @@ footer:has(+ #audio-player .player) {
     opacity: 0;
     translate: 0 25px;
   }
+}
+
+@keyframes toggle-vt-names {
+	entry 0%  {
+    --should-vt: none;
+	}
+	entry 1%,
+  exit 99% {
+    --should-vt: var(--vt-name);
+	}
+	exit 100% {
+	  --should-vt: none;
+	}
 }
 
 .animated-bottom-border {
