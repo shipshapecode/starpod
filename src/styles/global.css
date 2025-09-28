@@ -4,6 +4,10 @@
 
 @import 'atropos/css';
 
+@view-transition {
+  navigation: auto;
+}
+
 main:has(+ * + #audio-player .player) {
   @media (min-width: 1024px) {
     @apply mb-28;
@@ -34,8 +38,10 @@ footer:has(+ #audio-player .player) {
   animation-timeline: view();
   animation-range: entry 10% cover 25%;
 
-  content-visibility: auto;
-  contain-intrinsic-block-size: 45vh;
+  > div {
+    content-visibility: auto;
+    contain-intrinsic-block-size: 45vh;
+  }
 
   & h2 > a {
     animation: toggle-vt-names linear both;
