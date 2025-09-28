@@ -16,7 +16,6 @@ main:has(+ * + #audio-player .player) {
 
 html {
   color-scheme: light dark;
-  view-transition-name: none;
 }
 
 html, .custom-scrollbar {
@@ -43,9 +42,11 @@ footer:has(+ #audio-player .player) {
     contain-intrinsic-block-size: 45vh;
   }
 
-  & h2 > a {
-    animation: toggle-vt-names linear both;
-    animation-timeline: view();
+  @media (width >= 1024px) {
+    & h2 > a {
+      animation: toggle-vt-names linear both;
+      animation-timeline: view();
+    }
   }
 }
 
