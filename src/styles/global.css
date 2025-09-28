@@ -32,6 +32,9 @@ footer:has(+ #audio-player .player) {
   animation: episode-in linear both;
   animation-timeline: view();
   animation-range: entry 10% cover 25%;
+
+  content-visibility: auto;
+  contain-intrinsic-size: 45vh;
 }
 
 @keyframes episode-in {
