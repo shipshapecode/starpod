@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import { Schema } from 'astro-seo-schema';
 
 import SpeedInsights from '@vercel/speed-insights/astro';
@@ -62,8 +63,16 @@ const description = Astro.props.description ?? starpodConfig.description;
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
     <meta name="msapplication-TileColor" content="#da532c" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1a1a1a"
+      media="(prefers-color-scheme: dark)"
+    />
 
     <!-- Title -->
     <title>{title}</title>
@@ -115,14 +124,14 @@ const description = Astro.props.description ?? starpodConfig.description;
     />
 
     <slot name="head" />
-
+    <ClientRouter />
   </head>
   <body
     class="font-inter text-light-text-body dark:bg-dark-background dark:text-dark-text-body antialiased"
   >
     <header
-      transition:persist="sidenav"
       class="custom-scrollbar lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
+      transition:persist="sidenav"
     >
       <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
         <div
