@@ -31,17 +31,30 @@ export interface Episode {
   };
 }
 
+let showInfoCache: Show | null = null;
+
 export async function getShowInfo() {
+  if (showInfoCache) {
+    return showInfoCache;
+  }
+
   // @ts-expect-error
   const showInfo = (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
   showInfo.image = (await optimizeImage(showInfo.image, {
     height: 640,
     width: 640
   })) as string;
+
+  showInfoCache = showInfo;
   return showInfo;
 }
 
+let episodesCache: Array<Episode> | null = null;
+
 export async function getAllEpisodes() {
+  if (episodesCache) {
+    return episodesCache;
+  }
   let FeedSchema = object({
     items: array(
       object({
@@ -106,5 +119,6 @@ export async function getAllEpisodes() {
       )
   );
 
+  episodesCache = episodes;
   return episodes;
 }

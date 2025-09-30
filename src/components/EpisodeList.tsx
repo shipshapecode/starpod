@@ -26,9 +26,9 @@ export default function EpisodeList({ episodes, show }: Props) {
                 aria-hidden="true"
                 class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
                 height={80}
+                loading="lazy"
                 src={episode.episodeThumbnail ?? show.image}
                 width={80}
-                loading="lazy"
               />
 
               <div class="flex flex-col">
@@ -38,7 +38,8 @@ export default function EpisodeList({ episodes, show }: Props) {
                   <a
                     href={`/${episode.episodeSlug}`}
                     style={
-                      'view-transition-name: var(--should-vt); --vt-name: vt-' + dasherize(episode.title)
+                      'view-transition-name: var(--should-vt); --vt-name: vt-' +
+                      dasherize(episode.title)
                     }
                   >
                     {episode.episodeNumber}: {episode.title}
