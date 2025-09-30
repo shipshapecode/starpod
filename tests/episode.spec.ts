@@ -35,7 +35,7 @@ test('works with episode numbers', async ({ page }) => {
   const ogImage = page.locator('meta[property="og:image"]');
   await expect(ogImage).toHaveAttribute('content', episode1.image);
 
-  const twitterImage = page.locator('meta[name="twitter:image"]');
+  const twitterImage = page.locator('meta[name="twitter:image:src"]');
   await expect(twitterImage).toHaveAttribute('content', episode1.image);
 });
 
