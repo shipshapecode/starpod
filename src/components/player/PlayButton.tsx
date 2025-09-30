@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'preact/hooks';
 import type { Episode } from '../../lib/rss';
 import { currentEpisode, isPlaying } from '../state';
 
@@ -41,12 +40,6 @@ const PauseIcon = (
 );
 
 export default function PlayButton({ episode }: Props) {
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
   const isCurrentEpisode = episode && episode.id === currentEpisode.value?.id;
   const showPauseIcon =
     ((episode && isCurrentEpisode) || !episode) && isPlaying.value;
@@ -68,11 +61,9 @@ export default function PlayButton({ episode }: Props) {
           }
         }}
       >
-        {hasMounted && (
-          <span key={showPauseIcon ? 'pause' : 'play'}>
-            {showPauseIcon ? PauseIcon : PlayIcon}
-          </span>
-        )}
+        <span key={showPauseIcon ? 'pause' : 'play'}>
+          {showPauseIcon ? PauseIcon : PlayIcon}
+        </span>
         <span class="sr-only">{showPauseIcon ? 'Pause' : 'Play'}</span>
       </button>
     </div>
