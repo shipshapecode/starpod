@@ -1,3 +1,4 @@
+@import './fonts.css';
 @import './tailwind.css';
 @import './gradient-icon.css';
 @import './buttons.css';
@@ -18,7 +19,8 @@ html {
   color-scheme: light dark;
 }
 
-html, .custom-scrollbar {
+html,
+.custom-scrollbar {
   scrollbar-color: var(--color-light-input-border) transparent;
 
   @media (prefers-color-scheme: dark) {
@@ -32,7 +34,7 @@ footer:has(+ #audio-player .player) {
   }
 }
 
-[aria-label="EpisodeList"] li {
+[aria-label='EpisodeList'] li {
   animation: episode-in linear both;
   animation-timeline: view();
   animation-range: entry 10% cover 25%;
@@ -58,30 +60,30 @@ footer:has(+ #audio-player .player) {
 }
 
 @keyframes toggle-vt-names {
-	entry 0%  {
+  entry 0% {
     --should-vt: none;
-	}
-	entry 1%,
+  }
+  entry 1%,
   exit 99% {
     --should-vt: var(--vt-name);
-	}
-	exit 100% {
-	  --should-vt: none;
-	}
+  }
+  exit 100% {
+    --should-vt: none;
+  }
 }
 
 .animated-bottom-border {
-  @apply border-b after:block after:h-[1px] after:w-0 after:bg-gradient-to-r after:from-[#C6B2FF] after:to-[#8D67FF] after:transition-all after:duration-500 after:ease-in-out hover:after:w-full dark:border-dark-border dark:after:from-[#43C9F5] dark:after:to-[#B4EDFF];
+  @apply dark:border-dark-border border-b after:block after:h-[1px] after:w-0 after:bg-gradient-to-r after:from-[#C6B2FF] after:to-[#8D67FF] after:transition-all after:duration-500 after:ease-in-out hover:after:w-full dark:after:from-[#43C9F5] dark:after:to-[#B4EDFF];
 }
 
 .input {
-  @apply rounded border border-light-input-border bg-light-input-bg p-4 !outline-none !ring-0 transition-colors focus:border-light-input-border-focused dark:border-dark-input-border dark:bg-dark-input-bg dark:focus:border-dark-input-border-focused;
+  @apply border-light-input-border bg-light-input-bg focus:border-light-input-border-focused dark:border-dark-input-border dark:bg-dark-input-bg dark:focus:border-dark-input-border-focused rounded border p-4 !ring-0 transition-colors !outline-none;
 }
 
 @utility section-heading {
-  @apply text-xs font-bold uppercase tracking-wide;
+  @apply text-xs font-bold tracking-wide uppercase;
 }
 
 @utility section-heading-underlined {
-  @apply section-heading border-b pb-4 dark:border-dark-border;
+  @apply section-heading dark:border-dark-border border-b pb-4;
 }

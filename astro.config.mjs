@@ -12,7 +12,7 @@ export default defineConfig({
     imageService: true,
     imagesConfig: {
       formats: ['image/avif'],
-      minimumCacheTTL: 60,
+      minimumCacheTTL: 3600,
       remotePatterns: [
         {
           protocol: 'https'
@@ -27,6 +27,12 @@ export default defineConfig({
       enabled: true
     }
   }),
+  build: {
+    inlineStylesheets: 'auto'
+  },
+  experimental: {
+    clientPrerender: true
+  },
   image: {
     remotePatterns: [
       {
@@ -36,6 +42,10 @@ export default defineConfig({
         protocol: 'http'
       }
     ]
+  },
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'viewport'
   },
   site: 'https://whiskey.fm',
   trailingSlash: 'never',
@@ -61,12 +71,5 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()]
-  },
-  prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport',
-  },
-  experimental: {
-    clientPrerender: true,
-  },
+  }
 });
