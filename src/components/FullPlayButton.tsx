@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'preact/hooks';
 import type { JSX } from 'preact/jsx-runtime';
 
 import type { Episode } from '../lib/rss';
@@ -47,12 +46,6 @@ function renderIcon(icon: JSX.Element, key?: string) {
 }
 
 export default function FullPlayButton({ episode }: Props) {
-  const [hasMounted, setHasMounted] = useState(false);
-
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
   const isCurrentEpisode = episode.id === currentEpisode.value?.id;
   const showPauseIcon = isCurrentEpisode && isPlaying.value;
 
@@ -69,17 +62,14 @@ export default function FullPlayButton({ episode }: Props) {
     >
       <span class="text-light-text-heading flex w-full items-center rounded-full p-2 pr-4 dark:text-white">
         <span class="bg-light-text-heading dark:text-dark-button mr-3 flex h-7 w-7 items-center justify-center rounded-full text-white dark:bg-white">
-          {hasMounted &&
-            (showPauseIcon
-              ? renderIcon(PauseIcon, 'pause')
-              : renderIcon(PlayIcon, 'play'))}
+          {showPauseIcon
+            ? renderIcon(PauseIcon, 'pause')
+            : renderIcon(PlayIcon, 'play')}
         </span>
-        {hasMounted && (showPauseIcon ? 'Pause' : 'Play')} Episode
-        {hasMounted && (
-          <span class="sr-only">
-            (press to {showPauseIcon ? 'pause' : 'play'})
-          </span>
-        )}
+        {showPauseIcon ? 'Pause' : 'Play'} Episode
+        <span class="sr-only">
+          (press to {showPauseIcon ? 'pause' : 'play'})
+        </span>
       </span>
     </button>
   );

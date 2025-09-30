@@ -19,6 +19,7 @@ export interface Episode {
   title: string;
   published: number;
   description: string;
+  duration: number;
   content: string;
   episodeImage?: string;
   episodeNumber?: string;
@@ -48,6 +49,7 @@ export async function getAllEpisodes() {
         title: string(),
         published: number(),
         description: string(),
+        itunes_duration: number(),
         itunes_episode: optional(number()),
         itunes_episodeType: string(),
         itunes_image: optional(object({ href: optional(string()) })),
@@ -75,6 +77,7 @@ export async function getAllEpisodes() {
           title,
           enclosures,
           published,
+          itunes_duration,
           itunes_episode,
           itunes_episodeType,
           itunes_image
@@ -88,6 +91,7 @@ export async function getAllEpisodes() {
             title: `${title}`,
             content: description,
             description: truncate(htmlToText(description), 260),
+            duration: itunes_duration,
             episodeImage: itunes_image?.href,
             episodeNumber,
             episodeSlug,

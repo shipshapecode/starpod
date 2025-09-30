@@ -99,13 +99,41 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
       name: episode.title,
       datePublished: new Date(episode.published).toISOString(),
       description: episode.description,
-      episodeNumber: episode.episodeNumber
+      episodeNumber: episode.episodeNumber,
+      url: canonicalURL.toString(),
+      image: episode.episodeImage || show.image,
+      duration: `PT${Math.floor(episode.duration / 60)}M${episode.duration % 60}S`,
+      associatedMedia: {
+        '@type': 'MediaObject',
+        contentUrl: episode.audio?.src,
+        encodingFormat: episode.audio?.type || 'audio/mpeg'
+      },
+      partOfSeries: {
+        '@type': 'PodcastSeries',
+        name: show.title,
+        url: Astro.site?.toString()
+      }
     }}
   />
 
+  <!-- Enhanced Open Graph tags -->
+  <meta slot="head" property="og:audio" content={episode.audio?.src} />
+  <meta
+    slot="head"
+    property="article:published_time"
+    content={new Date(episode.published).toISOString()}
+  />
+  {
+    hostsAndGuests
+      ?.filter((p) => p.isHost)
+      .map((host) => (
+        <meta slot="head" property="article:author" content={host.name} />
+      ))
+  }
+
   <div class="relative z-10 px-8 lg:px-18">
     <div class="block lg:flex">
-      <div class="mt-4 mr-11 hidden lg:block">
+      <div class="mt-4 mr-11 hidden h-14 w-14 shrink-0 lg:block">
         <PlayButton client:only="preact" episode={episode} />
       </div>
 
@@ -150,6 +178,31 @@ const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumbe
         {
           Transcript ? (
             <div class="mb-20">
+              <Schema
+                item={{
+                  '@context': 'https://schema.org',
+                  '@type': 'Article',
+                  headline: `${episode.title} - Episode Transcript`,
+                  datePublished: new Date(episode.published).toISOString(),
+                  author: {
+                    '@type': 'Organization',
+                    name: show.title
+                  },
+                  publisher: {
+                    '@type': 'Organization',
+                    name: show.title
+                  },
+                  mainEntityOfPage: {
+                    '@type': 'WebPage',
+                    '@id': canonicalURL.toString()
+                  },
+                  about: {
+                    '@type': 'PodcastEpisode',
+                    name: episode.title,
+                    episodeNumber: episode.episodeNumber
+                  }
+                }}
+              />
               <article class="transcript prose prose-neutral dark:prose-invert line-clamp-4">
                 <Transcript />
               </article>

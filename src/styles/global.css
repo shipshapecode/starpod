@@ -4,6 +4,10 @@
 
 @import 'atropos/css';
 
+@view-transition {
+  navigation: auto;
+}
+
 main:has(+ * + #audio-player .player) {
   @media (min-width: 1024px) {
     @apply mb-28;
@@ -32,6 +36,18 @@ footer:has(+ #audio-player .player) {
   animation: episode-in linear both;
   animation-timeline: view();
   animation-range: entry 10% cover 25%;
+
+  > div {
+    content-visibility: auto;
+    contain-intrinsic-block-size: 45vh;
+  }
+
+  @media (width >= 1024px) {
+    & h2 > a {
+      animation: toggle-vt-names linear both;
+      animation-timeline: view();
+    }
+  }
 }
 
 @keyframes episode-in {
@@ -39,6 +55,19 @@ footer:has(+ #audio-player .player) {
     opacity: 0;
     translate: 0 25px;
   }
+}
+
+@keyframes toggle-vt-names {
+	entry 0%  {
+    --should-vt: none;
+	}
+	entry 1%,
+  exit 99% {
+    --should-vt: var(--vt-name);
+	}
+	exit 100% {
+	  --should-vt: none;
+	}
 }
 
 .animated-bottom-border {

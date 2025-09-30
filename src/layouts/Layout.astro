@@ -1,6 +1,5 @@
 ---
 import { ClientRouter } from 'astro:transitions';
-
 import { Schema } from 'astro-seo-schema';
 
 import SpeedInsights from '@vercel/speed-insights/astro';
@@ -38,10 +37,10 @@ const description = Astro.props.description ?? starpodConfig.description;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
@@ -64,7 +63,16 @@ const description = Astro.props.description ?? starpodConfig.description;
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
     <meta name="msapplication-TileColor" content="#da532c" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1a1a1a"
+      media="(prefers-color-scheme: dark)"
+    />
 
     <!-- Title -->
     <title>{title}</title>
@@ -85,10 +93,19 @@ const description = Astro.props.description ?? starpodConfig.description;
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- @ts-ignore: TypeScript false positive on inline JavaScript -->
     <link
+      rel="preload"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-      rel="stylesheet"
+      as="style"
+      onload={"this.onload=null;this.rel='stylesheet'"}
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
     <Schema
       slot="head"
@@ -98,12 +115,23 @@ const description = Astro.props.description ?? starpodConfig.description;
         name: show.title,
         about: starpodConfig.blurb,
         description: show.description,
-        webFeed: starpodConfig.rssFeed
+        url: canonicalURL.toString(),
+        webFeed: starpodConfig.rssFeed,
+        author: {
+          '@type': 'Organization',
+          name: show.title,
+          url: canonicalURL.origin
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: show.title,
+          url: canonicalURL.origin
+        },
+        image: show.image
       }}
     />
 
     <slot name="head" />
-
     <ClientRouter />
   </head>
   <body
@@ -111,6 +139,7 @@ const description = Astro.props.description ?? starpodConfig.description;
   >
     <header
       class="custom-scrollbar lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
+      transition:persist="sidenav"
     >
       <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
         <div
