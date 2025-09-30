@@ -86,8 +86,8 @@ const description = Astro.props.description ?? starpodConfig.description;
 
     <!-- Image -->
     <meta content={imageUrl ?? show.image} property="og:image" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content={imageUrl ?? show.image} />
+    <meta content="summary" name="twitter:card" />
+    <meta content={imageUrl ?? show.image} name="twitter:image:src" />
 
     <meta property="og:site_name" content={show.title} />
 
