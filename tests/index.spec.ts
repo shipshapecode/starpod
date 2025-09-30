@@ -28,7 +28,7 @@ test('index page has correct meta', async ({ page }) => {
     `/_image?href=${encodeURIComponent(indexMeta.image)}&w=640&q=75`
   );
 
-  const twitterImage = page.locator('meta[name="twitter:image"]');
+  const twitterImage = page.locator('meta[name="twitter:image:src"]');
   await expect(twitterImage).toHaveAttribute(
     'content',
     `/_image?href=${encodeURIComponent(indexMeta.image)}&w=640&q=75`
