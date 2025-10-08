@@ -1,0 +1,36 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Thank You!">
+  <div class="relative z-10 px-8 lg:px-18">
+    <h1
+      class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
+    >
+      Thank You for Sponsoring!
+    </h1>
+    
+    <p class="mb-5 text-light-text-body dark:text-dark-text-body">
+      Your sponsorship has been successfully processed. We'll be in touch shortly
+      to coordinate your ad placement and get you set up.
+    </p>
+    
+    <p class="mb-5 text-light-text-body dark:text-dark-text-body">
+      Check your email for confirmation and next steps. If you have any questions,
+      feel free to <a href="/contact" class="underline hover:text-light-text-heading dark:hover:text-white">contact us</a>.
+    </p>
+    
+    <div class="mt-8 flex gap-4">
+      <a href="/" class="btn">
+        <span class="text-light-text-heading rounded-full px-8 py-3 text-center text-sm dark:text-white">
+          Back to Home
+        </span>
+      </a>
+      <a href="/sponsor" class="btn">
+        <span class="text-light-text-heading rounded-full px-8 py-3 text-center text-sm dark:text-white">
+          View Sponsor Options
+        </span>
+      </a>
+    </div>
+  </div>
+</Layout>

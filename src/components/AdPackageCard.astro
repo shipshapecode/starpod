@@ -3,9 +3,10 @@ export interface Props {
   bullets: Array<string>;
   heading: string;
   price: string;
+  productId: string;
 }
 
-const { bullets, heading, price } = Astro.props;
+const { bullets, heading, price, productId } = Astro.props;
 ---
 
 <div class="dark:bg-dark-background relative z-10 mb-6 rounded-lg bg-white p-1">
@@ -37,7 +38,7 @@ const { bullets, heading, price } = Astro.props;
     </h3>
 
     <div class="flex w-full">
-      <a class="btn mb-8 w-full justify-center" href="/contact">
+      <a class="btn mb-8 w-full justify-center" href={`/api/checkout?products=${productId}`}>
         <span
           class="text-light-text-heading rounded-full px-8 py-3 text-center text-sm dark:text-white"
         >

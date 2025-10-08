@@ -22,6 +22,7 @@
     "@astrojs/preact": "^4.1.1",
     "@astrojs/sitemap": "^3.6.0",
     "@astrojs/vercel": "^8.2.8",
+    "@polar-sh/astro": "^0.4.9",
     "@preact/signals": "^2.3.1",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
@@ -31,7 +32,8 @@
     "preact": "^10.27.2",
     "rss-to-json": "^2.1.1",
     "schema-dts": "^1.1.5",
-    "valibot": "^0.31.1"
+    "valibot": "^0.31.1",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.1",
