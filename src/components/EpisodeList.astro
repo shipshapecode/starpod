@@ -1,0 +1,64 @@
+---
+import FormattedDate from '../components/FormattedDate';
+import FullPlayButton from '../components/FullPlayButton';
+import type { Episode, Show } from '../lib/rss';
+import { dasherize } from '../utils/dasherize';
+
+export interface Props {
+  episodes: Array<Episode>;
+  show: Show;
+}
+
+const { episodes, show } = Astro.props;
+---
+
+<ul aria-label="EpisodeList">
+  {
+    episodes.map((episode) => {
+      return (
+        <li class="dark:border-dark-border border-b">
+          <div class="flex w-full flex-col py-12 lg:flex-row">
+            <img
+              alt={`${episode.title} - episode art`}
+              aria-hidden="true"
+              class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
+              height={80}
+              loading="lazy"
+              src={episode.episodeThumbnail ?? show.image}
+              width={80}
+            />
+
+            <div class="flex flex-col">
+              <FormattedDate date={new Date(episode.published)} />
+
+              <h2 class="text-light-text-heading my-2 text-lg font-bold dark:text-white">
+                <a
+                  href={`/${episode.episodeSlug}`}
+                  style={
+                    'view-transition-name: var(--should-vt); --vt-name: vt-' +
+                    dasherize(episode.title)
+                  }
+                >
+                  {episode.episodeNumber}: {episode.title}
+                </a>
+              </h2>
+
+              <p class="mb-5">{episode.description}</p>
+
+              <div class="flex items-center gap-6 text-sm">
+                <FullPlayButton client:visible episode={episode} />
+
+                <a
+                  class="text-light-text-heading font-bold dark:text-white"
+                  href={`/${episode.episodeSlug}`}
+                >
+                  Show notes
+                </a>
+              </div>
+            </div>
+          </div>
+        </li>
+      );
+    })
+  }
+</ul>
