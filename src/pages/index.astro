@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import EpisodeList from '../components/EpisodeList';
+import EpisodeList from '../components/EpisodeList.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
 const episodes = await getAllEpisodes();
 const show = await getShowInfo();
@@ -13,6 +13,6 @@ const title = `${show.title}`;
       Episodes
     </h1>
 
-    <EpisodeList client:load episodes={episodes} show={show} />
+    <EpisodeList episodes={episodes} show={show} />
   </div>
 </Layout>
