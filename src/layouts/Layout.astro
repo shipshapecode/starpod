@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
 import { Schema } from 'astro-seo-schema';
 
@@ -93,13 +94,7 @@ const description = Astro.props.description ?? starpodConfig.description;
 
     <link rel="preload" as="image" href={show.image} />
 
-    <link
-      crossorigin
-      rel="preload"
-      href="/fonts/InterVariable.woff2"
-      as="font"
-      type="font/woff2"
-    />
+    <Font cssVariable="--astro-font-inter" preload />
 
     <Schema
       slot="head"
