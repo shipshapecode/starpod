@@ -2,6 +2,7 @@
 import starpodConfig from '../../starpod.config';
 import AppleIcon from '../svgs/apple.svg?raw';
 import OvercastIcon from '../svgs/overcast.svg?raw';
+import PocketCastsIcon from '../svgs/pocket-casts.svg?raw';
 import SpotifyIcon from '../svgs/spotify.svg?raw';
 import YouTubeIcon from '../svgs/youtube.svg?raw';
 
@@ -14,7 +15,7 @@ const { platforms, rssFeed } = starpodConfig;
   {
     platforms?.apple && (
       <a
-        class="animated-bottom-border font-bold text-light-text-heading after:mt-4 dark:text-white"
+        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
         href={platforms.apple}
       >
         <span class="flex items-center">
@@ -29,7 +30,7 @@ const { platforms, rssFeed } = starpodConfig;
   {
     platforms?.spotify && (
       <a
-        class="animated-bottom-border font-bold text-light-text-heading after:mt-4 dark:text-white"
+        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
         href={platforms.spotify}
       >
         <span class="flex items-center">
@@ -44,7 +45,7 @@ const { platforms, rssFeed } = starpodConfig;
   {
     platforms?.overcast && (
       <a
-        class="animated-bottom-border font-bold text-light-text-heading after:mt-4 dark:text-white"
+        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
         href={platforms.overcast}
       >
         <span class="flex items-center">
@@ -57,9 +58,24 @@ const { platforms, rssFeed } = starpodConfig;
     )
   }
   {
+    platforms?.pocketCasts && (
+      <a
+        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
+        href={platforms.pocketCasts}
+      >
+        <span class="flex items-center">
+          Pocket Casts
+          <span class="ml-3 flex h-4 w-4 items-center">
+            <Fragment set:html={PocketCastsIcon} />
+          </span>
+        </span>
+      </a>
+    )
+  }
+  {
     platforms?.youtube && (
       <a
-        class="animated-bottom-border font-bold text-light-text-heading after:mt-4 dark:text-white"
+        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
         href={platforms.youtube}
       >
         <span class="flex items-center">
@@ -74,7 +90,7 @@ const { platforms, rssFeed } = starpodConfig;
   {
     rssFeed && (
       <a
-        class="animated-bottom-border font-bold text-light-text-heading after:mt-4 dark:text-white"
+        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
         href={rssFeed}
       >
         <span class="flex items-center">RSS Feed</span>

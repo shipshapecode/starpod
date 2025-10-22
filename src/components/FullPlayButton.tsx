@@ -1,10 +1,9 @@
 import type { JSX } from 'preact/jsx-runtime';
 
-import type { Episode } from '../lib/rss';
 import { currentEpisode, isPlaying } from './state';
 
 type Props = {
-  episode: Episode;
+  episode: (typeof currentEpisode)['value'];
 };
 
 const PlayIcon = (
@@ -46,6 +45,10 @@ function renderIcon(icon: JSX.Element, key?: string) {
 }
 
 export default function FullPlayButton({ episode }: Props) {
+  if (!episode) {
+    return null;
+  }
+
   const isCurrentEpisode = episode.id === currentEpisode.value?.id;
   const showPauseIcon = isCurrentEpisode && isPlaying.value;
 
@@ -54,7 +57,10 @@ export default function FullPlayButton({ episode }: Props) {
       class="btn"
       onClick={() => {
         currentEpisode.value = {
-          ...episode
+          audio: episode.audio,
+          episodeNumber: episode.episodeNumber,
+          id: episode.id,
+          title: episode.title
         };
 
         isPlaying.value = isCurrentEpisode ? !isPlaying.value : true;
