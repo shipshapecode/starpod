@@ -30,6 +30,8 @@ jobs:
         run: pnpm install
       - name: Run linting
         run: pnpm lint
+      - name: Run Astro check
+        run: pnpm astro check
 
   unit:
     timeout-minutes: 10
