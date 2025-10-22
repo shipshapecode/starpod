@@ -14,8 +14,6 @@ jobs:
         with:
           node-version: 22
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - name: Get pnpm store directory
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
@@ -42,8 +40,6 @@ jobs:
         with:
           node-version: 22
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - name: Get pnpm store directory
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
@@ -68,8 +64,6 @@ jobs:
         with:
           node-version: 22
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - name: Get pnpm store directory
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
