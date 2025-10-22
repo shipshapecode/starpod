@@ -46,7 +46,15 @@ const { episodes, show } = Astro.props;
               <p class="mb-5">{episode.description}</p>
 
               <div class="flex items-center gap-6 text-sm">
-                <FullPlayButton client:visible episode={episode} />
+                <FullPlayButton
+                  client:visible
+                  episode={{
+                    audio: episode.audio,
+                    episodeNumber: episode.episodeNumber,
+                    id: episode.id,
+                    title: episode.title
+                  }}
+                />
 
                 <a
                   class="text-light-text-heading font-bold dark:text-white"

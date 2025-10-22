@@ -1,8 +1,7 @@
-import type { Episode } from '../../lib/rss';
 import { currentEpisode, isPlaying } from '../state';
 
 type Props = {
-  episode?: Episode;
+  episode?: (typeof currentEpisode)['value'];
 };
 
 const PlayIcon = (
