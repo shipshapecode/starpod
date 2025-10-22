@@ -35,6 +35,35 @@ const { imageUrl, title } = Astro.props;
 const canonicalURL =
   Astro.props.canonicalURL ?? new URL(Astro.url.pathname, Astro.site);
 const description = Astro.props.description ?? starpodConfig.description;
+
+function extractDomain(url: string): string | null {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+}
+
+function getExternalDomains(): string[] {
+  const domains = new Set<string>();
+  const siteHostname = Astro.site?.hostname;
+
+  // Add RSS feed domain
+  const feedDomain = extractDomain(starpodConfig.rssFeed);
+  if (feedDomain && feedDomain !== siteHostname) {
+    domains.add(feedDomain);
+  }
+
+  // Add image domain if it's external
+  const imageDomain = extractDomain(show.image);
+  if (imageDomain && imageDomain !== siteHostname) {
+    domains.add(imageDomain);
+  }
+
+  return Array.from(domains);
+}
+
+const externalDomains = getExternalDomains();
 ---
 
 <!doctype html>
@@ -92,9 +121,44 @@ const description = Astro.props.description ?? starpodConfig.description;
 
     <meta property="og:site_name" content={show.title} />
 
-    <link rel="preload" as="image" href={show.image} />
+    <!-- Preload critical resources for faster LCP -->
+    <link rel="preload" as="image" href={show.image} fetchpriority="high" />
 
     <Font cssVariable="--astro-font-inter" preload />
+
+    <!-- DNS prefetch for external resources -->
+    {
+      externalDomains.map((domain) => (
+        <>
+          <link rel="dns-prefetch" href={`//${domain}`} />
+          <link rel="preconnect" href={`https://${domain}`} crossorigin />
+        </>
+      ))
+    }
+
+    <!-- Prefetch for Vercel image optimization -->
+    {Astro.site && <link rel="preconnect" href={Astro.site.origin} />}
+
+    <!-- Critical CSS for LCP optimization -->
+    <style>
+      /* Critical styles for above-the-fold content */
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        margin: 0;
+      }
+
+      .atropos-inner img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      /* Ensure LCP image renders quickly */
+      .show-art img {
+        content-visibility: auto;
+        contain: layout style paint;
+      }
+    </style>
 
     <Schema
       slot="head"
@@ -133,6 +197,7 @@ const description = Astro.props.description ?? starpodConfig.description;
       <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
         <div
           class="bg-light-card dark:bg-dark-card m-2 rounded-lg pt-10 pb-4 lg:pt-16 lg:pb-12"
+          style="contain: layout style;"
         >
           <ShowArtwork image={show.image} />
 
@@ -167,6 +232,7 @@ const description = Astro.props.description ?? starpodConfig.description;
       <div class="relative mt-2 pt-16">
         <div
           class="bg-gradient-light dark:bg-gradient-dark absolute top-0 right-0 left-0 z-0 h-80 w-full opacity-30"
+          style="content-visibility: auto;"
         >
         </div>
 

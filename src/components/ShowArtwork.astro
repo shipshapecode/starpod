@@ -33,9 +33,20 @@ const { image } = Astro.props;
 </a>
 
 <script>
-  import Atropos from 'atropos';
+  // Defer Atropos initialization to after LCP
+  function initAtropos() {
+    import('atropos').then((module) => {
+      const Atropos = module.default;
+      Atropos({
+        el: '.show-art'
+      });
+    });
+  }
 
-  Atropos({
-    el: '.show-art'
-  });
+  // Initialize after page load to avoid blocking LCP
+  if (document.readyState === 'complete') {
+    initAtropos();
+  } else {
+    window.addEventListener('load', initAtropos);
+  }
 </script>
