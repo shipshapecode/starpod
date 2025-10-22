@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import db from '@astrojs/db';
 import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
@@ -31,7 +31,19 @@ export default defineConfig({
     inlineStylesheets: 'always'
   },
   experimental: {
-    clientPrerender: true
+    clientPrerender: true,
+    fonts: [
+      {
+        provider: fontProviders.google({
+          experimental: { variableAxis: { Inter: { opsz: ['14..32'] } } }
+        }),
+        name: 'Inter',
+        cssVariable: '--astro-font-inter',
+        weights: ['300 900'],
+        styles: ['normal'],
+        subsets: ['latin']
+      }
+    ]
   },
   image: {
     remotePatterns: [
