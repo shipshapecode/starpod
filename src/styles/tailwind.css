@@ -36,7 +36,7 @@
   --color-light-text-body: oklch(59.68% 0.017 285.89);
   --color-light-text-heading: oklch(30.55% 0.052 292.57);
 
-  --font-inter: Inter, sans-serif;
+  --font-inter: var(--astro-font-inter);
 }
 
 /*
