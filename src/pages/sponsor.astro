@@ -41,11 +41,13 @@ const countries = [
         bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
         heading="30 second ad"
         price="$500"
+        productId={import.meta.env.POLAR_30SEC_PRODUCT_ID || 'YOUR_30SEC_PRODUCT_ID'}
       />
       <AdPackageCard
         bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
         heading="60 second ad"
         price="$1,000"
+        productId={import.meta.env.POLAR_60SEC_PRODUCT_ID || 'YOUR_60SEC_PRODUCT_ID'}
       />
     </div>
 
