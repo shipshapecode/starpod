@@ -18,6 +18,8 @@
     "start": "astro dev",
     "test": "concurrently \"pnpm:test:*(!fix)\" --names \"test:\"",
     "test:e2e": "pnpm exec playwright test",
+    "test:e2e:with-db": "pnpm exec playwright test --project=chromium-with-db",
+    "test:e2e:no-db": "pnpm exec playwright test --project=chromium-no-db",
     "test:unit": "vitest"
   },
   "dependencies": {
