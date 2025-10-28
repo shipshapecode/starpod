@@ -10,6 +10,7 @@
   "scripts": {
     "astro": "astro",
     "build": "astro check && astro build --remote",
+    "check:no-db": "astro check --config astro.config.no-db.mjs --tsconfig tsconfig.no-db.json",
     "db:seed": "pnpm astro db execute db/seed.ts --remote",
     "dev": "astro dev",
     "lint": "eslint . --cache",
