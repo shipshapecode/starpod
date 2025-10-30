@@ -5,8 +5,8 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 
-// https://astro.build/config
-export default defineConfig({
+// Shared base configuration (without db)
+export const baseConfig = {
   output: 'static',
   adapter: vercel({
     imageService: true,
@@ -62,7 +62,6 @@ export default defineConfig({
   site: 'https://whiskey.fm',
   trailingSlash: 'never',
   integrations: [
-    db(),
     preact(),
     sitemap({
       filter: (page) => {
@@ -84,4 +83,10 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   }
+};
+
+// https://astro.build/config - Default configuration with astro:db
+export default defineConfig({
+  ...baseConfig,
+  integrations: [db(), ...baseConfig.integrations]
 });
