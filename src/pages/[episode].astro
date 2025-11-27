@@ -1,14 +1,14 @@
 ---
 import { getEntry } from 'astro:content';
-import {
-  db,
-  eq,
-  Episode as DbEpisode,
-  HostOrGuest,
-  Person,
-  Sponsor,
-  SponsorForEpisode
-} from 'astro:db';
+
+// Check if astro:db integration is available by looking for the virtual module
+let astroDB;
+
+try {
+  astroDB = await import('astro:db');
+} catch {
+  // astro:db is not available
+}
 
 import { Schema } from 'astro-seo-schema';
 
@@ -55,32 +55,40 @@ if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
 
 const canonicalURL = new URL(`/${episode.episodeSlug}`, Astro.url);
 
-const hostsAndGuests = await db
-  .select({
-    id: Person.id,
-    img: Person.img,
-    isHost: HostOrGuest.isHost,
-    name: Person.name
-  })
-  .from(HostOrGuest)
-  .innerJoin(DbEpisode, eq(HostOrGuest.episodeSlug, DbEpisode.episodeSlug))
-  .innerJoin(Person, eq(HostOrGuest.personId, Person.id))
-  .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+let hostsAndGuests: any[] = [];
+let sponsors: any[] = [];
 
-const sponsors = await db
-  .select({
-    id: Sponsor.id,
-    img: Sponsor.img,
-    name: Sponsor.name,
-    url: Sponsor.url
-  })
-  .from(SponsorForEpisode)
-  .innerJoin(
-    DbEpisode,
-    eq(SponsorForEpisode.episodeSlug, DbEpisode.episodeSlug)
-  )
-  .innerJoin(Sponsor, eq(SponsorForEpisode.sponsorId, Sponsor.id))
-  .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+if (astroDB) {
+  // @ts-ignore - These table exports only exist when astro:db integration is enabled
+  const { db, eq, Episode: DbEpisode, HostOrGuest, Person, Sponsor, SponsorForEpisode } = astroDB;
+
+  hostsAndGuests = await db
+    .select({
+      id: Person.id,
+      img: Person.img,
+      isHost: HostOrGuest.isHost,
+      name: Person.name
+    })
+    .from(HostOrGuest)
+    .innerJoin(DbEpisode, eq(HostOrGuest.episodeSlug, DbEpisode.episodeSlug))
+    .innerJoin(Person, eq(HostOrGuest.personId, Person.id))
+    .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+
+  sponsors = await db
+    .select({
+      id: Sponsor.id,
+      img: Sponsor.img,
+      name: Sponsor.name,
+      url: Sponsor.url
+    })
+    .from(SponsorForEpisode)
+    .innerJoin(
+      DbEpisode,
+      eq(SponsorForEpisode.episodeSlug, DbEpisode.episodeSlug)
+    )
+    .innerJoin(Sponsor, eq(SponsorForEpisode.sponsorId, Sponsor.id))
+    .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+}
 
 const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumber}`;
 ---
