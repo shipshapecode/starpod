@@ -22,71 +22,70 @@ const countries = [
 ---
 
 <Layout title="Sponsor">
-  <div class="relative z-10 px-8 lg:px-18">
+  <div class="relative z-10 mb-2 px-8 pb-8 lg:px-18 lg:pb-16">
     <h1
-      class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
+      class="text-light-text-heading mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl dark:text-white"
     >
-      Sponsor {title}
+      Reach the Whiskey.fm audience with a sponsorship
     </h1>
 
-    <p class="mb-5">
-      Want to dazzle a crowd of tech nerds and whiskey connoisseurs? Throw your
-      brand into the mix! Our listeners love innovation, good banter, and a
-      stiff drink—so get in on the fun and make some magic happen. Stay classy,
-      sponsor.
+    <p class="mb-5 text-xl font-semibold lg:text-2xl">
+      A show in the <a
+        href="https://www.buzzsprout.com/stats#:~:text=Top%2010%25,441"
+        class="text-black underline dark:text-white">top 10%</a
+      > of podcasts; be seen on Twitter, YouTube, Twitch, Bluesky, RSS and our website.
     </p>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <AdPackageCard
-        bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
-        heading="30 second ad"
-        price="$500"
-      />
-      <AdPackageCard
-        bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
-        heading="60 second ad"
-        price="$1,000"
-      />
-    </div>
+    <p class="mb-5">
+      Our show focuses on web development, cutting-edge tech, and fine whiskey.
+      Our audience consists of tech decision-makers, software architects,
+      engineering managers, and of course web developers. Tech nerds with the
+      authority to buy and the desire for premium goods.
+    </p>
+
+    <p class="mb-5">
+      We're offering shared access to a 2025 tech audience through all the most
+      popular channels.
+    </p>
 
     <h2
-      class="mb-4 mt-16 text-2xl font-bold text-light-text-heading lg:mb-6 lg:mt-20 lg:text-5xl dark:text-white"
+      class="text-light-text-heading mt-16 mb-4 text-2xl font-bold lg:mt-20 lg:mb-6 lg:text-5xl dark:text-white"
     >
       Your overall ad reach
     </h2>
 
-    <h3 class="section-heading mb-8 mt-8 lg:mt-12">Listener Metrics</h3>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2">
+    <div class="mt-10 grid grid-cols-1 lg:grid-cols-2">
       <figure>
         <span
-          class="text-6xl font-bold tabular-nums text-light-text-heading dark:text-white"
+          class="text-light-text-heading text-6xl font-bold tabular-nums dark:text-white"
         >
-          1,000
+          75K+
         </span>
 
-        <figcaption class="mt-2 font-bold">listeners per episode</figcaption>
+        <figcaption class="mt-2 font-bold">Monthly Impressions</figcaption>
       </figure>
 
       <figure>
         <span
-          class="text-6xl font-bold tabular-nums text-light-text-heading dark:text-white"
+          class="text-light-text-heading text-6xl font-bold tabular-nums dark:text-white"
         >
-          15,000
+          3-10K
         </span>
 
-        <figcaption class="mt-2 font-bold">listeners per 90 days</figcaption>
+        <figcaption class="mt-2 font-bold">
+          Monthly Downloads Per Episode
+        </figcaption>
       </figure>
     </div>
 
-    <h3 class="section-heading mb-8 mt-8 lg:mt-12">
-      Top Listeners By Location
-    </h3>
+    <h3 class="section-heading mt-8 lg:mt-18">Top Listeners By Location</h3>
 
-    <div class="grid grid-cols-[minmax(0,max-content)_1fr_minmax(0,max-content)] gap-x-4 gap-y-12 border-b py-6 text-light-text-heading dark:border-dark-border dark:text-white">
-    {
-      countries.map((country) => {
-        return (
+    <div
+      class="text-light-text-heading dark:border-dark-border mb-8 grid grid-cols-[minmax(0,max-content)_1fr_minmax(0,max-content)] gap-x-4 gap-y-12 border-b py-6 dark:text-white"
+    >
+      {
+        countries.map((country) => (
+          <>
             <div class="flex items-center">
               <Image
                 class="mr-4 h-6 w-6 rounded-xs"
@@ -109,9 +108,104 @@ const countries = [
             <div class="flex items-center justify-end">
               {country.percentage}%
             </div>
-        );
-      })
-    }
+          </>
+        ))
+      }
+    </div>
+
+    <div
+      class="relative my-15 overflow-hidden rounded-2xl border border-gray-200 p-8 lg:my-25 lg:p-12 dark:border-gray-800 dark:from-purple-950/20 dark:to-blue-950/20"
+    >
+      <div class="relative z-10">
+        <p
+          class="mb-4 text-2xl leading-tight font-bold text-balance text-gray-900 lg:text-3xl dark:text-white"
+        >
+          A 3-month partnership guarantees your brand over{' '}
+          <span
+            class="bg-gradient-to-r from-[#8A63FF] to-[#3707ac] bg-clip-text text-transparent dark:from-[#42C8F3] dark:to-[#B6EDFF]"
+          >
+            200,000 relevant impressions.
+          </span>
+        </p>
+        <p class="mb-6 text-lg text-gray-700 lg:text-xl dark:text-gray-300">
+          That's a lot of attention.
+        </p>
+        <p class="mb-6 text-lg text-gray-700 lg:text-xl dark:text-gray-300">
+          If the sponsorship is in the show, it's in that audio and/or video
+          forever.
+          <strong>The total long-tail impressions could be wild</strong>.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <AdPackageCard
+        bullets={[
+          'A baked in, high-trust host read pre-roll ad',
+          '$700 for 30-seconds or $1,000 for 60-seconds'
+        ]}
+        heading="The Distiller's Cut"
+        price="$700-1k"
+      />
+      <AdPackageCard
+        bullets={[
+          'Have a bottle of whiskey or software product reviewed',
+          'Honest, positive mention during Whiskey and/or Whatnot segments'
+        ]}
+        heading="The Product/Bottle Drop"
+        price="$250"
+      />
+      <AdPackageCard
+        bullets={[
+          'Ad on our website or in the show notes',
+          'Placed prominently on main page and show notes',
+          'Consistent exposure outside of the audio feed'
+        ]}
+        heading="The Label"
+        price="$250"
+      />
+      <AdPackageCard
+        bullets={[
+          '4x 30-second host-read ads',
+          '4x website & show notes placements',
+          'Perfect for consistent monthly presence'
+        ]}
+        heading="The Crate (full month)"
+        price="$2.4k"
+      />
+      <AdPackageCard
+        bullets={[
+          'Our flagship monthly sponsorship',
+          '4x 60-second host-read ads',
+          '4x website & show notes placements',
+          '"Presented By [Your Company]" in episode titles',
+          'Social media mentions for each episode'
+        ]}
+        heading="The Full Barrel"
+        price="$4k"
+      />
+    </div>
+
+    <div class="mt-20 mb-8 mb-12 lg:mt-32">
+      <p class="text-xg mb-6 text-gray-600 lg:text-3xl dark:text-gray-400">
+        Or… maybe you have an idea?
+      </p>
+
+      <p
+        class="mb-12 text-lg leading-relaxed text-balance lg:text-xl dark:text-gray-100"
+      >
+        We're excited geeks growing a show; we hope we can share some of that
+        with you.
+      </p>
+
+      <p class="text-light-text-heading text-md font-semibold dark:text-white">
+        Whiskey Web and Whatnot,
+      </p>
+      <p
+        class="bg-gradient-to-r from-[var(--color-light-text-heading)] to-[var(--color-light-icon)] bg-clip-text text-lg font-medium text-transparent dark:from-[var(--color-dark-text-body)] dark:to-[var(--color-dark-icon)]"
+      >
+        Chuck, Robbie, & Adam
+      </p>
     </div>
   </div>
 </Layout>
