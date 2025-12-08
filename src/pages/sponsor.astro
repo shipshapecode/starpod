@@ -4,9 +4,9 @@ import { Image } from 'astro:assets';
 
 import Layout from '../layouts/Layout.astro';
 import AdPackageCard from '../components/AdPackageCard.astro';
-import { getShowInfo } from '../lib/rss';
-const show = await getShowInfo();
-const title = `${show.title}`;
+// import { getShowInfo } from '../lib/rss';
+// const show = await getShowInfo();
+// const title = `${show.title}`;
 
 const countryFlags = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/countries/*.{jpeg,jpg,png}'
