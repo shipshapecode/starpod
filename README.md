@@ -118,15 +118,21 @@ This site uses Polar.sh for sponsor checkout. To set it up:
 1. **Get your Polar credentials:**
    - Log in to your [Polar dashboard](https://polar.sh)
    - Go to Settings → API to get your access token
-   - Create two products for your sponsorship packages (30-second and 60-second ads)
+   - Create two products for your sponsorship packages (30-second and 60-second
+     ads)
    - Note the product IDs from each product's page
 
-2. **Configure environment variables:**
-   Create a `.env` file in the root directory with:
+2. **Configure environment variables:** Create a `.env` file in the root
+   directory with:
+
    ```env
    POLAR_ACCESS_TOKEN=your_polar_access_token_here
    POLAR_30SEC_PRODUCT_ID=your_30sec_product_id_here
    POLAR_60SEC_PRODUCT_ID=your_60sec_product_id_here
+   POLAR_BOTTLEDROP_PRODUCT_ID=your_bottledrop_product_id_here
+   POLAR_CRATE_PRODUCT_ID=your_crate_product_id_here
+   POLAR_FULLBARREL_PRODUCT_ID=your_fullbarrel_product_id_here
+   POLAR_LABEL_PRODUCT_ID=your_label_product_id_here
    POLAR_SUCCESS_URL=https://whiskey.fm/sponsor/success
    ```
 
@@ -142,6 +148,7 @@ This site uses Polar.sh for sponsor checkout. To set it up:
    - Test with a real payment to confirm everything works
 
 The integration uses the `@polar-sh/astro` package which provides:
+
 - Server-side checkout session creation at `/api/checkout`
 - Automatic tax compliance through Polar's Merchant of Record service
 - Support for multiple products and dynamic pricing

@@ -4,27 +4,34 @@ export interface Props {
   heading: string;
   price: string;
   productId: string;
+  period?: string;
 }
 
-const { bullets, heading, price, productId } = Astro.props;
+const { bullets, heading, price, productId, period = 'per episode' } = Astro.props;
 ---
 
-<div class="dark:bg-dark-background relative z-10 mb-6 rounded-lg bg-white p-1">
+<div
+  class="dark:bg-dark-background relative z-10 mb-6 grid grid-rows-[auto_1fr] rounded-lg bg-white p-1"
+>
   <h2
-    class="bg-light-card text-light-text-heading dark:bg-dark-card px-5 py-4 font-bold lg:py-6 dark:text-white"
+    class="bg-light-card text-light-text-heading dark:bg-dark-card px-5 py-4 text-xl font-bold lg:py-6 dark:text-white"
   >
     {heading}
   </h2>
 
-  <ul class="list-disc px-8">
+  <ul class="flex flex-1 flex-col px-8">
     {
       bullets.map((bullet) => {
-        return <li class="dark:border-dark-border border-b py-6">{bullet}</li>;
+        return (
+          <li class="dark:border-dark-border border-b py-6 text-balance">
+            {bullet}
+          </li>
+        );
       })
     }
 
     <h3
-      class="text-light-text-heading mt-8 mb-12 px-5 text-4xl font-bold tabular-nums dark:text-white"
+      class="text-light-text-heading mt-8 mb-12 flex-1 content-end px-5 text-4xl font-bold tabular-nums dark:text-white"
     >
       {price}
       <span
@@ -32,8 +39,8 @@ const { bullets, heading, price, productId } = Astro.props;
       >
         /
       </span>
-      <span class="text-light-text-body dark:text-dark-text-body text-2xl">
-        per episode
+      <span class="text-light-text-body dark:text-dark-text-body text-lg">
+        {period}
       </span>
     </h3>
 

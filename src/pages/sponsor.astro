@@ -19,76 +19,75 @@ const countries = [
   { name: 'Germany', flag: 'Germany.png', percentage: 4 },
   { name: 'Australia', flag: 'Australia.png', percentage: 4 }
 ];
+
+const currentYear = new Date().getFullYear();
 ---
 
 <Layout title="Sponsor">
-  <div class="relative z-10 px-8 lg:px-18">
+  <div class="relative z-10 mb-2 px-8 pb-8 lg:px-18 lg:pb-16">
     <h1
-      class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
+      class="text-light-text-heading text-balance mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl dark:text-white"
     >
-      Sponsor {title}
+      {title} is a <a
+        href="https://www.buzzsprout.com/stats#:~:text=Top%2010%25,441"
+        class="text-black underline dark:text-white">top 10% podcast</a
+      >
     </h1>
 
-    <p class="mb-5">
-      Want to dazzle a crowd of tech nerds and whiskey connoisseurs? Throw your
-      brand into the mix! Our listeners love innovation, good banter, and a
-      stiff drink—so get in on the fun and make some magic happen. Stay classy,
-      sponsor.
+    <p class="mb-5 text-xl font-semibold lg:text-2xl text-balance">
+      Sponsorships provide multi-channel exposure across Audio, Video, and Social Media.
     </p>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <AdPackageCard
-        bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
-        heading="30 second ad"
-        price="$500"
-        productId={import.meta.env.POLAR_30SEC_PRODUCT_ID || 'YOUR_30SEC_PRODUCT_ID'}
-      />
-      <AdPackageCard
-        bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
-        heading="60 second ad"
-        price="$1,000"
-        productId={import.meta.env.POLAR_60SEC_PRODUCT_ID || 'YOUR_60SEC_PRODUCT_ID'}
-      />
-    </div>
+    <p class="mb-5 text-pretty">
+      We blend technical depth with premium lifestyle content, covering web
+      development, software architecture, and fine whiskey. Our audience is a bunch of tech nerds; <strong>Engineering Managers, Software Architects, Web Developers, and Backend Engineers</strong>.
+    </p>
+
+    <p class="mb-5">
+      We're offering shared access to a {currentYear} tech audience through all the most
+      popular channels.
+    </p>
 
     <h2
-      class="mb-4 mt-16 text-2xl font-bold text-light-text-heading lg:mb-6 lg:mt-20 lg:text-5xl dark:text-white"
+      class="text-light-text-heading mt-16 mb-4 text-2xl font-bold lg:mt-20 lg:mb-6 lg:text-5xl dark:text-white"
     >
-      Your overall ad reach
+      Reach
     </h2>
 
-    <h3 class="section-heading mb-8 mt-8 lg:mt-12">Listener Metrics</h3>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2">
+    <div class="mt-10 grid grid-cols-1 lg:grid-cols-2">
       <figure>
         <span
-          class="text-6xl font-bold tabular-nums text-light-text-heading dark:text-white"
+          class="text-light-text-heading text-6xl font-bold tabular-nums dark:text-white"
         >
-          1,000
+          <span data-count-up-target="75">0</span>K+
         </span>
 
-        <figcaption class="mt-2 font-bold">listeners per episode</figcaption>
+        <figcaption class="mt-2 font-bold">Monthly Impressions</figcaption>
       </figure>
 
       <figure>
         <span
-          class="text-6xl font-bold tabular-nums text-light-text-heading dark:text-white"
+          class="text-light-text-heading text-6xl font-bold tabular-nums dark:text-white"
         >
-          15,000
+          <span data-count-up-target="3">0</span>-<span data-count-up-target="10"
+            >0</span
+          >K
         </span>
 
-        <figcaption class="mt-2 font-bold">listeners per 90 days</figcaption>
+        <figcaption class="mt-2 font-bold">
+          Monthly Downloads Per Episode
+        </figcaption>
       </figure>
     </div>
 
-    <h3 class="section-heading mb-8 mt-8 lg:mt-12">
-      Top Listeners By Location
-    </h3>
+    <h3 class="section-heading mt-8 lg:mt-18">Top Listeners By Location</h3>
 
-    <div class="grid grid-cols-[minmax(0,max-content)_1fr_minmax(0,max-content)] gap-x-4 gap-y-12 border-b py-6 text-light-text-heading dark:border-dark-border dark:text-white">
-    {
-      countries.map((country) => {
-        return (
+    <div
+      class="text-light-text-heading dark:border-dark-border mb-8 grid grid-cols-[minmax(0,max-content)_1fr_minmax(0,max-content)] gap-x-4 gap-y-12 border-b py-6 dark:text-white"
+    >
+      {
+        countries.map((country) => (
+          <>
             <div class="flex items-center">
               <Image
                 class="mr-4 h-6 w-6 rounded-xs"
@@ -103,17 +102,224 @@ const countries = [
             <div class="relative flex items-center">
               <div class="absolute z-0 h-1 w-full rounded-lg bg-gray-200 outline-hidden dark:bg-gray-700" />
               <div
-                class="absolute z-10 h-1 rounded-lg bg-linear-to-r from-[#D8CCFF] to-[#8A63FF] dark:from-[#42C8F3] dark:to-[#B6EDFF]"
-                style={`width:${country.percentage}%`}
+                class="absolute z-10 h-1 rounded-lg bg-linear-to-r from-[#D8CCFF] to-[#8A63FF] transition-all duration-1000 ease-out dark:from-[#42C8F3] dark:to-[#B6EDFF]"
+                style="width: 0%"
+                data-progress-bar
+                data-width={country.percentage}
               />
             </div>
 
             <div class="flex items-center justify-end">
               {country.percentage}%
             </div>
-        );
-      })
-    }
+          </>
+        ))
+      }
+    </div>
+
+    <div
+      id="spotlight-card"
+      class="group relative my-15 overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 p-8 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl lg:my-25 lg:p-12 dark:border-gray-800 dark:bg-[#050505]"
+    >
+      <!-- Spotlight Overlay -->
+      <div
+        class="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style="background: radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(139, 92, 246, 0.15), transparent 40%);"
+      >
+      </div>
+
+      <div class="relative z-10">
+        <p
+          class="mb-4 text-2xl leading-tight font-bold text-balance text-gray-900 lg:text-3xl dark:text-white"
+        >
+          A 3-month partnership delivers{' '}
+          <span
+            class="bg-gradient-to-r from-[#8A63FF] to-[#3707ac] bg-clip-text text-transparent dark:from-[#42C8F3] dark:to-[#B6EDFF]"
+          >
+            200,000+ targeted impressions.
+          </span>
+        </p>
+        <p class="mb-6 text-lg text-gray-700 lg:text-xl dark:text-gray-300">
+          Unlike ephemeral ads, our host-read sponsorships are baked into the
+          content, providing <strong>evergreen value</strong> that continues to drive
+          awareness and conversions long after the episode airs.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <AdPackageCard
+        bullets={[
+          'Have a bottle of whiskey or software product reviewed',
+          'Honest, positive mention during Whiskey and/or Whatnot segments'
+        ]}
+        heading="The Drop"
+        price="$250"
+        productId=`${import.meta.env.POLAR_BOTTLEDROP_PRODUCT_ID || 'YOUR_BOTTLEDROP_PRODUCT_ID'}`
+      />
+      <AdPackageCard
+        bullets={[
+          'Ad on our website or in the show notes',
+          'Placed prominently on main page and show notes',
+          'Consistent exposure outside of the audio feed'
+        ]}
+        heading="The Label"
+        price="$250"
+        productId=`${import.meta.env.POLAR_LABEL_PRODUCT_ID || 'YOUR_LABEL_PRODUCT_ID'}`
+      />
+      <AdPackageCard
+        bullets={[
+          'A baked in, high-trust host read pre-roll ad',
+          '30-seconds'
+        ]}
+        heading="The Distiller's Cut"
+        price="$500"
+        productId=`${import.meta.env.POLAR_30SEC_PRODUCT_ID || 'YOUR_30SEC_PRODUCT_ID'}`
+      />
+      <AdPackageCard
+        bullets={[
+          'A baked in, high-trust host read pre-roll ad',
+          '60-seconds'
+        ]}
+        heading="The Spirit Maker's Cut"
+        price="$1k"
+        productId=`${import.meta.env.POLAR_60SEC_PRODUCT_ID || 'YOUR_60SEC_PRODUCT_ID'}`
+      />
+      <AdPackageCard
+        bullets={[
+          '4x 30-second host-read ads',
+          '4x website & show notes placements',
+          'Perfect for consistent monthly presence'
+        ]}
+        heading="The Crate"
+        price="$2.4k"
+        period="per month"
+        productId=`${import.meta.env.POLAR_CRATE_PRODUCT_ID || 'YOUR_CRATE_PRODUCT_ID'}`
+      />
+      <AdPackageCard
+        bullets={[
+          'Our flagship monthly sponsorship',
+          '4x 60-second host-read ads',
+          '4x website & show notes placements',
+          '"Presented By [Your Company]" in episode titles',
+          'Social media mentions for each episode'
+        ]}
+        heading="The Full Barrel"
+        price="$4k"
+        period="per month"
+        productId=`${import.meta.env.POLAR_FULLBARREL_PRODUCT_ID || 'YOUR_FULLBARREL_PRODUCT_ID'}`
+      />
+    </div>
+
+    <div class="mt-20 mb-12 lg:mt-32">
+      <p class="text-2xl text-gray-600 lg:text-3xl dark:text-gray-400">
+        Or… maybe you have an idea?
+      </p>
+
+      <p
+        class="mb-12 text-lg leading-relaxed text-balance lg:text-xl dark:text-gray-100"
+      >
+        We're down to <a href="/contact">chat</a> about it.
+      </p>
+
+      <p class="text-light-text-heading text-md font-semibold dark:text-white">
+        Whiskey Web and Whatnot,
+      </p>
+      <p class="group text-lg font-medium text-gray-400 dark:text-gray-500">
+        <span
+          class="inline-block cursor-pointer bg-gradient-to-r from-[var(--color-light-text-heading)] to-[var(--color-light-icon)] bg-clip-text text-transparent transition-all duration-300 group-hover:blur-[2px] group-hover:opacity-30 hover:!blur-none hover:!opacity-100 hover:scale-110 dark:from-[var(--color-dark-text-body)] dark:to-[var(--color-dark-icon)]"
+          >Chuck</span
+        ><span
+          class="transition-all duration-300 group-hover:blur-[2px] group-hover:opacity-30"
+          >,</span
+        >
+        <span
+          class="inline-block cursor-pointer bg-gradient-to-r from-[var(--color-light-text-heading)] to-[var(--color-light-icon)] bg-clip-text text-transparent transition-all duration-300 group-hover:blur-[2px] group-hover:opacity-30 hover:!blur-none hover:!opacity-100 hover:scale-110 dark:from-[var(--color-dark-text-body)] dark:to-[var(--color-dark-icon)]"
+          >Robbie</span
+        ><span
+          class="transition-all duration-300 group-hover:blur-[2px] group-hover:opacity-30"
+          >, &</span
+        >
+        <span
+          class="inline-block cursor-pointer bg-gradient-to-r from-[var(--color-light-text-heading)] to-[var(--color-light-icon)] bg-clip-text text-transparent transition-all duration-300 group-hover:blur-[2px] group-hover:opacity-30 hover:!blur-none hover:!opacity-100 hover:scale-110 dark:from-[var(--color-dark-text-body)] dark:to-[var(--color-dark-icon)]"
+          >Adam</span
+        >
+      </p>
     </div>
   </div>
 </Layout>
+
+<script lang="ts">
+  const animationDuration = 2000;
+  const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4);
+
+  const animate = (el) => {
+    const target = parseInt(el.getAttribute('data-count-up-target') || '0', 10);
+    const startTime = performance.now();
+
+    const update = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / animationDuration, 1);
+      const easedProgress = easeOutQuart(progress);
+
+      const current = Math.round(easedProgress * target);
+      el.textContent = current.toString();
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        el.textContent = target.toString();
+      }
+    };
+
+    requestAnimationFrame(update);
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          animate(el);
+          observer.unobserve(el);
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
+
+  document.querySelectorAll('[data-count-up-target]').forEach((el) => {
+    observer.observe(el);
+  });
+
+  const progressBarObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const width = el.getAttribute('data-width');
+          if (width) {
+            el.setAttribute('style', `width:${width}%`);
+          }
+          progressBarObserver.unobserve(el);
+        }
+      });
+    },
+    { rootMargin: '0px 0px -20% 0px' }
+  );
+
+  document.querySelectorAll('[data-progress-bar]').forEach((el) => {
+    progressBarObserver.observe(el);
+  });
+
+  const card = document.getElementById('spotlight-card');
+  if (card) {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
+  }
+</script>
