@@ -3,6 +3,71 @@ import people from './people';
 type PersonId = (typeof people)[number]['id'];
 
 export default {
+  // 227
+  'mcp-security-framework-fatigue-and-ai-agents-with-will-johnson-presented-by-coderabbit':
+    [{ id: 'robbiethewagner' }, { id: 'argyleink' }, { id: 'willjohnsonio' }],
+  // 226
+  'a-very-merry-descent-into-holiday-madness': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' }
+  ],
+  // 225
+  'soc-2-in-the-streets-spaghetti-in-the-sheets': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' }
+  ],
+  // 224
+  'spooky-scary-css': [{ id: 'robbiethewagner' }, { id: 'argyleink' }],
+  // 223
+  'the-piano-man-of-state-machines-w-david-k-piano': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' },
+    { id: 'davidkpiano' }
+  ],
+  // 222
+  'doing-one-thing-exceptionally-well-coderabbits-approach-to-ai-code-review': [
+    { id: 'robbiethewagner' },
+    { id: 'nickytonline', host: true },
+    { id: 'esthor' },
+    { id: 'hkrackdev' }
+  ],
+  // 221
+  'are-developers-overthinking-everything-w-bdougie': [
+    { id: 'robbiethewagner' },
+    { id: 'nickytonline', host: true },
+    { id: 'bdougie' }
+  ],
+  // 220
+  'the-future-of-front-end-vim-wars-and-raising-gamer-kids-w-nick-taylor': [
+    { id: 'robbiethewagner' },
+    { id: 'tasonjorres', host: true },
+    { id: 'nickytonline' }
+  ],
+  // 219
+  'from-librarian-to-developer-w-roxy-rodriguez-becker': [
+    { id: 'robbiethewagner' },
+    { id: 'tasonjorres', host: true },
+    { id: 'roxanacodes' }
+  ],
+  // 218
+  'how-to-build-a-career-when-the-rules-keep-changing-w-taylor-desseyn-jason-torres':
+    [
+      { id: 'robbiethewagner' },
+      { id: 'tasonjorres', host: true },
+      { id: 'tdesseyn' }
+    ],
+  // 217
+  'open-source-agents-and-the-next-ai-wave-w-angie-jones': [
+    { id: 'robbiethewagner' },
+    { id: 'jlengstorf', host: true },
+    { id: 'techgirl1908' }
+  ],
+  // 216
+  'why-open-source-might-be-your-best-career-move-w-shruti-kapoor': [
+    { id: 'robbiethewagner' },
+    { id: 'jlengstorf', host: true },
+    { id: 'shrutikapoor08' }
+  ],
   // 209
   'is-cracker-barrel-a-js-framework': [
     { id: 'robbiethewagner' },
