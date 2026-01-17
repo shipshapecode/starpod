@@ -35,7 +35,7 @@ export default {
   'are-developers-overthinking-everything-w-bdougie': [
     { id: 'robbiethewagner' },
     { id: 'nickytonline', host: true },
-    { id: 'bdougie' }
+    { id: 'bdougieyo' }
   ],
   // 220
   'the-future-of-front-end-vim-wars-and-raising-gamer-kids-w-nick-taylor': [

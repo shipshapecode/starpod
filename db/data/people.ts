@@ -4,6 +4,7 @@ export const people = [
   { id: 'adamstac', name: 'Adam Stacoviak', img: 'adamstac.jpg' },
   { id: 'amerawhite2', name: 'Amera White', img: 'amerawhite2.jpg' },
   { id: 'argyleink', name: 'Adam Argyle', img: 'argyleink.jpg' },
+  { id: 'bdougieyo', name: 'Brian Douglas', img: 'bdougieyo.jpg' },
   { id: 'bholmesdev', name: 'Ben Holmes', img: 'bholmesdev.jpg' },
   {
     id: 'burgessdryan',
