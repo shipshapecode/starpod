@@ -4,6 +4,7 @@ export const people = [
   { id: 'adamstac', name: 'Adam Stacoviak', img: 'adamstac.jpg' },
   { id: 'amerawhite2', name: 'Amera White', img: 'amerawhite2.jpg' },
   { id: 'argyleink', name: 'Adam Argyle', img: 'argyleink.jpg' },
+  { id: 'bdougieyo', name: 'Brian Douglas', img: 'bdougieyo.jpg' },
   { id: 'bholmesdev', name: 'Ben Holmes', img: 'bholmesdev.jpg' },
   {
     id: 'burgessdryan',
@@ -56,6 +57,11 @@ export const people = [
     img: 'davidfowl.jpg'
   },
   {
+    id: 'davidkpiano',
+    name: 'David K. Piano',
+    img: 'davidkpiano.jpg'
+  },
+  {
     id: 'dblums',
     name: 'Dan Blumberg',
     img: 'dblums.jpg'
@@ -71,9 +77,19 @@ export const people = [
     img: 'engineering_bae.jpg'
   },
   {
+    id: 'esthor',
+    name: 'Erik Thorelli',
+    img: 'esthor.jpg'
+  },
+  {
     id: 'henrihelvetica',
     name: 'Henri Helvetica',
     img: 'henrihelvetica.jpg'
+  },
+  {
+    id: 'hkrackdev',
+    name: 'Hendrik Krack',
+    img: 'hkrackdev.jpg'
   },
   {
     id: 'htmx_org',
@@ -160,6 +176,11 @@ export const people = [
     name: 'Michael Nagdi'
   },
   {
+    id: 'nickytonline',
+    name: 'Nick Taylor',
+    img: 'nickytonline.jpg'
+  },
+  {
     id: 'ntonchev',
     name: 'Nas Tonchev'
   },
@@ -198,7 +219,12 @@ export const people = [
     name: 'Robby Russell',
     img: 'robbyrussell.jpg'
   },
-   {
+  {
+    id: 'roxanacodes',
+    name: 'Roxy Rodbeck',
+    img: 'roxanacodes.jpg'
+  },
+  {
     id: 'rwjblue',
     name: 'Robert Jackson',
     img: 'rwjblue.jpg'
@@ -207,6 +233,11 @@ export const people = [
     id: 'shaundai',
     name: 'Shaundai Person',
     img: 'shaundai.jpg'
+  },
+  {
+    id: 'shrutikapoor08',
+    name: 'Shruti Kapoor',
+    img: 'shrutikapoor08.jpg'
   },
   {
     id: 'tasonjorres',
@@ -266,6 +297,7 @@ export const people = [
   },
   { id: 'wagslane', name: 'Lane Wagner', img: 'wagslane.jpg' },
   { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' },
+  { id: 'willjohnsonio', name: 'Will Johnson', img: 'willjohnsonio.jpg' },
   { id: 'zeeg', name: 'David Cramer', img: 'zeeg.jpg' }
 ] as const;
 
