@@ -4,7 +4,8 @@ const indexMeta = {
   title: 'Whiskey Web and Whatnot: Web Development, Neat',
   description:
     /^Veteran web developers RobbieTheWagner, Charles William Carpenter III, and Adam Argyle host this informal, whiskey-fueled fireside chat with your favorite web devs. They discuss all things web development including JavaScript, TypeScript, EmberJS, React, Astro, SolidJS, CSS, HTML, Web3, and more. They take a unique approach and focus on getting to know the human side of developers and their hobbies outside of work, all while sampling a new whiskey that they rate on their unique tentacle scale./,
-  image: 'https://assets.flightcast.com/static/fx4npv5dbjrucewh4372wfv9.jpg'
+  image:
+    'https://assets.flightcast.com/workspaces/w3c9dshmqkhqsgbaue0txwq5/podcasts/w7bqgc792i30fd43a32uawx0/fx4npv5dbjrucewh4372wfv9.jpg'
 };
 
 test('index page has correct meta', async ({ page }) => {
