@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 const episode1 = {
   title:
-    'Throwback Frameworks, Tailwind Fandom, and CSS with Jhey Tompkins - Whiskey Web and Whatnot: Web Development, Neat - Episode 120',
+    'Throwback Frameworks, Tailwind Fandom, and CSS with Jhey Tompkins - Whiskey Web and Whatnot - Episode 120',
   description:
     /^Have you ever reflected on the tools that shaped your journey as a developer?/,
   image:
@@ -11,7 +11,7 @@ const episode1 = {
 
 const episode2 = {
   title:
-    'FEHH x WWW: AI, VR, and the Future of Web Development - Whiskey Web and Whatnot: Web Development, Neat - Episode Bonus',
+    'FEHH x WWW: AI, VR, and the Future of Web Development - Whiskey Web and Whatnot - Episode Bonus',
   description:
     /^In this crossover episode, Chuck and Robbie join Jem Young and Ryan Burgess from/,
   image:
