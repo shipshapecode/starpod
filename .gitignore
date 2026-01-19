@@ -30,3 +30,6 @@ test-results/
 
 # AI settings
 AGENTS.md
+
+# generated collections
+src/data/collections.generated.ts

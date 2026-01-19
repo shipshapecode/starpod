@@ -1,0 +1,57 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import EpisodeList from '../../components/EpisodeList.astro';
+import { collections } from '../../data/collections';
+import { getAllEpisodes, getShowInfo } from '../../lib/rss';
+
+const show = await getShowInfo();
+
+export async function getStaticPaths() {
+  return collections.map((collection) => ({
+    params: { slug: collection.slug },
+    props: { collection }
+  }));
+}
+
+const { collection } = Astro.props;
+const allEpisodes = await getAllEpisodes();
+
+// Filter episodes that belong to this collection and sort newest-first
+const collectionEpisodes = allEpisodes
+  .filter((episode) => collection.episodeSlugs.includes(episode.episodeSlug))
+  .sort((a, b) => b.published - a.published);
+
+const title = `${collection.title} - ${show.title}`;
+const canonicalURL = new URL(`/collections/${collection.slug}`, Astro.url);
+---
+
+<Layout title={title} canonicalURL={canonicalURL}>
+  <div class="relative z-10 px-8 lg:px-18">
+    <h1 class="text-light-text-heading text-4xl font-bold dark:text-white">
+      {collection.title}
+    </h1>
+
+    {collection.subtitle && (
+      <p class="mt-2 text-xl text-light-text-body dark:text-dark-text-body">
+        {collection.subtitle}
+      </p>
+    )}
+
+    {collection.description && (
+      <p class="mt-4 text-lg">{collection.description}</p>
+    )}
+
+    {collectionEpisodes.length > 0 ? (
+      <div class="mt-12">
+        <EpisodeList episodes={collectionEpisodes} show={show} />
+      </div>
+    ) : (
+      <div class="mt-12">
+        <p class="text-lg">
+          No episodes found in this collection. Please check the collection
+          configuration.
+        </p>
+      </div>
+    )}
+  </div>
+</Layout>

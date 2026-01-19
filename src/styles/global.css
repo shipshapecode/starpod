@@ -86,3 +86,9 @@ footer:has(+ #audio-player .player) {
 @utility section-heading-underlined {
   @apply section-heading dark:border-dark-border border-b pb-4;
 }
+
+@supports (grid-template-rows: subgrid) {
+  .collections-grid {
+    grid-auto-rows: minmax(0, auto);
+  }
+}

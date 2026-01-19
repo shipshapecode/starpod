@@ -1,0 +1,88 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { collections } from '../../data/collections';
+import { getAllEpisodes, getShowInfo } from '../../lib/rss';
+
+const show = await getShowInfo();
+const allEpisodes = await getAllEpisodes();
+const title = `Collections - ${show.title}`;
+const canonicalURL = new URL('/collections', Astro.url);
+
+// For each collection, get the 4 latest episodes
+const collectionsWithEpisodes = collections.map((collection) => {
+  const collectionEpisodes = allEpisodes
+    .filter((episode) => collection.episodeSlugs.includes(episode.episodeSlug))
+    .sort((a, b) => b.published - a.published)
+    .slice(0, 4); // Get 4 latest episodes
+
+  return {
+    ...collection,
+    latestEpisodes: collectionEpisodes
+  };
+});
+---
+
+<Layout title={title} canonicalURL={canonicalURL}>
+  <div class="relative z-10 px-8 lg:px-18">
+    <h1 class="text-light-text-heading text-4xl font-bold dark:text-white">
+      Collections
+    </h1>
+
+    <p class="mt-4 text-lg">
+      Curated collections of episodes organized by topic.
+    </p>
+
+    <div class="collections-grid mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {collectionsWithEpisodes.map((collection) => (
+        <a
+          href={`/collections/${collection.slug}`}
+          class="group relative grid overflow-hidden rounded-lg bg-light-card dark:bg-dark-card transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:focus:ring-offset-dark-background"
+          style="grid-template-rows: subgrid; grid-row: auto / span 3;"
+        >
+          <div
+            class="pointer-events-none absolute inset-0 rounded-lg opacity-30 dark:opacity-20"
+            style="background: radial-gradient(77% 77% at 50% 0%, rgba(237, 236, 252, 0.4) 0%, rgba(237, 236, 252, 0) 100%);"
+            aria-hidden="true"
+          ></div>
+          <div
+            class="pointer-events-none absolute inset-0 rounded-lg opacity-0 dark:opacity-20"
+            style="background: radial-gradient(77% 77% at 50% 0%, rgba(88, 105, 132, 0.3) 0%, rgba(88, 105, 132, 0) 100%);"
+            aria-hidden="true"
+          ></div>
+          <div class="aspect-1 w-full overflow-hidden bg-gray-200 dark:bg-gray-800">
+            {collection.latestEpisodes.length > 0 ? (
+              <div class="grid h-full w-full grid-cols-2">
+                {collection.latestEpisodes.map((episode, index) => (
+                  <img
+                    src={episode.episodeThumbnail ?? show.image}
+                    alt={`${episode.title} - episode art`}
+                    class="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    loading="lazy"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div class="flex h-full w-full items-center justify-center">
+                <span class="text-sm text-gray-500">No episodes</span>
+              </div>
+            )}
+          </div>
+          <div class="px-6">
+            <h2 class="text-light-text-heading text-xl font-bold dark:text-white">
+              {collection.title}
+            </h2>
+            {collection.description && (
+              <p class="mt-2 text-sm">{collection.description}</p>
+            )}
+          </div>
+          <div class="px-6 pb-6">
+            <p class="text-sm font-medium text-cyan-600 dark:text-cyan-400">
+              {collection.episodeSlugs.length}{' '}
+              {collection.episodeSlugs.length === 1 ? 'episode' : 'episodes'}
+            </p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>
