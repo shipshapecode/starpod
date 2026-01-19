@@ -21,6 +21,11 @@ const collectionEpisodes = allEpisodes
   .filter((episode) => collection.episodeSlugs.includes(episode.episodeSlug))
   .sort((a, b) => b.published - a.published);
 
+// Find current collection index for pagination
+const currentIndex = collections.findIndex((c) => c.slug === collection.slug);
+const prevCollection = currentIndex > 0 ? collections[currentIndex - 1] : null;
+const nextCollection = currentIndex < collections.length - 1 ? collections[currentIndex + 1] : null;
+
 const title = `${collection.title} - ${show.title}`;
 const canonicalURL = new URL(`/collections/${collection.slug}`, Astro.url);
 ---
@@ -51,6 +56,63 @@ const canonicalURL = new URL(`/collections/${collection.slug}`, Astro.url);
           No episodes found in this collection. Please check the collection
           configuration.
         </p>
+      </div>
+    )}
+
+    {/* Pagination Navigation */}
+    {(prevCollection || nextCollection) && (
+      <div class="py-16 grid grid-cols-1 gap-6 md:grid-cols-2">
+        {prevCollection && (
+          <a
+            href={`/collections/${prevCollection.slug}`}
+            class="group relative grid overflow-hidden rounded-lg bg-light-card dark:bg-dark-card transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:focus:ring-offset-dark-background"
+          >
+            <div
+              class="pointer-events-none absolute inset-0 rounded-lg opacity-30 dark:opacity-20"
+              style="background: radial-gradient(77% 77% at 50% 0%, rgba(237, 236, 252, 0.4) 0%, rgba(237, 236, 252, 0) 100%);"
+              aria-hidden="true"
+            ></div>
+            <div class="px-6 py-8">
+              <p class="text-sm font-medium text-cyan-600 dark:text-cyan-400 mb-2">
+                Previous
+              </p>
+              <h2 class="text-light-text-heading text-xl font-bold dark:text-white">
+                {prevCollection.title}
+              </h2>
+              {prevCollection.description && (
+                <p class="mt-2 text-sm text-light-text-body dark:text-dark-text-body">
+                  {prevCollection.description}
+                </p>
+              )}
+            </div>
+          </a>
+        )}
+
+        {nextCollection && (
+          <a
+            href={`/collections/${nextCollection.slug}`}
+            class="group relative grid overflow-hidden rounded-lg bg-light-card dark:bg-dark-card transition-transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:focus:ring-offset-dark-background"
+          >
+            <div
+              class="pointer-events-none absolute inset-0 rounded-lg opacity-30 dark:opacity-20"
+              style="background: radial-gradient(77% 77% at 50% 0%, rgba(237, 236, 252, 0.4) 0%, rgba(237, 236, 252, 0) 100%);"
+              aria-hidden="true"
+            ></div>
+            <div class="px-6 py-8">
+              <p class="text-sm font-medium text-cyan-600 dark:text-cyan-400 mb-2">
+                Next
+              </p>
+              <h2 class="text-light-text-heading text-xl font-bold dark:text-white">
+                {nextCollection.title}
+              </h2>
+              {nextCollection.description && (
+                <p class="mt-2 text-sm text-light-text-body dark:text-dark-text-body">
+                  {nextCollection.description}
+                </p>
+              )}
+            </div>
+          </a>
+        )}
       </div>
     )}
   </div>
