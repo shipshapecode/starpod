@@ -62,6 +62,7 @@ export async function getAllEpisodes() {
         title: string(),
         published: number(),
         description: string(),
+        content_encoded: optional(string()),
         itunes_duration: number(),
         itunes_episode: optional(number()),
         itunes_episodeType: string(),
@@ -86,6 +87,7 @@ export async function getAllEpisodes() {
       .map(
         async ({
           description,
+          content_encoded,
           id,
           title,
           enclosures,
@@ -98,11 +100,12 @@ export async function getAllEpisodes() {
           const episodeNumber =
             itunes_episodeType === 'bonus' ? 'Bonus' : `${itunes_episode}`;
           const episodeSlug = dasherize(title);
+          const episodeContent = content_encoded || description;
 
           return {
             id,
             title: `${title}`,
-            content: description,
+            content: episodeContent,
             description: truncate(htmlToText(description), 260),
             duration: itunes_duration,
             episodeImage: itunes_image?.href,
