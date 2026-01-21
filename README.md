@@ -110,3 +110,62 @@ see fit.
 
 We use Turso and Astro DB to setup guests per episode. If you would also like to
 do this, you will need a Turso account.
+
+### LLM Discovery Features
+
+Starpod includes built-in support for LLM (Large Language Model) discovery
+through the [llms.txt specification](https://llmstxt.org/). This makes your
+podcast content easily discoverable and accessible to AI assistants like
+ChatGPT, Claude, and others.
+
+#### What's Included
+
+- `/llms.txt` - Structured file following the llms.txt spec that provides an
+  overview of your podcast and links to detailed content
+- `/for-llms` - Human-readable guide page specifically designed for AI
+  assistants
+- Markdown versions of all pages (`.html.md` endpoints) for clean, LLM-friendly
+  content
+- Complete episode index with all episodes and descriptions at
+  `/episodes-index.html.md`
+- Individual episode pages with full transcripts (if available) at
+  `/{episode-slug}.html.md`
+
+#### How LLMs Can Use Your Podcast
+
+With these features automatically generated from your RSS feed and config, LLMs
+can:
+
+- **Discover and recommend** specific episodes based on topics or themes
+- **Answer detailed questions** about episode content using full transcripts
+- **Summarize episodes** or extract key points and insights
+- **Find episodes** with specific guests or covering certain subjects
+- **Provide information** about your hosts, show format, and where to listen
+
+#### Transcript Support
+
+If you provide episode transcripts in
+`src/content/transcripts/[episode-number].md`, they will automatically be
+included in the LLM-accessible content. Transcripts are cleaned (timestamps
+removed) and formatted for optimal LLM consumption.
+
+All transcript content is available at `/{episode-slug}.html.md` or
+`/{episode-number}.html.md`.
+
+**Note:** Transcripts are optional. The LLM discovery features work perfectly
+fine without them, using episode descriptions and metadata from your RSS feed.
+
+#### Generated Endpoints
+
+All of the following endpoints are automatically generated at build time from
+your `starpod.config.ts` and RSS feed:
+
+- `/llms.txt` - Main discovery file
+- `/for-llms` - Human-readable guide page
+- `/for-llms.html.md` - Markdown version of guide
+- `/about.html.md` - Markdown version of about page
+- `/episodes-index.html.md` - Complete episode listing
+- `/{episode-slug}.html.md` - Individual episode with transcript
+- `/{episode-number}.html.md` - Alternative episode URL
+
+No configuration needed - it just works!

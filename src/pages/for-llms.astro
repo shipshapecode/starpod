@@ -1,0 +1,248 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getAllEpisodes, getShowInfo } from '../lib/rss';
+import { formatDate, formatDuration } from '../lib/llms';
+import starpodConfig from '../../starpod.config';
+
+const show = await getShowInfo();
+const episodes = await getAllEpisodes();
+const recentEpisodes = episodes.slice(0, 10);
+
+// Calculate average duration and frequency
+let avgDuration = 0;
+let episodesPerWeek = 0;
+
+if (episodes.length > 0) {
+  const totalDuration = episodes.reduce((sum, ep) => sum + ep.duration, 0);
+  avgDuration = totalDuration / episodes.length;
+
+  if (episodes.length > 1) {
+    const newest = episodes[0].published;
+    const oldest = episodes[episodes.length - 1].published;
+    const daysBetween = (newest - oldest) / (1000 * 60 * 60 * 24);
+    episodesPerWeek = (episodes.length / daysBetween) * 7;
+  }
+}
+---
+
+<Layout
+  title="For LLMs - AI Assistant Guide"
+  description={`Comprehensive guide for AI assistants about ${show.title}`}
+>
+  <div class="relative z-10 px-8 lg:px-18">
+    <h1
+      class="text-light-text-heading mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl dark:text-white"
+    >
+      {show.title} - Guide for AI Assistants
+    </h1>
+
+    <section class="mb-8">
+      <h2 class="section-heading-underlined">Podcast Overview</h2>
+      <p class="mb-2">
+        <strong>Tagline:</strong>
+        {starpodConfig.blurb}
+      </p>
+      <p>{starpodConfig.description}</p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="section-heading-underlined">Hosts</h2>
+      {
+        starpodConfig.hosts.map((host) => (
+          <div class="mb-4">
+            <h3 class="text-light-text-heading text-xl font-bold dark:text-white">
+              {host.name}
+            </h3>
+            <p class="mt-2">{host.bio}</p>
+            {(host.website || host.github || host.twitter) && (
+              <div class="mt-2">
+                <strong>Links: </strong>
+                {host.website && (
+                  <>
+                    <a
+                      href={host.website}
+                      class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                    >
+                      Website
+                    </a>
+                    {' | '}
+                  </>
+                )}
+                {host.github && (
+                  <>
+                    <a
+                      href={host.github}
+                      class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                    >
+                      GitHub
+                    </a>
+                    {' | '}
+                  </>
+                )}
+                {host.twitter && (
+                  <a
+                    href={host.twitter}
+                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                  >
+                    Twitter
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="mb-8">
+      <h2 class="section-heading-underlined">Episode Information</h2>
+      <ul class="list-disc pl-6">
+        <li>
+          <strong>Total Episodes:</strong>
+          {episodes.length}
+        </li>
+        {
+          avgDuration > 0 && (
+            <li>
+              <strong>Average Episode Duration:</strong>{' '}
+              {formatDuration(avgDuration)}
+            </li>
+          )
+        }
+        {
+          episodesPerWeek > 0 && (
+            <li>
+              <strong>Publishing Frequency:</strong> Approximately{' '}
+              {episodesPerWeek.toFixed(1)} episodes per week
+            </li>
+          )
+        }
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="section-heading-underlined">Recent Episodes</h2>
+      <ul class="list-disc pl-6">
+        {
+          recentEpisodes.map((episode) => (
+            <li>
+              <strong>Episode {episode.episodeNumber}:</strong>{' '}
+              <a
+                href={`/${episode.episodeSlug}.html.md`}
+                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+              >
+                {episode.title}
+              </a>{' '}
+              - {formatDate(episode.published)}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="section-heading-underlined">Transcript Availability</h2>
+      <p>
+        Transcripts are available for many episodes and are included in the
+        individual episode markdown files. Access any episode at
+        <code>/{'{episode-slug}'}.html.md</code> to view the full transcript if
+        available.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="section-heading-underlined">How to Listen</h2>
+      <ul class="list-disc pl-6">
+        {
+          starpodConfig.platforms.apple && (
+            <li>
+              <a
+                href={starpodConfig.platforms.apple}
+                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+              >
+                Apple Podcasts
+              </a>
+            </li>
+          )
+        }
+        {
+          starpodConfig.platforms.spotify && (
+            <li>
+              <a
+                href={starpodConfig.platforms.spotify}
+                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+              >
+                Spotify
+              </a>
+            </li>
+          )
+        }
+        {
+          starpodConfig.platforms.youtube && (
+            <li>
+              <a
+                href={starpodConfig.platforms.youtube}
+                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+              >
+                YouTube
+              </a>
+            </li>
+          )
+        }
+        {
+          starpodConfig.platforms.overcast && (
+            <li>
+              <a
+                href={starpodConfig.platforms.overcast}
+                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+              >
+                Overcast
+              </a>
+            </li>
+          )
+        }
+        {
+          starpodConfig.platforms.pocketCasts && (
+            <li>
+              <a
+                href={starpodConfig.platforms.pocketCasts}
+                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+              >
+                Pocket Casts
+              </a>
+            </li>
+          )
+        }
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="section-heading-underlined">RSS Feed</h2>
+      <p>
+        Direct RSS feed access: <a
+          href={starpodConfig.rssFeed}
+          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          >{starpodConfig.rssFeed}</a
+        >
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="section-heading-underlined">Complete Episode List</h2>
+      <p>
+        For a complete list of all episodes with descriptions, see <a
+          href="/episodes-index.html.md"
+          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          >Episodes Index</a
+        >.
+      </p>
+      <p class="mt-2">
+        Markdown version of this page: <a
+          href="/for-llms.html.md"
+          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          >for-llms.html.md</a
+        >
+      </p>
+    </section>
+  </div>
+</Layout>
