@@ -82,3 +82,41 @@ test('works for bonus episodes with no episode number', async ({ page }) => {
   const twitterImage = page.locator('meta[name="twitter:image:src"]');
   await expect(twitterImage).toHaveAttribute('content', episode2.image);
 });
+
+test('displays hosts and guests when astro:db is available', async ({
+  page
+}) => {
+  await page.goto('/120');
+
+  // Check if the "Creators and Guests" section exists
+  const creatorsSection = page.locator('h3:has-text("Creators and Guests")');
+  await expect(creatorsSection).toBeVisible();
+
+  // Check if at least one host/guest is displayed in the grid
+  const hostGuestGrid = page.locator(
+    'h3:has-text("Creators and Guests") + div'
+  );
+  await expect(hostGuestGrid).toBeVisible();
+
+  // Check that there are actual host/guest items
+  const hostGuestItems = page.locator(
+    'h3:has-text("Creators and Guests") + div > div'
+  );
+  await expect(hostGuestItems.first()).toBeVisible();
+});
+
+test('displays sponsors when astro:db is available', async ({ page }) => {
+  await page.goto('/120');
+
+  // Check if the "Sponsors" section exists
+  const sponsorsSection = page.locator('h3:has-text("Sponsors")');
+  await expect(sponsorsSection).toBeVisible();
+
+  // Check if at least one sponsor is displayed in the grid
+  const sponsorGrid = page.locator('h3:has-text("Sponsors") + div');
+  await expect(sponsorGrid).toBeVisible();
+
+  // Check that there are actual sponsor items
+  const sponsorItems = page.locator('h3:has-text("Sponsors") + div > a');
+  await expect(sponsorItems.first()).toBeVisible();
+});
