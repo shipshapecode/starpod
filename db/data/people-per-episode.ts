@@ -3,6 +3,17 @@ import people from './people';
 type PersonId = (typeof people)[number]['id'];
 
 export default {
+  // 229
+  'is-ai-just-stealing-with-extra-steps-presented-by-coderabbit': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' }
+  ],
+  // 228
+  'santaexe-presented-by-coderabbit': [
+    { id: 'robbiethewagner' },
+    { id: 'chuckcarpenter' },
+    { id: 'argyleink' }
+  ],
   // 227
   'mcp-security-framework-fatigue-and-ai-agents-with-will-johnson-presented-by-coderabbit':
     [{ id: 'robbiethewagner' }, { id: 'argyleink' }, { id: 'willjohnsonio' }],

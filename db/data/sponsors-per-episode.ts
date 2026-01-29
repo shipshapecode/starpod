@@ -1,8 +1,13 @@
 export default {
+  // 229
+  'is-ai-just-stealing-with-extra-steps-presented-by-coderabbit': [
+    { id: 'code-rabbit' }
+  ],
+  // 228
+  'santaexe-presented-by-coderabbit': [{ id: 'code-rabbit' }],
   // 227
   'mcp-security-framework-fatigue-and-ai-agents-with-will-johnson-presented-by-coderabbit':
     [{ id: 'code-rabbit' }],
-  // 226
   // 190
   'vibe-podcasting-app-rewrites-ai-assistants-pbjs-and-more': [
     { id: 'norlan' }

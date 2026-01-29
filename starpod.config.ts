@@ -11,7 +11,7 @@ export default defineStarpodConfig({
       bio: 'Huge Ember and Tailwind fanboy. I used to work at Netflix btw.',
       img: 'robbiethewagner.jpg',
       github: 'https://github.com/RobbieTheWagner',
-      twitter: 'https://x.com/RobbieTheWagner',
+      twitter: 'https://x.com/RobbieWagner',
       website: 'https://robbiethewagner.dev'
     },
     {
@@ -19,7 +19,7 @@ export default defineStarpodConfig({
       bio: 'Third of his name, user of gifs, hater of ESM.',
       img: 'chuckcarpenter.jpg',
       github: 'https://github.com/chuckcarpenter',
-      twitter: 'https://x.com/CharlesWthe3rd',
+      twitter: 'https://x.com/ChuckCarpenter',
       website: 'https://shipshape.io'
     },
     {
