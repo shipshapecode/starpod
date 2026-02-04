@@ -3,17 +3,18 @@
     <!-- Base dots layer -->
     <div class="bg-dots-light dark:bg-dots-dark absolute inset-0 bg-repeat-x"></div>
     
-    <!-- Twinkling dots overlay -->
-    <svg class="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice">
-      <circle class="twinkle-dot twinkle-1" cx="3%" cy="25%" r="1" />
-      <circle class="twinkle-dot twinkle-2" cx="12%" cy="40%" r="1" />
-      <circle class="twinkle-dot twinkle-3" cx="25%" cy="15%" r="1" />
-      <circle class="twinkle-dot twinkle-4" cx="38%" cy="60%" r="1" />
-      <circle class="twinkle-dot twinkle-5" cx="52%" cy="30%" r="1" />
-      <circle class="twinkle-dot twinkle-6" cx="67%" cy="50%" r="1" />
-      <circle class="twinkle-dot twinkle-7" cx="78%" cy="20%" r="1" />
-      <circle class="twinkle-dot twinkle-8" cx="88%" cy="45%" r="1" />
-      <circle class="twinkle-dot twinkle-9" cx="95%" cy="70%" r="1" />
+    <!-- Twinkling dots overlay - viewBox matches background SVG -->
+    <svg class="absolute inset-0 h-full w-full" viewBox="0 0 974 47" preserveAspectRatio="xMinYMin slice">
+      <!-- Positioned at exact grid coordinates (9px spacing, starting at 1) -->
+      <circle class="twinkle-dot twinkle-1" cx="10" cy="10" r="1" />
+      <circle class="twinkle-dot twinkle-2" cx="100" cy="19" r="1" />
+      <circle class="twinkle-dot twinkle-3" cx="226" cy="10" r="1" />
+      <circle class="twinkle-dot twinkle-4" cx="370" cy="1" r="1" />
+      <circle class="twinkle-dot twinkle-5" cx="478" cy="19" r="1" />
+      <circle class="twinkle-dot twinkle-6" cx="595" cy="10" r="1" />
+      <circle class="twinkle-dot twinkle-7" cx="721" cy="1" r="1" />
+      <circle class="twinkle-dot twinkle-8" cx="838" cy="19" r="1" />
+      <circle class="twinkle-dot twinkle-9" cx="919" cy="10" r="1" />
     </svg>
   </div>
 </div>
