@@ -11,6 +11,8 @@ import Hosts from '../components/Hosts.astro';
 import InfoCard from '../components/InfoCard.astro';
 import Platforms from '../components/Platforms.astro';
 import Player from '../components/Player';
+import SearchButton from '../components/SearchButton';
+import SearchDialog from '../components/SearchDialog';
 import ShowArtwork from '../components/ShowArtwork.astro';
 
 import { getShowInfo } from '../lib/rss';
@@ -164,6 +166,9 @@ const description = Astro.props.description ?? starpodConfig.description;
     <main
       class="bg-light-card dark:bg-dark-card mx-2 mb-2 rounded-lg lg:relative lg:ml-112 lg:min-h-screen xl:ml-120"
     >
+      <div class="absolute top-4 right-4 z-30">
+        <SearchButton client:load />
+      </div>
       <div class="relative mt-2 pt-16">
         <div
           class="bg-gradient-light dark:bg-gradient-dark absolute top-0 right-0 left-0 z-0 h-80 w-full opacity-30"
@@ -195,6 +200,7 @@ const description = Astro.props.description ?? starpodConfig.description;
     <div id="audio-player">
       <Player client:only="preact" transition:persist="player" />
     </div>
+    <SearchDialog client:load transition:persist="search-dialog" />
     <SpeedInsights />
   </body>
 </html>
