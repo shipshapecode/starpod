@@ -11,7 +11,7 @@ import Slider from './player/Slider';
 export default function Player() {
   const audioPlayer = useRef<HTMLAudioElement | null>(null);
   const progressRef = useRef<number | null>(null);
-  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
   if (currentEpisode.value === null) {
     return;
@@ -21,9 +21,9 @@ export default function Player() {
 
   function whilePlaying() {
     if (audioPlayer.current?.duration) {
-      const percentage =
-        (audioPlayer.current.currentTime / audioPlayer.current.duration) * 100;
-      setProgress(percentage);
+      const time = audioPlayer.current.currentTime;
+      const percentage = (time / audioPlayer.current.duration) * 100;
+      setCurrentTime(time);
 
       const slider = document.querySelector('.slider');
       const particles = document.querySelector('.ship-particles');
@@ -65,11 +65,12 @@ export default function Player() {
   }, [isPlaying.value]);
 
   useEffect(() => {
-    if (progress >= 99.99) {
+    const duration = audioPlayer.current?.duration ?? 0;
+    if (duration > 0 && currentTime >= duration - 0.01) {
       isPlaying.value = false;
-      setProgress(0);
+      setCurrentTime(0);
     }
-  }, [progress]);
+  }, [currentTime]);
 
   return (
     <div class="player fixed inset-x-0 bottom-0 z-50 lg:left-112 xl:left-120">
@@ -102,7 +103,7 @@ export default function Player() {
               </div>
               <ForwardButton audioPlayer={audioPlayer} />
             </div>
-            <Slider audioPlayer={audioPlayer} progress={progress} />
+            <Slider audioPlayer={audioPlayer} currentTime={currentTime} />
             <div class="flex items-center gap-4">
               <div class="flex items-center">
                 <PlaybackRateButton audioPlayer={audioPlayer} />
