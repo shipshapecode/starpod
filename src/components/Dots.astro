@@ -18,25 +18,70 @@
   }
 
   .dot-layer-1 {
-    animation: sparkle 4s ease-in-out infinite;
+    animation: glimmer1 7s ease-in-out infinite;
   }
 
   .dot-layer-2 {
-    animation: sparkle 4s ease-in-out infinite 1.3s;
-    background-position-x: 5px;
+    animation: glimmer2 11s ease-in-out infinite 2s;
+    background-position-x: 13px;
   }
 
   .dot-layer-3 {
-    animation: sparkle 4s ease-in-out infinite 2.6s;
-    background-position-x: 10px;
+    animation: glimmer3 13s ease-in-out infinite 5s;
+    background-position-x: 27px;
   }
 
-  @keyframes sparkle {
+  @keyframes glimmer1 {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    15% {
+      opacity: 0.8;
+    }
+    40% {
+      opacity: 0.5;
+    }
+    70% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes glimmer2 {
+    0%, 100% {
+      opacity: 0.5;
+    }
+    20% {
+      opacity: 0.9;
+    }
+    35% {
+      opacity: 0.3;
+    }
+    60% {
+      opacity: 0.7;
+    }
+    80% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes glimmer3 {
     0%, 100% {
       opacity: 0.4;
     }
-    50% {
+    10% {
+      opacity: 0.7;
+    }
+    30% {
       opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    75% {
+      opacity: 0.8;
     }
   }
 
