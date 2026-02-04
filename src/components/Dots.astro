@@ -1,25 +1,58 @@
 <div class="absolute top-0 left-0 flex h-12 w-full justify-center p-2">
-  <div class="bg-dots-light dark:bg-dots-dark twinkle h-12 w-full bg-repeat-x"></div>
+  <div class="relative h-12 w-full">
+    <!-- Base dots layer -->
+    <div class="bg-dots-light dark:bg-dots-dark absolute inset-0 bg-repeat-x"></div>
+    
+    <!-- Twinkling dots overlay -->
+    <svg class="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice">
+      <circle class="twinkle-dot twinkle-1" cx="3%" cy="25%" r="1" />
+      <circle class="twinkle-dot twinkle-2" cx="12%" cy="40%" r="1" />
+      <circle class="twinkle-dot twinkle-3" cx="25%" cy="15%" r="1" />
+      <circle class="twinkle-dot twinkle-4" cx="38%" cy="60%" r="1" />
+      <circle class="twinkle-dot twinkle-5" cx="52%" cy="30%" r="1" />
+      <circle class="twinkle-dot twinkle-6" cx="67%" cy="50%" r="1" />
+      <circle class="twinkle-dot twinkle-7" cx="78%" cy="20%" r="1" />
+      <circle class="twinkle-dot twinkle-8" cx="88%" cy="45%" r="1" />
+      <circle class="twinkle-dot twinkle-9" cx="95%" cy="70%" r="1" />
+    </svg>
+  </div>
 </div>
 
 <style>
-  .twinkle {
-    animation: twinkle 8s ease-in-out infinite;
+  .twinkle-dot {
+    opacity: 0;
+    fill: #9090A0;
   }
 
-  @keyframes twinkle {
-    0%, 92%, 100% {
-      opacity: 1;
+  @media (prefers-color-scheme: dark) {
+    .twinkle-dot {
+      fill: #667188;
     }
-    96% {
+  }
+
+  .twinkle-1 { animation: twinkle 6s ease-in-out infinite 0.5s; }
+  .twinkle-2 { animation: twinkle 8s ease-in-out infinite 2s; }
+  .twinkle-3 { animation: twinkle 7s ease-in-out infinite 1s; }
+  .twinkle-4 { animation: twinkle 9s ease-in-out infinite 4s; }
+  .twinkle-5 { animation: twinkle 5s ease-in-out infinite 3s; }
+  .twinkle-6 { animation: twinkle 8s ease-in-out infinite 0s; }
+  .twinkle-7 { animation: twinkle 6s ease-in-out infinite 5s; }
+  .twinkle-8 { animation: twinkle 7s ease-in-out infinite 2.5s; }
+  .twinkle-9 { animation: twinkle 9s ease-in-out infinite 6s; }
+
+  @keyframes twinkle {
+    0%, 85%, 100% {
       opacity: 0;
+    }
+    90%, 95% {
+      opacity: 1;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .twinkle {
+    .twinkle-dot {
       animation: none;
-      opacity: 1;
+      opacity: 0;
     }
   }
 </style>
