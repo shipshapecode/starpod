@@ -1,3 +1,49 @@
 <div class="absolute top-0 left-0 flex h-12 w-full justify-center p-2">
-  <div class="bg-dots-light dark:bg-dots-dark h-12 w-full bg-repeat-x"></div>
+  <div class="dots-container h-12 w-full">
+    <div class="bg-dots-light dark:bg-dots-dark dot-layer dot-layer-1 h-full w-full bg-repeat-x"></div>
+    <div class="bg-dots-light dark:bg-dots-dark dot-layer dot-layer-2 h-full w-full bg-repeat-x"></div>
+    <div class="bg-dots-light dark:bg-dots-dark dot-layer dot-layer-3 h-full w-full bg-repeat-x"></div>
+  </div>
 </div>
+
+<style>
+  .dots-container {
+    position: relative;
+  }
+
+  .dot-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .dot-layer-1 {
+    animation: sparkle 4s ease-in-out infinite;
+  }
+
+  .dot-layer-2 {
+    animation: sparkle 4s ease-in-out infinite 1.3s;
+    background-position-x: 5px;
+  }
+
+  .dot-layer-3 {
+    animation: sparkle 4s ease-in-out infinite 2.6s;
+    background-position-x: 10px;
+  }
+
+  @keyframes sparkle {
+    0%, 100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot-layer {
+      animation: none;
+      opacity: 0.7;
+    }
+  }
+</style>
