@@ -1,3 +1,4 @@
+import type { JSX } from 'preact/jsx-runtime';
 import { useEffect, useState, useRef, useCallback } from 'preact/hooks';
 import { isSearchOpen } from './state';
 
@@ -115,7 +116,7 @@ export default function SearchDialog() {
   }, [selectedIndex]);
 
   // Handle backdrop click
-  const handleBackdropClick = (e: MouseEvent) => {
+  const handleBackdropClick = (e: JSX.TargetedMouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       isSearchOpen.value = false;
     }
@@ -236,7 +237,10 @@ export default function SearchDialog() {
               <span>to select</span>
             </span>
           </div>
-          <span>{filteredEpisodes.length} results</span>
+          <span>
+            {filteredEpisodes.length}{' '}
+            {filteredEpisodes.length === 1 ? 'result' : 'results'}
+          </span>
         </div>
       </div>
     </div>
