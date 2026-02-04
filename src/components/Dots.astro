@@ -1,94 +1,25 @@
 <div class="absolute top-0 left-0 flex h-12 w-full justify-center p-2">
-  <div class="dots-container h-12 w-full">
-    <div class="bg-dots-light dark:bg-dots-dark dot-layer dot-layer-1 h-full w-full bg-repeat-x"></div>
-    <div class="bg-dots-light dark:bg-dots-dark dot-layer dot-layer-2 h-full w-full bg-repeat-x"></div>
-    <div class="bg-dots-light dark:bg-dots-dark dot-layer dot-layer-3 h-full w-full bg-repeat-x"></div>
-  </div>
+  <div class="bg-dots-light dark:bg-dots-dark twinkle h-12 w-full bg-repeat-x"></div>
 </div>
 
 <style>
-  .dots-container {
-    position: relative;
+  .twinkle {
+    animation: twinkle 8s ease-in-out infinite;
   }
 
-  .dot-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  .dot-layer-1 {
-    animation: glimmer1 7s ease-in-out infinite;
-  }
-
-  .dot-layer-2 {
-    animation: glimmer2 11s ease-in-out infinite 2s;
-    background-position-x: 13px;
-  }
-
-  .dot-layer-3 {
-    animation: glimmer3 13s ease-in-out infinite 5s;
-    background-position-x: 27px;
-  }
-
-  @keyframes glimmer1 {
-    0%, 100% {
-      opacity: 0.3;
-    }
-    15% {
-      opacity: 0.8;
-    }
-    40% {
-      opacity: 0.5;
-    }
-    70% {
+  @keyframes twinkle {
+    0%, 92%, 100% {
       opacity: 1;
     }
-    85% {
-      opacity: 0.4;
-    }
-  }
-
-  @keyframes glimmer2 {
-    0%, 100% {
-      opacity: 0.5;
-    }
-    20% {
-      opacity: 0.9;
-    }
-    35% {
-      opacity: 0.3;
-    }
-    60% {
-      opacity: 0.7;
-    }
-    80% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes glimmer3 {
-    0%, 100% {
-      opacity: 0.4;
-    }
-    10% {
-      opacity: 0.7;
-    }
-    30% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.3;
-    }
-    75% {
-      opacity: 0.8;
+    96% {
+      opacity: 0;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .dot-layer {
+    .twinkle {
       animation: none;
-      opacity: 0.7;
+      opacity: 1;
     }
   }
 </style>
