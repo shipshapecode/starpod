@@ -1,6 +1,7 @@
 ---
 import FormattedDate from '../components/FormattedDate';
 import FullPlayButton from '../components/FullPlayButton';
+import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
 import type { Episode, Show } from '../lib/rss';
 import { dasherize } from '../utils/dasherize';
 
@@ -14,9 +15,15 @@ const { episodes, show } = Astro.props;
 
 {
   episodes.length === 0 ? (
-    <p class="py-12 text-center text-lg">
-      No episodes yet. Check back soon!
-    </p>
+    <div class="flex flex-col items-center">
+      <div class="h-auto w-full max-w-80">
+        <UFOIllustration />
+      </div>
+
+      <p class="text-light-text-heading py-10 text-lg font-bold dark:text-white">
+        No episodes yet. Check back soon!
+      </p>
+    </div>
   ) : (
     <ul aria-label="EpisodeList">
       {episodes.map((episode) => {
