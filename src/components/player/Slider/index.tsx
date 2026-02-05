@@ -3,7 +3,7 @@ import './styles.css';
 
 type Props = {
   audioPlayer: MutableRef<HTMLAudioElement | null>;
-  progress: number;
+  currentTime: number;
 };
 
 function parseTime(seconds: number) {
@@ -23,11 +23,10 @@ function formatTime(seconds: Array<number>, totalSeconds = seconds) {
     .join(':');
 }
 
-export default function Slider({ audioPlayer, progress }: Props) {
-  let currentTime = parseTime(
-    Math.floor(audioPlayer.current?.currentTime ?? 0)
-  );
-  let totalTime = parseTime(Math.floor(audioPlayer.current?.duration ?? 0));
+export default function Slider({ audioPlayer, currentTime }: Props) {
+  let currentTimeFormatted = parseTime(Math.floor(currentTime));
+  let duration = Math.floor(audioPlayer.current?.duration ?? 0);
+  let totalTime = parseTime(duration);
 
   return (
     <div class="absolute inset-x-0 bottom-full flex flex-auto touch-none items-center gap-6 md:relative">
@@ -36,20 +35,16 @@ export default function Slider({ audioPlayer, progress }: Props) {
         role="slider"
         aria-label="audio timeline"
         aria-valuemin={0}
-        aria-valuemax={Math.floor(audioPlayer.current?.duration ?? 0)}
-        aria-valuenow={Math.floor(audioPlayer.current?.currentTime ?? 0)}
-        aria-valuetext={`${Math.floor(
-          audioPlayer.current?.currentTime ?? 0
-        )} seconds`}
+        aria-valuemax={duration}
+        aria-valuenow={Math.floor(currentTime)}
+        aria-valuetext={`${Math.floor(currentTime)} seconds`}
         class="slider group"
         type="range"
-        max="100"
-        value={progress}
+        max={duration}
+        value={Math.floor(currentTime)}
         onInput={(e: InputEvent) => {
           if (audioPlayer?.current) {
-            const value =
-              (Number((e.target as HTMLInputElement).value) / 100) *
-              audioPlayer.current.duration;
+            const value = Number((e.target as HTMLInputElement).value);
             audioPlayer.current.currentTime = value;
           }
         }}
@@ -62,7 +57,7 @@ export default function Slider({ audioPlayer, progress }: Props) {
         <div className="col-start-1 row-start-1 h-1 w-1 rounded-full"></div>
       </div>
       <span class="hidden text-sm text-nowrap tabular-nums md:inline-block">
-        {formatTime(currentTime, totalTime)} / {formatTime(totalTime)}
+        {formatTime(currentTimeFormatted, totalTime)} / {formatTime(totalTime)}
       </span>
     </div>
   );

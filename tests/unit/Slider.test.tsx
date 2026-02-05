@@ -20,18 +20,18 @@ describe('Slider', () => {
   });
 
   it('renders slider with correct attributes', () => {
-    render(<Slider audioPlayer={audioPlayerRef} progress={33.33} />);
+    render(<Slider audioPlayer={audioPlayerRef} currentTime={60} />);
 
     const slider = screen.getByRole('slider');
     expect(slider).toBeInTheDocument();
     expect(slider).toHaveAttribute('aria-label', 'audio timeline');
     expect(slider).toHaveAttribute('aria-orientation', 'horizontal');
     expect(slider).toHaveAttribute('type', 'range');
-    expect(slider).toHaveAttribute('max', '100');
+    expect(slider).toHaveAttribute('max', '180');
   });
 
   it('displays correct aria values', () => {
-    render(<Slider audioPlayer={audioPlayerRef} progress={33.33} />);
+    render(<Slider audioPlayer={audioPlayerRef} currentTime={60} />);
 
     const slider = screen.getByRole('slider');
     expect(slider).toHaveAttribute('aria-valuemin', '0');
@@ -41,12 +41,12 @@ describe('Slider', () => {
   });
 
   it('updates current time when slider is moved', () => {
-    render(<Slider audioPlayer={audioPlayerRef} progress={33.33} />);
+    render(<Slider audioPlayer={audioPlayerRef} currentTime={60} />);
 
     const slider = screen.getByRole('slider') as HTMLInputElement;
 
-    // Simulate moving slider to 50% (90 seconds into 180 second track)
-    fireEvent.input(slider, { target: { value: '50' } });
+    // Simulate moving slider to 90 seconds
+    fireEvent.input(slider, { target: { value: '90' } });
 
     expect(mockAudioElement.currentTime).toBe(90);
   });
@@ -55,7 +55,7 @@ describe('Slider', () => {
     const nullRef = createRef();
     nullRef.current = null;
 
-    render(<Slider audioPlayer={nullRef} progress={0} />);
+    render(<Slider audioPlayer={nullRef} currentTime={0} />);
 
     const slider = screen.getByRole('slider');
     expect(slider).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('Slider', () => {
 
   it('displays time information on desktop', () => {
     const { container } = render(
-      <Slider audioPlayer={audioPlayerRef} progress={33.33} />
+      <Slider audioPlayer={audioPlayerRef} currentTime={60} />
     );
 
     // Time display should be present (but may be hidden on mobile)
@@ -79,7 +79,7 @@ describe('Slider', () => {
     mockAudioElement.duration = 0;
     mockAudioElement.currentTime = 0;
 
-    render(<Slider audioPlayer={audioPlayerRef} progress={0} />);
+    render(<Slider audioPlayer={audioPlayerRef} currentTime={0} />);
 
     const slider = screen.getByRole('slider');
     expect(slider).toHaveAttribute('aria-valuemax', '0');
@@ -92,7 +92,7 @@ describe('Slider', () => {
     mockAudioElement.duration = 7200; // 2:00:00
 
     const { container } = render(
-      <Slider audioPlayer={audioPlayerRef} progress={50.85} />
+      <Slider audioPlayer={audioPlayerRef} currentTime={3661} />
     );
 
     // Check that time is formatted correctly with hours
@@ -106,7 +106,7 @@ describe('Slider', () => {
     mockAudioElement.duration = 600; // 10:00
 
     const { container } = render(
-      <Slider audioPlayer={audioPlayerRef} progress={10.83} />
+      <Slider audioPlayer={audioPlayerRef} currentTime={65} />
     );
 
     // Check that time is formatted without unnecessary leading zeros
@@ -116,7 +116,7 @@ describe('Slider', () => {
   });
 
   it('renders particle animation elements', () => {
-    render(<Slider audioPlayer={audioPlayerRef} progress={33.33} />);
+    render(<Slider audioPlayer={audioPlayerRef} currentTime={60} />);
 
     const particles = document.querySelector('.ship-particles');
     expect(particles).toBeInTheDocument();
@@ -126,21 +126,21 @@ describe('Slider', () => {
     expect(dots).toHaveLength(5);
   });
 
-  it('calculates seek position correctly for different progress values', () => {
-    render(<Slider audioPlayer={audioPlayerRef} progress={0} />);
+  it('calculates seek position correctly for different time values', () => {
+    render(<Slider audioPlayer={audioPlayerRef} currentTime={0} />);
 
     const slider = screen.getByRole('slider') as HTMLInputElement;
 
-    // Test 0% progress
+    // Test seeking to 0 seconds
     fireEvent.input(slider, { target: { value: '0' } });
     expect(mockAudioElement.currentTime).toBe(0);
 
-    // Test 100% progress
-    fireEvent.input(slider, { target: { value: '100' } });
+    // Test seeking to 180 seconds (end of track)
+    fireEvent.input(slider, { target: { value: '180' } });
     expect(mockAudioElement.currentTime).toBe(180);
 
-    // Test 25% progress
-    fireEvent.input(slider, { target: { value: '25' } });
+    // Test seeking to 45 seconds
+    fireEvent.input(slider, { target: { value: '45' } });
     expect(mockAudioElement.currentTime).toBe(45);
   });
 });
