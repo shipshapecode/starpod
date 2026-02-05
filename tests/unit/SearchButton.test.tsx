@@ -41,8 +41,8 @@ describe('SearchButton', () => {
   it('contains search icon', () => {
     render(<SearchButton />);
 
-    const svg = screen.getByRole('button').querySelector('svg');
-    expect(svg).toBeInTheDocument();
-    expect(svg).toHaveAttribute('aria-hidden', 'true');
+    const icon = screen.getByRole('button').querySelector('.search-icon');
+    expect(icon).toBeInTheDocument();
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
   });
 });

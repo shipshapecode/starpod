@@ -134,20 +134,10 @@ export default function SearchDialog() {
       <div class="bg-light-card dark:bg-dark-card w-full max-w-xl mx-4 rounded-lg shadow-2xl border border-light-input-border dark:border-dark-border overflow-hidden">
         {/* Search Input */}
         <div class="flex items-center border-b border-light-input-border dark:border-dark-border px-4">
-          <svg
-            class="h-5 w-5 text-light-icon dark:text-dark-icon shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+          <span
+            class="search-icon h-5 w-5 text-light-icon dark:text-dark-icon shrink-0"
             aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          />
           <input
             ref={inputRef}
             type="text"
