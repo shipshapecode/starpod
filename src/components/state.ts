@@ -7,3 +7,6 @@ export const currentEpisode = signal<Pick<
 > | null>(null);
 export const isPlaying = signal(false);
 export const isMuted = signal(false);
+
+// Search state
+export const isSearchOpen = signal(false);

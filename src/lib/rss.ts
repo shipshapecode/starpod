@@ -31,6 +31,12 @@ export interface Episode {
   };
 }
 
+// Subset of Episode for search functionality
+export type SearchableEpisode = Pick<
+  Episode,
+  'id' | 'title' | 'description' | 'episodeNumber' | 'episodeSlug' | 'episodeThumbnail'
+>;
+
 let showInfoCache: Show | null = null;
 
 export async function getShowInfo() {
