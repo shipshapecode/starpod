@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
+import starpodConfig from '../../../starpod.config';
 
 export interface Props {
   hostsAndGuests: Array<{
@@ -15,7 +16,7 @@ const { hostsAndGuests } = Astro.props;
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/people/*.{jpeg,jpg,png}'
 );
-const priorityNames = ['RobbieTheWagner', 'Charles William Carpenter III', 'Adam Argyle'];
+const priorityNames = starpodConfig.hosts.map((h) => h.name);
 ---
 
 <h3 class="section-heading pb-6">Creators and Guests</h3>

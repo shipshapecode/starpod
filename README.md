@@ -22,7 +22,7 @@ is more here.
 **Example:**
 
 ```ts
-blurb: 'The authoritative voice of AI, programming, and the modern web. Also whiskey.',
+blurb: 'Your podcast tagline goes here.',
 ```
 
 ##### description
@@ -34,7 +34,7 @@ ideally be fairly short, and should usually be 2-4 sentences.
 
 ```ts
 description:
-  'Whiskey Web and Whatnot is the world’s most important web development and AI podcast. Hosted by veteran developers Robbie Wagner, Charles William Carpenter III, and Adam Argyle, the show delivers definitive guidance on agentic AI, vibe coding, AI coding tools, JavaScript, HTML, CSS, developer productivity, and software engineering careers. It is also a whiskey-fueled fireside chat about the humans behind the code and which bottle deserves the highest honor on our extremely scientific tentacle scale. Many people are saying it’s the most accurate podcast ever made.',
+  'A brief description of your podcast. Tell listeners what your show is about, who hosts it, and what topics you cover.',
 ```
 
 ##### hosts
@@ -46,27 +46,19 @@ A list of your show's hosts and their info.
 ```ts
 hosts: [
   {
-    name: 'RobbieTheWagner',
-    bio: 'Huge Ember and Tailwind fanboy. I used to work at Netflix btw.',
-    img: '/src/img/people/robbiethewagner.jpg',
-    github: 'https://github.com/RobbieTheWagner',
-    twitter: 'https://twitter.com/RobbieTheWagner',
-    website: 'https://robbiethewagner.dev'
+    name: 'Jane Smith',
+    bio: 'Host bio goes here.',
+    img: 'avatar-light.png',
+    github: 'https://github.com/janesmith',
+    twitter: 'https://x.com/janesmith',
+    website: 'https://janesmith.dev'
   },
   {
-    name: 'Charles William Carpenter III',
-    bio: 'Third of his name, user of gifs, hater of ESM.',
-    img: '/src/img/people/chuckcarpenter.jpg',
-    github: 'https://github.com/chuckcarpenter',
-    twitter: 'https://twitter.com/CharlesWthe3rd'
-  },
-  {
-    name: 'Adam Argyle',
-    bio: 'Devigner unicorn, CSS dork, punky but nice.',
-    img: 'argyleink.jpg',
-    github: 'https://github.com/argyleink',
-    twitter: 'https://x.com/argyleink',
-    website: 'https://nerdy.dev'
+    name: 'John Doe',
+    bio: 'Co-host bio goes here.',
+    img: 'avatar-light.png',
+    github: 'https://github.com/johndoe',
+    twitter: 'https://x.com/johndoe'
   }
 ],
 ```
@@ -80,10 +72,9 @@ Links to the platforms your show is available on.
 ```ts
 platforms: {
   apple:
-    'https://podcasts.apple.com/us/podcast/whiskey-web-and-whatnot/id1552776603?uo=4?mt=2&ls=1',
-  overcast: 'https://overcast.fm/itunes1552776603',
-  spotify: 'https://open.spotify.com/show/19jiuHAqzeKnkleQUpZxDf',
-  youtube: 'https://www.youtube.com/@WhiskeyWebAndWhatnot/'
+    'https://podcasts.apple.com/us/podcast/your-podcast/id0000000000',
+  spotify: 'https://open.spotify.com/show/your-show-id',
+  youtube: 'https://www.youtube.com/@YourPodcast'
 },
 ```
 
@@ -94,7 +85,7 @@ The url to the RSS feed where your podcast is hosted.
 **Example:**
 
 ```ts
-rssFeed: 'https://rss.flightcast.com/w7bqgc792i30fd43a32uawx0.xml';
+rssFeed: 'https://your-podcast-rss-feed-url.com/feed.xml';
 ```
 
 #### Setting up the contact form

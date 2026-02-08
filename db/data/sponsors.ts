@@ -1,14 +1,8 @@
 export default [
   {
-    id: 'code-rabbit',
-    name: 'CodeRabbit',
-    img: 'code-rabbit.svg',
-    url: 'http://coderabbit.link/whiskey'
-  },
-  {
-    id: 'norlan',
-    name: 'Norlan',
+    id: 'example-sponsor',
+    name: 'Example Sponsor',
     img: 'norlan.svg',
-    url: 'https://norlanglass.com/'
+    url: 'https://example.com'
   }
 ];

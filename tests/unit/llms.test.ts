@@ -70,10 +70,10 @@ describe('LLM Utilities', () => {
 
     it('preserves speaker labels', () => {
       const input =
-        '**Robbie Wagner:** [00:34] Hello\n**Chuck Carpenter:** [01:23] Hi there';
+        '**Jane Smith:** [00:34] Hello\n**John Doe:** [01:23] Hi there';
       const result = cleanTranscript(input);
-      expect(result).toContain('**Robbie Wagner:**');
-      expect(result).toContain('**Chuck Carpenter:**');
+      expect(result).toContain('**Jane Smith:**');
+      expect(result).toContain('**John Doe:**');
     });
 
     it('removes extra whitespace while preserving paragraphs', () => {

@@ -9,6 +9,7 @@ import {
 } from 'astro:db';
 
 import { getAllEpisodes } from '../src/lib/rss';
+import starpodConfig from '../starpod.config';
 import people from './data/people';
 import peoplePerEpisode from './data/people-per-episode';
 import sponsors from './data/sponsors';
@@ -55,9 +56,12 @@ export default async function seed() {
           isHost:
             person.host !== undefined
               ? Boolean(person.host)
-              : ['argyleink', 'chuckcarpenter', 'robbiethewagner'].includes(
-                  person.id
-                ),
+              : people
+                  .filter((p) =>
+                    starpodConfig.hosts.some((h) => h.name === p.name)
+                  )
+                  .map((p) => p.id)
+                  .includes(person.id),
           personId: person.id
         });
       }
