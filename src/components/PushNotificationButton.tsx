@@ -147,7 +147,15 @@ export default function PushNotificationButton({
   return (
     <button
       onClick={handleClick}
-      class="flex items-center justify-center text-light-text-body transition-colors hover:text-light-text-heading dark:text-dark-text-body dark:hover:text-white"
+      class={`gradient-icon h-6 w-6 transition-all ${
+        isSubscribed.value ? 'opacity-100' : 'opacity-60'
+      }`}
+      style={{
+        maskImage: 'url(/images/bell.svg)',
+        maskSize: 'contain',
+        maskRepeat: 'no-repeat',
+        maskPosition: 'center'
+      }}
       aria-label={
         isSubscribed.value
           ? 'Disable push notifications'
@@ -158,21 +166,6 @@ export default function PushNotificationButton({
           ? 'Disable push notifications'
           : 'Enable push notifications'
       }
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill={isSubscribed.value ? 'currentColor' : 'none'}
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="h-6 w-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
-        />
-      </svg>
-    </button>
+    />
   );
 }
