@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/preact';
+import { render, screen, waitFor } from '@testing-library/preact';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PushNotificationButton from '../../src/components/PushNotificationButton';
 import {
