@@ -17,24 +17,39 @@ self.addEventListener('push', (event) => {
     body: 'A new episode is now available!',
     icon: '/android-chrome-192x192.png',
     badge: '/favicon-32x32.png',
-    tag: 'new-episode'
+    tag: 'new-episode',
+    image: undefined,
+    url: '/'
   };
 
   if (event.data) {
     try {
-      data = event.data.json();
+      const pushData = event.data.json();
+      // Merge received data with defaults
+      data = { ...data, ...pushData };
     } catch (e) {
       console.error('Error parsing push data:', e);
     }
   }
 
-  const promiseChain = self.registration.showNotification(data.title, {
+  const notificationOptions = {
     body: data.body,
     icon: data.icon,
     badge: data.badge,
     tag: data.tag,
-    data: data
-  });
+    data: { url: data.url },
+    requireInteraction: false
+  };
+
+  // Add image if provided (episode art)
+  if (data.image) {
+    notificationOptions.image = data.image;
+  }
+
+  const promiseChain = self.registration.showNotification(
+    data.title,
+    notificationOptions
+  );
 
   event.waitUntil(promiseChain);
 });

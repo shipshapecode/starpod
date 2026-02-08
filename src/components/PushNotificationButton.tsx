@@ -69,6 +69,9 @@ export default function PushNotificationButton() {
         // This will enable triggering notifications when new episodes are published
         // Example: await fetch('/api/subscribe', { method: 'POST', body: JSON.stringify(subscription) })
         console.log('Push subscription created (not yet sent to server)');
+
+        // Send welcome notification
+        await sendWelcomeNotification(registration);
       }
     } catch (error) {
       console.error('Error subscribing to push notifications:', error);
@@ -95,6 +98,26 @@ export default function PushNotificationButton() {
     }
   }
 
+  // Send welcome notification after subscription
+  async function sendWelcomeNotification(
+    registration: ServiceWorkerRegistration
+  ) {
+    try {
+      await registration.showNotification('Welcome to Whiskey Web and Whatnot!', {
+        body: "You're all set! We'll notify you when new episodes are published.",
+        icon: '/android-chrome-192x192.png',
+        badge: '/favicon-32x32.png',
+        tag: 'welcome',
+        requireInteraction: false,
+        data: {
+          url: '/'
+        }
+      });
+    } catch (error) {
+      console.error('Error showing welcome notification:', error);
+    }
+  }
+
   // Helper function to convert VAPID key
   function urlBase64ToUint8Array(base64String: string) {
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -118,7 +141,7 @@ export default function PushNotificationButton() {
   return (
     <button
       onClick={handleClick}
-      class="flex items-center justify-center p-3 text-light-text-body transition-colors hover:text-light-text-heading dark:text-dark-text-body dark:hover:text-white"
+      class="flex items-center justify-center text-light-text-body transition-colors hover:text-light-text-heading dark:text-dark-text-body dark:hover:text-white"
       aria-label={
         isSubscribed.value
           ? 'Disable push notifications'

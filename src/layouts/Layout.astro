@@ -11,7 +11,6 @@ import Hosts from '../components/Hosts.astro';
 import InfoCard from '../components/InfoCard.astro';
 import Platforms from '../components/Platforms.astro';
 import Player from '../components/Player';
-import PushNotificationButton from '../components/PushNotificationButton';
 import ShowArtwork from '../components/ShowArtwork.astro';
 
 import { getShowInfo } from '../lib/rss';
@@ -159,12 +158,6 @@ const description = Astro.props.description ?? starpodConfig.description;
 
         <div class="hidden lg:block">
           <InfoCard />
-        </div>
-
-        <div class="hidden lg:block">
-          <div class="m-2 mt-0">
-            <PushNotificationButton client:only="preact" />
-          </div>
         </div>
       </div>
     </header>

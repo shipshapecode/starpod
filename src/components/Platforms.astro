@@ -1,4 +1,5 @@
 ---
+import PushNotificationButton from './PushNotificationButton';
 import starpodConfig from '../../starpod.config';
 import { getShowInfo } from '../lib/rss';
 
@@ -12,6 +13,7 @@ const show = await getShowInfo();
 <div
   class="mt-16 flex items-center justify-center gap-6 lg:mt-0 lg:justify-start"
 >
+  <PushNotificationButton client:only="preact" />
   {
     platforms?.spotify && (
       <a
