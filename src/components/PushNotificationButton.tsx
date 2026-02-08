@@ -4,7 +4,13 @@ import {
   isSubscribed
 } from './notificationState';
 
-export default function PushNotificationButton() {
+interface PushNotificationButtonProps {
+  showTitle?: string;
+}
+
+export default function PushNotificationButton({
+  showTitle = 'Whiskey Web and Whatnot'
+}: PushNotificationButtonProps) {
   const [isSupported, setIsSupported] = useState(false);
 
   useEffect(() => {
@@ -103,7 +109,7 @@ export default function PushNotificationButton() {
     registration: ServiceWorkerRegistration
   ) {
     try {
-      await registration.showNotification('Welcome to Whiskey Web and Whatnot!', {
+      await registration.showNotification(`Welcome to ${showTitle}!`, {
         body: "You're all set! We'll notify you when new episodes are published.",
         icon: '/android-chrome-192x192.png',
         badge: '/favicon-32x32.png',

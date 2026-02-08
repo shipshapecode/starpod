@@ -18,7 +18,6 @@ self.addEventListener('push', (event) => {
     icon: '/android-chrome-192x192.png',
     badge: '/favicon-32x32.png',
     tag: 'new-episode',
-    image: undefined,
     url: '/'
   };
 
