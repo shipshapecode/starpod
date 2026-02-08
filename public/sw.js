@@ -45,7 +45,10 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
   // Navigate to the episode or homepage
-  const urlToOpen = event.notification.data?.url || '/';
+  const urlToOpen = new URL(
+    event.notification.data?.url || '/',
+    self.location.origin
+  ).href;
 
   event.waitUntil(
     self.clients
@@ -53,7 +56,9 @@ self.addEventListener('notificationclick', (event) => {
       .then((clientList) => {
         // Check if a window is already open
         for (const client of clientList) {
-          if (client.url === urlToOpen && 'focus' in client) {
+          const clientPath = new URL(client.url).pathname;
+          const targetPath = new URL(urlToOpen).pathname;
+          if (clientPath === targetPath && 'focus' in client) {
             return client.focus();
           }
         }

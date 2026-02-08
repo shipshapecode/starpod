@@ -52,19 +52,23 @@ export default function PushNotificationButton() {
         const registration = await navigator.serviceWorker.register('/sw.js');
         await registration.update();
 
+        // TODO: Configure VAPID key via environment variable in production
+        // For now, using a placeholder VAPID key for demonstration
+        const vapidKey =
+          'BEl62iUYgUivxIkv69yViEuiBIa-Ib37J8xQmrPcBKKk6qzqsXBBEDdHDz_D8LViZvZOGSIcjKPi0xhS3IkmJnw';
+
         // Subscribe to push notifications
         const subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(
-            // Using a public VAPID key - in production, this should be configured
-            'BEl62iUYgUivxIkv69yViEuiBIa-Ib37J8xQmrPcBKKk6qzqsXBBEDdHDz_D8LViZvZOGSIcjKPi0xhS3IkmJnw'
-          )
+          applicationServerKey: urlBase64ToUint8Array(vapidKey)
         });
 
         isSubscribed.value = true;
 
-        // In a real app, send subscription to your server
-        console.log('Push subscription:', subscription);
+        // TODO: Send subscription to server endpoint for storing
+        // This will enable triggering notifications when new episodes are published
+        // Example: await fetch('/api/subscribe', { method: 'POST', body: JSON.stringify(subscription) })
+        console.log('Push subscription created (not yet sent to server)');
       }
     } catch (error) {
       console.error('Error subscribing to push notifications:', error);
@@ -81,7 +85,8 @@ export default function PushNotificationButton() {
         await subscription.unsubscribe();
         isSubscribed.value = false;
 
-        // In a real app, notify your server to remove this subscription
+        // TODO: Notify server to remove this subscription from the database
+        // Example: await fetch('/api/unsubscribe', { method: 'POST', body: JSON.stringify({ endpoint: subscription.endpoint }) })
         console.log('Unsubscribed from push notifications');
       }
     } catch (error) {
