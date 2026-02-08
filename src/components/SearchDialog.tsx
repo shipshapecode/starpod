@@ -1,14 +1,12 @@
 import type { JSX } from 'preact/jsx-runtime';
 import { useEffect, useState, useRef, useCallback } from 'preact/hooks';
 import { isSearchOpen } from './state';
-import type { SearchableEpisode } from '../lib/rss';
+import type { Episode } from '../lib/rss';
 
 export default function SearchDialog() {
   const [query, setQuery] = useState('');
-  const [episodes, setEpisodes] = useState<SearchableEpisode[]>([]);
-  const [filteredEpisodes, setFilteredEpisodes] = useState<SearchableEpisode[]>(
-    []
-  );
+  const [episodes, setEpisodes] = useState<Episode[]>([]);
+  const [filteredEpisodes, setFilteredEpisodes] = useState<Episode[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
