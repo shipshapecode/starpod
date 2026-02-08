@@ -169,3 +169,32 @@ your `starpod.config.ts` and RSS feed:
 - `/{episode-number}.html.md` - Alternative episode URL
 
 No configuration needed - it just works!
+
+### Push Notifications
+
+Starpod includes support for native web push notifications to alert subscribers when new episodes are published. A bell icon button appears at the bottom left of the main sidebar (on desktop/larger screens) when the browser supports push notifications.
+
+#### How It Works
+
+- **Enable Notifications**: Click the bell icon to request permission and subscribe to push notifications
+- **Disable Notifications**: Click the bell icon again (when enabled) to unsubscribe after confirming
+- **Visual Feedback**: The bell icon fills when notifications are enabled, and shows outlined when disabled
+- **Browser Support**: The button only appears if the browser supports the Web Push API and Service Workers
+
+#### Implementation Notes
+
+The current implementation includes:
+- Client-side subscription management using the Push API
+- Service worker for receiving and displaying notifications (`public/sw.js`)
+- Persistent state using Preact signals
+
+**TODO for Production Use:**
+1. Configure a VAPID key pair for your application (currently uses a placeholder)
+2. Implement server-side API endpoints to:
+   - Store push subscriptions when users enable notifications
+   - Remove subscriptions when users disable notifications
+   - Trigger push notifications when new episodes are published
+3. Set up a backend service to monitor your RSS feed and send notifications
+
+See `src/components/PushNotificationButton.tsx` for TODOs and implementation details.
+
