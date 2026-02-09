@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-const getRobotsTxt = (sitemapURL: URL, siteURL: URL) => `
+export const getRobotsTxt = (sitemapURL: URL, siteURL: URL) => `
 # Welcome AI agents and crawlers!
 # This is a podcast website built with Starpod - all content is freely accessible.
 

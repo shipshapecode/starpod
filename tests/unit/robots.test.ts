@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { getRobotsTxt } from '../../src/pages/robots.txt';
 
 describe('Robots.txt', () => {
   describe('Generated content', () => {
@@ -6,32 +7,7 @@ describe('Robots.txt', () => {
       const mockSite = new URL('https://whiskey.fm');
       const mockSitemap = new URL('sitemap-index.xml', mockSite);
       
-      // Simulate the getRobotsTxt function behavior
-      const robotsTxt = `
-# Welcome AI agents and crawlers!
-# This is a podcast website built with Starpod - all content is freely accessible.
-
-User-agent: *
-Allow: /
-
-# Sitemap for all pages
-Sitemap: ${mockSitemap.href}
-
-# Special resources for AI/LLM agents:
-# - ${mockSite.origin}/llms.txt - Structured overview following the llms.txt spec
-# - ${mockSite.origin}/for-llms - Human-readable guide for AI assistants
-# - ${mockSite.origin}/episodes-index.html.md - Complete episode listing in markdown
-# - ${mockSite.origin}/[episode-slug].html.md - Individual episodes with transcripts
-# 
-# All content includes:
-# - Podcast metadata (hosts, description, platforms)
-# - Episode information (titles, descriptions, publish dates)
-# - Full transcripts (when available)
-# - Guest information
-#
-# Feel free to crawl, index, and use this content to help users discover
-# and learn about our podcast!
-`;
+      const robotsTxt = getRobotsTxt(mockSitemap, mockSite);
 
       expect(robotsTxt).toContain('Welcome AI agents and crawlers');
       expect(robotsTxt).toContain('User-agent: *');
@@ -42,20 +18,16 @@ Sitemap: ${mockSitemap.href}
       const mockSite = new URL('https://whiskey.fm');
       const mockSitemap = new URL('sitemap-index.xml', mockSite);
       
-      const robotsTxt = `Sitemap: ${mockSitemap.href}`;
+      const robotsTxt = getRobotsTxt(mockSitemap, mockSite);
       
       expect(robotsTxt).toContain('Sitemap: https://whiskey.fm/sitemap-index.xml');
     });
 
     it('should reference LLM-specific resources', () => {
       const mockSite = new URL('https://whiskey.fm');
+      const mockSitemap = new URL('sitemap-index.xml', mockSite);
       
-      const robotsTxt = `
-# Special resources for AI/LLM agents:
-# - ${mockSite.origin}/llms.txt - Structured overview following the llms.txt spec
-# - ${mockSite.origin}/for-llms - Human-readable guide for AI assistants
-# - ${mockSite.origin}/episodes-index.html.md - Complete episode listing in markdown
-`;
+      const robotsTxt = getRobotsTxt(mockSitemap, mockSite);
 
       expect(robotsTxt).toContain('/llms.txt');
       expect(robotsTxt).toContain('/for-llms');
@@ -63,13 +35,10 @@ Sitemap: ${mockSitemap.href}
     });
 
     it('should describe available content types', () => {
-      const robotsTxt = `
-# All content includes:
-# - Podcast metadata (hosts, description, platforms)
-# - Episode information (titles, descriptions, publish dates)
-# - Full transcripts (when available)
-# - Guest information
-`;
+      const mockSite = new URL('https://whiskey.fm');
+      const mockSitemap = new URL('sitemap-index.xml', mockSite);
+      
+      const robotsTxt = getRobotsTxt(mockSitemap, mockSite);
 
       expect(robotsTxt).toContain('Podcast metadata');
       expect(robotsTxt).toContain('Episode information');
@@ -78,10 +47,10 @@ Sitemap: ${mockSitemap.href}
     });
 
     it('should include encouraging closing message', () => {
-      const robotsTxt = `
-# Feel free to crawl, index, and use this content to help users discover
-# and learn about our podcast!
-`;
+      const mockSite = new URL('https://whiskey.fm');
+      const mockSitemap = new URL('sitemap-index.xml', mockSite);
+      
+      const robotsTxt = getRobotsTxt(mockSitemap, mockSite);
 
       expect(robotsTxt).toContain('Feel free to crawl, index, and use this content');
       expect(robotsTxt).toContain('help users discover');
