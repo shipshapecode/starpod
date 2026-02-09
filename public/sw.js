@@ -1,16 +1,32 @@
 // Service Worker for Push Notifications
+
+// Helper for conditional logging in development
+const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
+function devLog(...args) {
+  if (isDev) {
+    console.log(...args);
+  }
+}
+
+function devError(...args) {
+  if (isDev) {
+    console.error(...args);
+  }
+}
+
 self.addEventListener('install', () => {
-  console.log('Service Worker installing.');
+  devLog('Service Worker installing.');
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker activating.');
+  devLog('Service Worker activating.');
   event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener('push', (event) => {
-  console.log('Push notification received:', event);
+  devLog('Push notification received:', event);
 
   let data = {
     title: 'New Whiskey Web and Whatnot Episode',
@@ -27,7 +43,7 @@ self.addEventListener('push', (event) => {
       // Merge received data with defaults
       data = { ...data, ...pushData };
     } catch (e) {
-      console.error('Error parsing push data:', e);
+      devError('Error parsing push data:', e);
     }
   }
 
@@ -54,7 +70,7 @@ self.addEventListener('push', (event) => {
 });
 
 self.addEventListener('notificationclick', (event) => {
-  console.log('Notification clicked:', event);
+  devLog('Notification clicked:', event);
 
   event.notification.close();
 
