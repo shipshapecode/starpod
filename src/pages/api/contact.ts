@@ -18,34 +18,34 @@ export const POST: APIRoute = async ({ request }) => {
     );
   }
 
-  await fetch(import.meta.env.SLACK_WEBHOOK, {
+  await fetch(import.meta.env.DISCORD_WEBHOOK, {
     method: 'POST',
     headers: {
-      Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      blocks: [
+      embeds: [
         {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: `*Name:* ${name}`
-          }
-        },
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: `*Email:* ${email}`
-          }
-        },
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: `*Message:* ${message}`
-          }
+          title: 'New Contact Form Submission',
+          color: 0x5865f2,
+          fields: [
+            {
+              name: 'Name',
+              value: String(name),
+              inline: true
+            },
+            {
+              name: 'Email',
+              value: String(email),
+              inline: true
+            },
+            {
+              name: 'Message',
+              value: String(message),
+              inline: false
+            }
+          ],
+          timestamp: new Date().toISOString()
         }
       ]
     })

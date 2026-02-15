@@ -100,8 +100,8 @@ rssFeed: 'https://rss.flightcast.com/w7bqgc792i30fd43a32uawx0.xml';
 #### Setting up the contact form
 
 The contact form hits an APIRoute at `/api/contact`. It is currently configured
-to send the form data to a Slack channel webhook I had setup. It reads the url
-from `import.meta.env.SLACK_WEBHOOK`, so if you define a `SLACK_WEBHOOK`
+to send the form data to a Discord channel webhook. It reads the url from
+`import.meta.env.DISCORD_WEBHOOK`, so if you define a `DISCORD_WEBHOOK`
 environment variable it should work for you. Of course, feel free to customize
 the code [here](./src/pages/api/contact.ts) to send the data elsewhere as you
 see fit.
