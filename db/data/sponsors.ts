@@ -1,5 +1,11 @@
 export default [
   {
+    id: 'cascadiajs',
+    name: 'CascadiaJS',
+    img: 'cascadiajs.svg',
+    url: 'https://cascadiajs.com'
+  },
+  {
     id: 'code-rabbit',
     name: 'CodeRabbit',
     img: 'code-rabbit.svg',

@@ -1,4 +1,8 @@
 export default {
+  // 232
+  'we-fired-the-tools-no-ralph-wiggum-no-training-wheels-just-agents': [
+    { id: 'cascadiajs' }
+  ],
   // 230
   'we-accidentally-deleted-programming-presented-by-coderabbit': [
     { id: 'code-rabbit' }
