@@ -37,6 +37,9 @@ test('works with episode numbers', async ({ page }) => {
 
   const twitterImage = page.locator('meta[name="twitter:image:src"]');
   await expect(twitterImage).toHaveAttribute('content', episode1.image);
+
+  const twitterCard = page.locator('meta[name="twitter:card"]');
+  await expect(twitterCard).toHaveAttribute('content', 'summary_large_image');
 });
 
 test('works with episode slugs', async ({ page }) => {

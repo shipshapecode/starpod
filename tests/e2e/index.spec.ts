@@ -34,6 +34,9 @@ test('index page has correct meta', async ({ page }) => {
     `/_image?href=${encodeURIComponent(indexMeta.image)}&w=640&q=75`
   );
 
+  const twitterCard = page.locator('meta[name="twitter:card"]');
+  await expect(twitterCard).toHaveAttribute('content', 'summary_large_image');
+
   const firstEpisodeThumbnail = page.locator(
     '[aria-label="EpisodeList"] li:first-of-type > div > img'
   );
@@ -41,4 +44,11 @@ test('index page has correct meta', async ({ page }) => {
     'src',
     RegExp('^/_image[?]href=.*w=160&q=75$')
   );
+  await expect(firstEpisodeThumbnail).toHaveAttribute('loading', 'eager');
+  await expect(firstEpisodeThumbnail).toHaveAttribute('fetchpriority', 'high');
+
+  const secondEpisodeThumbnail = page.locator(
+    '[aria-label="EpisodeList"] li:nth-of-type(2) > div > img'
+  );
+  await expect(secondEpisodeThumbnail).toHaveAttribute('loading', 'lazy');
 });
