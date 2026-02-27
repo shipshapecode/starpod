@@ -10,6 +10,7 @@
   "scripts": {
     "astro": "astro",
     "build": "astro check && astro build --remote",
+    "check:no-db": "astro check --config astro.config.no-db.mjs --tsconfig tsconfig.no-db.json",
     "db:seed": "pnpm astro db execute db/seed.ts --remote",
     "dev": "astro dev",
     "lint": "eslint . --cache",
@@ -18,6 +19,8 @@
     "start": "astro dev",
     "test": "concurrently \"pnpm:test:*(!fix)\" --names \"test:\"",
     "test:e2e": "pnpm exec playwright test",
+    "test:e2e:with-db": "pnpm exec playwright test --project=chromium-with-db",
+    "test:e2e:no-db": "pnpm exec playwright test --project=chromium-no-db",
     "test:unit": "vitest"
   },
   "dependencies": {

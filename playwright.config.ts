@@ -33,18 +33,30 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      name: 'chromium-with-db',
+      use: { ...devices['Desktop Chrome'] },
+      testDir: './tests/e2e'
     },
 
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] }
+      name: 'firefox-with-db',
+      use: { ...devices['Desktop Firefox'] },
+      testDir: './tests/e2e'
     },
 
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] }
+      name: 'webkit-with-db',
+      use: { ...devices['Desktop Safari'] },
+      testDir: './tests/e2e'
+    },
+
+    {
+      name: 'chromium-no-db',
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:4322'
+      },
+      testDir: './tests/e2e-no-db'
     }
 
     /* Test against mobile viewports. */
@@ -69,9 +81,16 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'pnpm dev',
-    url: 'http://localhost:4321',
-    reuseExistingServer: !process.env.CI
-  }
+  webServer: [
+    {
+      command: 'pnpm dev',
+      url: 'http://localhost:4321',
+      reuseExistingServer: !process.env.CI
+    },
+    {
+      command: 'pnpm astro dev --config astro.config.no-db.mjs --port 4322',
+      url: 'http://localhost:4322',
+      reuseExistingServer: !process.env.CI
+    }
+  ]
 });
