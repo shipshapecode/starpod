@@ -169,3 +169,58 @@ your `starpod.config.ts` and RSS feed:
 - `/{episode-number}.html.md` - Alternative episode URL
 
 No configuration needed - it just works!
+
+### Push Notifications
+
+Starpod includes support for native web push notifications to alert subscribers when new episodes are published. The bell icon button appears as the first icon in the "Listen" platforms list when the browser supports push notifications.
+
+#### How It Works
+
+- **Enable Notifications**: Click the bell icon to request permission and subscribe to push notifications
+- **Welcome Message**: Immediately receive a welcome notification with the show logo confirming your subscription
+- **Disable Notifications**: Click the bell icon again (when enabled) to unsubscribe after confirming
+- **Visual Feedback**: The bell icon fills when notifications are enabled, and shows outlined when disabled
+- **Rich Notifications**: Episode notifications include episode artwork, full title, and description
+- **Browser Support**: The button only appears if the browser supports the Web Push API and Service Workers
+
+#### Features
+
+- **Welcome notification** with brand logo when user subscribes
+- **Episode artwork** displayed in push notifications
+- **Detailed episode information** including title and description
+- **Integrated design** - bell icon is first in the platforms list
+- **Stateful behavior** - visual feedback for subscription status
+
+#### Implementation Notes
+
+The current implementation includes:
+- Client-side subscription management using the Push API
+- Service worker for receiving and displaying notifications (`public/sw.js`)
+- Persistent state using Preact signals
+- Welcome notification shown immediately after subscription
+- Support for episode artwork and detailed content in notifications
+
+**TODO for Production Use:**
+1. Configure a VAPID key pair for your application (currently uses a placeholder)
+2. Implement server-side API endpoints to:
+   - Store push subscriptions when users enable notifications
+   - Remove subscriptions when users disable notifications
+   - Trigger push notifications when new episodes are published
+3. Set up a backend service to monitor your RSS feed and send notifications with episode data
+
+When sending episode notifications from your server, include:
+```javascript
+{
+  title: "New Episode: Episode Title",
+  body: "Episode description...",
+  icon: "/android-chrome-192x192.png",  // Brand logo
+  badge: "/favicon-32x32.png",
+  image: "https://cdn.example.com/episode-art.jpg",  // Episode artwork
+  url: "/episode-slug",  // Link to episode page
+  tag: "new-episode"
+}
+```
+
+See `src/components/PushNotificationButton.tsx` for TODOs and implementation details.
+
+
