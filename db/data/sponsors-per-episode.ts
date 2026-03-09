@@ -1,4 +1,12 @@
 export default {
+  // 235
+  // '': [{ id: 'warp' }],
+  // 234
+  'pay-no-attention-to-the-llm-behind-the-terminal-w-zach-lloyd': [
+    { id: 'cascadiajs' }
+  ],
+  // 233
+  'humans-are-now-legacy-dependencies': [{ id: 'cascadiajs' }],
   // 232
   'we-fired-the-tools-no-ralph-wiggum-no-training-wheels-just-agents': [
     { id: 'cascadiajs' }

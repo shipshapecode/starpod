@@ -16,5 +16,11 @@ export default [
     name: 'Norlan',
     img: 'norlan.svg',
     url: 'https://norlanglass.com/'
+  },
+  {
+    id: 'warp',
+    name: 'Warp',
+    img: 'warp.svg',
+    url: 'https://warp.dev/'
   }
 ];

@@ -3,6 +3,17 @@ import people from './people';
 type PersonId = (typeof people)[number]['id'];
 
 export default {
+  // 234
+  'pay-no-attention-to-the-llm-behind-the-terminal-w-zach-lloyd': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' },
+    { id: 'zachlloyd' }
+  ],
+  // 233
+  'humans-are-now-legacy-dependencies': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' }
+  ],
   // 232
   'we-fired-the-tools-no-ralph-wiggum-no-training-wheels-just-agents': [
     { id: 'robbiethewagner' },

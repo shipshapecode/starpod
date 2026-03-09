@@ -298,6 +298,7 @@ export const people = [
   { id: 'wagslane', name: 'Lane Wagner', img: 'wagslane.jpg' },
   { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' },
   { id: 'willjohnsonio', name: 'Will Johnson', img: 'willjohnsonio.jpg' },
+  { id: 'zachlloyd', name: 'Zach Lloyd', img: 'zachlloyd.jpg' },
   { id: 'zeeg', name: 'David Cramer', img: 'zeeg.jpg' }
 ] as const;
 
