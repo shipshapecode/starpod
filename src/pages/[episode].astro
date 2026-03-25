@@ -1,5 +1,5 @@
 ---
-import { getEntry } from 'astro:content';
+import { getEntry, render } from 'astro:content';
 import { eq } from 'drizzle-orm';
 
 import { createDb } from '../../db';
@@ -49,7 +49,7 @@ let Transcript;
 if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
   Transcript = await getEntry('transcripts', episode.episodeNumber);
   if (Transcript) {
-    const { Content } = await Transcript.render();
+    const { Content } = await render(Transcript);
     Transcript = Content;
   }
 }

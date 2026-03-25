@@ -30,20 +30,26 @@ export default defineConfig({
     inlineStylesheets: 'always'
   },
   experimental: {
-    clientPrerender: true,
-    fonts: [
-      {
-        provider: fontProviders.google({
-          experimental: { variableAxis: { Inter: { opsz: ['14..32'] } } }
-        }),
-        name: 'Inter',
-        cssVariable: '--astro-font-inter',
-        weights: ['300 900'],
-        styles: ['normal'],
-        subsets: ['latin']
-      }
-    ]
+    clientPrerender: true
   },
+  fonts: [
+    {
+      provider: fontProviders.google(),
+      name: 'Inter',
+      cssVariable: '--astro-font-inter',
+      formats: ['woff2'],
+      styles: ['normal'],
+      subsets: ['latin'],
+      weights: ['300 900'],
+      options: {
+        experimental: {
+          variableAxis: {
+            opsz: ['14..32']
+          }
+        }
+      }
+    }
+  ],
   image: {
     remotePatterns: [
       {
