@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ props }) => {
   let transcriptContent = '';
   if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
     const transcript = await getEntry('transcripts', episode.episodeNumber);
-    if (transcript) {
+    if (transcript?.body) {
       // Clean the transcript by removing timestamps
       transcriptContent = cleanTranscript(transcript.body);
     }
