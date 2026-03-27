@@ -1,12 +1,15 @@
+import 'dotenv/config';
+
+import { sql } from 'drizzle-orm';
+
+import { createDb } from './index';
 import {
-  db,
   Episode,
   HostOrGuest,
   Person,
   Sponsor,
-  SponsorForEpisode,
-  sql
-} from 'astro:db';
+  SponsorForEpisode
+} from './schema';
 
 import { getAllEpisodes } from '../src/lib/rss';
 import people from './data/people';
@@ -14,8 +17,12 @@ import peoplePerEpisode from './data/people-per-episode';
 import sponsors from './data/sponsors';
 import sponsorsPerEpisode from './data/sponsors-per-episode';
 
-// https://astro.build/db/seed
-export default async function seed() {
+const db = createDb(
+  process.env.ASTRO_DB_REMOTE_URL!,
+  process.env.ASTRO_DB_APP_TOKEN!
+);
+
+async function seed() {
   await db
     .insert(Person)
     .values(people as any)
@@ -82,4 +89,11 @@ export default async function seed() {
     .insert(SponsorForEpisode)
     .values(sponsorsForEpisodesToInsert)
     .onConflictDoNothing();
+
+  console.log('Seed complete!');
 }
+
+seed().catch((err) => {
+  console.error('Seed failed:', err);
+  process.exit(1);
+});

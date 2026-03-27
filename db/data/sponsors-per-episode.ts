@@ -1,6 +1,11 @@
 export default {
+  // 237
+  'the-transactional-trap-how-97-of-developers-are-using-ai-wrong-w-leon-noel-danny-thompson':
+    [{ id: 'warp' }],
+  // 236
+  'the-manager-has-become-the-managed-presented-by-warp': [{ id: 'warp' }],
   // 235
-  // '': [{ id: 'warp' }],
+  'hot-pockets-pro-max-presented-by-warp': [{ id: 'warp' }],
   // 234
   'pay-no-attention-to-the-llm-behind-the-terminal-w-zach-lloyd': [
     { id: 'cascadiajs' }
