@@ -2,7 +2,7 @@ import { htmlToText } from 'html-to-text';
 import parseFeed from 'rss-to-json';
 import { array, number, object, optional, parse, string } from 'valibot';
 
-import { optimizeImage, resolveRedirects } from './optimize-episode-image';
+import { optimizeImage } from './optimize-episode-image';
 import { dasherize } from '../utils/dasherize';
 import { truncate } from '../utils/truncate';
 import starpodConfig from '../../starpod.config';
@@ -108,9 +108,7 @@ export async function getAllEpisodes() {
             content: episodeContent,
             description: truncate(htmlToText(description), 260),
             duration: itunes_duration,
-            episodeImage: itunes_image?.href
-              ? await resolveRedirects(itunes_image.href)
-              : undefined,
+            episodeImage: itunes_image?.href,
             episodeNumber,
             episodeSlug,
             episodeThumbnail: await optimizeImage(itunes_image?.href),
