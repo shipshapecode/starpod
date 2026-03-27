@@ -72,6 +72,11 @@ export const people = [
     img: 'diegogonzalez.jpg'
   },
   {
+    id: 'dthompsondev',
+    name: 'Danny Thompson',
+    img: 'dthompsondev.jpg'
+  },
+  {
     id: 'engineering_bae',
     name: 'Taylor Poindexter',
     img: 'engineering_bae.jpg'
@@ -150,6 +155,11 @@ export const people = [
     id: 'kvlly',
     name: 'Kelly Vaughn',
     img: 'kvlly.jpg'
+  },
+  {
+    id: 'leonnoel',
+    name: 'Leon Noel',
+    img: 'leonnoel.jpg'
   },
   {
     id: 'madisonkanna',
@@ -296,6 +306,7 @@ export const people = [
     img: 'typecraft_dev.jpg'
   },
   { id: 'wagslane', name: 'Lane Wagner', img: 'wagslane.jpg' },
+  { id: 'wattenberger', name: 'Amelia Wattenberger', img: 'wattenberger.jpg' },
   { id: 'wesbos', name: 'Wes Bos', img: 'wesbos.jpg' },
   { id: 'willjohnsonio', name: 'Will Johnson', img: 'willjohnsonio.jpg' },
   { id: 'zachlloyd', name: 'Zach Lloyd', img: 'zachlloyd.jpg' },

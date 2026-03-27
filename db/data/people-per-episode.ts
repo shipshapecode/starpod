@@ -3,6 +3,25 @@ import people from './people';
 type PersonId = (typeof people)[number]['id'];
 
 export default {
+  // 237
+  'the-transactional-trap-how-97-of-developers-are-using-ai-wrong-w-leon-noel-danny-thompson':
+    [
+      { id: 'robbiethewagner' },
+      { id: 'argyleink' },
+      { id: 'leonnoel' },
+      { id: 'dthompsondev' }
+    ],
+  // 236
+  'the-manager-has-become-the-managed-presented-by-warp': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' },
+    { id: 'wattenberger' }
+  ],
+  // 235
+  'hot-pockets-pro-max-presented-by-warp': [
+    { id: 'robbiethewagner' },
+    { id: 'argyleink' }
+  ],
   // 234
   'pay-no-attention-to-the-llm-behind-the-terminal-w-zach-lloyd': [
     { id: 'robbiethewagner' },

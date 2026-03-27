@@ -1,14 +1,15 @@
 ---
 import { getEntry } from 'astro:content';
+import { eq } from 'drizzle-orm';
+
+import { createDb } from '../../db';
 import {
-  db,
-  eq,
   Episode as DbEpisode,
   HostOrGuest,
   Person,
   Sponsor,
   SponsorForEpisode
-} from 'astro:db';
+} from '../../db/schema';
 
 import { Schema } from 'astro-seo-schema';
 
@@ -54,6 +55,11 @@ if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
 }
 
 const canonicalURL = new URL(`/${episode.episodeSlug}`, Astro.url);
+
+const db = createDb(
+  import.meta.env.ASTRO_DB_REMOTE_URL,
+  import.meta.env.ASTRO_DB_APP_TOKEN
+);
 
 const hostsAndGuests = await db
   .select({
