@@ -25,6 +25,17 @@ export type Host = {
   website?: string;
 };
 
+export type StandardSiteConfig = {
+  /**
+   * Your ATProto DID (e.g., "did:plc:abc123"). Find yours at https://bsky.app/settings.
+   */
+  did: string;
+  /**
+   * The publication record key from when you created your publication on ATProto.
+   */
+  publicationRkey: string;
+};
+
 export type StarpodConfig = {
   /**
    * A very short tagline for your show. Generally, no more than one sentence. Less is more here.
@@ -53,6 +64,11 @@ export type StarpodConfig = {
    * The url to the RSS feed where your podcast is hosted.
    */
   rssFeed: string;
+  /**
+   * Configuration for standard.site (ATProto/Bluesky federation).
+   * When provided, enables the .well-known/site.standard.publication verification endpoint.
+   */
+  standardSite?: StandardSiteConfig;
 };
 
 export const defineStarpodConfig = (config: StarpodConfig) => config;
