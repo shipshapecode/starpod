@@ -11,6 +11,8 @@ on:
 jobs:
   backfill:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: ${{ github.event.inputs.confirm == 'backfill' }}
     steps:
       - uses: actions/checkout@v4
