@@ -18,6 +18,8 @@
     "lint:fix": "eslint . --fix",
     "preview": "astro preview",
     "start": "astro dev",
+    "publish:episodes": "tsx scripts/publish-episodes.ts",
+    "publish:episodes:backfill": "tsx scripts/publish-episodes.ts --backfill",
     "test": "concurrently \"pnpm:test:*(!fix)\" --names \"test:\"",
     "test:e2e": "pnpm exec playwright test",
     "test:unit": "vitest"

@@ -1,0 +1,39 @@
+name: Backfill Episodes to ATProto
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "backfill" to confirm publishing all episodes to ATProto'
+        required: true
+        type: string
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirm == 'backfill' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install dependencies
+        run: pnpm install
+      - name: Backfill all episodes
+        run: pnpm tsx scripts/publish-episodes.ts --backfill
+        env:
+          ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
+          ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
+          STANDARD_SITE_URL: ${{ secrets.STANDARD_SITE_URL }}
+          STANDARD_SITE_PUBLICATION_RKEY: ${{ secrets.STANDARD_SITE_PUBLICATION_RKEY }}

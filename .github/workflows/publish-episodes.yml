@@ -1,0 +1,40 @@
+name: Publish Episodes to ATProto
+
+on:
+  # Run after the daily site rebuild to catch new episodes
+  workflow_run:
+    workflows: ["Rebuild Astro Site"]
+    types: [completed]
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # Only run if the triggering workflow succeeded (or manual dispatch)
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: Install dependencies
+        run: pnpm install
+      - name: Publish new episodes
+        run: pnpm tsx scripts/publish-episodes.ts
+        env:
+          ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
+          ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
+          STANDARD_SITE_URL: ${{ secrets.STANDARD_SITE_URL }}
+          STANDARD_SITE_PUBLICATION_RKEY: ${{ secrets.STANDARD_SITE_PUBLICATION_RKEY }}
