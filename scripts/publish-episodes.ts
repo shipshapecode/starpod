@@ -52,7 +52,7 @@ const FeedSchema = object({
       content_encoded: optional(string()),
       itunes_duration: number(),
       itunes_episode: optional(number()),
-      itunes_episodeType: string(),
+      itunes_episodeType: optional(string()),
       itunes_image: optional(object({ href: optional(string()) })),
       enclosures: array(
         object({
@@ -72,7 +72,7 @@ interface FeedEpisode {
   content_encoded?: string;
   itunes_duration: number;
   itunes_episode?: number;
-  itunes_episodeType: string;
+  itunes_episodeType?: string;
 }
 
 async function main() {
