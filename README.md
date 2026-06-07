@@ -106,6 +106,44 @@ environment variable it should work for you. Of course, feel free to customize
 the code [here](./src/pages/api/contact.ts) to send the data elsewhere as you
 see fit.
 
+#### standard.site (ATProto Federation)
+
+Starpod supports [standard.site](https://standard.site/) — a specification that
+connects your podcast website to [ATProto](https://atproto.com/) (the protocol
+behind Bluesky). Enabling this allows:
+
+- **Verified ownership** — Cryptographically prove you own your content across
+  the federated web
+- **Cross-platform discovery** — Your podcast appears on ATProto readers like
+  [Leaflet](https://leaflet.pub/) and [Pckt](https://pckt.blog)
+- **Federated engagement** — Comments and interactions from Bluesky and other
+  ATProto apps can connect back to your site
+
+This feature is entirely optional. The site works perfectly without it — the
+verification endpoint simply returns a 404 when unconfigured. No changes to
+`astro.config.mjs` are needed.
+
+**To enable**, set these environment variables (e.g., in `.env`):
+
+```
+STANDARD_SITE_DID=did:plc:your-did-here
+STANDARD_SITE_PUBLICATION_RKEY=your-publication-rkey-here
+```
+
+| Variable | Description | Where to find it |
+|----------|-------------|------------------|
+| `STANDARD_SITE_DID` | Your ATProto DID (decentralized identifier) | [bsky.app/settings](https://bsky.app/settings) → scroll to "DID" |
+| `STANDARD_SITE_PUBLICATION_RKEY` | Record key for your publication | Returned by `StandardSitePublisher.publishPublication()` from [`@bryanguffey/astro-standard-site`](https://github.com/musicjunkieg/astro-standard-site) |
+
+After deploying, verify with:
+
+```bash
+curl https://your-site.com/.well-known/site.standard.publication
+```
+
+For full setup instructions (creating a publication, syncing posts, etc.), see
+the [`@bryanguffey/astro-standard-site` README](https://github.com/musicjunkieg/astro-standard-site#readme).
+
 #### Configuring guests
 
 We use Turso and Astro DB to setup guests per episode. If you would also like to
