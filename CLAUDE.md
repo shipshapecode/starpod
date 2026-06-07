@@ -88,3 +88,8 @@ configured for Preact (`jsxImportSource: "preact"`).
 - `ASTRO_DB_REMOTE_URL` — Turso/libSQL database URL (e.g.,
   `libsql://your-db.turso.io`).
 - `ASTRO_DB_APP_TOKEN` — Authentication token for Turso database.
+- `STANDARD_SITE_DID` — Your ATProto DID for standard.site verification (e.g.,
+  `did:plc:abc123`). Find yours at https://bsky.app/settings.
+- `STANDARD_SITE_PUBLICATION_RKEY` — The publication record key returned when
+  creating a publication via `StandardSitePublisher.publishPublication()` from
+  `@bryanguffey/astro-standard-site`.

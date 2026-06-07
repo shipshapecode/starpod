@@ -1,19 +1,16 @@
 import type { APIRoute } from 'astro';
 import { generatePublicationWellKnown } from '@bryanguffey/astro-standard-site';
-import starpodConfig from '../../../starpod.config';
 
 export const GET: APIRoute = () => {
-  const { standardSite } = starpodConfig;
+  const did = import.meta.env.STANDARD_SITE_DID;
+  const publicationRkey = import.meta.env.STANDARD_SITE_PUBLICATION_RKEY;
 
-  if (!standardSite) {
+  if (!did || !publicationRkey) {
     return new Response('standard.site not configured', { status: 404 });
   }
 
   return new Response(
-    generatePublicationWellKnown({
-      did: standardSite.did,
-      publicationRkey: standardSite.publicationRkey
-    }),
+    generatePublicationWellKnown({ did, publicationRkey }),
     { headers: { 'Content-Type': 'text/plain' } }
   );
 };
