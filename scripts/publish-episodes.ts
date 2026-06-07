@@ -99,12 +99,28 @@ async function main() {
   console.log(`✅ Logged in as ${publisher.getDid()}`);
 
   // Get existing documents to avoid duplicates
-  const existingDocs = await publisher.listDocuments(100);
-  const existingPaths = new Set(
-    existingDocs
-      .map((doc) => doc.value.path)
-      .filter(Boolean)
-  );
+  const existingPaths = new Set<string>();
+  let cursor: string | undefined;
+
+  // Paginate through all existing documents (ATProto caps at 100 per request)
+  do {
+    const agent = publisher.getAtpAgent();
+    const response = await agent.api.com.atproto.repo.listRecords({
+      repo: publisher.getDid(),
+      collection: 'site.standard.document',
+      limit: 100,
+      cursor
+    });
+
+    for (const record of response.data.records) {
+      const doc = record.value as { path?: string };
+      if (doc.path) {
+        existingPaths.add(doc.path);
+      }
+    }
+
+    cursor = response.data.cursor;
+  } while (cursor);
 
   let published = 0;
   let skipped = 0;
