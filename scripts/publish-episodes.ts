@@ -64,17 +64,6 @@ const FeedSchema = object({
   )
 });
 
-interface FeedEpisode {
-  id: string;
-  title: string;
-  published: number;
-  description: string;
-  content_encoded?: string;
-  itunes_duration: number;
-  itunes_episode?: number;
-  itunes_episodeType?: string;
-}
-
 async function main() {
   console.log(
     BACKFILL ? '📚 Backfilling all episodes...' : '🆕 Publishing new episodes...'
@@ -91,8 +80,8 @@ async function main() {
 
   // Initialize publisher
   const publisher = new StandardSitePublisher({
-    identifier,
-    password
+    identifier: identifier as string,
+    password: password as string
   });
 
   await publisher.login();
@@ -105,7 +94,7 @@ async function main() {
   // Paginate through all existing documents (ATProto caps at 100 per request)
   do {
     const agent = publisher.getAtpAgent();
-    const response = await agent.api.com.atproto.repo.listRecords({
+    const response = await agent.com.atproto.repo.listRecords({
       repo: publisher.getDid(),
       collection: 'site.standard.document',
       limit: 100,
@@ -143,7 +132,7 @@ async function main() {
       : description;
 
     const input: PublishDocumentInput = {
-      site: siteUrl,
+      site: siteUrl as string,
       path,
       title: episode.title,
       description,

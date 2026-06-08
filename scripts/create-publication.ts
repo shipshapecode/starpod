@@ -29,8 +29,8 @@ if (!identifier || !password || !siteUrl) {
 
 async function main() {
   const publisher = new StandardSitePublisher({
-    identifier,
-    password
+    identifier: identifier as string,
+    password: password as string
   });
 
   await publisher.login();
@@ -38,7 +38,7 @@ async function main() {
 
   const result = await publisher.publishPublication({
     name: starpodConfig.blurb,
-    url: siteUrl,
+    url: siteUrl as string,
     description: starpodConfig.description
   });
 
