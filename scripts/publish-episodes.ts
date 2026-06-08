@@ -30,18 +30,6 @@ import { dasherize } from '../src/utils/dasherize';
 
 const BACKFILL = process.argv.includes('--backfill');
 
-const identifier = process.env.ATPROTO_HANDLE;
-const password = process.env.ATPROTO_APP_PASSWORD;
-const siteUrl = process.env.STANDARD_SITE_URL;
-const publicationRkey = process.env.STANDARD_SITE_PUBLICATION_RKEY;
-
-if (!identifier || !password || !siteUrl || !publicationRkey) {
-  console.error(
-    'Missing required environment variables. Need: ATPROTO_HANDLE, ATPROTO_APP_PASSWORD, STANDARD_SITE_URL, STANDARD_SITE_PUBLICATION_RKEY'
-  );
-  process.exit(1);
-}
-
 const FeedSchema = object({
   items: array(
     object({
@@ -65,6 +53,18 @@ const FeedSchema = object({
 });
 
 async function main() {
+  const identifier = process.env.ATPROTO_HANDLE;
+  const password = process.env.ATPROTO_APP_PASSWORD;
+  const siteUrl = process.env.STANDARD_SITE_URL;
+  const publicationRkey = process.env.STANDARD_SITE_PUBLICATION_RKEY;
+
+  if (!identifier || !password || !siteUrl || !publicationRkey) {
+    console.error(
+      'Missing required environment variables. Need: ATPROTO_HANDLE, ATPROTO_APP_PASSWORD, STANDARD_SITE_URL, STANDARD_SITE_PUBLICATION_RKEY'
+    );
+    process.exit(1);
+  }
+
   console.log(
     BACKFILL ? '📚 Backfilling all episodes...' : '🆕 Publishing new episodes...'
   );
@@ -80,8 +80,8 @@ async function main() {
 
   // Initialize publisher
   const publisher = new StandardSitePublisher({
-    identifier: identifier as string,
-    password: password as string
+    identifier,
+    password
   });
 
   await publisher.login();
@@ -132,7 +132,7 @@ async function main() {
       : description;
 
     const input: PublishDocumentInput = {
-      site: siteUrl as string,
+      site: siteUrl,
       path,
       title: episode.title,
       description,

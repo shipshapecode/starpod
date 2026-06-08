@@ -16,21 +16,21 @@
 import { StandardSitePublisher } from '@bryanguffey/astro-standard-site';
 import starpodConfig from '../starpod.config';
 
-const identifier = process.env.ATPROTO_HANDLE;
-const password = process.env.ATPROTO_APP_PASSWORD;
-const siteUrl = process.env.STANDARD_SITE_URL;
-
-if (!identifier || !password || !siteUrl) {
-  console.error(
-    'Missing required environment variables. Need: ATPROTO_HANDLE, ATPROTO_APP_PASSWORD, STANDARD_SITE_URL'
-  );
-  process.exit(1);
-}
-
 async function main() {
+  const identifier = process.env.ATPROTO_HANDLE;
+  const password = process.env.ATPROTO_APP_PASSWORD;
+  const siteUrl = process.env.STANDARD_SITE_URL;
+
+  if (!identifier || !password || !siteUrl) {
+    console.error(
+      'Missing required environment variables. Need: ATPROTO_HANDLE, ATPROTO_APP_PASSWORD, STANDARD_SITE_URL'
+    );
+    process.exit(1);
+  }
+
   const publisher = new StandardSitePublisher({
-    identifier: identifier as string,
-    password: password as string
+    identifier,
+    password
   });
 
   await publisher.login();
@@ -38,7 +38,7 @@ async function main() {
 
   const result = await publisher.publishPublication({
     name: starpodConfig.blurb,
-    url: siteUrl as string,
+    url: siteUrl,
     description: starpodConfig.description
   });
 
