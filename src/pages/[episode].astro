@@ -18,8 +18,7 @@ import CreatorsAndGuests from '../components/episode/CreatorsAndGuests.astro';
 import Sponsors from '../components/episode/Sponsors.astro';
 import MarkdownTranscript from '../components/episode/MarkdownTranscript';
 import RssTranscript from '../components/episode/Transcript';
-import PlayButton from '../components/player/PlayButton';
-import FullPlayButton from '../components/FullPlayButton';
+import EpisodeCta from '../components/EpisodeCta';
 import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
 import { generateDocumentLinkTag } from '@bryanguffey/astro-standard-site';
 
@@ -176,17 +175,38 @@ const documentLinkTag =
   }
 
   <div class="relative z-10 px-8 lg:px-18">
-    <div class="block lg:flex">
-      <div class="mt-4 mr-11 hidden h-14 w-14 shrink-0 lg:block">
-        <PlayButton
-          client:only="preact"
-          episode={{
-            audio: episode.audio,
-            episodeNumber: episode.episodeNumber,
-            id: episode.id,
-            title: episode.title
-          }}
-        />
+    <div class="block lg:flex lg:gap-11">
+      <div class="mb-8 shrink-0 lg:mb-0 lg:mt-4 lg:w-56">
+        <div
+          class="relative mx-auto w-48 overflow-hidden rounded-2xl sm:w-64 lg:w-full"
+        >
+          <img
+            class="block w-full"
+            src={episode.episodeImage ?? show.image}
+            alt={`${episode.title} cover art`}
+            height={640}
+            width={640}
+            loading="eager"
+          />
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors hover:bg-black/10"
+          >
+            <EpisodeCta
+              client:only="preact"
+              round
+              mode={episode.video ? 'video' : 'audio'}
+              label={episode.video ? 'Watch episode' : 'Play episode'}
+              episode={{
+                audio: episode.audio,
+                video: episode.video,
+                episodeImage: episode.episodeImage,
+                episodeNumber: episode.episodeNumber,
+                id: episode.id,
+                title: episode.title
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       <div class="overflow-hidden break-words">
@@ -203,16 +223,53 @@ const documentLinkTag =
           {episode.description}
         </p>
 
-        <div class="mb-8 block lg:hidden">
-          <FullPlayButton
-            client:only="preact"
-            episode={{
-              audio: episode.audio,
-              episodeNumber: episode.episodeNumber,
-              id: episode.id,
-              title: episode.title
-            }}
-          />
+        <div class="mb-8 flex flex-wrap items-center gap-4">
+          {
+            episode.video ? (
+              <>
+                <EpisodeCta
+                  client:only="preact"
+                  mode="video"
+                  label="Watch Episode"
+                  episode={{
+                    audio: episode.audio,
+                    video: episode.video,
+                    episodeImage: episode.episodeImage,
+                    episodeNumber: episode.episodeNumber,
+                    id: episode.id,
+                    title: episode.title
+                  }}
+                />
+                <EpisodeCta
+                  client:only="preact"
+                  mode="audio"
+                  label="Listen"
+                  episode={{
+                    audio: episode.audio,
+                    video: episode.video,
+                    episodeImage: episode.episodeImage,
+                    episodeNumber: episode.episodeNumber,
+                    id: episode.id,
+                    title: episode.title
+                  }}
+                />
+              </>
+            ) : (
+              <EpisodeCta
+                client:only="preact"
+                mode="audio"
+                label="Play Episode"
+                episode={{
+                  audio: episode.audio,
+                  video: episode.video,
+                  episodeImage: episode.episodeImage,
+                  episodeNumber: episode.episodeNumber,
+                  id: episode.id,
+                  title: episode.title
+                }}
+              />
+            )
+          }
         </div>
 
         {

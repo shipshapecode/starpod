@@ -53,6 +53,22 @@ export type StarpodConfig = {
    * The url to the RSS feed where your podcast is hosted.
    */
   rssFeed: string;
+  /**
+   * Optional call-to-action shown in the nav rail and mobile app-bar. When
+   * omitted, Starpod renders a "Subscribe" button pointing at your primary
+   * platform link (or RSS feed). Repoint it at anything you like — newsletter,
+   * Patreon, live-show tickets, a Discord invite, etc.
+   */
+  cta?: {
+    /**
+     * The button label. Defaults to "Subscribe".
+     */
+    label?: string;
+    /**
+     * Where the button links. Defaults to your first platform link, then RSS.
+     */
+    href?: string;
+  };
 };
 
 export const defineStarpodConfig = (config: StarpodConfig) => config;

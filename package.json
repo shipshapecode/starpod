@@ -36,6 +36,8 @@
     "astro-seo-schema": "^5.2.0",
     "atropos": "^2.0.2",
     "drizzle-orm": "^0.45.2",
+    "fast-xml-parser": "4.5.4",
+    "hls.js": "^1.6.16",
     "preact": "^10.29.2",
     "rss-to-json": "^2.1.1",
     "schema-dts": "^1.1.5",

@@ -61,6 +61,64 @@ footer:has(+ #audio-player .player) {
   }
 }
 
+/*
+  The circular play/watch affordance: indigo-ink at rest, sweeping to the
+  rationed Iris (light) / Aqua (dark) accent gradient on hover. Colors are
+  OKLCH; size/transition stay as utility classes on the element.
+*/
+.play-affordance {
+  background-color: var(--color-light-text-heading);
+  color: oklch(100% 0 0);
+
+  &:hover {
+    background-image: linear-gradient(
+      to right,
+      oklch(86% 0.073 293),
+      oklch(60.5% 0.213 293)
+    );
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background-color: oklch(100% 0 0);
+    color: var(--color-dark-button);
+
+    &:hover {
+      background-image: linear-gradient(
+        to right,
+        oklch(76.5% 0.122 223),
+        oklch(91% 0.05 220)
+      );
+    }
+  }
+}
+
+.menu-panel {
+  animation: menu-panel-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.menu-scrim {
+  animation: menu-scrim-in 300ms ease-out;
+}
+
+@keyframes menu-panel-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes menu-scrim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-panel,
+  .menu-scrim {
+    animation: none;
+  }
+}
+
 .animated-bottom-border {
   @apply dark:border-dark-border border-b after:block after:h-[1px] after:w-0 after:bg-gradient-to-r after:from-[#C6B2FF] after:to-[#8D67FF] after:transition-all after:duration-500 after:ease-in-out hover:after:w-full dark:after:from-[#43C9F5] dark:after:to-[#B4EDFF];
 }
