@@ -1,6 +1,14 @@
 import { htmlToText } from 'html-to-text';
 import parseFeed from 'rss-to-json';
-import { array, number, object, optional, parse, string } from 'valibot';
+import {
+  array,
+  number,
+  object,
+  optional,
+  parse,
+  string,
+  union
+} from 'valibot';
 
 import { optimizeImage } from './optimize-episode-image';
 import { dasherize } from '../utils/dasherize';
@@ -29,6 +37,40 @@ export interface Episode {
     src: string;
     type: string;
   };
+  // A transcript referenced by the feed's `<podcast:transcript>` tag, if any.
+  // Used as a fallback when no explicit markdown transcript is provided for the
+  // episode.
+  transcriptUrl?: string;
+  transcriptType?: string;
+}
+
+// A single `<podcast:transcript>` entry from the RSS feed.
+const TranscriptSchema = object({
+  url: string(),
+  type: optional(string()),
+  language: optional(string()),
+  rel: optional(string())
+});
+
+// A feed may list zero, one, or several transcripts per episode. Prefer a JSON
+// transcript (Flightcast's format), then VTT, then whatever comes first.
+function pickTranscript(
+  transcript:
+    | { url: string; type?: string }
+    | Array<{ url: string; type?: string }>
+    | undefined
+) {
+  if (!transcript) {
+    return undefined;
+  }
+
+  const list = Array.isArray(transcript) ? transcript : [transcript];
+
+  return (
+    list.find((t) => t.type?.toLowerCase().includes('json')) ??
+    list.find((t) => t.type?.toLowerCase().includes('vtt')) ??
+    list[0]
+  );
 }
 
 let showInfoCache: Show | null = null;
@@ -63,14 +105,19 @@ export async function getAllEpisodes() {
         published: number(),
         description: string(),
         content_encoded: optional(string()),
+        podcast_transcript: optional(
+          union([TranscriptSchema, array(TranscriptSchema)])
+        ),
         itunes_duration: number(),
         itunes_episode: optional(number()),
         itunes_episodeType: string(),
         itunes_image: optional(object({ href: optional(string()) })),
+        // A feed may list several enclosures (e.g. the audio file plus a
+        // generated cover image); the image enclosure has no `type`.
         enclosures: array(
           object({
             url: string(),
-            type: string()
+            type: optional(string())
           })
         )
       })
@@ -92,6 +139,7 @@ export async function getAllEpisodes() {
           title,
           enclosures,
           published,
+          podcast_transcript,
           itunes_duration,
           itunes_episode,
           itunes_episodeType,
@@ -101,6 +149,11 @@ export async function getAllEpisodes() {
             itunes_episodeType === 'bonus' ? 'Bonus' : `${itunes_episode}`;
           const episodeSlug = dasherize(title);
           const episodeContent = content_encoded || description;
+          const transcript = pickTranscript(podcast_transcript);
+          const audioEnclosure =
+            enclosures.find((enclosure) =>
+              enclosure.type?.startsWith('audio')
+            ) ?? enclosures[0];
 
           return {
             id,
@@ -113,10 +166,12 @@ export async function getAllEpisodes() {
             episodeSlug,
             episodeThumbnail: await optimizeImage(itunes_image?.href),
             published,
-            audio: enclosures.map((enclosure) => ({
-              src: enclosure.url,
-              type: enclosure.type
-            }))[0]
+            transcriptUrl: transcript?.url,
+            transcriptType: transcript?.type,
+            audio: {
+              src: audioEnclosure.url,
+              type: audioEnclosure.type ?? 'audio/mpeg'
+            }
           };
         }
       )

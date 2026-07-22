@@ -3,6 +3,7 @@ import type { APIRoute } from 'astro';
 
 import { cleanTranscript, generateEpisodeMarkdown } from '../lib/llms';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
+import { getRssTranscriptText } from '../lib/transcript';
 import starpodConfig from '../../starpod.config';
 
 export async function getStaticPaths() {
@@ -34,6 +35,12 @@ export const GET: APIRoute = async ({ props }) => {
       // Clean the transcript by removing timestamps
       transcriptContent = cleanTranscript(transcript.body);
     }
+  }
+
+  // Fall back to the RSS feed's `<podcast:transcript>` when no explicit
+  // markdown transcript exists for this episode.
+  if (!transcriptContent) {
+    transcriptContent = (await getRssTranscriptText(episode)) || '';
   }
 
   const markdown = generateEpisodeMarkdown(

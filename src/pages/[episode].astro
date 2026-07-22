@@ -16,6 +16,8 @@ import { Schema } from 'astro-seo-schema';
 import FormattedDate from '../components/FormattedDate';
 import CreatorsAndGuests from '../components/episode/CreatorsAndGuests.astro';
 import Sponsors from '../components/episode/Sponsors.astro';
+import MarkdownTranscript from '../components/episode/MarkdownTranscript';
+import RssTranscript from '../components/episode/Transcript';
 import PlayButton from '../components/player/PlayButton';
 import FullPlayButton from '../components/FullPlayButton';
 import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
@@ -23,6 +25,10 @@ import { generateDocumentLinkTag } from '@bryanguffey/astro-standard-site';
 
 import Layout from '../layouts/Layout.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
+import {
+  getRssTranscriptParagraphs,
+  type TranscriptParagraph
+} from '../lib/transcript';
 import { getDocumentRkeys } from '../lib/standardSite';
 import { dasherize } from '../utils/dasherize';
 
@@ -48,6 +54,7 @@ export async function getStaticPaths() {
 const { episode } = Astro.props;
 
 let Transcript;
+let rssTranscript: Array<TranscriptParagraph> | null = null;
 
 if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
   Transcript = await getEntry('transcripts', episode.episodeNumber);
@@ -56,6 +63,23 @@ if (episode.episodeNumber && episode.episodeNumber !== 'Bonus') {
     Transcript = Content;
   }
 }
+
+// Fall back to the transcript referenced by the RSS feed's
+// `<podcast:transcript>` tag when no explicit markdown transcript was provided.
+if (!Transcript) {
+  rssTranscript = await getRssTranscriptParagraphs(episode);
+}
+
+const hasTranscript = Boolean(Transcript) || Boolean(rssTranscript?.length);
+
+// The subset of episode fields the player needs, shared by both transcript
+// timestamp variants so clicking one can load this episode.
+const playerEpisode = {
+  audio: episode.audio,
+  episodeNumber: episode.episodeNumber,
+  id: episode.id,
+  title: episode.title
+};
 
 const canonicalURL = new URL(`/${episode.episodeSlug}`, Astro.url);
 
@@ -212,7 +236,7 @@ const documentLinkTag =
         </h3>
 
         {
-          Transcript ? (
+          hasTranscript ? (
             <div class="mb-20">
               <Schema
                 item={{
@@ -239,9 +263,19 @@ const documentLinkTag =
                   }
                 }}
               />
-              <article class="transcript prose prose-neutral dark:prose-invert line-clamp-4">
-                <Transcript />
-              </article>
+              {
+                Transcript ? (
+                  <MarkdownTranscript client:load episode={playerEpisode}>
+                    <Transcript />
+                  </MarkdownTranscript>
+                ) : (
+                  <RssTranscript
+                    client:load
+                    episode={playerEpisode}
+                    paragraphs={rssTranscript!}
+                  />
+                )
+              }
 
               <button
                 class="btn mt-4"

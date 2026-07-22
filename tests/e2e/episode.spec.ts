@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const episode1 = {
   title:
@@ -81,4 +81,73 @@ test('works for bonus episodes with no episode number', async ({ page }) => {
 
   const twitterImage = page.locator('meta[name="twitter:image:src"]');
   await expect(twitterImage).toHaveAttribute('content', episode2.image);
+});
+
+test.describe('transcripts', () => {
+  const timestampButtons = (page: Page) =>
+    page.getByRole('button', { name: /^Play from/ });
+
+  // Episode 6 has no markdown transcript in src/content/transcripts, so it
+  // falls back to the transcript referenced by the feed's <podcast:transcript>
+  // tag. Those timestamps are compact (e.g. "0:04"), with no brackets.
+  test('falls back to the RSS transcript with clickable timestamps when no markdown exists', async ({
+    page
+  }) => {
+    await page.goto('/6');
+
+    await expect(
+      page.getByRole('heading', { name: 'Episode Transcript' })
+    ).toBeVisible();
+    await expect(page.locator('article.transcript')).not.toBeEmpty();
+    await expect(timestampButtons(page).first()).toBeVisible();
+    await expect(timestampButtons(page).first()).toHaveText(/^\d{1,2}:\d{2}/);
+    await expect(
+      page.getByText('No transcript available for this episode.')
+    ).toHaveCount(0);
+  });
+
+  // Episode 120 has an explicit markdown transcript AND the feed exposes an RSS
+  // transcript for it — the markdown one must win. Its timestamps come from the
+  // markdown source, so they keep their bracketed form (e.g. "[00:00:00]").
+  test('prefers the explicit markdown transcript, with its own clickable timestamps', async ({
+    page
+  }) => {
+    await page.goto('/120');
+
+    await expect(
+      page.getByRole('heading', { name: 'Episode Transcript' })
+    ).toBeVisible();
+    await expect(page.locator('article.transcript')).not.toBeEmpty();
+    // Bracketed labels prove the markdown transcript rendered, not the RSS one.
+    await expect(timestampButtons(page).first()).toHaveText(/^\[\d{2}:\d{2}/);
+    await expect(
+      page.getByText('No transcript available for this episode.')
+    ).toHaveCount(0);
+  });
+
+  // Clicking a timestamp should load the episode into the audio player. We
+  // assert the player mounts with the episode (a real click is a trusted user
+  // gesture); we don't assert the exact seek position because that depends on
+  // streaming the remote audio, which is flaky in CI. Covers both the RSS
+  // (episode 6) and markdown (episode 120) timestamp paths.
+  for (const { episode, marker } of [
+    { episode: '6', marker: 'DevOps, Arcades and Whatnot' },
+    { episode: '120', marker: 'Tailwind Fandom' }
+  ]) {
+    test(`clicking a timestamp on episode ${episode} loads it into the player`, async ({
+      page
+    }) => {
+      await page.goto(`/${episode}`);
+
+      // The player only exists in the DOM once an episode is playing.
+      await expect(page.locator('.player')).toHaveCount(0);
+
+      await timestampButtons(page).first().click();
+
+      const player = page.locator('.player');
+      await expect(player).toBeVisible();
+      await expect(player).toContainText(marker);
+      await expect(player.locator('audio')).toHaveAttribute('src', /.+\.mp3/);
+    });
+  }
 });

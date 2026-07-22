@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'preact/hooks';
 
-import { currentEpisode, isMuted, isPlaying } from '../components/state';
+import { currentEpisode, isMuted, isPlaying, seekTo } from '../components/state';
 import MuteButton from './player/MuteButton';
 import PlayButton from './player/PlayButton';
 import PlaybackRateButton from './player/PlaybackRateButton';
@@ -63,6 +63,30 @@ export default function Player() {
       cancelAnimationFrame(progressRef.current as number);
     }
   }, [isPlaying.value]);
+
+  useEffect(() => {
+    const target = seekTo.value;
+    const player = audioPlayer.current;
+    if (target === null || !player) {
+      return;
+    }
+
+    const applySeek = () => {
+      player.currentTime = target;
+      isPlaying.value = true;
+      player.play();
+      seekTo.value = null;
+    };
+
+    // If the episode was just switched, its metadata isn't loaded yet and the
+    // seek wouldn't stick — wait for it. Otherwise seek immediately.
+    if (player.readyState >= 1 /* HAVE_METADATA */) {
+      applySeek();
+    } else {
+      player.addEventListener('loadedmetadata', applySeek, { once: true });
+      return () => player.removeEventListener('loadedmetadata', applySeek);
+    }
+  }, [seekTo.value]);
 
   useEffect(() => {
     const duration = audioPlayer.current?.duration ?? 0;
