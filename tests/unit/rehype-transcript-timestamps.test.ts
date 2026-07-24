@@ -80,6 +80,15 @@ describe('rehypeTranscriptTimestamps', () => {
     expect(buttons.map((b) => b.properties?.['data-seek'])).toEqual(['1', '5']);
   });
 
+  it('converts timestamps across sibling text nodes (no regex state leaks between them)', () => {
+    const tree = run(
+      paragraph(text('[00:00:01] first'), text('[00:00:05] second'))
+    );
+    const buttons = buttonsIn(tree);
+
+    expect(buttons.map((b) => b.properties?.['data-seek'])).toEqual(['1', '5']);
+  });
+
   it('leaves text without timestamps untouched', () => {
     const tree = run(paragraph(text('no timestamps here')));
 

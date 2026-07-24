@@ -106,10 +106,67 @@ function parseTranscript(
     return null;
   }
 
-  // VTT, SRT, or plain text: strip cue metadata and fall back to paragraph
-  // splitting on blank lines. Timing information isn't recovered here.
+  // VTT or SRT: parse cue blocks, keeping each cue's start time so the
+  // timestamps stay clickable, then group them like JSON segments.
+  const cues = parseCues(raw);
+  if (cues.length > 0) {
+    return groupSegments(cues);
+  }
+
+  // Plain text (or unparseable cues): strip any leftover cue metadata and fall
+  // back to paragraph splitting on blank lines. Timing isn't recoverable here.
   const stripped = stripCues(raw);
   return stripped ? splitParagraphs(stripped) : null;
+}
+
+/**
+ * Parse WebVTT/SRT cue blocks into `{ start, text }` entries, preserving the
+ * start time (in seconds) of each cue. Blocks without a `-->` timing line
+ * (e.g. the `WEBVTT` header) are skipped.
+ */
+function parseCues(raw: string): Array<{ text: string; start: number }> {
+  const cues: Array<{ text: string; start: number }> = [];
+
+  for (const block of raw.replace(/\r\n/g, '\n').split(/\n{2,}/)) {
+    const lines = block
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const timingIndex = lines.findIndex((line) => line.includes('-->'));
+    if (timingIndex === -1) {
+      continue;
+    }
+
+    const start = parseCueStart(lines[timingIndex]);
+    // Cue text is everything after the timing line (the numeric index and any
+    // cue identifier come before it).
+    const text = lines.slice(timingIndex + 1).join(' ').trim();
+    if (start !== undefined && text) {
+      cues.push({ text, start });
+    }
+  }
+
+  return cues;
+}
+
+/**
+ * Parse the start timestamp from a cue's timing line, supporting
+ * `HH:MM:SS.mmm` / `MM:SS.mmm` (VTT) and comma-delimited SRT milliseconds.
+ */
+function parseCueStart(timingLine: string): number | undefined {
+  const startPart = timingLine.split('-->')[0];
+  const match = startPart.match(/(?:(\d+):)?(\d{1,2}):(\d{2})(?:[.,](\d{1,3}))?/);
+  if (!match) {
+    return undefined;
+  }
+
+  const [, hours, minutes, seconds, milliseconds] = match;
+  return (
+    (hours ? Number(hours) * 3600 : 0) +
+    Number(minutes) * 60 +
+    Number(seconds) +
+    (milliseconds ? Number(milliseconds) / 1000 : 0)
+  );
 }
 
 /**

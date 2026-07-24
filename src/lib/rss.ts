@@ -152,7 +152,7 @@ export async function getAllEpisodes() {
           const transcript = pickTranscript(podcast_transcript);
           const audioEnclosure =
             enclosures.find((enclosure) =>
-              enclosure.type?.startsWith('audio')
+              enclosure.type?.toLowerCase().startsWith('audio/')
             ) ?? enclosures[0];
 
           return {

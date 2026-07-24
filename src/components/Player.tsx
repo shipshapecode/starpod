@@ -71,11 +71,20 @@ export default function Player() {
       return;
     }
 
-    const applySeek = () => {
+    const applySeek = async () => {
+      const previousIsPlaying = isPlaying.value;
+      const previousSeekTo = seekTo.value;
       player.currentTime = target;
-      isPlaying.value = true;
-      player.play();
-      seekTo.value = null;
+      try {
+        await player.play();
+        isPlaying.value = true;
+        seekTo.value = null;
+      } catch {
+        // Playback was blocked (e.g. autoplay policy) — keep the UI honest by
+        // restoring the pre-seek state instead of showing a false "playing".
+        isPlaying.value = previousIsPlaying;
+        seekTo.value = previousSeekTo;
+      }
     };
 
     // If the episode was just switched, its metadata isn't loaded yet and the

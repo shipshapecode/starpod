@@ -103,7 +103,7 @@ describe('getRssTranscriptParagraphs', () => {
     ]);
   });
 
-  it('strips WebVTT scaffolding for non-JSON transcripts', async () => {
+  it('parses WebVTT cues, preserving the start time so timestamps stay clickable', async () => {
     const vtt = [
       'WEBVTT',
       '',
@@ -121,9 +121,48 @@ describe('getRssTranscriptParagraphs', () => {
       makeEpisode({ transcriptType: 'text/vtt' })
     );
 
+    // Short cues group into one paragraph tagged with the first cue's start.
     expect(paragraphs).toEqual([
-      { text: 'Hello there.' },
-      { text: 'Welcome to the show.' }
+      { start: 4.5, text: 'Hello there. Welcome to the show.' }
+    ]);
+  });
+
+  it('parses SRT cues (comma milliseconds, HH:MM:SS) with start times', async () => {
+    const longCue = 'word '.repeat(140).trim(); // forces a paragraph break
+    const srt = [
+      '1',
+      '00:00:03,000 --> 00:00:30,000',
+      longCue,
+      '',
+      '2',
+      '01:02:03,000 --> 01:02:10,000',
+      'Second cue.'
+    ].join('\n');
+    mockFetch({ body: srt });
+
+    const paragraphs = await getRssTranscriptParagraphs(
+      makeEpisode({ transcriptType: 'application/x-subrip' })
+    );
+
+    expect(paragraphs).toEqual([
+      { start: 3, text: longCue },
+      { start: 3723, text: 'Second cue.' } // 1h 2m 3s
+    ]);
+  });
+
+  it('falls back to plain-text paragraphs when there are no cues', async () => {
+    mockFetch({
+      body: 'First paragraph.\n\nSecond paragraph.',
+      contentType: 'text/plain'
+    });
+
+    const paragraphs = await getRssTranscriptParagraphs(
+      makeEpisode({ transcriptType: 'text/plain' })
+    );
+
+    expect(paragraphs).toEqual([
+      { text: 'First paragraph.' },
+      { text: 'Second paragraph.' }
     ]);
   });
 
