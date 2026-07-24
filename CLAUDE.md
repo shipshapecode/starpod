@@ -64,7 +64,14 @@ connection is configured in `db/index.ts`.
 - `src/lib/` — Core utilities: RSS fetching, image optimization, LLM content
   generation.
 - `src/content/transcripts/` — Markdown transcript files named by episode
-  number.
+  number. When one is absent, the site falls back to the transcript referenced
+  by the feed's `<podcast:transcript>` tag (fetched/parsed in
+  `src/lib/transcript.ts`). Both sources render with clickable timestamps that
+  seek the player: RSS paragraphs via the `episode/Transcript` island, and
+  markdown `[HH:MM:SS]` timestamps via the `rehype-transcript-timestamps`
+  plugin (registered in `astro.config.mjs`) plus the `episode/MarkdownTranscript`
+  island. Note: changing that rehype plugin needs a dev server restart to take
+  effect, since Astro's content render cache doesn't reload it on hot-reload.
 - `src/layouts/Layout.astro` — Single shared layout.
 - `db/` — Database schema (`schema.ts`), connection (`index.ts`), seed script
   (`seed.ts`), and static data files (`data/`).

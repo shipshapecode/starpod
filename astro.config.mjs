@@ -4,6 +4,8 @@ import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 
+import rehypeTranscriptTimestamps from './src/lib/rehype-transcript-timestamps.mjs';
+
 // https://astro.build/config
 export default defineConfig({
   output: 'static',
@@ -28,6 +30,10 @@ export default defineConfig({
   }),
   build: {
     inlineStylesheets: 'always'
+  },
+  markdown: {
+    // Makes bracketed timestamps in markdown transcripts clickable for seeking.
+    rehypePlugins: [rehypeTranscriptTimestamps]
   },
   experimental: {
     clientPrerender: true
