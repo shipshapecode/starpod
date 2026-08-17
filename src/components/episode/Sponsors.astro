@@ -23,12 +23,8 @@ const svgs = import.meta.glob('/src/img/sponsors/*.svg', {
       return (
         <a href={sponsor.url} target="_blank">
           <div class="flex items-center">
-            <div class="mr-4 h-12 w-12 rounded-lg">
-              <Fragment
-                height="48"
-                width="48"
-                set:html={svgs[`/src/img/sponsors/${sponsor.img}`]()}
-              />
+            <div class="mr-4 h-12 w-12 shrink-0 rounded-lg [&>svg]:h-full [&>svg]:w-full">
+              <Fragment set:html={svgs[`/src/img/sponsors/${sponsor.img}`]()} />
             </div>
             {sponsor.name}
           </div>
