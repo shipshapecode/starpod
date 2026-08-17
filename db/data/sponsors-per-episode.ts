@@ -1,4 +1,26 @@
 export default {
+  // 252
+  // '': [{ id: 'gitkraken' }],
+  // 251
+  'guppy-pimps-tripp-pants-and-debugging-ie5': [{ id: 'gitkraken' }],
+  // 248
+  'dark-factories-polymorphic-ui-and-why-developers-still-matter': [
+    { id: 'gitkraken' }
+  ],
+  // 247
+  'proxies-petty-pranks-and-ramon-the-420-iq-gorilla-w-ken-wheeler': [
+    { id: 'gitkraken' }
+  ],
+  // 242
+  'from-wetware-to-software-presented-by-warp': [{ id: 'warp' }],
+  // 241
+  'axios-is-out-fetchium-is-in-presented-by-warp': [{ id: 'warp' }],
+  // 240
+  'ai-cowgorithm-disrupts-the-herd-presented-by-warp': [{ id: 'warp' }],
+  // 239
+  'flogging-margins-with-the-dropcap-murphys': [{ id: 'warp' }],
+  // 238
+  'nextjs-is-dead-long-live-nextjs-presented-by-warp': [{ id: 'warp' }],
   // 237
   'the-transactional-trap-how-97-of-developers-are-using-ai-wrong-w-leon-noel-danny-thompson':
     [{ id: 'warp' }],

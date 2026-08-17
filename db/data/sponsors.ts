@@ -12,6 +12,12 @@ export default [
     url: 'http://coderabbit.link/whiskey'
   },
   {
+    id: 'gitkraken',
+    name: 'GitKraken',
+    img: 'gitkraken.svg',
+    url: 'https://gitkraken.com/whiskeyfm'
+  },
+  {
     id: 'norlan',
     name: 'Norlan',
     img: 'norlan.svg',
