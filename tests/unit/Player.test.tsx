@@ -1,13 +1,25 @@
 import { render, screen } from '@testing-library/preact';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Player from '../../src/components/Player';
-import { currentEpisode, isPlaying, isMuted } from '../../src/components/state';
+import {
+  currentEpisode,
+  isPlaying,
+  isMuted,
+  isTheaterOpen,
+  mediaMode
+} from '../../src/components/state';
 
 const mockEpisode = {
   id: 'test-episode-1',
   title: 'Test Episode',
   audio: { src: 'test.mp3', type: 'audio/mpeg' },
   episodeNumber: '1'
+};
+
+const mockVideoEpisode = {
+  ...mockEpisode,
+  id: 'test-episode-video',
+  video: { src: 'test.m3u8', type: 'application/x-mpegURL' }
 };
 
 // Mock audio element
@@ -64,6 +76,8 @@ describe('Player', () => {
     currentEpisode.value = null;
     isPlaying.value = false;
     isMuted.value = false;
+    mediaMode.value = 'video';
+    isTheaterOpen.value = false;
     vi.clearAllMocks();
 
     // Mock HTMLAudioElement
@@ -134,14 +148,58 @@ describe('Player', () => {
     expect(slider).toHaveAttribute('aria-label', 'audio timeline');
   });
 
-  it('renders audio element', () => {
+  it('renders media element', () => {
     currentEpisode.value = mockEpisode;
 
     const { container } = render(<Player />);
 
-    // Audio element should exist in the component tree
-    const audioElement = container.querySelector('audio');
-    expect(audioElement).toBeTruthy();
+    // A single <video> element backs both audio and video playback
+    const mediaElement = container.querySelector('video');
+    expect(mediaElement).toBeTruthy();
+  });
+
+  it('shows the audio/video toggle only for episodes with video', () => {
+    mediaMode.value = 'video';
+    currentEpisode.value = mockEpisode;
+    const { rerender } = render(<Player />);
+
+    // Audio-only episode: no toggle.
+    expect(
+      screen.queryByRole('button', { name: /switch to (audio|video)/i })
+    ).toBeNull();
+
+    // Video episode (default video mode): toggle offers switching to audio.
+    currentEpisode.value = mockVideoEpisode;
+    rerender(<Player />);
+    expect(
+      screen.getByRole('button', { name: /switch to audio only/i })
+    ).toBeInTheDocument();
+  });
+
+  it('exposes native video controls when the theater is open', () => {
+    mediaMode.value = 'video';
+    isTheaterOpen.value = true;
+    currentEpisode.value = mockVideoEpisode;
+
+    const { container } = render(<Player />);
+
+    const video = container.querySelector('video');
+    expect(video).toHaveAttribute('controls');
+    expect(
+      screen.getByRole('button', { name: /minimize video/i })
+    ).toBeInTheDocument();
+  });
+
+  it('offers a Watch affordance for video episodes when the theater is closed', () => {
+    mediaMode.value = 'video';
+    isTheaterOpen.value = false;
+    currentEpisode.value = mockVideoEpisode;
+
+    render(<Player />);
+
+    expect(
+      screen.getByRole('button', { name: /expand video/i })
+    ).toBeInTheDocument();
   });
 
   it('applies view transition name for animations', () => {

@@ -1,3 +1,4 @@
+import { XMLParser } from 'fast-xml-parser';
 import { htmlToText } from 'html-to-text';
 import parseFeed from 'rss-to-json';
 import {
@@ -42,6 +43,14 @@ export interface Episode {
   // episode.
   transcriptUrl?: string;
   transcriptType?: string;
+  /**
+   * HLS video stream, when the feed provides a `<podcast:alternateEnclosure>`
+   * with a `application/x-mpegURL` source. Absent for audio-only episodes.
+   */
+  video?: {
+    src: string;
+    type: string;
+  };
 }
 
 // A single `<podcast:transcript>` entry from the RSS feed.
@@ -91,6 +100,64 @@ export async function getShowInfo() {
   return showInfo;
 }
 
+const HLS_TYPE = 'application/x-mpegURL';
+
+let videoMapCache: Map<string, Episode['video']> | null = null;
+
+/**
+ * `rss-to-json` only surfaces a hardcoded allowlist of fields and drops
+ * `<podcast:alternateEnclosure>` entirely, so we parse the raw feed XML once to
+ * pull the HLS video stream for each episode, keyed by guid.
+ */
+async function getEpisodeVideos() {
+  if (videoMapCache) {
+    return videoMapCache;
+  }
+
+  const map = new Map<string, Episode['video']>();
+
+  const res = await fetch(starpodConfig.rssFeed);
+  const xml = await res.text();
+  const parsed = new XMLParser({ ignoreAttributes: false }).parse(xml);
+
+  const channel = parsed?.rss?.channel ?? parsed?.feed;
+  let items = channel?.item ?? [];
+  if (!Array.isArray(items)) {
+    items = [items];
+  }
+
+  for (const item of items) {
+    const guid =
+      typeof item?.guid === 'object' ? item.guid['#text'] : item?.guid;
+    if (!guid) {
+      continue;
+    }
+
+    let alternates = item['podcast:alternateEnclosure'];
+    if (!alternates) {
+      continue;
+    }
+    if (!Array.isArray(alternates)) {
+      alternates = [alternates];
+    }
+
+    const hls = alternates.find(
+      (alt: Record<string, unknown>) => alt['@_type'] === HLS_TYPE
+    );
+    const source = hls?.['podcast:source'];
+    const uri = Array.isArray(source)
+      ? source[0]?.['@_uri']
+      : source?.['@_uri'];
+
+    if (uri) {
+      map.set(String(guid), { src: uri, type: HLS_TYPE });
+    }
+  }
+
+  videoMapCache = map;
+  return map;
+}
+
 let episodesCache: Array<Episode> | null = null;
 
 export async function getAllEpisodes() {
@@ -127,6 +194,8 @@ export async function getAllEpisodes() {
   // @ts-expect-error
   let feed = (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
   let items = parse(FeedSchema, feed).items;
+
+  const videoMap = await getEpisodeVideos();
 
   let episodes: Array<Episode> = await Promise.all(
     items
@@ -171,7 +240,8 @@ export async function getAllEpisodes() {
             audio: {
               src: audioEnclosure.url,
               type: audioEnclosure.type ?? 'audio/mpeg'
-            }
+            },
+            video: videoMap.get(id)
           };
         }
       )

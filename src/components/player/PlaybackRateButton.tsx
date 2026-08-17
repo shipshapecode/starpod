@@ -1,7 +1,7 @@
 import { useState, type MutableRef } from 'preact/hooks';
 
 type Props = {
-  audioPlayer: MutableRef<HTMLAudioElement | null>;
+  audioPlayer: MutableRef<HTMLMediaElement | null>;
 };
 
 const playbackRates = [1, 1.2, 1.5, 2];

@@ -3,7 +3,7 @@ import type { Episode } from '../lib/rss';
 
 export const currentEpisode = signal<Pick<
   Episode,
-  'audio' | 'episodeNumber' | 'id' | 'title'
+  'audio' | 'video' | 'episodeImage' | 'episodeNumber' | 'id' | 'title'
 > | null>(null);
 export const isPlaying = signal(false);
 export const isMuted = signal(false);
@@ -24,6 +24,17 @@ export function seekToEpisode(
   }
   seekTo.value = seconds;
 }
+
+// When the current episode has video, whether to play the video stream or fall
+// back to audio-only. Defaults to video; ignored for audio-only episodes.
+export const mediaMode = signal<'video' | 'audio'>('video');
+
+// Whether the expanded video theater (large, native-controls surface above the
+// docked player bar) is open. Toggled from the player and the episode page.
+export const isTheaterOpen = signal(false);
+
+// Mobile slide-over navigation menu open/closed.
+export const isMenuOpen = signal(false);
 
 // Search state
 export const isSearchOpen = signal(false);
