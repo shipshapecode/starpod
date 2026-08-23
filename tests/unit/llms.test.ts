@@ -9,7 +9,11 @@ import {
   generateEpisodeMarkdown,
   generateEpisodesIndex,
   generateForLlmsMarkdown,
-  generateAboutMarkdown
+  generateAboutMarkdown,
+  generateWhenToUseSection,
+  generateDeveloperResourcesSection,
+  generateHomeMarkdown,
+  generateContactMarkdown
 } from '../../src/lib/llms';
 import type { Episode, Show } from '../../src/lib/rss';
 import type { StarpodConfig } from '../../src/utils/config';
@@ -213,6 +217,79 @@ describe('LLM Utilities', () => {
 
       expect(result).toContain('https://podcast.example.com');
       expect(result).toContain('/about.html.md');
+    });
+
+    it('includes when-to-use guidance and developer resources', () => {
+      const result = generateLlmsTxt(mockShow, mockEpisodes, mockConfig);
+
+      expect(result).toContain('## When To Use This Site');
+      expect(result).toContain('## Developer Resources');
+      expect(result).toContain('/openapi.json');
+      expect(result).toContain('/contact.html.md');
+    });
+  });
+
+  describe('generateWhenToUseSection', () => {
+    const mockShow: Show = {
+      title: 'Test Podcast',
+      description: 'A test podcast',
+      image: 'https://example.com/image.jpg',
+      link: 'https://example.com'
+    };
+
+    it('names best-fit use cases for the show', () => {
+      const result = generateWhenToUseSection(mockShow);
+
+      expect(result).toContain('## When To Use This Site');
+      expect(result).toContain('Use Test Podcast (this site) when you need');
+      expect(result).toContain('transcripts');
+      expect(result).toContain('Do not use this site');
+    });
+
+    it('explains how to fetch machine-readable content', () => {
+      const siteUrl = new URL('https://podcast.example.com');
+      const result = generateWhenToUseSection(mockShow, siteUrl);
+
+      expect(result).toContain('Accept: text/markdown');
+      expect(result).toContain('https://podcast.example.com/llms.txt');
+      expect(result).toContain('https://podcast.example.com/openapi.json');
+    });
+  });
+
+  describe('generateDeveloperResourcesSection', () => {
+    const mockShow: Show = {
+      title: 'Test Podcast',
+      description: 'A test podcast',
+      image: 'https://example.com/image.jpg',
+      link: 'https://example.com'
+    };
+
+    const mockConfig: StarpodConfig = {
+      blurb: 'Test blurb',
+      description: 'Test description',
+      hosts: [{ name: 'Host One', bio: 'Bio', img: 'host.jpg' }],
+      platforms: {},
+      rssFeed: 'https://example.com/rss.xml'
+    };
+
+    it('lists machine-readable endpoints by name', () => {
+      const siteUrl = new URL('https://podcast.example.com');
+      const result = generateDeveloperResourcesSection(
+        mockShow,
+        mockConfig,
+        siteUrl
+      );
+
+      expect(result).toContain('## Developer Resources');
+      expect(result).toContain('Test Podcast API');
+      expect(result).toContain('https://podcast.example.com/openapi.json');
+      expect(result).toContain(
+        'https://podcast.example.com/api/episodes/search.json'
+      );
+      expect(result).toContain(
+        'https://podcast.example.com/sitemap-index.xml'
+      );
+      expect(result).toContain('https://example.com/rss.xml');
     });
   });
 
@@ -498,6 +575,108 @@ describe('LLM Utilities', () => {
 
       expect(result).toContain('## Listen to the Show');
       expect(result).toContain('https://spotify.com/show');
+    });
+  });
+
+  describe('generateHomeMarkdown', () => {
+    const mockShow: Show = {
+      title: 'Test Podcast',
+      description: 'A test podcast',
+      image: 'https://example.com/image.jpg',
+      link: 'https://example.com'
+    };
+
+    const mockConfig: StarpodConfig = {
+      blurb: 'Test blurb',
+      description: 'Test description',
+      hosts: [{ name: 'Host One', bio: 'Bio', img: 'host.jpg' }],
+      platforms: {
+        spotify: 'https://spotify.com/show'
+      },
+      rssFeed: 'https://example.com/rss.xml'
+    };
+
+    const mockEpisodes: Episode[] = [
+      {
+        id: 'ep1',
+        title: 'Episode 1',
+        published: Date.now(),
+        description: 'First episode',
+        duration: 3600,
+        content: 'Content',
+        episodeSlug: 'episode-1',
+        episodeNumber: '1',
+        audio: { src: 'https://example.com/ep1.mp3', type: 'audio/mpeg' }
+      }
+    ];
+
+    it('generates homepage markdown with show overview and episodes', () => {
+      const siteUrl = new URL('https://podcast.example.com');
+      const result = generateHomeMarkdown(
+        mockShow,
+        mockEpisodes,
+        mockConfig,
+        siteUrl
+      );
+
+      expect(result).toContain('# Test Podcast');
+      expect(result).toContain('> Test blurb');
+      expect(result).toContain('## Latest Episodes');
+      expect(result).toContain(
+        'https://podcast.example.com/episode-1.html.md'
+      );
+      expect(result).toContain('## Explore');
+      expect(result).toContain('/episodes-index.html.md');
+      expect(result).toContain('/openapi.json');
+      expect(result).toContain('## Listen');
+      expect(result).toContain('https://spotify.com/show');
+    });
+  });
+
+  describe('generateContactMarkdown', () => {
+    const mockShow: Show = {
+      title: 'Test Podcast',
+      description: 'A test podcast',
+      image: 'https://example.com/image.jpg',
+      link: 'https://example.com'
+    };
+
+    const mockConfig: StarpodConfig = {
+      blurb: 'Test blurb',
+      description: 'Test description',
+      hosts: [
+        {
+          name: 'Host One',
+          bio: 'Bio',
+          img: 'host.jpg',
+          twitter: 'https://twitter.com/host1',
+          github: 'https://github.com/host1',
+          website: 'https://host1.com'
+        }
+      ],
+      platforms: {
+        apple: 'https://apple.com/podcast'
+      },
+      rssFeed: 'https://example.com/rss.xml'
+    };
+
+    it('points at the contact form and API endpoint', () => {
+      const siteUrl = new URL('https://podcast.example.com');
+      const result = generateContactMarkdown(mockShow, mockConfig, siteUrl);
+
+      expect(result).toContain('# Contact Test Podcast');
+      expect(result).toContain('https://podcast.example.com/contact');
+      expect(result).toContain('/api/contact');
+      expect(result).toContain('`name`');
+    });
+
+    it('includes host links and platforms', () => {
+      const result = generateContactMarkdown(mockShow, mockConfig);
+
+      expect(result).toContain('### Host One');
+      expect(result).toContain('https://twitter.com/host1');
+      expect(result).toContain('https://github.com/host1');
+      expect(result).toContain('https://apple.com/podcast');
     });
   });
 });
