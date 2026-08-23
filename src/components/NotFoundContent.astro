@@ -1,0 +1,42 @@
+---
+import FourZeroFourIllustration from './illustrations/404Illustration.astro';
+---
+
+<div
+  class="relative z-10 flex flex-col items-center justify-center px-8 lg:px-18"
+>
+  <FourZeroFourIllustration />
+
+  <div class="mt-12 flex justify-center">
+    <button class="btn" onclick="history.back()">
+      <span
+        class="text-light-text-heading rounded-full px-10 py-3 text-center text-sm dark:text-white"
+      >
+        Go back
+      </span>
+    </button>
+  </div>
+
+  <nav class="mt-10 pb-16 text-center text-sm" aria-label="Helpful links">
+    <p class="mb-3">Looking for something? Try one of these:</p>
+    <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+      <li>
+        <a class="underline hover:no-underline" href="/">All episodes</a>
+      </li>
+      <li>
+        <a class="underline hover:no-underline" href="/about">About</a>
+      </li>
+      <li>
+        <a class="underline hover:no-underline" href="/contact">Contact</a>
+      </li>
+      <li>
+        <a class="underline hover:no-underline" href="/llms.txt">llms.txt</a>
+      </li>
+      <li>
+        <a class="underline hover:no-underline" href="/sitemap-index.xml">
+          Sitemap
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>

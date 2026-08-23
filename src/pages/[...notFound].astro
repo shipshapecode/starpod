@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NotFoundContent from '../components/NotFoundContent.astro';
+import { jsonError } from '../lib/api-errors';
+import { generateNotFoundMarkdown } from '../lib/not-found';
+import { getShowInfo } from '../lib/rss';
+
+// Rendered on demand so nonexistent paths return a real HTTP 404 with a body
+// agents can recover from: JSON for API paths, markdown for markdown-accepting
+// agents, and the regular 404 page for browsers.
+export const prerender = false;
+
+const pathname = Astro.url.pathname;
+
+if (pathname.startsWith('/api/')) {
+  return jsonError(
+    404,
+    'not_found',
+    `No API endpoint exists at ${pathname}`,
+    'See /openapi.json for the available endpoints.'
+  );
+}
+
+const accept = Astro.request.headers.get('accept') ?? '';
+
+if (accept.includes('text/markdown')) {
+  const show = await getShowInfo();
+  const markdown = generateNotFoundMarkdown(pathname, show, Astro.site);
+
+  return new Response(markdown, {
+    status: 404,
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      Vary: 'Accept'
+    }
+  });
+}
+
+Astro.response.status = 404;
+Astro.response.statusText = 'Not Found';
+Astro.response.headers.set('Vary', 'Accept');
+---
+
+<Layout title="404 - Not found">
+  <NotFoundContent />
+</Layout>
