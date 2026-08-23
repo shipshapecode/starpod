@@ -1,6 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ContactForm from '../components/ContactForm';
+import { getShowInfo } from '../lib/rss';
+import starpodConfig from 'starpod.config';
+
+const show = await getShowInfo();
+
+const platformLinks = [
+  { name: 'Apple Podcasts', url: starpodConfig.platforms.apple },
+  { name: 'Spotify', url: starpodConfig.platforms.spotify },
+  { name: 'YouTube', url: starpodConfig.platforms.youtube },
+  { name: 'Overcast', url: starpodConfig.platforms.overcast },
+  { name: 'Pocket Casts', url: starpodConfig.platforms.pocketCasts }
+].filter((platform) => platform.url);
 ---
 
 <Layout title="Contact">
@@ -12,10 +24,93 @@ import ContactForm from '../components/ContactForm';
     </h1>
 
     <p class="mb-8">
-      Have a question for us or a topic you would like us to cover on the show?
-      Reach out here and we'll be in touch soon!
+      Have a question for us, feedback on an episode, or a topic you would like
+      us to cover on {show.title}? Maybe a guest you want to hear from, or just
+      something you want to say? Fill out the form below and your message goes
+      straight to the hosts — we read every one and we'll be in touch soon!
     </p>
 
     <ContactForm client:load />
+
+    <div class="mt-12 pb-16">
+      <h2
+        class="text-light-text-heading mb-4 text-xl font-bold dark:text-white"
+      >
+        Reach the hosts directly
+      </h2>
+
+      <ul class="mb-8 flex flex-col gap-2">
+        {
+          starpodConfig.hosts.map((host) => (
+            <li>
+              <span class="font-bold">{host.name}</span>
+              {host.twitter && (
+                <>
+                  {' — '}
+                  <a
+                    class="underline hover:no-underline"
+                    href={host.twitter}
+                    rel="noopener noreferrer"
+                  >
+                    Twitter
+                  </a>
+                </>
+              )}
+              {host.github && (
+                <>
+                  {' · '}
+                  <a
+                    class="underline hover:no-underline"
+                    href={host.github}
+                    rel="noopener noreferrer"
+                  >
+                    GitHub
+                  </a>
+                </>
+              )}
+              {host.website && (
+                <>
+                  {' · '}
+                  <a
+                    class="underline hover:no-underline"
+                    href={host.website}
+                    rel="noopener noreferrer"
+                  >
+                    Website
+                  </a>
+                </>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+
+      {
+        platformLinks.length > 0 && (
+          <>
+            <h2 class="text-light-text-heading mb-4 text-xl font-bold dark:text-white">
+              Follow the show
+            </h2>
+            <p class="mb-4">
+              The best way to support {show.title} is to subscribe, leave a
+              review, and share episodes with your friends. You can find us on:
+            </p>
+            <ul class="flex flex-wrap gap-x-6 gap-y-2">
+              {platformLinks.map((platform) => (
+                <li>
+                  <a
+                    class="underline hover:no-underline"
+                    href={platform.url}
+                    rel="noopener noreferrer"
+                  >
+                    {platform.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </div>
   </div>
 </Layout>

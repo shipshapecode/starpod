@@ -37,6 +37,16 @@ const { imageUrl, title } = Astro.props;
 const canonicalURL =
   Astro.props.canonicalURL ?? new URL(Astro.url.pathname, Astro.site);
 const description = Astro.props.description ?? starpodConfig.description;
+
+// The show's profiles elsewhere, so agents can connect this site to the same
+// entity on other platforms (JSON-LD sameAs).
+const sameAs = [
+  starpodConfig.platforms.apple,
+  starpodConfig.platforms.spotify,
+  starpodConfig.platforms.youtube,
+  starpodConfig.platforms.overcast,
+  starpodConfig.platforms.pocketCasts
+].filter((url): url is string => Boolean(url));
 ---
 
 <!doctype html>
@@ -108,15 +118,22 @@ const description = Astro.props.description ?? starpodConfig.description;
         description: show.description,
         url: canonicalURL.toString(),
         webFeed: starpodConfig.rssFeed,
+        sameAs,
         author: {
           '@type': 'Organization',
           name: show.title,
-          url: canonicalURL.origin
+          description: starpodConfig.description,
+          url: canonicalURL.origin,
+          logo: show.image,
+          sameAs
         },
         publisher: {
           '@type': 'Organization',
           name: show.title,
-          url: canonicalURL.origin
+          description: starpodConfig.description,
+          url: canonicalURL.origin,
+          logo: show.image,
+          sameAs
         },
         image: show.image
       }}
