@@ -1,22 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import FourZeroFourIllustration from '../components/illustrations/404Illustration.astro';
+import NotFoundContent from '../components/NotFoundContent.astro';
 ---
 
 <Layout title="404 - Not found">
-  <div
-    class="relative z-10 flex flex-col items-center justify-center px-8 lg:px-18"
-  >
-    <FourZeroFourIllustration />
-
-    <div class="mt-12 flex justify-center pb-16">
-      <button class="btn" onclick="history.back()">
-        <span
-          class="text-light-text-heading rounded-full px-10 py-3 text-center text-sm dark:text-white"
-        >
-          Go back
-        </span>
-      </button>
-    </div>
-  </div>
+  <NotFoundContent />
 </Layout>
