@@ -1,22 +1,29 @@
 name: Publish Episodes to ATProto
 
 on:
-  # Run after the daily site rebuild to catch new episodes
-  workflow_run:
-    workflows: ["Rebuild Astro Site"]
-    types: [completed]
-  # Allow manual trigger
+  # Poll the RSS feed for new episodes. Offset from the top of the hour —
+  # GitHub delays cron runs scheduled at :00/:30 the most.
+  schedule:
+    - cron: "7,37 * * * *"
+  # Allow manual trigger (skips the feed-changed gate)
   workflow_dispatch:
 
+concurrency:
+  group: publish-episodes
+  cancel-in-progress: false
+
 jobs:
-  # Skip publishing entirely if standard.site/ATProto secrets aren't configured,
-  # so forks without standard.site set up don't fail this workflow.
-  check:
+  # Gate: skip publishing entirely if standard.site/ATProto secrets aren't
+  # configured (so forks without standard.site set up don't fail this
+  # workflow), and skip scheduled runs when the feed hasn't changed since the
+  # last successful publish.
+  gate:
     runs-on: ubuntu-latest
-    # Only run if the triggering workflow succeeded (or manual dispatch)
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     outputs:
       configured: ${{ steps.config.outputs.configured }}
+      changed: ${{ steps.feed.outputs.changed }}
+      feed-hash: ${{ steps.feed.outputs.hash }}
+      rebuild-triggered: ${{ steps.rebuild.outputs.triggered }}
     steps:
       - name: Check ATProto configuration
         id: config
@@ -32,10 +39,64 @@ jobs:
             echo "configured=false" >> "$GITHUB_OUTPUT"
             echo "::notice::standard.site/ATProto secrets not set — skipping episode publishing."
           fi
+      - uses: actions/checkout@v4
+        if: steps.config.outputs.configured == 'true'
+      - name: Restore last published feed hash
+        if: steps.config.outputs.configured == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .feed-hash
+          key: feed-hash-
+          restore-keys: |
+            feed-hash-
+      - name: Check feed for changes
+        if: steps.config.outputs.configured == 'true'
+        id: feed
+        run: |
+          set -euo pipefail
+          FEED_URL=$(sed -n "s/.*rssFeed: *['\"]\([^'\"]*\)['\"].*/\1/p" starpod.config.ts | head -1)
+          if [ -z "$FEED_URL" ]; then
+            echo "::warning::Could not extract rssFeed from starpod.config.ts — publishing unconditionally."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! FEED_BODY=$(curl -sfL "$FEED_URL"); then
+            echo "::warning::Could not fetch RSS feed — publishing unconditionally."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          HASH=$(printf '%s' "$FEED_BODY" | sha256sum | cut -d' ' -f1)
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+          PREV=$(cat .feed-hash 2>/dev/null || true)
+          if [ "$HASH" = "$PREV" ]; then
+            echo "Feed unchanged since last publish."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Feed changed (or no previous hash) — publishing."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      # Kick off the Vercel rebuild as soon as a feed change is detected, so
+      # the site build runs while the publish job is installing dependencies.
+      # The publish script then waits for the new episode pages to be live
+      # before publishing documents that link to them.
+      - name: Trigger site rebuild
+        if: steps.config.outputs.configured == 'true' && steps.feed.outputs.changed == 'true'
+        id: rebuild
+        env:
+          REBUILD_WEBHOOK: ${{ secrets.REBUILD_WEBHOOK }}
+        run: |
+          if [ -n "$REBUILD_WEBHOOK" ]; then
+            curl -sf -X POST "$REBUILD_WEBHOOK" > /dev/null
+            echo "triggered=true" >> "$GITHUB_OUTPUT"
+            echo "Triggered site rebuild."
+          else
+            echo "triggered=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::REBUILD_WEBHOOK not set — publishing without waiting for a site rebuild."
+          fi
 
   publish:
-    needs: check
-    if: ${{ needs.check.outputs.configured == 'true' }}
+    needs: gate
+    if: ${{ needs.gate.outputs.configured == 'true' && (github.event_name == 'workflow_dispatch' || needs.gate.outputs.changed == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -64,3 +125,15 @@ jobs:
           ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
           STANDARD_SITE_URL: ${{ secrets.STANDARD_SITE_URL }}
           STANDARD_SITE_PUBLICATION_RKEY: ${{ secrets.STANDARD_SITE_PUBLICATION_RKEY }}
+          WAIT_FOR_SITE: ${{ needs.gate.outputs.rebuild-triggered }}
+      # Record the feed hash only after a successful publish, so a failed run
+      # is retried on the next scheduled poll.
+      - name: Record published feed hash
+        if: ${{ needs.gate.outputs.feed-hash != '' }}
+        run: printf '%s' "${{ needs.gate.outputs.feed-hash }}" > .feed-hash
+      - name: Save feed hash
+        if: ${{ needs.gate.outputs.feed-hash != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .feed-hash
+          key: feed-hash-${{ needs.gate.outputs.feed-hash }}

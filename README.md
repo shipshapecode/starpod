@@ -167,8 +167,10 @@ variables → Actions → New repository secret**:
 
 Episodes are published to ATProto as individual documents automatically:
 
-- **Automatic** — The `Publish Episodes to ATProto` workflow runs after each
-  daily site rebuild and publishes any new episodes
+- **Automatic** — The `Publish Episodes to ATProto` workflow polls the RSS
+  feed every 30 minutes; when it finds new episodes it triggers a site rebuild
+  (via the `REBUILD_WEBHOOK` secret), waits for the new episode pages to be
+  live, and then publishes the episodes
 - **Manual** — Trigger the workflow manually from the Actions tab
 - **Backfill** — Use the `Backfill Episodes to ATProto` workflow (Actions tab →
   Run workflow → type "backfill") to publish all existing episodes

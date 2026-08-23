@@ -29,6 +29,38 @@ import starpodConfig from '../starpod.config';
 import { dasherize } from '../src/utils/dasherize';
 
 const BACKFILL = process.argv.includes('--backfill');
+// Set by the GitHub workflow when it has just triggered a site rebuild:
+// published documents link to episode pages, so wait for the rebuilt site to
+// serve them before publishing.
+const WAIT_FOR_SITE = process.env.WAIT_FOR_SITE === 'true';
+
+const PAGE_WAIT_TIMEOUT_MS = 10 * 60 * 1000;
+const PAGE_WAIT_INTERVAL_MS = 15 * 1000;
+
+async function waitForPage(url: string) {
+  const deadline = Date.now() + PAGE_WAIT_TIMEOUT_MS;
+
+  for (;;) {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      if (response.ok) {
+        return;
+      }
+      console.log(`  ⏳ ${url} → ${response.status}, waiting for rebuild...`);
+    } catch (err) {
+      console.log(`  ⏳ ${url} unreachable, waiting for rebuild... (${err})`);
+    }
+
+    if (Date.now() >= deadline) {
+      throw new Error(
+        `Timed out waiting for ${url} — site rebuild may have failed. ` +
+          'Episodes will be retried on the next scheduled run.'
+      );
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, PAGE_WAIT_INTERVAL_MS));
+  }
+}
 
 const FeedSchema = object({
   items: array(
@@ -111,6 +143,20 @@ async function main() {
 
     cursor = response.data.cursor;
   } while (cursor);
+
+  // All new episode pages come from the same rebuild, so once the first new
+  // page is live the rest are too.
+  if (WAIT_FOR_SITE && !BACKFILL) {
+    const firstNew = episodes.find(
+      (episode) => !existingPaths.has(`/${dasherize(episode.title)}`)
+    );
+    if (firstNew) {
+      const pageUrl = `${siteUrl.replace(/\/$/, '')}/${dasherize(firstNew.title)}`;
+      console.log(`⏳ Waiting for rebuilt site to serve ${pageUrl}...`);
+      await waitForPage(pageUrl);
+      console.log('✅ Site rebuild is live.');
+    }
+  }
 
   let published = 0;
   let skipped = 0;
