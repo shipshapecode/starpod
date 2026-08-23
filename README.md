@@ -250,12 +250,40 @@ fine without them, using episode descriptions and metadata from your RSS feed.
 All of the following endpoints are automatically generated at build time from
 your `starpod.config.ts` and RSS feed:
 
-- `/llms.txt` - Main discovery file
+- `/llms.txt` - Main discovery file, including "when to use this site" guidance
+  for agents and a developer resources section
 - `/for-llms` - Human-readable guide page
 - `/for-llms.html.md` - Markdown version of guide
+- `/index.html.md` - Markdown version of the homepage
 - `/about.html.md` - Markdown version of about page
+- `/contact.html.md` - Markdown version of the contact page
 - `/episodes-index.html.md` - Complete episode listing
 - `/{episode-slug}.html.md` - Individual episode with transcript
 - `/{episode-number}.html.md` - Alternative episode URL
+- `/openapi.json` - OpenAPI 3.1 spec describing the JSON API endpoints
+  (episode search, episode pagination, contact form)
 
 No configuration needed - it just works!
+
+#### Markdown Content Negotiation
+
+Agents can also request any page that has a markdown twin with an
+`Accept: text/markdown` header and get the markdown version back from the same
+URL, per [acceptmarkdown.com](https://acceptmarkdown.com). Both variants are
+served with `Vary: Accept` so CDNs cache them separately.
+
+This is implemented by `scripts/vercel-md-negotiation.mjs`, which runs as part
+of `pnpm build` and injects Accept-based rewrite routes into the Vercel build
+output. If you customize the `build` script in `package.json`, keep the
+`node scripts/vercel-md-negotiation.mjs` step after `astro build`. (Deploying
+somewhere other than Vercel? The `.html.md` URLs still work everywhere; only
+the Accept-header negotiation is Vercel-specific.)
+
+#### Agent-Friendly Errors
+
+- Nonexistent paths return a real HTTP 404: browsers get the styled 404 page,
+  `Accept: text/markdown` clients get a short markdown body pointing at the
+  sitemap, `llms.txt`, and the episodes index, and `/api/*` paths get a
+  structured JSON error
+- API errors are structured JSON with a stable `error.code`, a message, and a
+  resolution `hint` - never an HTML error page

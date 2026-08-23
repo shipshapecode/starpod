@@ -13,7 +13,9 @@ Whatnot podcast).
 ## Commands
 
 - **Dev server:** `pnpm dev` (runs on localhost:4321)
-- **Build:** `pnpm build` (runs `astro check` then `astro build`)
+- **Build:** `pnpm build` (runs `astro check`, `astro build`, then
+  `scripts/vercel-md-negotiation.mjs`, which injects `Accept: text/markdown`
+  content-negotiation routes into the Vercel build output)
 - **Lint:** `pnpm lint` (ESLint with caching)
 - **Lint fix:** `pnpm lint:fix`
 - **All tests:** `pnpm test` (runs unit + e2e concurrently)
@@ -56,7 +58,11 @@ connection is configured in `db/index.ts`.
 
 - `src/pages/` — Astro pages and API routes. Dynamic episode pages use
   `[episode].astro`. LLM-friendly `.html.md.ts` endpoints generate markdown
-  versions.
+  versions. `openapi.json.ts` publishes an OpenAPI spec for the JSON API.
+  `[...notFound].astro` is an on-demand (prerender=false) catch-all that
+  returns agent-friendly 404s: JSON errors for `/api/*`, a markdown body for
+  `Accept: text/markdown` clients, and the styled 404 page otherwise. API
+  routes return structured JSON errors via `src/lib/api-errors.ts`.
 - `src/components/` — Mix of `.astro` (static) and `.tsx` (Preact interactive)
   components. The audio player (`src/components/player/`) and search dialog are
   Preact.
