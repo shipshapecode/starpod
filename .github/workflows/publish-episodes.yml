@@ -136,4 +136,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: .feed-hash
-          key: feed-hash-${{ needs.gate.outputs.feed-hash }}
+          # Include run id/attempt so re-publishing a previously seen hash
+          # still saves (cache keys are immutable); the prefix restore picks
+          # the most recently created entry.
+          key: feed-hash-${{ needs.gate.outputs.feed-hash }}-${{ github.run_id }}-${{ github.run_attempt }}
