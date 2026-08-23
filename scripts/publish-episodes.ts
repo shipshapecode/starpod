@@ -164,6 +164,7 @@ async function main() {
 
   let published = 0;
   let skipped = 0;
+  let failed = 0;
 
   for (const episode of episodes) {
     const slug = dasherize(episode.title);
@@ -205,13 +206,20 @@ async function main() {
         skipped++;
       } else {
         console.error(`  ❌ ${episode.title}: ${message}`);
+        failed++;
       }
     }
   }
 
   console.log(
-    `\n🎉 Done! Published: ${published}, Skipped: ${skipped}, Total episodes: ${episodes.length}`
+    `\n🎉 Done! Published: ${published}, Skipped: ${skipped}, Failed: ${failed}, Total episodes: ${episodes.length}`
   );
+
+  // Exit nonzero so the workflow doesn't record the feed hash and the failed
+  // episodes are retried on the next scheduled run.
+  if (failed > 0) {
+    throw new Error(`${failed} episode(s) failed to publish.`);
+  }
 }
 
 main().catch((err) => {
