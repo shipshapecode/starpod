@@ -144,16 +144,20 @@ async function main() {
     cursor = response.data.cursor;
   } while (cursor);
 
-  // All new episode pages come from the same rebuild, so once the first new
-  // page is live the rest are too.
+  // Vercel deploys are atomic, so new pages go live together — but wait on
+  // every unpublished page so publishing can't outrun the rebuild regardless
+  // of feed ordering or previously failed publishes.
   if (WAIT_FOR_SITE && !BACKFILL) {
-    const firstNew = episodes.find(
-      (episode) => !existingPaths.has(`/${dasherize(episode.title)}`)
-    );
-    if (firstNew) {
-      const pageUrl = `${siteUrl.replace(/\/$/, '')}/${dasherize(firstNew.title)}`;
-      console.log(`⏳ Waiting for rebuilt site to serve ${pageUrl}...`);
-      await waitForPage(pageUrl);
+    const pendingUrls = episodes
+      .filter((episode) => !existingPaths.has(`/${dasherize(episode.title)}`))
+      .map(
+        (episode) => `${siteUrl.replace(/\/$/, '')}/${dasherize(episode.title)}`
+      );
+    if (pendingUrls.length > 0) {
+      console.log(
+        `⏳ Waiting for rebuilt site to serve ${pendingUrls.length} new episode page(s)...`
+      );
+      await Promise.all(pendingUrls.map((url) => waitForPage(url)));
       console.log('✅ Site rebuild is live.');
     }
   }
