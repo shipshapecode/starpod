@@ -136,10 +136,15 @@ export default function starpod(starpodConfig: StarpodConfig): AstroIntegration 
       },
       'astro:build:done': () => {
         // Injects `Accept: text/markdown` content-negotiation routes into the
-        // Vercel build output. No-ops for other adapters.
-        applyVercelMarkdownNegotiation(
-          fileURLToPath(new URL('./.vercel/output', projectRoot))
-        );
+        // Vercel build output. No-ops for other adapters. The adapter's own
+        // astro:build:done hook runs after this one and writes
+        // `.vercel/output/config.json`, so the patch must wait until process
+        // exit (the patch is synchronous fs work, which is safe there).
+        process.once('exit', () => {
+          applyVercelMarkdownNegotiation(
+            fileURLToPath(new URL('./.vercel/output', projectRoot))
+          );
+        });
       }
     }
   };

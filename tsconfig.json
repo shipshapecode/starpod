@@ -3,6 +3,9 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "paths": {
+      "starpod/src/*": ["./packages/starpod/src/*"]
+    },
     "esModuleInterop": true,
     "strictNullChecks": true,
     "verbatimModuleSyntax": true,
