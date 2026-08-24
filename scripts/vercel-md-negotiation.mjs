@@ -114,23 +114,42 @@ export function buildNegotiationRoutes(mdPaths) {
  * inserted ahead of the `filesystem` handler. Idempotent: an already patched
  * config is returned unchanged.
  */
+// Canonical JSON encoding (sorted object keys) so routes can be compared for
+// exact equality regardless of key order.
+const canonical = (value) => {
+  if (Array.isArray(value)) {
+    return value.map(canonical);
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.keys(value)
+        .sort()
+        .map((key) => [key, canonical(value[key])])
+    );
+  }
+  return value;
+};
+
+const routeKey = (route) => JSON.stringify(canonical(route));
+
 export function patchConfig(config, mdPaths) {
   if (!Array.isArray(config.routes)) {
     throw new Error('config.json has no routes array');
   }
 
-  const alreadyPatched = config.routes.some(
-    (route) =>
-      typeof route.dest === 'string' &&
-      route.dest.endsWith(MD_SUFFIX) &&
-      Array.isArray(route.has)
-  );
-  if (alreadyPatched) {
+  const negotiationRoutes = buildNegotiationRoutes(mdPaths);
+  if (negotiationRoutes.length === 0) {
     return { config, inserted: 0 };
   }
 
-  const negotiationRoutes = buildNegotiationRoutes(mdPaths);
-  if (negotiationRoutes.length === 0) {
+  // Idempotency: only skip when every generated route is already present
+  // exactly. A user-added conditional markdown route must not suppress the
+  // generated set.
+  const existingRoutes = new Set(config.routes.map(routeKey));
+  const alreadyPatched = negotiationRoutes.every((route) =>
+    existingRoutes.has(routeKey(route))
+  );
+  if (alreadyPatched) {
     return { config, inserted: 0 };
   }
 

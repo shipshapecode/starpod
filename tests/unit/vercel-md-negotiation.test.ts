@@ -124,6 +124,27 @@ describe('vercel-md-negotiation', () => {
       expect(again.routes).toHaveLength(config.routes.length);
     });
 
+    it('still patches when an unrelated conditional markdown route exists', () => {
+      const config = baseConfig();
+      // A user-added Accept-conditional route pointing at a markdown file must
+      // not suppress the generated negotiation set.
+      config.routes.unshift({
+        src: '^/custom$',
+        has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }],
+        dest: '/custom-page.html.md'
+      });
+
+      const { config: patched, inserted } = patchConfig(config, [
+        '/index',
+        '/about'
+      ]);
+
+      expect(inserted).toBe(4);
+      expect(
+        patched.routes.some((r: { dest?: string }) => r.dest === '/index.html.md')
+      ).toBe(true);
+    });
+
     it('throws when the filesystem handler is missing', () => {
       expect(() =>
         patchConfig({ version: 3, routes: [] }, ['/about'])
