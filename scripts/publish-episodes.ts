@@ -62,24 +62,17 @@ async function waitForPage(url: string) {
   }
 }
 
+// Only validate the fields this script actually uses — requiring unused
+// fields makes publishing break whenever the feed host changes something
+// irrelevant (e.g. Flightcast's image enclosures have no `type`).
 const FeedSchema = object({
   items: array(
     object({
-      id: string(),
       title: string(),
       published: number(),
       description: string(),
       content_encoded: optional(string()),
-      itunes_duration: number(),
-      itunes_episode: optional(number()),
-      itunes_episodeType: optional(string()),
-      itunes_image: optional(object({ href: optional(string()) })),
-      enclosures: array(
-        object({
-          url: string(),
-          type: string()
-        })
-      )
+      itunes_episodeType: optional(string())
     })
   )
 });
