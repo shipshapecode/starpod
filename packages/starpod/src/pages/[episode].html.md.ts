@@ -4,7 +4,7 @@ import type { APIRoute } from 'astro';
 import { cleanTranscript, generateEpisodeMarkdown } from '../lib/llms';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
 import { getRssTranscriptText } from '../lib/transcript';
-import starpodConfig from '../../starpod.config';
+import starpodConfig from 'virtual:starpod/config';
 
 export async function getStaticPaths() {
   const allEpisodes = await getAllEpisodes();

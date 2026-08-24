@@ -26,7 +26,7 @@ import {
 } from '@bryanguffey/astro-standard-site';
 
 import starpodConfig from '../starpod.config';
-import { dasherize } from '../src/utils/dasherize';
+import { dasherize } from 'starpod/src/utils/dasherize';
 
 const BACKFILL = process.argv.includes('--backfill');
 // Set by the GitHub workflow when it has just triggered a site rebuild:

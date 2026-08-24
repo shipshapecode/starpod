@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateNotFoundMarkdown } from '../../src/lib/not-found';
-import type { Show } from '../../src/lib/rss';
+import { generateNotFoundMarkdown } from 'starpod/src/lib/not-found';
+import type { Show } from 'starpod/src/lib/rss';
 
 describe('generateNotFoundMarkdown', () => {
   const mockShow: Show = {

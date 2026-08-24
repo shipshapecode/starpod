@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 
 import { generateForLlmsMarkdown } from '../lib/llms';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
-import starpodConfig from '../../starpod.config';
+import starpodConfig from 'virtual:starpod/config';
 
 export const GET: APIRoute = async ({ site }) => {
   const show = await getShowInfo();

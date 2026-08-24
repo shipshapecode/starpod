@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { generateOpenApiSpec } from '../../src/lib/openapi';
-import type { Show } from '../../src/lib/rss';
-import type { StarpodConfig } from '../../src/utils/config';
+import { generateOpenApiSpec } from 'starpod/src/lib/openapi';
+import type { Show } from 'starpod/src/lib/rss';
+import type { StarpodConfig } from 'starpod/src/utils/config';
 
 const mockShow: Show = {
   title: 'Test Podcast',

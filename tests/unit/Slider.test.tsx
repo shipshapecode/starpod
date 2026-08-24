@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/preact';
 import { beforeEach, describe, expect, it } from 'vitest';
-import Slider from '../../src/components/player/Slider';
+import Slider from 'starpod/src/components/player/Slider';
 import { createRef } from 'preact';
 
 // Mock audio element

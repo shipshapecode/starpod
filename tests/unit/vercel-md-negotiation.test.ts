@@ -7,7 +7,7 @@ import {
   buildNegotiationRoutes,
   collectMarkdownPaths,
   patchConfig
-} from '../../scripts/vercel-md-negotiation.mjs';
+} from 'starpod/src/vercel-md-negotiation.mjs';
 
 const ACCEPT_MD = [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }];
 

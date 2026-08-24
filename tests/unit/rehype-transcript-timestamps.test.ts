@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import rehypeTranscriptTimestamps from '../../src/lib/rehype-transcript-timestamps.mjs';
+import rehypeTranscriptTimestamps from 'starpod/src/lib/rehype-transcript-timestamps.mjs';
 
 type HastNode = {
   type: string;

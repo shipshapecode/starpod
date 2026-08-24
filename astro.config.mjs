@@ -1,10 +1,8 @@
-import { defineConfig, fontProviders } from 'astro/config';
-import preact from '@astrojs/preact';
-import sitemap from '@astrojs/sitemap';
-import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
+import { defineConfig } from 'astro/config';
+import starpod from 'starpod';
 
-import rehypeTranscriptTimestamps from './src/lib/rehype-transcript-timestamps.mjs';
+import starpodConfig from './starpod.config';
 
 // https://astro.build/config
 export default defineConfig({
@@ -28,60 +26,8 @@ export default defineConfig({
       enabled: true
     }
   }),
-  build: {
-    inlineStylesheets: 'always'
-  },
-  markdown: {
-    // Makes bracketed timestamps in markdown transcripts clickable for seeking.
-    rehypePlugins: [rehypeTranscriptTimestamps]
-  },
-  experimental: {
-    clientPrerender: true
-  },
-  fonts: [
-    {
-      provider: fontProviders.google(),
-      name: 'Inter',
-      cssVariable: '--astro-font-inter',
-      formats: ['woff2'],
-      styles: ['normal'],
-      subsets: ['latin'],
-      weights: ['300 900'],
-      options: {
-        experimental: {
-          variableAxis: {
-            opsz: ['14..32']
-          }
-        }
-      }
-    }
-  ],
-  image: {
-    remotePatterns: [
-      {
-        protocol: 'https'
-      },
-      {
-        protocol: 'http'
-      }
-    ]
-  },
-  prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport'
-  },
   site: 'https://whiskey.fm',
-  trailingSlash: 'never',
-  integrations: [
-    preact(),
-    sitemap({
-      filter: (page) => {
-        const pathname = new URL(page).pathname;
-        // Exclude episode number pages and only include slug pages.
-        return !/^\/\d+\/?$/.test(pathname);
-      }
-    })
-  ],
+  integrations: [starpod(starpodConfig)],
   // These were specific redirects we needed for our podcast, if you do not have any routes to redirect, you can safely remove this.
   redirects: {
     '/hot-takes-tan-stack-and-open-source-with-tanner-linsley':
@@ -90,8 +36,5 @@ export default defineConfig({
       'creating-codepen-tackling-tailwind-and-keeping-it-simple-with-chris-coyier',
     '/coding-languages-ai-and-the-evolution-of-game-development-with-phillip-winston':
       '/coding-languages-ai-and-the-evolution-of-game-development-with-philip-winston'
-  },
-  vite: {
-    plugins: [tailwindcss()]
   }
 });

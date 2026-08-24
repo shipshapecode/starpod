@@ -11,48 +11,27 @@ importers:
 
   .:
     dependencies:
-      '@astrojs/preact':
-        specifier: ^5.1.4
-        version: 5.1.4(@babel/core@7.29.7)(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(preact@10.29.2)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0)
       '@astrojs/vercel':
         specifier: ^10.0.8
         version: 10.0.8(astro@6.4.2(@types/node@24.12.4)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0))(react@19.0.0)(rollup@4.60.4)
       '@bryanguffey/astro-standard-site':
         specifier: ^1.0.3
         version: 1.0.3(astro@6.4.2(@types/node@24.12.4)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0))
-      '@libsql/client':
-        specifier: ^0.17.3
-        version: 0.17.3
-      '@preact/signals':
-        specifier: ^2.9.1
-        version: 2.9.1(preact@10.29.2)
-      '@vercel/analytics':
-        specifier: ^1.6.1
-        version: 1.6.1(react@19.0.0)
-      '@vercel/speed-insights':
-        specifier: ^1.3.1
-        version: 1.3.1(react@19.0.0)
       astro:
         specifier: 6.4.2
         version: 6.4.2(@types/node@24.12.4)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0)
-      astro-seo-schema:
-        specifier: ^5.2.0
-        version: 5.2.0(astro@6.4.2(@types/node@24.12.4)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0))(schema-dts@1.1.5)
-      atropos:
-        specifier: ^2.0.2
-        version: 2.0.2
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@libsql/client@0.17.3)
-      preact:
-        specifier: ^10.29.2
-        version: 10.29.2
+      html-to-text:
+        specifier: ^9.0.5
+        version: 9.0.5
       rss-to-json:
         specifier: ^2.1.1
         version: 2.1.1
-      schema-dts:
-        specifier: ^1.1.5
-        version: 1.1.5
+      starpod:
+        specifier: workspace:*
+        version: link:packages/starpod
       valibot:
         specifier: ^1.4.1
         version: 1.4.1(typescript@5.9.3)
@@ -60,24 +39,12 @@ importers:
       '@astrojs/check':
         specifier: ^0.9.9
         version: 0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@5.9.3)
-      '@astrojs/sitemap':
-        specifier: ^3.7.3
-        version: 3.7.3
       '@eslint/js':
         specifier: ^9.39.4
         version: 9.39.4
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.60.0
-      '@tailwindcss/forms':
-        specifier: ^0.5.11
-        version: 0.5.11(tailwindcss@4.3.0)
-      '@tailwindcss/typography':
-        specifier: ^0.5.19
-        version: 0.5.19(tailwindcss@4.3.0)
-      '@tailwindcss/vite':
-        specifier: ^4.3.0
-        version: 4.3.0(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.22.4)(yaml@2.9.0))
       '@testing-library/jest-dom':
         specifier: ^6.9.1
         version: 6.9.1
@@ -111,12 +78,12 @@ importers:
       globals:
         specifier: ^16.5.0
         version: 16.5.0
-      html-to-text:
-        specifier: ^9.0.5
-        version: 9.0.5
       jsdom:
         specifier: ^27.4.0
         version: 27.4.0
+      preact:
+        specifier: ^10.29.2
+        version: 10.29.2
       prettier:
         specifier: ^3.8.3
         version: 3.8.3
@@ -144,6 +111,73 @@ importers:
       vitest:
         specifier: ^4.1.7
         version: 4.1.7(@types/node@24.12.4)(jsdom@27.4.0)(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/starpod:
+    dependencies:
+      '@astrojs/preact':
+        specifier: ^5.1.4
+        version: 5.1.4(@babel/core@7.29.7)(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(preact@10.29.2)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0)
+      '@astrojs/sitemap':
+        specifier: ^3.7.3
+        version: 3.7.3
+      '@bryanguffey/astro-standard-site':
+        specifier: ^1.0.3
+        version: 1.0.3(astro@6.4.2(@types/node@24.12.4)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0))
+      '@libsql/client':
+        specifier: ^0.17.3
+        version: 0.17.3
+      '@preact/signals':
+        specifier: ^2.9.1
+        version: 2.9.1(preact@10.29.2)
+      '@tailwindcss/forms':
+        specifier: ^0.5.11
+        version: 0.5.11(tailwindcss@4.3.0)
+      '@tailwindcss/typography':
+        specifier: ^0.5.19
+        version: 0.5.19(tailwindcss@4.3.0)
+      '@tailwindcss/vite':
+        specifier: ^4.3.0
+        version: 4.3.0(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@vercel/speed-insights':
+        specifier: ^1.3.1
+        version: 1.3.1(react@19.0.0)
+      astro-seo-schema:
+        specifier: ^5.2.0
+        version: 5.2.0(astro@6.4.2(@types/node@24.12.4)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0))(schema-dts@1.1.5)
+      atropos:
+        specifier: ^2.0.2
+        version: 2.0.2
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@libsql/client@0.17.3)
+      html-to-text:
+        specifier: ^9.0.5
+        version: 9.0.5
+      preact:
+        specifier: ^10.29.2
+        version: 10.29.2
+      rss-to-json:
+        specifier: ^2.1.1
+        version: 2.1.1
+      schema-dts:
+        specifier: ^1.1.5
+        version: 1.1.5
+      tailwindcss:
+        specifier: ^4.3.0
+        version: 4.3.0
+      valibot:
+        specifier: ^1.4.1
+        version: 1.4.1(typescript@5.9.3)
+    devDependencies:
+      '@types/html-to-text':
+        specifier: ^9.0.4
+        version: 9.0.4
+      astro:
+        specifier: 6.4.2
+        version: 6.4.2(@types/node@24.12.4)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0)
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
 packages:
 

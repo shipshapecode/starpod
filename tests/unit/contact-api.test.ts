@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ALL, POST } from '../../src/pages/api/contact';
+import { ALL, POST } from 'starpod/src/pages/api/contact';
 
 type ApiContext = Parameters<typeof POST>[0];
 

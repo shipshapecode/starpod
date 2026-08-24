@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
 import { formatDate, formatDuration } from '../lib/llms';
-import starpodConfig from '../../starpod.config';
+import starpodConfig from 'virtual:starpod/config';
 
 const show = await getShowInfo();
 const episodes = await getAllEpisodes();

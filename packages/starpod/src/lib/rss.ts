@@ -11,9 +11,21 @@ import {
 } from 'valibot';
 
 import { optimizeImage } from './optimize-episode-image';
+import type { StarpodConfig } from '../utils/config';
 import { dasherize } from '../utils/dasherize';
 import { truncate } from '../utils/truncate';
-import starpodConfig from '../../starpod.config';
+
+// Inside Astro (dev, build, vitest) the config comes from the integration's
+// virtual module. Standalone scripts (e.g. `db/seed.ts` under tsx) have no
+// Vite, so they must pass their config explicitly and the dynamic import is
+// never reached.
+async function resolveRssFeed(config?: StarpodConfig): Promise<string> {
+  if (config) {
+    return config.rssFeed;
+  }
+  const { default: starpodConfig } = await import('virtual:starpod/config');
+  return starpodConfig.rssFeed;
+}
 
 export interface Show {
   title: string;
@@ -75,13 +87,13 @@ function pickTranscript(
 
 let showInfoCache: Show | null = null;
 
-export async function getShowInfo() {
+export async function getShowInfo(config?: StarpodConfig) {
   if (showInfoCache) {
     return showInfoCache;
   }
 
   // @ts-expect-error
-  const showInfo = (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
+  const showInfo = (await parseFeed.parse(await resolveRssFeed(config))) as Show;
   showInfo.image = (await optimizeImage(showInfo.image, {
     height: 640,
     width: 640
@@ -93,7 +105,7 @@ export async function getShowInfo() {
 
 let episodesCache: Array<Episode> | null = null;
 
-export async function getAllEpisodes() {
+export async function getAllEpisodes(config?: StarpodConfig) {
   if (episodesCache) {
     return episodesCache;
   }
@@ -125,7 +137,7 @@ export async function getAllEpisodes() {
   });
 
   // @ts-expect-error
-  let feed = (await parseFeed.parse(starpodConfig.rssFeed)) as Show;
+  let feed = (await parseFeed.parse(await resolveRssFeed(config))) as Show;
   let items = parse(FeedSchema, feed).items;
 
   let episodes: Array<Episode> = await Promise.all(

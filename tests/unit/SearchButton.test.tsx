@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/preact';
 import { beforeEach, describe, expect, it } from 'vitest';
-import SearchButton from '../../src/components/SearchButton';
-import { isSearchOpen } from '../../src/components/state';
+import SearchButton from 'starpod/src/components/SearchButton';
+import { isSearchOpen } from 'starpod/src/components/state';
 
 describe('SearchButton', () => {
   beforeEach(() => {

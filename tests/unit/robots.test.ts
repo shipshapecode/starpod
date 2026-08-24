@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { getRobotsTxt } from '../../src/pages/robots.txt';
+import { getRobotsTxt } from 'starpod/src/pages/robots.txt';
 
 describe('Robots.txt', () => {
   let mockSite: URL;

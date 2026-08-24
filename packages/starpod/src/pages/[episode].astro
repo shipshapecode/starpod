@@ -2,14 +2,14 @@
 import { getEntry, render } from 'astro:content';
 import { eq } from 'drizzle-orm';
 
-import { createDb } from '../../db';
+import { createDb } from '../db';
 import {
   Episode as DbEpisode,
   HostOrGuest,
   Person,
   Sponsor,
   SponsorForEpisode
-} from '../../db/schema';
+} from '../db/schema';
 
 import { Schema } from 'astro-seo-schema';
 

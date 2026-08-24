@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/preact';
 import { beforeEach, describe, expect, it } from 'vitest';
-import FullPlayButton from '../../src/components/FullPlayButton';
-import { currentEpisode, isPlaying } from '../../src/components/state';
+import FullPlayButton from 'starpod/src/components/FullPlayButton';
+import { currentEpisode, isPlaying } from 'starpod/src/components/state';
 
 const mockEpisode = {
   id: 'test-episode-1',

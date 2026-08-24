@@ -1,5 +1,14 @@
 @import 'tailwindcss';
 
+/*
+  Tailwind's automatic source detection skips node_modules, so when this
+  package is installed as a dependency its own templates must be registered
+  explicitly. Paths are relative to this stylesheet.
+*/
+@source '../components';
+@source '../layouts';
+@source '../pages';
+
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 

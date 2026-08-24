@@ -10,9 +10,9 @@ import {
   generateEpisodesIndex,
   generateForLlmsMarkdown,
   generateAboutMarkdown
-} from '../../src/lib/llms';
-import type { Episode, Show } from '../../src/lib/rss';
-import type { StarpodConfig } from '../../src/utils/config';
+} from 'starpod/src/lib/llms';
+import type { Episode, Show } from 'starpod/src/lib/rss';
+import type { StarpodConfig } from 'starpod/src/utils/config';
 
 describe('LLM Utilities', () => {
   describe('formatDuration', () => {

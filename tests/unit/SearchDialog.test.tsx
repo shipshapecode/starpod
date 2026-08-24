@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/preact';
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest';
-import SearchDialog from '../../src/components/SearchDialog';
-import { isSearchOpen } from '../../src/components/state';
+import SearchDialog from 'starpod/src/components/SearchDialog';
+import { isSearchOpen } from 'starpod/src/components/state';
 
 // Mock fetch for episodes
 const mockEpisodes = [
