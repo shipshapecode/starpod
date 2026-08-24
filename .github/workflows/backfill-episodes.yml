@@ -57,7 +57,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Backfill all episodes
-        run: pnpm tsx scripts/publish-episodes.ts --backfill
+        run: pnpm tsx scripts/publish-atproto-episodes.ts --backfill
         env:
           ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
           ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}

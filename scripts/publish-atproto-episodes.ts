@@ -12,8 +12,8 @@
  *   STANDARD_SITE_PUBLICATION_RKEY - The publication record key
  *
  * Usage:
- *   pnpm publish:episodes          # publish new episodes only
- *   pnpm publish:episodes:backfill # publish all episodes (backfill)
+ *   pnpm publish:atproto          # publish new episodes only
+ *   pnpm publish:atproto:backfill # publish all episodes (backfill)
  */
 
 import { htmlToText } from 'html-to-text';
@@ -26,7 +26,7 @@ import {
 } from '@bryanguffey/astro-standard-site';
 
 import starpodConfig from '../starpod.config';
-import { dasherize } from '../src/utils/dasherize';
+import { dasherize } from 'starpod/src/utils/dasherize';
 
 const BACKFILL = process.argv.includes('--backfill');
 // Set by the GitHub workflow when it has just triggered a site rebuild:
