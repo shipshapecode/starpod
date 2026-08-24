@@ -84,7 +84,17 @@ describe('vercel-md-negotiation', () => {
   });
 
   describe('patchConfig', () => {
-    const baseConfig = () => ({
+    type Route = {
+      src?: string;
+      dest?: string;
+      headers?: Record<string, string>;
+      status?: number;
+      handle?: string;
+      has?: Array<{ type: string; key: string; value: string }>;
+      continue?: boolean;
+    };
+
+    const baseConfig = (): { version: number; routes: Route[] } => ({
       version: 3,
       routes: [
         { src: '^/old-path$', headers: { Location: '/new-path' }, status: 308 },
