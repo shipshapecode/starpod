@@ -9,7 +9,7 @@
   "license": "MIT",
   "scripts": {
     "astro": "astro",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && node scripts/vercel-md-negotiation.mjs",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx db/seed.ts",
     "db:studio": "drizzle-kit studio",
