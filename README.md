@@ -179,10 +179,10 @@ You can also publish locally:
 
 ```bash
 # Publish only new episodes
-pnpm publish:episodes
+pnpm publish:atproto
 
 # Backfill all episodes
-pnpm publish:episodes:backfill
+pnpm publish:atproto:backfill
 ```
 
 ##### Verification
