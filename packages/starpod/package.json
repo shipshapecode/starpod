@@ -15,7 +15,10 @@
     "withastro",
     "podcast"
   ],
-  "files": ["src", "tsconfig.json"],
+  "bin": {
+    "starpod": "./cli/index.mjs"
+  },
+  "files": ["cli", "src", "tsconfig.json"],
   "exports": {
     ".": "./src/index.ts",
     "./config": "./src/config.ts",

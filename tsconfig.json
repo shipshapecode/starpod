@@ -13,5 +13,5 @@
     "jsxImportSource": "preact"
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "packages/create-starpod/template"]
+  "exclude": ["dist", "packages/starpod/cli/template"]
 }

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
- * create-starpod: scaffold a podcast website powered by the starpod Astro
- * integration. Dependency-free on purpose — prompts use node:readline.
+ * The starpod CLI. Currently one command: scaffold a podcast website powered
+ * by the starpod Astro integration. Dependency-free on purpose — prompts use
+ * node:readline.
  *
  * Usage:
- *   npm create starpod@latest [dir] [--name "My Show"] [--rss <url>]
- *     [--database] [--yes]
+ *   npx starpod new [dir] [--name "My Show"] [--rss <url>] [--database]
+ *     [--yes]
  */
 
 import {
@@ -23,7 +24,25 @@ import { fileURLToPath } from 'node:url';
 
 const TEMPLATE_DIR = fileURLToPath(new URL('./template', import.meta.url));
 
-const args = process.argv.slice(2);
+const HELP = `starpod — podcast websites from an RSS feed
+
+Usage:
+  npx starpod new [dir] [options]
+
+Options:
+  --name "My Show"   Podcast name
+  --rss <url>        RSS feed URL
+  --database         Enable the guests & sponsors database (Turso)
+  --yes              Skip prompts, accept defaults
+`;
+
+const [command, ...args] = process.argv.slice(2);
+
+if (command !== 'new') {
+  console.log(HELP);
+  process.exit(command === '--help' || command === undefined ? 0 : 1);
+}
+
 const flags = new Set(args.filter((a) => a.startsWith('--')));
 const positional = args.filter((a) => !a.startsWith('--'));
 
