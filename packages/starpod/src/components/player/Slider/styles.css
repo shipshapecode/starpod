@@ -17,7 +17,7 @@
   }
   &::-webkit-slider-thumb {
     @apply relative -mt-[5px] box-content h-4 w-4 cursor-pointer appearance-none bg-contain bg-no-repeat transition-opacity duration-300 lg:opacity-0;
-    background-image: url('/images/rocket-dark.svg');
+    background-image: url('../../../assets/rocket-dark.svg');
     background-position: center center;
     box-shadow: none;
     background-color: #0000;
@@ -33,16 +33,16 @@
   }
   &::-moz-range-thumb {
     @apply h-4 w-4 cursor-pointer appearance-none border-0 bg-transparent bg-contain bg-no-repeat transition-opacity duration-300 outline-none lg:opacity-0;
-    background-image: url('/images/rocket-dark.svg');
+    background-image: url('../../../assets/rocket-dark.svg');
     background-position: center center;
   }
 
   @media (prefers-color-scheme: light) {
     &::-webkit-slider-thumb {
-      background-image: url('/images/rocket-light.svg');
+      background-image: url('../../../assets/rocket-light.svg');
     }
     &::-moz-range-thumb {
-      background-image: url('/images/rocket-light.svg');
+      background-image: url('../../../assets/rocket-light.svg');
     }
   }
 

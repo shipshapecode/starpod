@@ -54,6 +54,20 @@ export function collectMarkdownPaths(staticDir) {
   return paths.sort();
 }
 
+/**
+ * Derive negotiated URL paths from Astro's generated page pathnames (as given
+ * to the `astro:build:done` hook), e.g. 'about.html.md' -> '/about'. Used by
+ * the integration, where the static output directory is not yet populated at
+ * hook time.
+ */
+export function pagesToMarkdownPaths(pathnames) {
+  return pathnames
+    .map((p) => p.replace(/^\/+/, '').replace(/\/+$/, ''))
+    .filter((p) => p.endsWith(MD_SUFFIX))
+    .map((p) => '/' + p.slice(0, -MD_SUFFIX.length))
+    .sort();
+}
+
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const chunk = (items, size) => {
@@ -171,11 +185,11 @@ export function patchConfig(config, mdPaths) {
   return { config: { ...config, routes }, inserted: negotiationRoutes.length };
 }
 
-export function main(outputDir = '.vercel/output') {
+export function main(outputDir = '.vercel/output', mdPaths = null) {
   const configPath = join(outputDir, 'config.json');
   const staticDir = join(outputDir, 'static');
 
-  if (!existsSync(configPath) || !existsSync(staticDir)) {
+  if (!existsSync(configPath) || (mdPaths === null && !existsSync(staticDir))) {
     console.log(
       `[md-negotiation] No Vercel build output at ${outputDir}, skipping`
     );
@@ -183,7 +197,9 @@ export function main(outputDir = '.vercel/output') {
   }
 
   const config = JSON.parse(readFileSync(configPath, 'utf-8'));
-  const mdPaths = collectMarkdownPaths(staticDir);
+  if (mdPaths === null) {
+    mdPaths = collectMarkdownPaths(staticDir);
+  }
   const { config: patched, inserted } = patchConfig(config, mdPaths);
 
   if (inserted === 0) {

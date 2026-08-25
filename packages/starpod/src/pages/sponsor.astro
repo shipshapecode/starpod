@@ -12,13 +12,16 @@ const countryFlags = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/countries/*.{jpeg,jpg,png}'
 );
 
+// TODO(starpod): this page's copy, ad packages, and listener stats are still
+// Whiskey-specific and should move into starpod.config. Rows whose flag image
+// is missing from src/img/countries are skipped so fresh sites don't crash.
 const countries = [
   { name: 'United States', flag: 'USA.png', percentage: 52 },
   { name: 'United Kingdom', flag: 'UK.png', percentage: 7 },
   { name: 'Canada', flag: 'Canada.png', percentage: 5 },
   { name: 'Germany', flag: 'Germany.png', percentage: 4 },
   { name: 'Australia', flag: 'Australia.png', percentage: 4 }
-];
+].filter((country) => countryFlags[`/src/img/countries/${country.flag}`]);
 ---
 
 <Layout title="Sponsor">

@@ -18,9 +18,10 @@ interface VercelOutputConfig {
 }
 
 export function collectMarkdownPaths(staticDir: string): string[];
+export function pagesToMarkdownPaths(pathnames: string[]): string[];
 export function buildNegotiationRoutes(mdPaths: string[]): NegotiationRoute[];
 export function patchConfig(
   config: VercelOutputConfig,
   mdPaths: string[]
 ): { config: VercelOutputConfig; inserted: number };
-export function main(outputDir?: string): void;
+export function main(outputDir?: string, mdPaths?: string[] | null): void;

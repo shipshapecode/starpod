@@ -4,10 +4,17 @@ import { Image } from 'astro:assets';
 
 import starpodConfig from 'virtual:starpod/config';
 
+import avatarLight from '../assets/avatar-light.png';
+
 const { hosts } = starpodConfig;
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/people/*.{jpeg,jpg,png}'
 );
+
+// Fall back to the packaged avatar when the site has not provided a photo in
+// src/img/people yet.
+const hostImage = (img: string) =>
+  images[`/src/img/people/${img}`]?.() ?? avatarLight;
 ---
 
 <div
@@ -21,7 +28,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
         <Image
           class="mr-4 h-12 w-12 rounded-lg"
           height={48}
-          src={images[`/src/img/people/${host.img}`]()}
+          src={hostImage(host.img)}
           width={48}
           alt=""
           loading="lazy"

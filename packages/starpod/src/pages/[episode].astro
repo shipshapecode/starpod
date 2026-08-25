@@ -23,6 +23,8 @@ import FullPlayButton from '../components/FullPlayButton';
 import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
 import { generateDocumentLinkTag } from '@bryanguffey/astro-standard-site';
 
+import { database } from 'virtual:starpod/config';
+
 import Layout from '../layouts/Layout.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
 import {
@@ -83,37 +85,45 @@ const playerEpisode = {
 
 const canonicalURL = new URL(`/${episode.episodeSlug}`, Astro.url);
 
-const db = createDb(
-  import.meta.env.ASTRO_DB_REMOTE_URL,
-  import.meta.env.ASTRO_DB_APP_TOKEN
-);
+// The guests/sponsors database is opt-in via the integration's `database`
+// option; without it the page renders with those sections absent.
+const db = database
+  ? createDb(
+      import.meta.env.ASTRO_DB_REMOTE_URL,
+      import.meta.env.ASTRO_DB_APP_TOKEN
+    )
+  : null;
 
-const hostsAndGuests = await db
-  .select({
-    id: Person.id,
-    img: Person.img,
-    isHost: HostOrGuest.isHost,
-    name: Person.name
-  })
-  .from(HostOrGuest)
-  .innerJoin(DbEpisode, eq(HostOrGuest.episodeSlug, DbEpisode.episodeSlug))
-  .innerJoin(Person, eq(HostOrGuest.personId, Person.id))
-  .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+const hostsAndGuests = !db
+  ? []
+  : await db
+      .select({
+        id: Person.id,
+        img: Person.img,
+        isHost: HostOrGuest.isHost,
+        name: Person.name
+      })
+      .from(HostOrGuest)
+      .innerJoin(DbEpisode, eq(HostOrGuest.episodeSlug, DbEpisode.episodeSlug))
+      .innerJoin(Person, eq(HostOrGuest.personId, Person.id))
+      .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
 
-const sponsors = await db
-  .select({
-    id: Sponsor.id,
-    img: Sponsor.img,
-    name: Sponsor.name,
-    url: Sponsor.url
-  })
-  .from(SponsorForEpisode)
-  .innerJoin(
-    DbEpisode,
-    eq(SponsorForEpisode.episodeSlug, DbEpisode.episodeSlug)
-  )
-  .innerJoin(Sponsor, eq(SponsorForEpisode.sponsorId, Sponsor.id))
-  .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+const sponsors = !db
+  ? []
+  : await db
+      .select({
+        id: Sponsor.id,
+        img: Sponsor.img,
+        name: Sponsor.name,
+        url: Sponsor.url
+      })
+      .from(SponsorForEpisode)
+      .innerJoin(
+        DbEpisode,
+        eq(SponsorForEpisode.episodeSlug, DbEpisode.episodeSlug)
+      )
+      .innerJoin(Sponsor, eq(SponsorForEpisode.sponsorId, Sponsor.id))
+      .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
 
 const title = `${episode.title} - ${show.title} - Episode ${episode.episodeNumber}`;
 

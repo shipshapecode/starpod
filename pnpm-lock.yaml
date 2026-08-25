@@ -117,9 +117,6 @@ importers:
 
   packages/starpod:
     dependencies:
-      '@astrojs/preact':
-        specifier: ^5.1.4
-        version: 5.1.4(@babel/core@7.29.7)(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(preact@10.29.2)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0)
       '@astrojs/sitemap':
         specifier: ^3.7.3
         version: 3.7.3
@@ -156,9 +153,6 @@ importers:
       html-to-text:
         specifier: ^9.0.5
         version: 9.0.5
-      preact:
-        specifier: ^10.29.2
-        version: 10.29.2
       rss-to-json:
         specifier: ^2.1.1
         version: 2.1.1
@@ -172,12 +166,18 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(typescript@5.9.3)
     devDependencies:
+      '@astrojs/preact':
+        specifier: ^5.1.4
+        version: 5.1.4(@babel/core@7.29.7)(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(preact@10.29.2)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0)
       '@types/html-to-text':
         specifier: ^9.0.4
         version: 9.0.4
       astro:
         specifier: 6.4.2
         version: 6.4.2(@types/node@24.12.4)(@vercel/functions@3.6.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.60.4)(tsx@4.22.4)(yaml@2.9.0)
+      preact:
+        specifier: ^10.29.2
+        version: 10.29.2
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

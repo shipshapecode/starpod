@@ -6,19 +6,22 @@ import { Schema } from 'astro-seo-schema';
 import SpeedInsights from '@vercel/speed-insights/astro';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import Dots from '../components/Dots.astro';
-import Hosts from '../components/Hosts.astro';
-import InfoCard from '../components/InfoCard.astro';
-import Platforms from '../components/Platforms.astro';
+import Dots from 'virtual:starpod/components/Dots';
+import Hosts from 'virtual:starpod/components/Hosts';
+import InfoCard from 'virtual:starpod/components/InfoCard';
+import Platforms from 'virtual:starpod/components/Platforms';
 import Player from '../components/Player';
 import SearchButton from '../components/SearchButton';
 import SearchDialog from '../components/SearchDialog';
-import ShowArtwork from '../components/ShowArtwork.astro';
+import ShowArtwork from 'virtual:starpod/components/ShowArtwork';
 
 import { getShowInfo } from '../lib/rss';
 import starpodConfig from 'virtual:starpod/config';
 
 import '../styles/global.css';
+// Site-provided stylesheets from the integration's `customCss` option; loads
+// after the built-in styles so they win the cascade.
+import 'virtual:starpod/user-css';
 
 const show = await getShowInfo();
 

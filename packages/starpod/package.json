@@ -15,6 +15,7 @@
     "withastro",
     "podcast"
   ],
+  "files": ["src", "tsconfig.json"],
   "exports": {
     ".": "./src/index.ts",
     "./config": "./src/config.ts",
@@ -24,7 +25,6 @@
     "./src/*": "./src/*"
   },
   "dependencies": {
-    "@astrojs/preact": "^5.1.4",
     "@astrojs/sitemap": "^3.7.3",
     "@bryanguffey/astro-standard-site": "^1.0.3",
     "@libsql/client": "^0.17.3",
@@ -37,18 +37,21 @@
     "atropos": "^2.0.2",
     "drizzle-orm": "^0.45.2",
     "html-to-text": "^9.0.5",
-    "preact": "^10.29.2",
     "rss-to-json": "^2.1.1",
     "schema-dts": "^1.1.5",
     "tailwindcss": "^4.3.0",
     "valibot": "^1.4.1"
   },
   "peerDependencies": {
-    "astro": "^6.0.0"
+    "@astrojs/preact": "^5.0.0",
+    "astro": "^6.0.0",
+    "preact": "^10.0.0"
   },
   "devDependencies": {
+    "@astrojs/preact": "^5.1.4",
     "@types/html-to-text": "^9.0.4",
     "astro": "6.4.2",
+    "preact": "^10.29.2",
     "typescript": "^5.9.3"
   },
   "engines": {

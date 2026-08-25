@@ -15,6 +15,17 @@ import type { StarpodConfig } from '../utils/config';
 import { dasherize } from '../utils/dasherize';
 import { truncate } from '../utils/truncate';
 
+// rss-to-json is CJS with `__esModule: true` and both `exports.parse` and
+// `exports.default` pointing at the same function, so what the default import
+// yields depends on whether the bundler externalized it. Normalize both
+// shapes to the parse function.
+type ParseFeedFn = (url: string) => Promise<unknown>;
+const parseFeedModule: unknown = parseFeed;
+const parseRssFeed: ParseFeedFn =
+  typeof parseFeedModule === 'function'
+    ? (parseFeedModule as ParseFeedFn)
+    : (parseFeedModule as { parse: ParseFeedFn }).parse;
+
 // Inside Astro (dev, build, vitest) the config comes from the integration's
 // virtual module. Standalone scripts (e.g. `db/seed.ts` under tsx) have no
 // Vite, so they must pass their config explicitly and the dynamic import is
@@ -92,8 +103,7 @@ export async function getShowInfo(config?: StarpodConfig) {
     return showInfoCache;
   }
 
-  // @ts-expect-error
-  const showInfo = (await parseFeed.parse(await resolveRssFeed(config))) as Show;
+  const showInfo = (await parseRssFeed(await resolveRssFeed(config))) as Show;
   showInfo.image = (await optimizeImage(showInfo.image, {
     height: 640,
     width: 640
@@ -136,8 +146,7 @@ export async function getAllEpisodes(config?: StarpodConfig) {
     )
   });
 
-  // @ts-expect-error
-  let feed = (await parseFeed.parse(await resolveRssFeed(config))) as Show;
+  let feed = (await parseRssFeed(await resolveRssFeed(config))) as Show;
   let items = parse(FeedSchema, feed).items;
 
   let episodes: Array<Episode> = await Promise.all(

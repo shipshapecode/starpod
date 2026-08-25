@@ -1,3 +1,4 @@
+import { resolve as resolvePath } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import preact from '@astrojs/preact';
@@ -9,26 +10,109 @@ import type { Plugin as VitePlugin } from 'vite';
 
 import rehypeTranscriptTimestamps from './lib/rehype-transcript-timestamps.mjs';
 import { type StarpodConfig } from './utils/config';
-import { main as applyVercelMarkdownNegotiation } from './vercel-md-negotiation.mjs';
+import {
+  main as applyVercelMarkdownNegotiation,
+  pagesToMarkdownPaths
+} from './vercel-md-negotiation.mjs';
+
+/**
+ * Built-in components a site may replace via `options.components`. Each maps
+ * to the default implementation shipped with the package; call sites import
+ * them through `virtual:starpod/components/<Name>` so an override swaps the
+ * module everywhere at once.
+ */
+const OVERRIDABLE_COMPONENTS = {
+  Dots: './components/Dots.astro',
+  EpisodeList: './components/EpisodeList.astro',
+  Hosts: './components/Hosts.astro',
+  InfoCard: './components/InfoCard.astro',
+  LargePlatforms: './components/LargePlatforms.astro',
+  NotFoundContent: './components/NotFoundContent.astro',
+  Platforms: './components/Platforms.astro',
+  ShowArtwork: './components/ShowArtwork.astro'
+} as const;
+
+export type OverridableComponent = keyof typeof OVERRIDABLE_COMPONENTS;
+
+export interface StarpodOptions {
+  /**
+   * Enable the Turso/Drizzle database for per-episode guests and sponsors.
+   * Requires `ASTRO_DB_REMOTE_URL` and `ASTRO_DB_APP_TOKEN`. When disabled
+   * (the default), episode pages simply render without the guests and
+   * sponsors sections.
+   */
+  database?: boolean;
+  /**
+   * Replace built-in components with your own, e.g.
+   * `{ Hosts: './src/components/MyHosts.astro' }`. Paths are resolved from
+   * the project root.
+   */
+  components?: Partial<Record<OverridableComponent, string>>;
+  /**
+   * Extra stylesheets loaded after the built-in styles, e.g.
+   * `['./src/styles/theme.css']`. Paths are resolved from the project root.
+   */
+  customCss?: string[];
+}
 
 const VIRTUAL_CONFIG_ID = 'virtual:starpod/config';
 const RESOLVED_VIRTUAL_CONFIG_ID = '\0' + VIRTUAL_CONFIG_ID;
+const VIRTUAL_USER_CSS_ID = 'virtual:starpod/user-css';
+const RESOLVED_VIRTUAL_USER_CSS_ID = '\0' + VIRTUAL_USER_CSS_ID;
+const VIRTUAL_COMPONENT_PREFIX = 'virtual:starpod/components/';
 
 /**
- * Exposes the user's Starpod config to every page and component in the
- * package as the `virtual:starpod/config` module.
+ * Serves the virtual modules that connect the consuming site to the package:
+ * the validated config (plus feature flags), user CSS, and component
+ * overrides.
  */
-function starpodConfigPlugin(config: StarpodConfig): VitePlugin {
+function starpodVitePlugin(
+  config: StarpodConfig,
+  options: StarpodOptions,
+  root: URL
+): VitePlugin {
+  const rootDir = fileURLToPath(root);
+
   return {
-    name: 'starpod-config',
+    name: 'starpod',
     resolveId(id) {
       if (id === VIRTUAL_CONFIG_ID) {
         return RESOLVED_VIRTUAL_CONFIG_ID;
       }
+      if (id === VIRTUAL_USER_CSS_ID) {
+        return RESOLVED_VIRTUAL_USER_CSS_ID;
+      }
+      if (id.startsWith(VIRTUAL_COMPONENT_PREFIX)) {
+        const name = id.slice(
+          VIRTUAL_COMPONENT_PREFIX.length
+        ) as OverridableComponent;
+        const defaultPath = OVERRIDABLE_COMPONENTS[name];
+        if (!defaultPath) {
+          throw new Error(
+            `[starpod] Unknown component "${name}". Overridable components: ${Object.keys(OVERRIDABLE_COMPONENTS).join(', ')}`
+          );
+        }
+        const override = options.components?.[name];
+        return override
+          ? resolvePath(rootDir, override)
+          : fileURLToPath(new URL(defaultPath, import.meta.url));
+      }
     },
     load(id) {
       if (id === RESOLVED_VIRTUAL_CONFIG_ID) {
-        return `export default ${JSON.stringify(config)};`;
+        return [
+          `export default ${JSON.stringify(config)};`,
+          `export const database = ${options.database === true};`
+        ].join('\n');
+      }
+      if (id === RESOLVED_VIRTUAL_USER_CSS_ID) {
+        const imports = (options.customCss ?? []).map(
+          (css) =>
+            `import ${JSON.stringify(
+              css.startsWith('.') ? resolvePath(rootDir, css) : css
+            )};`
+        );
+        return imports.join('\n') || 'export {};';
       }
     }
   };
@@ -65,7 +149,10 @@ const ROUTES: Array<{ pattern: string; entrypoint: string }> = [
   }
 ];
 
-export default function starpod(starpodConfig: StarpodConfig): AstroIntegration {
+export default function starpod(
+  starpodConfig: StarpodConfig,
+  options: StarpodOptions = {}
+): AstroIntegration {
   let projectRoot: URL;
 
   return {
@@ -110,7 +197,13 @@ export default function starpod(starpodConfig: StarpodConfig): AstroIntegration 
             remotePatterns: [{ protocol: 'https' }, { protocol: 'http' }]
           },
           integrations: [
-            preact(),
+            preact({
+              // The preset's default exclude is /node_modules/, which would
+              // skip this package's own .tsx components when starpod is
+              // installed as a dependency. Exclude everything else but keep
+              // starpod's sources in the Preact JSX transform.
+              exclude: [/node_modules(?!.*[\\/]starpod[\\/])/]
+            }),
             sitemap({
               filter: (page) => {
                 const pathname = new URL(page).pathname;
@@ -130,21 +223,28 @@ export default function starpod(starpodConfig: StarpodConfig): AstroIntegration 
           },
           trailingSlash: 'never',
           vite: {
-            plugins: [tailwindcss(), starpodConfigPlugin(starpodConfig)]
+            plugins: [
+              tailwindcss(),
+              starpodVitePlugin(starpodConfig, options, config.root)
+            ]
           }
         });
       },
-      'astro:build:done': () => {
+      'astro:build:done': ({ dir, assets }) => {
         // Injects `Accept: text/markdown` content-negotiation routes into the
-        // Vercel build output. No-ops for other adapters. The adapter's own
-        // astro:build:done hook runs after this one and writes
-        // `.vercel/output/config.json`, so the patch must wait until process
-        // exit (the patch is synchronous fs work, which is safe there).
-        process.once('exit', () => {
-          applyVercelMarkdownNegotiation(
-            fileURLToPath(new URL('./.vercel/output', projectRoot))
-          );
-        });
+        // Vercel build output. No-ops for other adapters. The adapter runs
+        // first in astro:build:done (Astro unshifts it), so config.json exists
+        // here — but the static dir is only copied afterwards, so the markdown
+        // twin paths are derived from the build's generated assets, not the
+        // filesystem.
+        const outputBase = fileURLToPath(dir);
+        const generated = [...assets.values()]
+          .flat()
+          .map((url) => fileURLToPath(url).slice(outputBase.length));
+        applyVercelMarkdownNegotiation(
+          fileURLToPath(new URL('./.vercel/output', projectRoot)),
+          pagesToMarkdownPaths(generated)
+        );
       }
     }
   };

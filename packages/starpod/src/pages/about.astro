@@ -4,12 +4,19 @@ import { Image } from 'astro:assets';
 
 import Layout from '../layouts/Layout.astro';
 import starpodConfig from 'virtual:starpod/config';
-import LargePlatforms from '../components/LargePlatforms.astro';
+import LargePlatforms from 'virtual:starpod/components/LargePlatforms';
+
+import avatarLight from '../assets/avatar-light.png';
 
 const { hosts } = starpodConfig;
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/people/*.{jpeg,jpg,png}'
 );
+
+// Fall back to the packaged avatar when the site has not provided a photo in
+// src/img/people yet.
+const hostImage = (img: string) =>
+  images[`/src/img/people/${img}`]?.() ?? avatarLight;
 ---
 
 <Layout title="About">
@@ -36,7 +43,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
             <Image
               class="mr-6 mb-4 h-12 w-12 rounded-lg lg:h-20 lg:w-20"
               height={80}
-              src={images[`/src/img/people/${host.img}`]()}
+              src={hostImage(host.img)}
               width={80}
               alt=""
             />
