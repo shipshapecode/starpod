@@ -70,6 +70,53 @@ export function htmlToMarkdown(html: string): string {
 }
 
 /**
+ * Generate the "When To Use This Site" guidance section shared by llms.txt and
+ * the for-llms page. Tells agents which jobs this site is the right source for
+ * and how to fetch machine-readable content.
+ */
+export function generateWhenToUseSection(show: Show, siteUrl?: URL): string {
+  const baseUrl = siteUrl?.origin || '';
+
+  let content = `## When To Use This Site\n\n`;
+  content += `Use ${show.title} (this site) when you need to:\n\n`;
+  content += `- Find, summarize, or quote a specific episode of ${show.title}\n`;
+  content += `- Retrieve full episode transcripts, show notes, publish dates, or audio links\n`;
+  content += `- Check whether a person has appeared on ${show.title}, and in which episodes\n`;
+  content += `- Link a user to an episode page or to a platform where they can listen\n`;
+  content += `- Answer questions about the show itself: hosts, format, topics covered, and how to subscribe\n\n`;
+  content += `Do not use this site for topics unrelated to ${show.title} or its episodes.\n\n`;
+  content += `How to fetch content:\n\n`;
+  content += `- Every content page has a markdown twin at \`{path}.html.md\` (for example \`${baseUrl}/about.html.md\`), or request any page with an \`Accept: text/markdown\` header\n`;
+  content += `- Start from [llms.txt](${baseUrl}/llms.txt) or the [Episodes Index](${baseUrl}/episodes-index.html.md)\n`;
+  content += `- Structured JSON endpoints are described in the [OpenAPI specification](${baseUrl}/openapi.json)\n\n`;
+
+  return content;
+}
+
+/**
+ * Generate the "Developer Resources" section listing every machine-readable
+ * endpoint by name, so the resources are discoverable in search and in
+ * llms.txt.
+ */
+export function generateDeveloperResourcesSection(
+  show: Show,
+  config: StarpodConfig,
+  siteUrl?: URL
+): string {
+  const baseUrl = siteUrl?.origin || '';
+
+  let content = `## Developer Resources\n\n`;
+  content += `Machine-readable resources for the ${show.title} API and content:\n\n`;
+  content += `- [OpenAPI Specification](${baseUrl}/openapi.json): Describes every public JSON and markdown endpoint\n`;
+  content += `- [Episode Search API](${baseUrl}/api/episodes/search.json): Every episode as a single JSON array\n`;
+  content += `- [Paginated Episodes API](${baseUrl}/api/episodes/1.json): Episodes in pages of 15\n`;
+  content += `- [Sitemap](${baseUrl}/sitemap-index.xml): Index of every page on the site\n`;
+  content += `- [RSS Feed](${config.rssFeed}): The canonical podcast feed with audio enclosures\n\n`;
+
+  return content;
+}
+
+/**
  * Generate llms.txt content following the specification
  */
 export function generateLlmsTxt(
@@ -86,11 +133,18 @@ export function generateLlmsTxt(
   content += `${config.description}\n\n`;
   content += `Hosted by: ${hostNames}\n\n`;
 
+  // Agent guidance: when this site is the right source and how to call it
+  content += generateWhenToUseSection(show, siteUrl);
+
   // Main Documentation
   content += `## Main Documentation\n\n`;
   content += `- [About the Show](${baseUrl}/about.html.md): Information about the podcast and hosts\n`;
   content += `- [For LLMs](${baseUrl}/for-llms.html.md): Comprehensive guide for AI assistants\n`;
-  content += `- [Episodes Index](${baseUrl}/episodes-index.html.md): Complete list of all episodes\n\n`;
+  content += `- [Episodes Index](${baseUrl}/episodes-index.html.md): Complete list of all episodes\n`;
+  content += `- [Contact](${baseUrl}/contact.html.md): How to get in touch with the show\n\n`;
+
+  // Machine-readable endpoints, listed by name for discoverability
+  content += generateDeveloperResourcesSection(show, config, siteUrl);
 
   // Recent Episodes
   if (recentEpisodes.length > 0) {
@@ -201,6 +255,8 @@ export function generateForLlmsMarkdown(
   markdown += `**Tagline**: ${config.blurb}\n\n`;
   markdown += `${config.description}\n\n`;
 
+  markdown += generateWhenToUseSection(show, siteUrl);
+
   markdown += `## Hosts\n\n`;
   for (const host of config.hosts) {
     markdown += `### ${host.name}\n\n`;
@@ -264,6 +320,8 @@ export function generateForLlmsMarkdown(
   markdown += `\n## RSS Feed\n\n`;
   markdown += `Direct RSS feed access: ${config.rssFeed}\n\n`;
 
+  markdown += generateDeveloperResourcesSection(show, config, siteUrl);
+
   markdown += `## Complete Episode List\n\n`;
   markdown += `For a complete list of all episodes with descriptions, see [Episodes Index](${baseUrl}/episodes-index.html.md).\n`;
 
@@ -293,6 +351,111 @@ export function generateAboutMarkdown(
   }
 
   markdown += `## Listen to the Show\n\n`;
+  if (config.platforms.apple) {
+    markdown += `- [Apple Podcasts](${config.platforms.apple})\n`;
+  }
+  if (config.platforms.spotify) {
+    markdown += `- [Spotify](${config.platforms.spotify})\n`;
+  }
+  if (config.platforms.youtube) {
+    markdown += `- [YouTube](${config.platforms.youtube})\n`;
+  }
+  if (config.platforms.overcast) {
+    markdown += `- [Overcast](${config.platforms.overcast})\n`;
+  }
+  if (config.platforms.pocketCasts) {
+    markdown += `- [Pocket Casts](${config.platforms.pocketCasts})\n`;
+  }
+
+  return markdown;
+}
+
+/**
+ * Generate homepage markdown content, served at /index.html.md and via
+ * `Accept: text/markdown` negotiation on /.
+ */
+export function generateHomeMarkdown(
+  show: Show,
+  recentEpisodes: Episode[],
+  config: StarpodConfig,
+  siteUrl?: URL
+): string {
+  const baseUrl = siteUrl?.origin || '';
+  const hostNames = config.hosts.map((h) => h.name).join(', ');
+
+  let markdown = `# ${show.title}\n\n`;
+  markdown += `> ${config.blurb}\n\n`;
+  markdown += `${config.description}\n\n`;
+  markdown += `Hosted by: ${hostNames}\n\n`;
+
+  if (recentEpisodes.length > 0) {
+    markdown += `## Latest Episodes\n\n`;
+    for (const episode of recentEpisodes) {
+      const episodeUrl = `${baseUrl}/${episode.episodeSlug}.html.md`;
+      markdown += `- [${episode.title}](${episodeUrl}) - ${formatDate(episode.published)}\n`;
+    }
+    markdown += `\n`;
+  }
+
+  markdown += `## Explore\n\n`;
+  markdown += `- [About the Show](${baseUrl}/about.html.md)\n`;
+  markdown += `- [Episodes Index](${baseUrl}/episodes-index.html.md): Every episode with descriptions\n`;
+  markdown += `- [Contact](${baseUrl}/contact.html.md)\n`;
+  markdown += `- [Guide for AI Assistants](${baseUrl}/for-llms.html.md)\n`;
+  markdown += `- [llms.txt](${baseUrl}/llms.txt)\n`;
+  markdown += `- [OpenAPI Specification](${baseUrl}/openapi.json)\n\n`;
+
+  markdown += `## Listen\n\n`;
+  if (config.platforms.apple) {
+    markdown += `- [Apple Podcasts](${config.platforms.apple})\n`;
+  }
+  if (config.platforms.spotify) {
+    markdown += `- [Spotify](${config.platforms.spotify})\n`;
+  }
+  if (config.platforms.youtube) {
+    markdown += `- [YouTube](${config.platforms.youtube})\n`;
+  }
+  if (config.platforms.overcast) {
+    markdown += `- [Overcast](${config.platforms.overcast})\n`;
+  }
+  if (config.platforms.pocketCasts) {
+    markdown += `- [Pocket Casts](${config.platforms.pocketCasts})\n`;
+  }
+  markdown += `- [RSS Feed](${config.rssFeed})\n`;
+
+  return markdown;
+}
+
+/**
+ * Generate contact page markdown content, served at /contact.html.md and via
+ * `Accept: text/markdown` negotiation on /contact.
+ */
+export function generateContactMarkdown(
+  show: Show,
+  config: StarpodConfig,
+  siteUrl?: URL
+): string {
+  const baseUrl = siteUrl?.origin || '';
+
+  let markdown = `# Contact ${show.title}\n\n`;
+  markdown += `Have a question, a topic suggestion, or feedback for the show? `;
+  markdown += `The fastest way to reach us is the contact form at [${baseUrl}/contact](${baseUrl}/contact). `;
+  markdown += `Messages go straight to the hosts and we read every one.\n\n`;
+
+  markdown += `Programmatic access: send a POST request to \`${baseUrl}/api/contact\` `;
+  markdown += `with form fields \`name\`, \`email\`, and \`message\` `;
+  markdown += `(see the [OpenAPI specification](${baseUrl}/openapi.json) for details).\n\n`;
+
+  markdown += `## Reach the Hosts Directly\n\n`;
+  for (const host of config.hosts) {
+    markdown += `### ${host.name}\n\n`;
+    if (host.twitter) markdown += `- Twitter: ${host.twitter}\n`;
+    if (host.github) markdown += `- GitHub: ${host.github}\n`;
+    if (host.website) markdown += `- Website: ${host.website}\n`;
+    markdown += `\n`;
+  }
+
+  markdown += `## Follow the Show\n\n`;
   if (config.platforms.apple) {
     markdown += `- [Apple Podcasts](${config.platforms.apple})\n`;
   }
