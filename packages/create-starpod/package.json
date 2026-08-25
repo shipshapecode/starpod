@@ -1,0 +1,20 @@
+{
+  "name": "create-starpod",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Scaffold a podcast website powered by the starpod Astro integration.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shipshapecode/starpod.git",
+    "directory": "packages/create-starpod"
+  },
+  "license": "MIT",
+  "keywords": ["astro", "podcast", "starpod", "create"],
+  "bin": {
+    "create-starpod": "./index.mjs"
+  },
+  "files": ["index.mjs", "template"],
+  "engines": {
+    "node": "^22.0.0"
+  }
+}
