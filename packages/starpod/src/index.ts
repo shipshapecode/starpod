@@ -9,7 +9,7 @@ import { fontProviders } from 'astro/config';
 import type { Plugin as VitePlugin } from 'vite';
 
 import rehypeTranscriptTimestamps from './lib/rehype-transcript-timestamps.mjs';
-import { type StarpodConfig } from './utils/config';
+import { validateStarpodConfig, type StarpodConfig } from './utils/config';
 import {
   main as applyVercelMarkdownNegotiation,
   pagesToMarkdownPaths
@@ -150,10 +150,41 @@ const ROUTES: Array<{ pattern: string; entrypoint: string }> = [
   }
 ];
 
+const MISSING_CONFIG_MESSAGE = `[starpod] Missing podcast config.
+
+Create starpod.config.ts at your project root:
+
+  import { defineStarpodConfig } from 'starpod/config';
+
+  export default defineStarpodConfig({
+    blurb: 'A one-line tagline for your show.',
+    description: 'A few sentences about your show.',
+    hosts: [{ name: 'Your Name', bio: 'A short bio.', img: 'your-name.jpg' }],
+    platforms: {},
+    rssFeed: 'https://example.com/feed.xml'
+  });
+
+Then pass it to the integration in astro.config.mjs:
+
+  import starpodConfig from './starpod.config';
+
+  export default defineConfig({
+    integrations: [starpod(starpodConfig)]
+  });
+`;
+
 export default function starpod(
-  starpodConfig: StarpodConfig,
+  config?: StarpodConfig,
   options: StarpodOptions = {}
 ): AstroIntegration {
+  if (!config) {
+    // `astro add starpod` writes `starpod()` with no arguments; fail with
+    // instructions rather than a crash deeper in the build.
+    throw new Error(MISSING_CONFIG_MESSAGE);
+  }
+  // Validated here too so configs that skipped defineStarpodConfig still
+  // get checked.
+  const starpodConfig = validateStarpodConfig(config);
   let projectRoot: URL;
 
   return {
