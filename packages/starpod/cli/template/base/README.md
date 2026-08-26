@@ -48,7 +48,7 @@ the JSON/markdown APIs); anything else is a normal Astro page you add to
 ```astro
 ---
 // src/pages/sponsor.astro
-import Layout from 'starpod/src/layouts/Layout.astro';
+import Layout from 'starpod/layout';
 ---
 
 <Layout title="Sponsor">

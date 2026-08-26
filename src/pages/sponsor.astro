@@ -6,9 +6,9 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 
-import AdPackageCard from 'starpod/src/components/AdPackageCard.astro';
-import Layout from 'starpod/src/layouts/Layout.astro';
-import { getShowInfo } from 'starpod/src/lib/rss';
+import AdPackageCard from 'starpod/components/AdPackageCard';
+import Layout from 'starpod/layout';
+import { getShowInfo } from 'starpod/rss';
 
 const show = await getShowInfo();
 const title = `${show.title}`;

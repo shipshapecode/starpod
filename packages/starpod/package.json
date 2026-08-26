@@ -25,6 +25,9 @@
     "./content": "./src/content.ts",
     "./db": "./src/db/index.ts",
     "./db/schema": "./src/db/schema.ts",
+    "./layout": "./src/layouts/Layout.astro",
+    "./components/AdPackageCard": "./src/components/AdPackageCard.astro",
+    "./rss": "./src/lib/rss.ts",
     "./src/*": "./src/*"
   },
   "dependencies": {
