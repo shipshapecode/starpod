@@ -124,6 +124,8 @@ function starpodVitePlugin(
  */
 const ROUTES: Array<{ pattern: string; entrypoint: string }> = [
   { pattern: '/', entrypoint: 'index.astro' },
+  { pattern: '/index.html.md', entrypoint: 'index.html.md.ts' },
+  { pattern: '/contact.html.md', entrypoint: 'contact.html.md.ts' },
   { pattern: '/404', entrypoint: '404.astro' },
   { pattern: '/[...notFound]', entrypoint: '[...notFound].astro' },
   { pattern: '/[episode]', entrypoint: '[episode].astro' },

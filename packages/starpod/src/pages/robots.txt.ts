@@ -15,6 +15,10 @@ Sitemap: ${sitemapURL.href}
 # - ${siteURL.origin}/for-llms - Human-readable guide for AI assistants
 # - ${siteURL.origin}/episodes-index.html.md - Complete episode listing in markdown
 # - ${siteURL.origin}/[episode-slug].html.md - Individual episodes with transcripts
+# - ${siteURL.origin}/openapi.json - OpenAPI spec for the JSON API endpoints
+#
+# Content pages also serve markdown via the Accept header
+# (Accept: text/markdown) or at their .html.md twin URL.
 # 
 # All content includes:
 # - Podcast metadata (hosts, description, platforms)

@@ -79,20 +79,53 @@ jobs:
       # the site build runs while the publish job is installing dependencies.
       # The publish script then waits for the new episode pages to be live
       # before publishing documents that link to them.
+      #
+      # The rebuild-hash cache tracks which feed content we already rebuilt
+      # for. The publish-success hash (.feed-hash) is intentionally separate:
+      # a persistently failing publish must keep retrying, but must not
+      # trigger a fresh Vercel build on every 30-minute poll.
+      - name: Restore last rebuild trigger hash
+        if: steps.config.outputs.configured == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: .rebuild-hash
+          key: rebuild-hash-
+          restore-keys: |
+            rebuild-hash-
       - name: Trigger site rebuild
         if: steps.config.outputs.configured == 'true' && steps.feed.outputs.changed == 'true'
         id: rebuild
         env:
           REBUILD_WEBHOOK: ${{ secrets.REBUILD_WEBHOOK }}
+          FEED_HASH: ${{ steps.feed.outputs.hash }}
         run: |
-          if [ -n "$REBUILD_WEBHOOK" ]; then
-            curl -sf -X POST "$REBUILD_WEBHOOK" > /dev/null
-            echo "triggered=true" >> "$GITHUB_OUTPUT"
-            echo "Triggered site rebuild."
-          else
+          if [ -z "$REBUILD_WEBHOOK" ]; then
             echo "triggered=false" >> "$GITHUB_OUTPUT"
+            echo "fired=false" >> "$GITHUB_OUTPUT"
             echo "::notice::REBUILD_WEBHOOK not set — publishing without waiting for a site rebuild."
+            exit 0
           fi
+          if [ -n "$FEED_HASH" ] && [ "$FEED_HASH" = "$(cat .rebuild-hash 2>/dev/null || true)" ]; then
+            # triggered=true so the publish script still waits for the pages
+            # from that earlier build before publishing.
+            echo "triggered=true" >> "$GITHUB_OUTPUT"
+            echo "fired=false" >> "$GITHUB_OUTPUT"
+            echo "Site already rebuilt for this feed content — not triggering again."
+            exit 0
+          fi
+          curl -sf -X POST "$REBUILD_WEBHOOK" > /dev/null
+          echo "triggered=true" >> "$GITHUB_OUTPUT"
+          echo "fired=true" >> "$GITHUB_OUTPUT"
+          echo "Triggered site rebuild."
+      - name: Record rebuild trigger hash
+        if: steps.rebuild.outputs.fired == 'true' && steps.feed.outputs.hash != ''
+        run: printf '%s' "${{ steps.feed.outputs.hash }}" > .rebuild-hash
+      - name: Save rebuild trigger hash
+        if: steps.rebuild.outputs.fired == 'true' && steps.feed.outputs.hash != ''
+        uses: actions/cache/save@v4
+        with:
+          path: .rebuild-hash
+          key: rebuild-hash-${{ steps.feed.outputs.hash }}-${{ github.run_id }}-${{ github.run_attempt }}
 
   publish:
     needs: gate
@@ -119,7 +152,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Publish new episodes
-        run: pnpm tsx scripts/publish-episodes.ts
+        run: pnpm tsx scripts/publish-atproto-episodes.ts
         env:
           ATPROTO_HANDLE: ${{ secrets.ATPROTO_HANDLE }}
           ATPROTO_APP_PASSWORD: ${{ secrets.ATPROTO_APP_PASSWORD }}
