@@ -142,7 +142,6 @@ const ROUTES: Array<{ pattern: string; entrypoint: string }> = [
   { pattern: '/llms.txt', entrypoint: 'llms.txt.ts' },
   { pattern: '/openapi.json', entrypoint: 'openapi.json.ts' },
   { pattern: '/robots.txt', entrypoint: 'robots.txt.ts' },
-  { pattern: '/sponsor', entrypoint: 'sponsor.astro' },
   { pattern: '/api/contact', entrypoint: 'api/contact.ts' },
   { pattern: '/api/episodes/[page].json', entrypoint: 'api/episodes/[page].json.ts' },
   {

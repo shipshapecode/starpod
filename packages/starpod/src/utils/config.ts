@@ -25,6 +25,18 @@ export type Host = {
   website?: string;
 };
 
+export type NavLink = {
+  /**
+   * Link text, e.g. "Store".
+   */
+  label: string;
+  /**
+   * Destination: an external URL or a local path like "/sponsor" for a
+   * custom page you added to your site's src/pages/.
+   */
+  href: string;
+};
+
 export type StarpodConfig = {
   /**
    * A very short tagline for your show. Generally, no more than one sentence. Less is more here.
@@ -53,6 +65,11 @@ export type StarpodConfig = {
    * The url to the RSS feed where your podcast is hosted.
    */
   rssFeed: string;
+  /**
+   * Extra navigation links shown after About and Contact — e.g. a merch
+   * store, or custom pages your site adds (like a sponsor page).
+   */
+  links?: Array<NavLink>;
 };
 
 export const defineStarpodConfig = (config: StarpodConfig) => config;

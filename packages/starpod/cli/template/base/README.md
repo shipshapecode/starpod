@@ -39,6 +39,27 @@ Pass options as the second argument to `starpod()` in `astro.config.mjs`:
 - `customCss: ['./src/styles/theme.css']` — stylesheets loaded after the
   built-in styles, for theming via CSS custom properties.
 
+## Custom pages
+
+Starpod injects the core routes (home, episodes, about, contact, search and
+the JSON/markdown APIs); anything else is a normal Astro page you add to
+`src/pages/`, composed from the package's building blocks:
+
+```astro
+---
+// src/pages/sponsor.astro
+import Layout from 'starpod/src/layouts/Layout.astro';
+---
+
+<Layout title="Sponsor">
+  <div class="relative z-10 px-8 lg:px-18">Your pitch here.</div>
+</Layout>
+```
+
+Link it from the site navigation via `links` in `starpod.config.ts`. See
+[whiskey.fm's sponsor page](https://github.com/shipshapecode/starpod/blob/main/src/pages/sponsor.astro)
+for a full reference implementation.
+
 ## Writing your own tests
 
 The `tsconfig.json` maps `starpod/src/*` to the package source, so unit tests

@@ -1,10 +1,15 @@
 ---
+// A fully custom page: Starpod injects the core site routes, and anything
+// else lives in your own src/pages/, composed from the package's building
+// blocks. This one is whiskey.fm's sponsorship pitch and doubles as the
+// reference implementation for custom pages.
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 
-import Layout from '../layouts/Layout.astro';
-import AdPackageCard from '../components/AdPackageCard.astro';
-import { getShowInfo } from '../lib/rss';
+import AdPackageCard from 'starpod/src/components/AdPackageCard.astro';
+import Layout from 'starpod/src/layouts/Layout.astro';
+import { getShowInfo } from 'starpod/src/lib/rss';
+
 const show = await getShowInfo();
 const title = `${show.title}`;
 
@@ -12,16 +17,13 @@ const countryFlags = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/countries/*.{jpeg,jpg,png}'
 );
 
-// TODO(starpod): this page's copy, ad packages, and listener stats are still
-// Whiskey-specific and should move into starpod.config. Rows whose flag image
-// is missing from src/img/countries are skipped so fresh sites don't crash.
 const countries = [
   { name: 'United States', flag: 'USA.png', percentage: 52 },
   { name: 'United Kingdom', flag: 'UK.png', percentage: 7 },
   { name: 'Canada', flag: 'Canada.png', percentage: 5 },
   { name: 'Germany', flag: 'Germany.png', percentage: 4 },
   { name: 'Australia', flag: 'Australia.png', percentage: 4 }
-].filter((country) => countryFlags[`/src/img/countries/${country.flag}`]);
+];
 ---
 
 <Layout title="Sponsor">

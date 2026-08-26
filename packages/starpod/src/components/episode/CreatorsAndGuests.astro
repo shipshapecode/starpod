@@ -2,6 +2,8 @@
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 
+import starpodConfig from 'virtual:starpod/config';
+
 import avatarDark from '../../assets/avatar-dark.png';
 import avatarLight from '../../assets/avatar-light.png';
 
@@ -18,7 +20,9 @@ const { hostsAndGuests } = Astro.props;
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/people/*.{jpeg,jpg,png}'
 );
-const priorityNames = ['RobbieTheWagner', 'Charles William Carpenter III', 'Adam Argyle'];
+// The show's configured hosts sort first, in config order; other hosts (e.g.
+// past hosts recorded in the database) follow, then guests alphabetically.
+const priorityNames = starpodConfig.hosts.map((host) => host.name);
 ---
 
 <h3 class="section-heading pb-6">Creators and Guests</h3>

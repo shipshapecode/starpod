@@ -175,6 +175,12 @@ export default defineStarpodConfig({
     // youtube: 'https://www.youtube.com/@yourshow'
   },
   rssFeed: '${rssFeed}'
+  // Extra navigation links, e.g. a merch store or custom pages you add to
+  // src/pages/ (see "Custom pages" in the README):
+  // links: [
+  //   { label: 'Store', href: 'https://example.com/store' },
+  //   { label: 'Become a sponsor', href: '/sponsor' }
+  // ]
 });
 `;
 }
