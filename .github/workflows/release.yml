@@ -1,0 +1,39 @@
+# Publishes the starpod package to npm. Requires an NPM_TOKEN repository
+# secret (an npm automation token with publish rights).
+#
+# Trigger by pushing a tag like `starpod@0.1.0` (matching the version in
+# packages/starpod/package.json), or manually from the Actions tab.
+name: Release
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'starpod@*'
+
+permissions:
+  contents: read
+  # For npm provenance attestation.
+  id-token: write
+
+jobs:
+  publish:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://registry.npmjs.org'
+      - uses: pnpm/action-setup@v4
+      - name: Install dependencies
+        run: pnpm install
+      - name: Lint and unit tests
+        run: |
+          pnpm lint
+          pnpm test:unit run
+      - name: Publish starpod
+        working-directory: packages/starpod
+        run: pnpm publish --access public --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
