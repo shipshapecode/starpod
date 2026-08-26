@@ -1,13 +1,13 @@
 {
   "name": "starpod-site",
-  "private": true,
-  "type": "module",
   "version": "0.0.1",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shipshapecode/starpod.git"
   },
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "astro": "astro",
     "build": "astro check && astro build",
@@ -18,9 +18,9 @@
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --fix",
     "preview": "astro preview",
-    "start": "astro dev",
     "publish:atproto": "tsx scripts/publish-atproto-episodes.ts",
     "publish:atproto:backfill": "tsx scripts/publish-atproto-episodes.ts --backfill",
+    "start": "astro dev",
     "test": "concurrently \"pnpm:test:*(!fix)\" --names \"test:\"",
     "test:e2e": "pnpm exec playwright test",
     "test:unit": "vitest"
@@ -56,6 +56,7 @@
     "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.4",
+    "release-plan": "^0.18.0",
     "sharp": "^0.34.5",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4",
@@ -63,19 +64,19 @@
     "vite": "^7.3.3",
     "vitest": "^4.1.7"
   },
+  "packageManager": "pnpm@10.27.0",
   "engines": {
     "node": "^22.0.0"
   },
-  "packageManager": "pnpm@10.27.0",
   "pnpm": {
-    "overrides": {
-      "fast-xml-parser": "4.5.4"
-    },
     "onlyBuiltDependencies": [
       "@tailwindcss/oxide",
       "@vercel/speed-insights",
       "esbuild",
       "sharp"
-    ]
+    ],
+    "overrides": {
+      "fast-xml-parser": "4.5.4"
+    }
   }
 }
