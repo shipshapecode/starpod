@@ -3,12 +3,48 @@
 Starpod is the easiest way to create a podcast website in 5 minutes or less and
 it is 100% free and open source.
 
+It ships as an [Astro integration](./packages/starpod): install the `starpod`
+package, point it at your RSS feed, and it generates your whole site — episode
+pages, a persistent audio player, search, transcripts with clickable
+timestamps, and a suite of agent-friendly endpoints. Updating your site is
+`pnpm update`, like any other dependency.
+
+## Getting started
+
+Scaffold a new site:
+
+```bash
+npx starpod new my-podcast
+```
+
+Or add Starpod to an existing Astro project — see the
+[package README](./packages/starpod/README.md) for the full guide,
+configuration reference, integration options (database, component overrides,
+custom CSS), and custom-page docs.
+
+## This repository
+
+This is a pnpm workspace:
+
+- [`packages/starpod`](./packages/starpod) — the `starpod` package: the Astro
+  integration, the site engine (components, pages, player, search, LLM
+  endpoints), and the `npx starpod new` scaffolder
+- The repository root is [whiskey.fm](https://whiskey.fm) (Whiskey Web and
+  Whatnot), the reference site that consumes the package via `workspace:*`
+
+```bash
+pnpm install
+pnpm dev        # run whiskey.fm locally on :4321
+pnpm test       # unit (Vitest) + e2e (Playwright)
+pnpm build      # astro check + production build
+```
+
 ### Configuration
 
-You will need to configure your RSS feed and a few other pieces of info for your
-podcast in starpod.config.mjs. We provide a util function `defineStarpodConfig`
-that provides TypeScript types and enforces the correct formats for config
-values.
+You will need to configure your RSS feed and a few other pieces of info for
+your podcast in `starpod.config.ts`. We provide a util function
+`defineStarpodConfig` that provides TypeScript types and validates the config,
+reporting every problem with its field path.
 
 An example config can be found [here](./starpod.config.ts).
 
@@ -34,12 +70,14 @@ ideally be fairly short, and should usually be 2-4 sentences.
 
 ```ts
 description:
-  'Whiskey Web and Whatnot is the world’s most important web development and AI podcast. Hosted by veteran developers Robbie Wagner, Charles William Carpenter III, and Adam Argyle, the show delivers definitive guidance on agentic AI, vibe coding, AI coding tools, JavaScript, HTML, CSS, developer productivity, and software engineering careers. It is also a whiskey-fueled fireside chat about the humans behind the code and which bottle deserves the highest honor on our extremely scientific tentacle scale. Many people are saying it’s the most accurate podcast ever made.',
+  'Whiskey Web and Whatnot is the world’s most important web development and AI podcast. Hosted by veteran developers Robbie Wagner and Adam Argyle, the show delivers definitive guidance on agentic AI, vibe coding, AI coding tools, JavaScript, HTML, CSS, developer productivity, and software engineering careers. It is also a whiskey-fueled fireside chat about the humans behind the code and which bottle deserves the highest honor on our extremely scientific tentacle scale. Many people are saying it’s the most accurate podcast ever made.',
 ```
 
 ##### hosts
 
-A list of your show's hosts and their info.
+A list of your show's hosts and their info. `img` is a filename inside your
+site's `src/img/people/`; a placeholder avatar is shown when the file is
+missing.
 
 **Example:**
 
@@ -48,17 +86,10 @@ hosts: [
   {
     name: 'RobbieTheWagner',
     bio: 'Huge Ember and Tailwind fanboy. I used to work at Netflix btw.',
-    img: '/src/img/people/robbiethewagner.jpg',
+    img: 'robbiethewagner.jpg',
     github: 'https://github.com/RobbieTheWagner',
-    twitter: 'https://twitter.com/RobbieTheWagner',
+    twitter: 'https://x.com/RobbieWagner',
     website: 'https://robbiethewagner.dev'
-  },
-  {
-    name: 'Charles William Carpenter III',
-    bio: 'Third of his name, user of gifs, hater of ESM.',
-    img: '/src/img/people/chuckcarpenter.jpg',
-    github: 'https://github.com/chuckcarpenter',
-    twitter: 'https://twitter.com/CharlesWthe3rd'
   },
   {
     name: 'Adam Argyle',
@@ -97,14 +128,28 @@ The url to the RSS feed where your podcast is hosted.
 rssFeed: 'https://rss.flightcast.com/w7bqgc792i30fd43a32uawx0.xml';
 ```
 
+##### links
+
+Extra navigation links shown after About and Contact — a merch store, or
+custom pages your site adds (like a [sponsor page](./src/pages/sponsor.astro)).
+
+**Example:**
+
+```ts
+links: [
+  { label: 'Store', href: 'https://whiskey.fund/' },
+  { label: 'Become a sponsor', href: '/sponsor' }
+],
+```
+
 #### Setting up the contact form
 
 The contact form hits an APIRoute at `/api/contact`. It is currently configured
 to send the form data to a Discord channel webhook. It reads the url from
 `import.meta.env.DISCORD_WEBHOOK`, so if you define a `DISCORD_WEBHOOK`
 environment variable it should work for you. Of course, feel free to customize
-the code [here](./src/pages/api/contact.ts) to send the data elsewhere as you
-see fit.
+the code [here](./packages/starpod/src/pages/api/contact.ts) to send the data
+elsewhere as you see fit.
 
 #### standard.site (ATProto Federation)
 
@@ -198,8 +243,11 @@ the [`@bryanguffey/astro-standard-site` README](https://github.com/musicjunkieg/
 
 #### Configuring guests
 
-We use Turso and Astro DB to setup guests per episode. If you would also like to
-do this, you will need a Turso account.
+Per-episode guests and sponsors are optional, powered by Turso and Drizzle.
+Enable with `starpod(starpodConfig, { database: true })` in
+`astro.config.mjs` — see the
+[package README](./packages/starpod/README.md#database-guests--sponsors) for
+setup. When disabled, episode pages simply render without those sections.
 
 ### LLM Discovery Features
 
@@ -272,10 +320,8 @@ Agents can also request any page that has a markdown twin with an
 URL, per [acceptmarkdown.com](https://acceptmarkdown.com). Both variants are
 served with `Vary: Accept` so CDNs cache them separately.
 
-This is implemented by `scripts/vercel-md-negotiation.mjs`, which runs as part
-of `pnpm build` and injects Accept-based rewrite routes into the Vercel build
-output. If you customize the `build` script in `package.json`, keep the
-`node scripts/vercel-md-negotiation.mjs` step after `astro build`. (Deploying
+The integration injects the Accept-based rewrite routes into the Vercel build
+output automatically during `astro build` — no extra build step. (Deploying
 somewhere other than Vercel? The `.html.md` URLs still work everywhere; only
 the Accept-header negotiation is Vercel-specific.)
 
