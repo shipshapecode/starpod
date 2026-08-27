@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-23T00:00:00Z",
+  "title": "Design System: Starpod",
+  "extensions": {
+    "colorMeta": {
+      "iris-accent": {
+        "role": "primary",
+        "displayName": "Iris",
+        "canonical": "oklch(60.5% 0.213 293)",
+        "tonalRamp": [
+          "oklch(25% 0.12 293)",
+          "oklch(35% 0.16 293)",
+          "oklch(45% 0.19 293)",
+          "oklch(55% 0.21 293)",
+          "oklch(63% 0.21 293)",
+          "oklch(73% 0.16 293)",
+          "oklch(85% 0.09 293)",
+          "oklch(95% 0.03 293)"
+        ]
+      },
+      "aqua-accent": {
+        "role": "primary",
+        "displayName": "Aqua",
+        "canonical": "oklch(76.5% 0.122 223)",
+        "tonalRamp": [
+          "oklch(25% 0.06 223)",
+          "oklch(35% 0.08 223)",
+          "oklch(45% 0.1 223)",
+          "oklch(55% 0.12 223)",
+          "oklch(66% 0.13 223)",
+          "oklch(76% 0.12 223)",
+          "oklch(86% 0.08 223)",
+          "oklch(95% 0.03 223)"
+        ]
+      },
+      "light-text-heading": {
+        "role": "neutral",
+        "displayName": "Deep Indigo Ink",
+        "canonical": "oklch(30.55% 0.052 292.57)",
+        "tonalRamp": [
+          "oklch(20% 0.05 292)",
+          "oklch(30.55% 0.052 292.57)",
+          "oklch(40% 0.045 292)",
+          "oklch(50% 0.035 292)",
+          "oklch(60% 0.025 292)",
+          "oklch(72% 0.018 292)",
+          "oklch(85% 0.01 292)",
+          "oklch(95% 0.005 292)"
+        ]
+      },
+      "light-card": {
+        "role": "neutral",
+        "displayName": "Off-White Card",
+        "canonical": "oklch(97.65% 0.005 274.97)",
+        "tonalRamp": [
+          "oklch(20% 0.02 275)",
+          "oklch(35% 0.02 275)",
+          "oklch(50% 0.015 275)",
+          "oklch(65% 0.01 275)",
+          "oklch(80% 0.008 275)",
+          "oklch(90% 0.006 275)",
+          "oklch(97.65% 0.005 274.97)",
+          "oklch(100% 0 0)"
+        ]
+      },
+      "dark-background": {
+        "role": "neutral",
+        "displayName": "Midnight Slate",
+        "canonical": "oklch(13.85% 0.025 273.24)",
+        "tonalRamp": [
+          "oklch(13.85% 0.025 273.24)",
+          "oklch(18.74% 0.024 280.08)",
+          "oklch(22.61% 0.035 280.78)",
+          "oklch(28% 0.045 281)",
+          "oklch(40% 0.05 281)",
+          "oklch(55% 0.04 281)",
+          "oklch(72% 0.025 281)",
+          "oklch(90% 0.01 281)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Episode-page H1; the single largest type on a page." },
+      "headline": { "displayName": "Headline", "purpose": "Show title in the identity rail." },
+      "title": { "displayName": "Title", "purpose": "Episode titles in the list; primary scannable link." },
+      "body": { "displayName": "Body", "purpose": "Descriptions, show notes, transcripts. Cap at 65-75ch." },
+      "label": { "displayName": "Label", "purpose": "Button text and inline actions." },
+      "section-label": { "displayName": "Section Label", "purpose": "Sanctioned small tracked label for section headings only." }
+    },
+    "shadows": [
+      { "name": "button-lift-light", "value": "0 1px 2px 0 oklch(91% 0.015 248 / 0.9)", "purpose": "Resting lift on pill buttons in light mode." },
+      { "name": "button-lift-dark", "value": "0 4px 6px -1px oklch(0% 0 0 / 0.25)", "purpose": "Resting lift on pill buttons in dark mode." },
+      { "name": "player-lift", "value": "0 10px 15px -3px oklch(0% 0 0 / 0.1)", "purpose": "Bottom player bar and expanded video pane; floats above page content." }
+    ],
+    "motion": [
+      { "name": "ring-sweep", "value": "--complete 500ms linear(0, 0.5982 55%, 0.875 75%, 1 100%)", "purpose": "Conic-gradient progress ring filling on button hover/focus." },
+      { "name": "play-grow", "value": "all 300ms", "purpose": "Round play button grows and gains the accent gradient on hover." },
+      { "name": "underline-grow", "value": "width 500ms ease-in-out", "purpose": "Nav-link bottom border growing left-to-right on hover." },
+      { "name": "icon-tint", "value": "--gradient-start 300ms, --gradient-stop 300ms", "purpose": "Platform icon gradient tinting to the accent on hover." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Pill button with an animated gradient ring that sweeps in on hover/focus.",
+      "html": "<button class=\"ds-btn\"><span class=\"ds-btn-label\">Show notes</span></button>",
+      "css": ".ds-btn { position: relative; display: inline-flex; padding: 1px; border: 1px solid transparent; border-radius: 9999px; background: oklch(100% 0 0); box-shadow: 0 1px 2px 0 oklch(91% 0.015 248 / 0.9); cursor: pointer; } .ds-btn::after { content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit; background: linear-gradient(135deg, oklch(86% 0.073 293), oklch(60.5% 0.213 293)); opacity: 0; transition: opacity 400ms; } .ds-btn:hover::after, .ds-btn:focus-visible::after { opacity: 1; } .ds-btn-label { display: inline-flex; padding: 0.5rem 1rem; font: 700 0.875rem/1.5 Inter, system-ui, sans-serif; color: oklch(30.55% 0.052 292.57); border-radius: 9999px; }"
+    },
+    {
+      "name": "Round Play Button",
+      "kind": "button",
+      "refersTo": "play-button",
+      "description": "Circular play control that grows and gains the accent gradient on hover.",
+      "html": "<button class=\"ds-play\" aria-label=\"Play\"><svg viewBox=\"0 0 11 14\" width=\"16\" height=\"16\" fill=\"none\"><path d=\"m.367882.443158c0-.065142.07026-.106046.126866-.073861l11.541952 6.562623c.0573.03256.0573.11515 0 .14772l-11.541949 6.56266c-.056606.0321-.126865-.0088-.126865-.0739z\" fill=\"currentColor\"/></svg></button>",
+      "css": ".ds-play { display: inline-flex; align-items: center; justify-content: center; height: 3.5rem; width: 3.5rem; border: none; border-radius: 9999px; background: oklch(30.55% 0.052 292.57); color: oklch(100% 0 0); cursor: pointer; transition: all 300ms; } .ds-play:hover { height: 4rem; width: 4rem; background: linear-gradient(90deg, oklch(86% 0.073 293), oklch(60.5% 0.213 293)); }"
+    },
+    {
+      "name": "Full Play Button",
+      "kind": "button",
+      "refersTo": "full-play-button",
+      "description": "Primary episode CTA: a pill with a circular icon badge and a label.",
+      "html": "<button class=\"ds-fullplay\"><span class=\"ds-fullplay-badge\"><svg viewBox=\"0 0 11 14\" width=\"12\" height=\"12\" fill=\"none\"><path d=\"m.367882.443158c0-.065142.07026-.106046.126866-.073861l11.541952 6.562623c.0573.03256.0573.11515 0 .14772l-11.541949 6.56266c-.056606.0321-.126865-.0088-.126865-.0739z\" fill=\"currentColor\"/></svg></span>Play Episode</button>",
+      "css": ".ds-fullplay { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem 0.5rem 0.5rem; border: 1px solid transparent; border-radius: 9999px; background: oklch(100% 0 0); box-shadow: 0 1px 2px 0 oklch(91% 0.015 248 / 0.9); font: 700 0.875rem/1.5 Inter, system-ui, sans-serif; color: oklch(30.55% 0.052 292.57); cursor: pointer; } .ds-fullplay-badge { display: inline-flex; align-items: center; justify-content: center; height: 1.75rem; width: 1.75rem; border-radius: 9999px; background: oklch(30.55% 0.052 292.57); color: oklch(100% 0 0); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Bordered field whose only focus signal is a border-color shift (default ring suppressed).",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Search episodes\" />",
+      "css": ".ds-input { width: 100%; padding: 1rem; border: 1px solid oklch(88.09% 0.018 234.53); border-radius: 0.25rem; background: oklch(100% 0 0); color: oklch(45% 0.017 285.89); font: 400 1rem/1.6 Inter, system-ui, sans-serif; outline: none; transition: border-color 200ms; } .ds-input::placeholder { color: oklch(59.68% 0.017 285.89); } .ds-input:focus { border-color: oklch(57.79% 0.03 234.37); }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Text link with an underline that grows left-to-right in the accent on hover.",
+      "html": "<a class=\"ds-nav\" href=\"#\">About</a>",
+      "css": ".ds-nav { display: inline-block; padding: 1.25rem 0; font: 400 1rem/1.6 Inter, system-ui, sans-serif; color: oklch(30.55% 0.052 292.57); text-decoration: none; } .ds-nav::after { content: ''; display: block; height: 1px; width: 0; margin-top: 1.25rem; background: linear-gradient(90deg, oklch(80% 0.105 293), oklch(61% 0.21 293)); transition: width 500ms ease-in-out; } .ds-nav:hover::after { width: 100%; }"
+    },
+    {
+      "name": "Episode Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Flat content surface lifted off the page by tone, not shadow.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-art\"></div><div><p class=\"ds-card-date\">June 23, 2026</p><h2 class=\"ds-card-title\">142: The Quiet Stage</h2><p class=\"ds-card-desc\">A neutral foundation that lets every show take center stage.</p></div></article>",
+      "css": ".ds-card { display: flex; gap: 1.5rem; padding: 1.5rem; border-radius: 0.5rem; background: oklch(97.65% 0.005 274.97); } .ds-card-art { height: 80px; width: 80px; border-radius: 0.5rem; flex: none; background: oklch(60.5% 0.213 293); } .ds-card-date { font: 400 0.875rem/1.5 Inter, system-ui, sans-serif; color: oklch(59.68% 0.017 285.89); margin: 0 0 0.5rem; } .ds-card-title { font: 700 1.125rem/1.4 Inter, system-ui, sans-serif; color: oklch(30.55% 0.052 292.57); margin: 0 0 0.5rem; } .ds-card-desc { font: 400 1rem/1.6 Inter, system-ui, sans-serif; color: oklch(59.68% 0.017 285.89); margin: 0; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Stage",
+    "overview": "Starpod is a stage, not a performer. The interface provides the lighting, the structure, and the seating; the podcast itself is the act. Every surface is built so a show's own artwork, voice, and episodes take center stage while the UI holds the wings. Because Starpod is a template adopted by many shows, neutrality is a feature: a near-monochrome low-chroma foundation with a single adaptive accent that shifts from violet by day to cyan by night, in a calm two-part layout of fixed identity rail plus scrollable content and a persistent bottom player.",
+    "keyCharacteristics": [
+      "Content-first: artwork and the play action outrank all chrome.",
+      "Adaptive single accent: Iris (violet) in light mode, Aqua (cyan) in dark mode.",
+      "Calm, low-chroma neutral surfaces with tonal layering instead of heavy shadow.",
+      "Refined-but-playful motion: gradient rings, a tilting cover, a growing play button.",
+      "Native and familiar interactions over invented ones.",
+      "Dark mode is a first-class, co-equal theme (not an afterthought)."
+    ],
+    "rules": [
+      { "name": "The Rationed Accent Rule", "body": "Iris/Aqua appear on interaction states and active indicators only, never as a section background or large fill. If a screen reads as purple or cyan at rest, the accent has been overused.", "section": "colors" },
+      { "name": "The Artwork-Is-Loudest Rule", "body": "On any view, the show's cover art should be the most saturated element; the chrome stays low-chroma so nothing competes with the content.", "section": "colors" },
+      { "name": "The One-Family Rule", "body": "Inter only. Character belongs to each adopting show via its content and artwork, not via Starpod's font choices.", "section": "typography" },
+      { "name": "The Lightness-Before-Shadow Rule", "body": "To separate two surfaces, move them a step on the tonal ramp before reaching for a shadow. Shadows mean 'this floats,' not 'this is a box.'", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the show's cover art the most saturated element on screen.",
+      "Do ration Iris/Aqua to interaction and active states; keep resting surfaces low-chroma.",
+      "Do separate surfaces by stepping the tonal ramp before adding a shadow.",
+      "Do use Inter across the whole system, varying weight and size for hierarchy.",
+      "Do treat dark mode as co-equal: every accent and component has a defined dark-mode counterpart.",
+      "Do keep motion refined and purposeful and provide a prefers-reduced-motion alternative for each.",
+      "Do lean on native, familiar media affordances (click-to-play, fullscreen, standard controls)."
+    ],
+    "donts": [
+      "Don't make the UI look like a generic SaaS landing page: no cream/sand backgrounds, no tracked-uppercase eyebrow over every section, no identical icon-heading-text card grids, no hero-metric template.",
+      "Don't ship the dated podcast-directory look: tiny artwork, undifferentiated link-soup of platform buttons, or an afterthought player.",
+      "Don't hard-code one show's personality, palette, or copy into component structure.",
+      "Don't let a screen read as 'purple' or 'cyan' at rest; that means the accent is overused.",
+      "Don't add a second typeface for 'character.'",
+      "Don't use blur or shadow decoratively; the only sanctioned blur is the functional frosted player bar.",
+      "Don't remove focus visibility: inputs suppress the default ring, so keep an AA-contrast focus signal.",
+      "Don't use border-left/border-right greater than 1px as a colored accent stripe, and never use gradient-filled text."
+    ]
+  }
+}

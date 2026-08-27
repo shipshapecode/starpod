@@ -58,6 +58,8 @@ export default function FullPlayButton({ episode }: Props) {
       onClick={() => {
         currentEpisode.value = {
           audio: episode.audio,
+          video: episode.video,
+          episodeImage: episode.episodeImage,
           episodeNumber: episode.episodeNumber,
           id: episode.id,
           title: episode.title

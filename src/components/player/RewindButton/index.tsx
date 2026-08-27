@@ -2,7 +2,7 @@ import type { MutableRef } from 'preact/hooks';
 import './styles.css';
 
 type Props = {
-  audioPlayer: MutableRef<HTMLAudioElement | null>;
+  audioPlayer: MutableRef<HTMLMediaElement | null>;
 };
 
 export default function RewindButton({ audioPlayer }: Props) {
