@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import EpisodeList from 'virtual:starpod/components/EpisodeList';
+import { getAllEpisodes, getShowInfo } from '../lib/rss';
+const episodes = await getAllEpisodes();
+const show = await getShowInfo();
+const title = `${show.title}`;
+---
+
+<Layout title={title}>
+  <div class="relative z-10 px-8 lg:px-18">
+    <h1 class="text-light-text-heading text-4xl font-bold dark:text-white">
+      Episodes
+    </h1>
+
+    <EpisodeList episodes={episodes} show={show} />
+  </div>
+</Layout>

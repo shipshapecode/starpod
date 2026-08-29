@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/preact';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import Player from '../../src/components/Player';
-import { currentEpisode, isPlaying, isMuted } from '../../src/components/state';
+import Player from 'starpod/src/components/Player';
+import { currentEpisode, isPlaying, isMuted } from 'starpod/src/components/state';
 
 const mockEpisode = {
   id: 'test-episode-1',

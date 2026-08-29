@@ -3,6 +3,9 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "paths": {
+      "starpod/src/*": ["./packages/starpod/src/*"]
+    },
     "esModuleInterop": true,
     "strictNullChecks": true,
     "verbatimModuleSyntax": true,
@@ -10,5 +13,5 @@
     "jsxImportSource": "preact"
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist", "packages/starpod/cli/template"]
 }

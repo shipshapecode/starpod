@@ -1,4 +1,4 @@
-import { defineStarpodConfig } from 'src/utils/config';
+import { defineStarpodConfig } from 'starpod/config';
 
 export default defineStarpodConfig({
   blurb:
@@ -32,5 +32,9 @@ export default defineStarpodConfig({
     spotify: 'https://open.spotify.com/show/19jiuHAqzeKnkleQUpZxDf',
     youtube: 'https://www.youtube.com/@WhiskeyWebAndWhatnot/'
   },
-  rssFeed: 'https://rss.flightcast.com/w7bqgc792i30fd43a32uawx0.xml'
+  rssFeed: 'https://rss.flightcast.com/w7bqgc792i30fd43a32uawx0.xml',
+  links: [
+    { label: 'Store', href: 'https://whiskey.fund/' },
+    { label: 'Become a sponsor', href: '/sponsor' }
+  ]
 });

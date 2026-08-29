@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/preact';
 import { beforeEach, describe, expect, it } from 'vitest';
-import MuteButton from '../../src/components/player/MuteButton';
-import { isMuted } from '../../src/components/state';
+import MuteButton from 'starpod/src/components/player/MuteButton';
+import { isMuted } from 'starpod/src/components/state';
 
 describe('MuteButton', () => {
   beforeEach(() => {

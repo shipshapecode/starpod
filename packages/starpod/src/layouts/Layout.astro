@@ -1,0 +1,209 @@
+---
+import { Font } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import { Schema } from 'astro-seo-schema';
+
+import SpeedInsights from '@vercel/speed-insights/astro';
+
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Dots from 'virtual:starpod/components/Dots';
+import Hosts from 'virtual:starpod/components/Hosts';
+import InfoCard from 'virtual:starpod/components/InfoCard';
+import Platforms from 'virtual:starpod/components/Platforms';
+import Player from '../components/Player';
+import SearchButton from '../components/SearchButton';
+import SearchDialog from '../components/SearchDialog';
+import ShowArtwork from 'virtual:starpod/components/ShowArtwork';
+
+import { getShowInfo } from '../lib/rss';
+import starpodConfig from 'virtual:starpod/config';
+
+import '../styles/global.css';
+// Site-provided stylesheets from the integration's `customCss` option; loads
+// after the built-in styles so they win the cascade.
+import 'virtual:starpod/user-css';
+
+const show = await getShowInfo();
+
+export interface Props {
+  /**
+   * If defined, this will override the default canonical URL.
+   */
+  canonicalURL?: URL;
+  description?: string;
+  imageUrl?: string;
+  title: string;
+}
+
+const { imageUrl, title } = Astro.props;
+
+const canonicalURL =
+  Astro.props.canonicalURL ?? new URL(Astro.url.pathname, Astro.site);
+const description = Astro.props.description ?? starpodConfig.description;
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="canonical" href={canonicalURL} />
+    <meta content={canonicalURL} property="og:url" />
+    <meta content="website" property="og:type" />
+    {
+      starpodConfig.platforms.appleIdNumber && (
+        <meta
+          name="apple-itunes-app"
+          content={`app-id=${starpodConfig.platforms.appleIdNumber}`}
+        />
+      )
+    }
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#1a1a1a"
+      media="(prefers-color-scheme: dark)"
+    />
+
+    <!-- Title -->
+    <title>{title}</title>
+    <meta content={title} property="og:title" />
+    <meta content={title} name="twitter:title" />
+
+    <!-- Description -->
+    <meta content={description} name="description" />
+    <meta content={description} property="og:description" />
+    <meta content={description} name="twitter:description" />
+
+    <!-- Image -->
+    <meta content={imageUrl ?? show.image} property="og:image" />
+    <meta content="summary" name="twitter:card" />
+    <meta content={imageUrl ?? show.image} name="twitter:image:src" />
+
+    <meta property="og:site_name" content={show.title} />
+
+    <link rel="preload" as="image" href={show.image} />
+
+    <Font cssVariable="--astro-font-inter" preload />
+
+    <Schema
+      slot="head"
+      item={{
+        '@context': 'https://schema.org',
+        '@type': 'PodcastSeries',
+        name: show.title,
+        about: starpodConfig.blurb,
+        description: show.description,
+        url: canonicalURL.toString(),
+        webFeed: starpodConfig.rssFeed,
+        author: {
+          '@type': 'Organization',
+          name: show.title,
+          url: canonicalURL.origin
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: show.title,
+          url: canonicalURL.origin
+        },
+        image: show.image
+      }}
+    />
+
+    <slot name="head" />
+    <ClientRouter />
+  </head>
+  <body
+    class="font-inter text-light-text-body dark:bg-dark-background dark:text-dark-text-body antialiased"
+  >
+    <header
+      class="custom-scrollbar lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
+      transition:persist="sidenav"
+    >
+      <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
+        <div
+          class="bg-light-card dark:bg-dark-card m-2 rounded-lg pt-10 pb-4 lg:pt-16 lg:pb-12"
+        >
+          <ShowArtwork image={show.image} />
+
+          <div class="px-4 sm:px-6 md:px-4 lg:px-16">
+            <p
+              class="text-light-text-heading mt-8 text-center text-2xl font-bold lg:text-left dark:text-white"
+            >
+              {show.title}
+            </p>
+
+            <p class="mt-2 text-center text-lg lg:text-left">
+              {starpodConfig.blurb}
+            </p>
+          </div>
+
+          <div class="px-4 sm:px-6 md:px-4 lg:px-16">
+            <Platforms />
+          </div>
+          <div class="hidden lg:block">
+            <Hosts />
+          </div>
+        </div>
+
+        <div class="hidden lg:block">
+          <InfoCard />
+        </div>
+      </div>
+    </header>
+    <main
+      class="bg-light-card dark:bg-dark-card mx-2 mb-2 rounded-lg lg:relative lg:ml-112 lg:min-h-screen xl:ml-120"
+    >
+      <div class="absolute top-4 right-4 z-30">
+        <SearchButton client:load />
+      </div>
+      <div class="relative mt-2 pt-16">
+        <div
+          class="bg-gradient-light dark:bg-gradient-dark absolute top-0 right-0 left-0 z-0 h-80 w-full opacity-30"
+        >
+        </div>
+
+        <Dots />
+
+        <div class="max-w-4xl">
+          <div
+            class:list={[
+              'dark:border-dark-border relative z-20 mb-12 border-b pb-6 lg:mb-16 lg:pb-10',
+              Astro.url.pathname === '/' && 'hidden'
+            ]}
+          >
+            <div class="ml-8 lg:ml-18">
+              <Breadcrumbs title={title} />
+            </div>
+          </div>
+
+          <slot />
+        </div>
+      </div>
+    </main>
+    <footer class="block lg:hidden">
+      <Hosts />
+      <InfoCard />
+    </footer>
+    <div id="audio-player">
+      <Player client:only="preact" transition:persist="player" />
+    </div>
+    <SearchDialog client:load transition:persist="search-dialog" />
+    <SpeedInsights />
+  </body>
+</html>

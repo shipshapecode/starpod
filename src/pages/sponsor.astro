@@ -1,10 +1,15 @@
 ---
+// A fully custom page: Starpod injects the core site routes, and anything
+// else lives in your own src/pages/, composed from the package's building
+// blocks. This one is whiskey.fm's sponsorship pitch and doubles as the
+// reference implementation for custom pages.
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 
-import Layout from '../layouts/Layout.astro';
-import AdPackageCard from '../components/AdPackageCard.astro';
-import { getShowInfo } from '../lib/rss';
+import AdPackageCard from 'starpod/components/AdPackageCard';
+import Layout from 'starpod/layout';
+import { getShowInfo } from 'starpod/rss';
+
 const show = await getShowInfo();
 const title = `${show.title}`;
 

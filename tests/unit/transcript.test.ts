@@ -3,8 +3,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   getRssTranscriptParagraphs,
   getRssTranscriptText
-} from '../../src/lib/transcript';
-import type { Episode } from '../../src/lib/rss';
+} from 'starpod/src/lib/transcript';
+import type { Episode } from 'starpod/src/lib/rss';
 
 // Each test uses a unique transcript URL because the module caches parsed
 // transcripts by URL — reusing a URL would return a previous test's cached

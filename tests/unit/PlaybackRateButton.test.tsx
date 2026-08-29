@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/preact';
 import { beforeEach, describe, expect, it } from 'vitest';
-import PlaybackRateButton from '../../src/components/player/PlaybackRateButton';
+import PlaybackRateButton from 'starpod/src/components/player/PlaybackRateButton';
 import { createRef } from 'preact';
 
 // Mock audio element

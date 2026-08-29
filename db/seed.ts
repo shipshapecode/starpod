@@ -2,16 +2,17 @@ import 'dotenv/config';
 
 import { sql } from 'drizzle-orm';
 
-import { createDb } from './index';
+import { createDb } from 'starpod/db';
 import {
   Episode,
   HostOrGuest,
   Person,
   Sponsor,
   SponsorForEpisode
-} from './schema';
+} from 'starpod/db/schema';
+import { getAllEpisodes } from 'starpod/src/lib/rss';
 
-import { getAllEpisodes } from '../src/lib/rss';
+import starpodConfig from '../starpod.config';
 import people from './data/people';
 import peoplePerEpisode from './data/people-per-episode';
 import sponsors from './data/sponsors';
@@ -43,7 +44,7 @@ async function seed() {
       }
     });
 
-  const allEpisodes = await getAllEpisodes();
+  const allEpisodes = await getAllEpisodes(starpodConfig);
   const episodes = allEpisodes.map((episode) => {
     return {
       episodeSlug: episode.episodeSlug

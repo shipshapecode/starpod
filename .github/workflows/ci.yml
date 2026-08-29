@@ -89,3 +89,31 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+  # Builds a freshly scaffolded consumer project against the local package.
+  # This exercises the installed-from-npm code path (JSX transform for
+  # node_modules sources, CJS interop, bundled assets, dependency pins) that
+  # the workspace build cannot see.
+  scaffold:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+      - name: Scaffold a project against the local package
+        run: |
+          node packages/starpod/cli/index.mjs new /tmp/scaffold-smoke --yes --name "Scaffold Smoke" --rss "https://rss.flightcast.com/w7bqgc792i30fd43a32uawx0.xml"
+          node -e "const fs=require('fs');const f='/tmp/scaffold-smoke/package.json';const p=JSON.parse(fs.readFileSync(f));p.dependencies.starpod='file:'+process.env.GITHUB_WORKSPACE+'/packages/starpod';fs.writeFileSync(f,JSON.stringify(p,null,2))"
+      - name: Build the scaffolded project
+        working-directory: /tmp/scaffold-smoke
+        run: |
+          pnpm install
+          pnpm exec astro build
+      - name: Verify agent endpoints in the output
+        run: |
+          test -f /tmp/scaffold-smoke/.vercel/output/static/llms.txt
+          test -f /tmp/scaffold-smoke/.vercel/output/static/openapi.json
+          node -e "const c=require('/tmp/scaffold-smoke/.vercel/output/config.json');const n=c.routes.filter(r=>JSON.stringify(r).includes('text/markdown')).length;if(!n)throw new Error('no negotiation routes in config.json');console.log('negotiation routes:',n)"
