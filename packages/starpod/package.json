@@ -1,7 +1,7 @@
 {
   "name": "starpod",
   "type": "module",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Turn an RSS feed into a full podcast website. An Astro integration.",
   "repository": {
     "type": "git",
@@ -18,7 +18,11 @@
   "bin": {
     "starpod": "./cli/index.mjs"
   },
-  "files": ["cli", "src", "tsconfig.json"],
+  "files": [
+    "cli",
+    "src",
+    "tsconfig.json"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./config": "./src/config.ts",
