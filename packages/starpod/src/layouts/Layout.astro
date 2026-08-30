@@ -4,6 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import { Schema } from 'astro-seo-schema';
 
 import SpeedInsights from '@vercel/speed-insights/astro';
+import { getPublicationAtUri } from '@bryanguffey/astro-standard-site';
 
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Dots from 'virtual:starpod/components/Dots';
@@ -40,6 +41,22 @@ const { imageUrl, title } = Astro.props;
 const canonicalURL =
   Astro.props.canonicalURL ?? new URL(Astro.url.pathname, Astro.site);
 const description = Astro.props.description ?? starpodConfig.description;
+
+// standard.site publication discovery hint. Bluesky's AppView needs this
+// `<link rel="site.standard.publication">` tag on every page (home + episodes)
+// to render shared links as a verified publication. On episode pages it sits
+// alongside the per-page `<link rel="site.standard.document">` tag. Only
+// emitted when the site has configured standard.site publishing.
+const standardSiteDid = import.meta.env.STANDARD_SITE_DID;
+const standardSitePublicationRkey = import.meta.env
+  .STANDARD_SITE_PUBLICATION_RKEY;
+const publicationLinkTag =
+  standardSiteDid && standardSitePublicationRkey
+    ? `<link rel="site.standard.publication" href="${getPublicationAtUri(
+        standardSiteDid,
+        standardSitePublicationRkey
+      )}">`
+    : null;
 ---
 
 <!doctype html>
@@ -124,6 +141,8 @@ const description = Astro.props.description ?? starpodConfig.description;
         image: show.image
       }}
     />
+
+    {publicationLinkTag && <Fragment set:html={publicationLinkTag} />}
 
     <slot name="head" />
     <ClientRouter />
