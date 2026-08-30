@@ -9,23 +9,37 @@ export interface Props {
 
 const { title } = Astro.props;
 
+// Multi-segment paths (e.g. a custom /collections/[slug] page) get an
+// intermediate crumb per ancestor segment, named by humanizing the segment.
+// The injected core routes are all single-segment, so those keep the
+// classic Home > title trail.
+function humanize(segment: string): string {
+  return segment
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+const segments = url.pathname.split('/').filter(Boolean);
+
+const breadcrumbItems: Array<{ name: string; href: string }> = [
+  { name: 'Home', href: '/' },
+  ...segments.slice(0, -1).map((segment, index) => ({
+    name: humanize(segment),
+    href: '/' + segments.slice(0, index + 1).join('/')
+  })),
+  ...(segments.length > 0 ? [{ name: title, href: url.pathname }] : [])
+];
+
 const breadcrumbSchema = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
-  itemListElement: [
-    {
-      '@type': 'ListItem',
-      position: 1,
-      name: 'Home',
-      item: Astro.site?.toString() || '/'
-    },
-    {
-      '@type': 'ListItem',
-      position: 2,
-      name: title,
-      item: new URL(url, Astro.site).toString()
-    }
-  ]
+  itemListElement: breadcrumbItems.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    item: new URL(item.href, Astro.site).toString()
+  }))
 };
 ---
 
@@ -33,31 +47,42 @@ const breadcrumbSchema = {
 
 <nav class="flex" aria-label="Breadcrumb">
   <ol role="list" class="flex items-center space-x-4 text-sm">
-    <li>
-      <div>
-        <a href="/" class="text-gray-400 hover:text-gray-500"> Home </a>
-      </div>
-    </li>
-    <li>
-      <div class="flex items-center">
-        <svg
-          class="h-4 w-4 shrink-0 text-gray-400"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-            clip-rule="evenodd"></path>
-        </svg>
-        <a
-          href={url}
-          class="ml-4 line-clamp-1 font-medium text-gray-500 hover:text-gray-700"
-        >
-          {title}
-        </a>
-      </div>
-    </li>
+    {
+      breadcrumbItems.map((item, index) => (
+        <li>
+          {index === 0 ? (
+            <div>
+              <a href={item.href} class="text-gray-400 hover:text-gray-500">
+                {item.name}
+              </a>
+            </div>
+          ) : (
+            <div class="flex items-center">
+              <svg
+                class="h-4 w-4 shrink-0 text-gray-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <a
+                href={item.href}
+                class="ml-4 line-clamp-1 font-medium text-gray-500 hover:text-gray-700"
+                aria-current={
+                  index === breadcrumbItems.length - 1 ? 'page' : undefined
+                }
+              >
+                {item.name}
+              </a>
+            </div>
+          )}
+        </li>
+      ))
+    }
   </ol>
 </nav>

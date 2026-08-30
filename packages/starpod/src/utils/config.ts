@@ -1,5 +1,6 @@
 import {
   array,
+  hexColor,
   minLength,
   nonEmpty,
   object,
@@ -83,6 +84,11 @@ export type StarpodConfig = {
    * store, or custom pages your site adds (like a sponsor page).
    */
   links?: Array<NavLink>;
+  /**
+   * Hex accent color used for the Safari pinned-tab icon and the Windows
+   * tile, e.g. "#531b3c". Defaults to the favicon-generator template colors.
+   */
+  brandColor?: string;
 };
 
 const urlField = (name: string) =>
@@ -132,7 +138,13 @@ const StarpodConfigSchema: GenericSchema<StarpodConfig> = object({
     'platforms is required (an empty object is fine)'
   ),
   rssFeed: urlField('rssFeed'),
-  links: optional(array(NavLinkSchema, 'links must be an array'))
+  links: optional(array(NavLinkSchema, 'links must be an array')),
+  brandColor: optional(
+    pipe(
+      string('brandColor must be a string'),
+      hexColor('brandColor must be a hex color like #531b3c')
+    )
+  )
 });
 
 /**

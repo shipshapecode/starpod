@@ -28,6 +28,17 @@ describe('defineStarpodConfig', () => {
     expect(config.links).toHaveLength(1);
   });
 
+  it('accepts a hex brandColor and rejects a non-hex one', () => {
+    const config = defineStarpodConfig({
+      ...validConfig,
+      brandColor: '#531b3c'
+    });
+    expect(config.brandColor).toBe('#531b3c');
+    expect(() =>
+      validateStarpodConfig({ ...validConfig, brandColor: 'maroon' })
+    ).toThrow(/brandColor must be a hex color/);
+  });
+
   it('rejects a non-URL rssFeed and names the field', () => {
     expect(() =>
       validateStarpodConfig({ ...validConfig, rssFeed: 'not a url' })

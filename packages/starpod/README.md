@@ -90,6 +90,8 @@ validates your config and lists every problem with its field path.
 - `rssFeed` — the feed your episodes are read from at build time
 - `links` (optional) — extra navigation links after About and Contact, e.g.
   `[{ label: 'Store', href: 'https://example.com/store' }]`
+- `brandColor` (optional) — hex accent color for the Safari pinned-tab icon
+  and Windows tile, e.g. `'#531b3c'`
 
 ## Integration options
 
