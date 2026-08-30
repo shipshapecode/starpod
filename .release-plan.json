@@ -1,18 +1,18 @@
 {
   "solution": {
     "starpod": {
-      "impact": "major",
-      "oldVersion": "0.1.0",
-      "newVersion": "1.0.0",
+      "impact": "patch",
+      "oldVersion": "1.0.0",
+      "newVersion": "1.0.1",
       "tagName": "latest",
       "constraints": [
         {
-          "impact": "major",
-          "reason": "Appears in changelog section :boom: Breaking Change"
+          "impact": "patch",
+          "reason": "Appears in changelog section :bug: Bug Fix"
         }
       ],
       "pkgJSONPath": "./packages/starpod/package.json"
     }
   },
-  "description": "## Release (2026-08-29)\n\n* starpod 1.0.0 (major)\n\n#### :boom: Breaking Change\n* `starpod`\n  * [#60](https://github.com/shipshapecode/starpod/pull/60) Convert Starpod into an installable Astro integration ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n\n#### Committers: 1\n- Robbie Wagner ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n"
+  "description": "## Release (2026-08-30)\n\n* starpod 1.0.1 (patch)\n\n#### :bug: Bug Fix\n* `starpod`\n  * [#64](https://github.com/shipshapecode/starpod/pull/64) Emit site.standard.publication link tag from the package Layout ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n\n#### Committers: 1\n- Robbie Wagner ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n"
 }

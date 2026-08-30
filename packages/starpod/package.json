@@ -1,7 +1,7 @@
 {
   "name": "starpod",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Turn an RSS feed into a full podcast website. An Astro integration.",
   "repository": {
     "type": "git",
