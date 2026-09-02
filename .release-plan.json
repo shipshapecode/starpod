@@ -1,18 +1,18 @@
 {
   "solution": {
     "starpod": {
-      "impact": "patch",
-      "oldVersion": "1.0.0",
-      "newVersion": "1.0.1",
+      "impact": "minor",
+      "oldVersion": "1.0.1",
+      "newVersion": "1.1.0",
       "tagName": "latest",
       "constraints": [
         {
-          "impact": "patch",
-          "reason": "Appears in changelog section :bug: Bug Fix"
+          "impact": "minor",
+          "reason": "Appears in changelog section :rocket: Enhancement"
         }
       ],
       "pkgJSONPath": "./packages/starpod/package.json"
     }
   },
-  "description": "## Release (2026-08-30)\n\n* starpod 1.0.1 (patch)\n\n#### :bug: Bug Fix\n* `starpod`\n  * [#64](https://github.com/shipshapecode/starpod/pull/64) Emit site.standard.publication link tag from the package Layout ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n\n#### Committers: 1\n- Robbie Wagner ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n"
+  "description": "## Release (2026-09-02)\n\n* starpod 1.1.0 (minor)\n\n#### :rocket: Enhancement\n* `starpod`\n  * [#66](https://github.com/shipshapecode/starpod/pull/66) Generalize Breadcrumbs and drop legacy favicon tags ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n\n#### Committers: 1\n- Robbie Wagner ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n"
 }

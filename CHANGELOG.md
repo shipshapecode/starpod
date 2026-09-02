@@ -1,5 +1,16 @@
 # Changelog
 
+## Release (2026-09-02)
+
+* starpod 1.1.0 (minor)
+
+#### :rocket: Enhancement
+* `starpod`
+  * [#66](https://github.com/shipshapecode/starpod/pull/66) Generalize Breadcrumbs and drop legacy favicon tags ([@RobbieTheWagner](https://github.com/RobbieTheWagner))
+
+#### Committers: 1
+- Robbie Wagner ([@RobbieTheWagner](https://github.com/RobbieTheWagner))
+
 ## Release (2026-08-30)
 
 * starpod 1.0.1 (patch)
