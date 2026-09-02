@@ -22,6 +22,7 @@ import {
  * module everywhere at once.
  */
 const OVERRIDABLE_COMPONENTS = {
+  Breadcrumbs: './components/Breadcrumbs.astro',
   Dots: './components/Dots.astro',
   EpisodeList: './components/EpisodeList.astro',
   Hosts: './components/Hosts.astro',

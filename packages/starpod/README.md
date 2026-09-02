@@ -105,8 +105,8 @@ starpod(starpodConfig, {
 });
 ```
 
-Overridable components: `Dots`, `EpisodeList`, `Hosts`, `InfoCard`,
-`LargePlatforms`, `NotFoundContent`, `Platforms`, `ShowArtwork`.
+Overridable components: `Breadcrumbs`, `Dots`, `EpisodeList`, `Hosts`,
+`InfoCard`, `LargePlatforms`, `NotFoundContent`, `Platforms`, `ShowArtwork`.
 
 ## Custom pages
 
