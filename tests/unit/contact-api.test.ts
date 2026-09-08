@@ -1,13 +1,18 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ALL, POST } from 'starpod/src/pages/api/contact';
+import { __resetRateLimitBucketsForTests } from 'starpod/src/lib/rate-limit';
 
 type ApiContext = Parameters<typeof POST>[0];
 
-function postContext(body: FormData | string): ApiContext {
+function postContext(
+  body: FormData | string,
+  headers?: Record<string, string>
+): ApiContext {
   const request = new Request('http://localhost/api/contact', {
     method: 'POST',
-    body
+    body,
+    headers
   });
   return { request } as ApiContext;
 }
@@ -24,6 +29,7 @@ describe('contact API', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
     vi.unstubAllGlobals();
+    __resetRateLimitBucketsForTests();
   });
 
   it('returns structured JSON 400 when fields are missing', async () => {
@@ -89,5 +95,63 @@ describe('contact API', () => {
     expect(response.headers.get('Allow')).toBe('POST');
     const body = await response.json();
     expect(body.error.code).toBe('method_not_allowed');
+  });
+
+  it('attaches RateLimit-* headers to a successful response', async () => {
+    vi.stubEnv('DISCORD_WEBHOOK', 'https://discord.example.com/webhook');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('ok', { status: 200 }))
+    );
+
+    const response = await POST(
+      postContext(validForm(), { 'x-forwarded-for': '203.0.113.10' })
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('RateLimit-Limit')).toBe('5');
+    expect(response.headers.get('RateLimit-Remaining')).toBe('4');
+    expect(response.headers.get('RateLimit-Reset')).toBeTruthy();
+  });
+
+  it('returns structured JSON 429 with Retry-After once the limit is exceeded', async () => {
+    vi.stubEnv('DISCORD_WEBHOOK', 'https://discord.example.com/webhook');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('ok', { status: 200 }))
+    );
+
+    const ip = { 'x-forwarded-for': '203.0.113.11' };
+    for (let i = 0; i < 5; i++) {
+      const response = await POST(postContext(validForm(), ip));
+      expect(response.status).toBe(200);
+    }
+
+    const limited = await POST(postContext(validForm(), ip));
+
+    expect(limited.status).toBe(429);
+    expect(limited.headers.get('RateLimit-Remaining')).toBe('0');
+    expect(limited.headers.get('Retry-After')).toBeTruthy();
+    const body = await limited.json();
+    expect(body.error.code).toBe('rate_limited');
+  });
+
+  it('tracks rate limits per client independently', async () => {
+    vi.stubEnv('DISCORD_WEBHOOK', 'https://discord.example.com/webhook');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('ok', { status: 200 }))
+    );
+
+    const clientOne = { 'x-forwarded-for': '203.0.113.12' };
+    const clientTwo = { 'x-forwarded-for': '203.0.113.13' };
+
+    for (let i = 0; i < 5; i++) {
+      await POST(postContext(validForm(), clientOne));
+    }
+
+    const stillAllowed = await POST(postContext(validForm(), clientTwo));
+
+    expect(stillAllowed.status).toBe(200);
   });
 });

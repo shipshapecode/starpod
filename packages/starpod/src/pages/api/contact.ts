@@ -1,10 +1,33 @@
 import type { APIRoute } from 'astro';
 
 import { jsonError } from '../../lib/api-errors';
+import {
+  checkRateLimit,
+  clientKey,
+  rateLimitHeaders
+} from '../../lib/rate-limit';
 
 export const prerender = false;
 
+// The contact form is the only mutating, costly endpoint on this site (it
+// calls out to a Discord webhook), so it's the only one worth rate limiting.
+const CONTACT_RATE_LIMIT = { limit: 5, windowMs: 60_000 };
+
 export const POST: APIRoute = async ({ request }) => {
+  const rate = checkRateLimit(clientKey(request), CONTACT_RATE_LIMIT);
+  const headers = rateLimitHeaders(rate);
+
+  if (!rate.allowed) {
+    const retryAfter = Math.max(0, rate.resetAt - Math.floor(Date.now() / 1000));
+    return jsonError(
+      429,
+      'rate_limited',
+      'Too many contact form submissions from this client',
+      'Wait a minute before trying again.',
+      { ...headers, 'Retry-After': String(retryAfter) }
+    );
+  }
+
   let data: FormData;
   try {
     data = await request.formData();
@@ -13,7 +36,8 @@ export const POST: APIRoute = async ({ request }) => {
       400,
       'invalid_body',
       'Request body could not be parsed as form data',
-      'Send a multipart/form-data or application/x-www-form-urlencoded body with name, email, and message fields.'
+      'Send a multipart/form-data or application/x-www-form-urlencoded body with name, email, and message fields.',
+      headers
     );
   }
 
@@ -32,7 +56,8 @@ export const POST: APIRoute = async ({ request }) => {
       400,
       'missing_fields',
       `Missing required fields: ${missing.join(', ')}`,
-      'Provide name, email, and message form fields.'
+      'Provide name, email, and message form fields.',
+      headers
     );
   }
 
@@ -41,7 +66,8 @@ export const POST: APIRoute = async ({ request }) => {
       500,
       'not_configured',
       'The contact form is not configured on this deployment',
-      'Set the DISCORD_WEBHOOK environment variable, or reach the hosts via the links on /contact.'
+      'Set the DISCORD_WEBHOOK environment variable, or reach the hosts via the links on /contact.',
+      headers
     );
   }
 
@@ -87,7 +113,8 @@ export const POST: APIRoute = async ({ request }) => {
       502,
       'delivery_failed',
       'Your message could not be delivered',
-      'Try again in a few minutes, or reach the hosts via the links on /contact.'
+      'Try again in a few minutes, or reach the hosts via the links on /contact.',
+      headers
     );
   }
 
@@ -98,7 +125,7 @@ export const POST: APIRoute = async ({ request }) => {
     }),
     {
       status: 200,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' }
+      headers: { 'Content-Type': 'application/json; charset=utf-8', ...headers }
     }
   );
 };
