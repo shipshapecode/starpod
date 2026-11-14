@@ -124,7 +124,9 @@ function parseTranscript(
  * start time (in seconds) of each cue. Blocks without a `-->` timing line
  * (e.g. the `WEBVTT` header) are skipped.
  */
-function parseCues(raw: string): Array<{ text: string; start: number }> {
+export function parseCues(
+  raw: string
+): Array<{ text: string; start: number }> {
   const cues: Array<{ text: string; start: number }> = [];
 
   for (const block of raw.replace(/\r\n/g, '\n').split(/\n{2,}/)) {

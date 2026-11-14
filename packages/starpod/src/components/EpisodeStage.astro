@@ -1,0 +1,150 @@
+---
+import { sortCast, voiceFor, type CastPerson } from '../lib/cast';
+import { getEpisodeCues } from '../lib/episode-cues';
+import { optimizeImage } from '../lib/optimize-episode-image';
+import type { Episode, Show } from '../lib/rss';
+import { dasherize } from '../utils/dasherize';
+import { formatDuration, toPlayable } from '../utils/playable';
+import { ArrowOutIcon, HeadphonesIcon, VideoIcon } from './icons';
+import Sponsors from './episode/Sponsors.astro';
+import LiveScript from './media/LiveScript';
+import StageControls from './media/StageControls';
+
+import type { ImageMetadata } from 'astro';
+import { getImage } from 'astro:assets';
+import starpodConfig from 'virtual:starpod/config';
+import avatarLight from '../assets/avatar-light.png';
+
+export interface Props {
+  episode: Episode;
+  show: Show;
+  /**
+   * The episode's hosts and guests, from the guests/sponsors database. Empty
+   * (or absent) when the database isn't enabled: no cast is shown.
+   */
+  people?: Array<CastPerson>;
+  /** The episode's sponsors from the database; the row hides when empty. */
+  sponsors?: Array<{ id: string; img: string | null; name: string; url: string }>;
+  /** `feature` on the home page (links on to the episode), `page` on its own page. */
+  variant: 'feature' | 'page';
+}
+
+const { episode, people = [], show, sponsors = [], variant } = Astro.props;
+const playable = toPlayable(episode, show);
+const Heading = variant === 'page' ? 'h1' : 'h2';
+const art =
+  (await optimizeImage(episode.episodeImage ?? show.image, { width: 960, height: 960 })) ??
+  show.image;
+const date = new Date(episode.published);
+const titleId = `stage-title-${episode.id.replace(/[^a-z0-9]/gi, '')}`;
+
+// The cast: this episode's own hosts and guests, in credit order. Anyone who
+// speaks as one of the transcript's two main voices wears that voice's face.
+const photos = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/img/people/*.{jpeg,jpg,png}'
+);
+const cues = people.length ? await getEpisodeCues(episode) : null;
+const cast = await Promise.all(
+  sortCast(people, starpodConfig.hosts.map((host) => host.name)).map(async (person) => {
+    const source =
+      (person.img && (await photos[`/src/img/people/${person.img}`]?.())?.default) ||
+      avatarLight;
+    const image = await getImage({ src: source, width: 112, height: 112, format: 'webp' });
+    return {
+      guest: !person.isHost,
+      name: person.name,
+      src: image.src,
+      voice: voiceFor(person.name, cues)
+    };
+  })
+);
+---
+
+<section
+  aria-labelledby={titleId}
+  class="stage"
+  data-has-video={episode.video ? '' : undefined}
+  data-stage
+  data-variant={variant}
+>
+  <div class="stage-room">
+  <div aria-hidden="true" class="stage-light" style={`--art: url("${art}")`}>
+    <canvas
+      class="stage-light-canvas"
+      data-episode-id={episode.id}
+      data-stage-light
+      height="18"
+      width="32"
+    ></canvas>
+  </div>
+  <div class="stage-frame" data-stage-frame>
+    <div aria-hidden="true" class="stage-ambient" style={`--art: url("${art}")`}></div>
+    <img
+      alt={`${episode.title} - episode art`}
+      class="stage-art"
+      decoding="async"
+      fetchpriority="high"
+      height="960"
+      src={art}
+      style={`view-transition-name: vt-art-${dasherize(episode.title)}`}
+      width="960"
+    />
+    <div class="stage-slot" data-episode-id={episode.id} data-media-slot></div>
+    <StageControls client:load episode={playable} part="overlay" />
+  </div>
+  </div>
+
+  <div class="stage-meta">
+    <Heading
+      class="stage-title"
+      id={titleId}
+      style={`view-transition-name: vt-${dasherize(episode.title)}`}
+    >
+      {episode.title}
+    </Heading>
+    <p class="stage-facts">
+      <span>{episode.episodeNumber === 'Bonus' ? 'Bonus' : `Episode ${episode.episodeNumber}`}</span>
+      <time datetime={date.toISOString()}>
+        {date.toLocaleDateString('en-us', { month: 'short', day: 'numeric', year: 'numeric' })}
+      </time>
+      <span>{formatDuration(episode.duration)}</span>
+      <span class="stage-kind">
+        {episode.video ? <VideoIcon size={15} /> : <HeadphonesIcon size={15} />}
+        {episode.video ? 'Video' : 'Audio'}
+      </span>
+    </p>
+    {
+      cast.length > 0 && (
+        <ul aria-label="Creators and guests" class="cast">
+          {cast.map((person) => (
+            <li class="cast-member" data-voice={person.voice ?? 'none'}>
+              <img alt="" class="cast-photo" height="56" loading="lazy" src={person.src} width="56" />
+              <span class="flex flex-col leading-tight">
+                <span class="cast-name text-ink font-semibold">{person.name}</span>
+                <span class="text-muted text-xs font-semibold tracking-wide uppercase">
+                  {person.guest ? 'Guest' : 'Host'}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <Sponsors sponsors={sponsors} />
+    <p class="stage-desc">{episode.description}</p>
+    <StageControls client:load episode={playable} part="actions" />
+    {
+      variant === 'feature' && (
+        <a class="link-on" href={`/${episode.episodeSlug}`}>
+          Show notes and transcript
+          <ArrowOutIcon size={16} />
+        </a>
+      )
+    }
+  </div>
+
+  <div class="stage-script">
+    <LiveScript client:only="preact" episode={playable} />
+  </div>
+
+</section>

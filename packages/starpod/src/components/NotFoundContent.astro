@@ -1,42 +1,45 @@
 ---
 import FourZeroFourIllustration from './illustrations/404Illustration.astro';
+
+const links = [
+  { href: '/', label: 'All episodes' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/llms.txt', label: 'llms.txt' },
+  { href: '/sitemap-index.xml', label: 'Sitemap' }
+];
 ---
 
-<div
-  class="relative z-10 flex flex-col items-center justify-center px-8 lg:px-18"
->
-  <FourZeroFourIllustration />
-
-  <div class="mt-12 flex justify-center">
-    <button class="btn" onclick="history.back()">
-      <span
-        class="text-light-text-heading rounded-full px-10 py-3 text-center text-sm dark:text-white"
-      >
-        Go back
-      </span>
-    </button>
+<div class="relative z-10 mx-auto flex max-w-xl flex-col items-center pb-16 text-center">
+  <div class="w-full max-w-md">
+    <FourZeroFourIllustration />
   </div>
 
-  <nav class="mt-10 pb-16 text-center text-sm" aria-label="Helpful links">
-    <p class="mb-3">Looking for something? Try one of these:</p>
-    <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2">
-      <li>
-        <a class="underline hover:no-underline" href="/">All episodes</a>
-      </li>
-      <li>
-        <a class="underline hover:no-underline" href="/about">About</a>
-      </li>
-      <li>
-        <a class="underline hover:no-underline" href="/contact">Contact</a>
-      </li>
-      <li>
-        <a class="underline hover:no-underline" href="/llms.txt">llms.txt</a>
-      </li>
-      <li>
-        <a class="underline hover:no-underline" href="/sitemap-index.xml">
-          Sitemap
-        </a>
-      </li>
+  <h1
+    class="text-ink mt-8 mb-0 font-(family-name:--font-display) text-[clamp(2rem,1.4rem+2vw,3rem)] leading-[0.95] font-extrabold tracking-[-0.01em] text-balance uppercase [font-stretch:72%]"
+  >
+    Page not found
+  </h1>
+  <p class="text-text mt-3 mb-0">Looking for something? Try one of these:</p>
+
+  <nav aria-label="Helpful links" class="mt-5">
+    <ul class="m-0 flex list-none flex-wrap justify-center gap-x-6 gap-y-2 p-0 text-sm font-semibold">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              class="text-ink underline decoration-transparent underline-offset-4 transition-[text-decoration-color] duration-300 hover:decoration-current"
+              href={link.href}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
     </ul>
   </nav>
+
+  <button class="button-secondary mt-8" onclick="history.back()" type="button">
+    Go back
+  </button>
 </div>

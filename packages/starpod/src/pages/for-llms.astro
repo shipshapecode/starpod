@@ -31,7 +31,7 @@ if (episodes.length > 0) {
 >
   <div class="relative z-10 px-8 lg:px-18">
     <h1
-      class="text-light-text-heading mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl dark:text-white"
+      class="text-ink mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl"
     >
       {show.title} - Guide for AI Assistants
     </h1>
@@ -50,7 +50,7 @@ if (episodes.length > 0) {
       {
         starpodConfig.hosts.map((host) => (
           <div class="mb-4">
-            <h3 class="text-light-text-heading text-xl font-bold dark:text-white">
+            <h3 class="text-ink text-xl font-bold">
               {host.name}
             </h3>
             <p class="mt-2">{host.bio}</p>
@@ -61,7 +61,7 @@ if (episodes.length > 0) {
                   <>
                     <a
                       href={host.website}
-                      class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                      class="animated-bottom-border text-ink font-bold after:mt-1"
                     >
                       Website
                     </a>
@@ -72,7 +72,7 @@ if (episodes.length > 0) {
                   <>
                     <a
                       href={host.github}
-                      class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                      class="animated-bottom-border text-ink font-bold after:mt-1"
                     >
                       GitHub
                     </a>
@@ -82,7 +82,7 @@ if (episodes.length > 0) {
                 {host.twitter && (
                   <a
                     href={host.twitter}
-                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                    class="animated-bottom-border text-ink font-bold after:mt-1"
                   >
                     Twitter
                   </a>
@@ -129,7 +129,7 @@ if (episodes.length > 0) {
               <strong>Episode {episode.episodeNumber}:</strong>{' '}
               <a
                 href={`/${episode.episodeSlug}.html.md`}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 {episode.title}
               </a>{' '}
@@ -158,7 +158,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.apple}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 Apple Podcasts
               </a>
@@ -170,7 +170,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.spotify}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 Spotify
               </a>
@@ -182,7 +182,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.youtube}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 YouTube
               </a>
@@ -194,7 +194,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.overcast}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 Overcast
               </a>
@@ -206,7 +206,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.pocketCasts}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 Pocket Casts
               </a>
@@ -221,7 +221,7 @@ if (episodes.length > 0) {
       <p>
         Direct RSS feed access: <a
           href={starpodConfig.rssFeed}
-          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          class="animated-bottom-border text-ink font-bold after:mt-1"
           >{starpodConfig.rssFeed}</a
         >
       </p>
@@ -232,14 +232,14 @@ if (episodes.length > 0) {
       <p>
         For a complete list of all episodes with descriptions, see <a
           href="/episodes-index.html.md"
-          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          class="animated-bottom-border text-ink font-bold after:mt-1"
           >Episodes Index</a
         >.
       </p>
       <p class="mt-2">
         Markdown version of this page: <a
           href="/for-llms.html.md"
-          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          class="animated-bottom-border text-ink font-bold after:mt-1"
           >for-llms.html.md</a
         >
       </p>
