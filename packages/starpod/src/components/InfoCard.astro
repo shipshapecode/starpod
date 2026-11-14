@@ -1,23 +1,50 @@
 ---
 import starpodConfig from 'virtual:starpod/config';
+import type { NavLinkIcon } from '../utils/config';
+import {
+  ArrowOutIcon,
+  BagIcon,
+  HeartIcon,
+  InfoIcon,
+  LinkIcon,
+  MailIcon,
+  MegaphoneIcon
+} from './icons';
 
 const links = starpodConfig.links ?? [];
+const path = Astro.url.pathname.replace(/\/$/, '');
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+const ICONS: Record<NavLinkIcon, typeof LinkIcon> = {
+  external: ArrowOutIcon,
+  heart: HeartIcon,
+  link: LinkIcon,
+  sponsor: MegaphoneIcon,
+  store: BagIcon
+};
+const iconFor = (link: (typeof links)[number]) =>
+  ICONS[link.icon ?? (isExternal(link.href) ? 'external' : 'link')];
 ---
 
-<div
-  class="m-2 mb-2 rounded-lg bg-light-card px-4 py-12 sm:px-6 md:px-4 lg:px-16 dark:bg-dark-card"
->
-  <a class="animated-bottom-border block pt-5 after:mt-5" href="/about">
-    About</a
-  >
-  <a class="animated-bottom-border block pt-5 after:mt-5" href="/contact">
-    Contact
-  </a>
-  {
-    links.map((link) => (
-      <a class="animated-bottom-border block pt-5 after:mt-5" href={link.href}>
-        {link.label}
+<a aria-current={path === '/about' ? 'page' : undefined} href="/about">
+  <InfoIcon />
+  <span>About</span>
+</a>
+<a aria-current={path === '/contact' ? 'page' : undefined} href="/contact">
+  <MailIcon />
+  <span>Contact</span>
+</a>
+{
+  links.map((link) => {
+    const Icon = iconFor(link);
+    return (
+      <a
+        aria-current={path === link.href ? 'page' : undefined}
+        href={link.href}
+        rel={isExternal(link.href) ? 'noopener' : undefined}
+      >
+        <Icon />
+        <span>{link.label}</span>
       </a>
-    ))
-  }
-</div>
+    );
+  })
+}

@@ -15,23 +15,29 @@ const svgs = import.meta.glob('/src/img/sponsors/*.svg', {
 });
 ---
 
-<h3 class="section-heading pb-6">Sponsors</h3>
-
-<div class="mb-12 grid grid-cols-1 gap-4 lg:mb-20 lg:grid-cols-2">
-  {
-    sponsors.map((sponsor) => {
-      return (
-        <a href={sponsor.url} target="_blank">
-          <div class="flex items-center">
-            <div class="mr-4 h-12 w-12 shrink-0 rounded-lg [&>svg]:h-full [&>svg]:w-full">
-              <Fragment
-                set:html={svgs[`/src/img/sponsors/${sponsor.img}`]?.() ?? ''}
-              />
-            </div>
-            {sponsor.name}
-          </div>
-        </a>
-      );
-    })
-  }
-</div>
+{
+  sponsors.length > 0 && (
+    <div class="mb-5">
+      <p class="text-muted mb-2 text-xs font-semibold tracking-wide uppercase">Presented by</p>
+      <ul class="flex flex-wrap gap-x-5 gap-y-3">
+        {sponsors.map((sponsor) => (
+          <li>
+            <a
+              class="text-ink group flex items-center gap-2.5 font-semibold"
+              href={sponsor.url}
+              rel="noopener"
+              target="_blank"
+            >
+              <span class="size-8 shrink-0 overflow-hidden rounded-md [&>svg]:size-full">
+                <Fragment set:html={svgs[`/src/img/sponsors/${sponsor.img}`]?.() ?? ''} />
+              </span>
+              <span class="underline decoration-transparent underline-offset-4 transition-[text-decoration-color] duration-300 group-hover:decoration-current">
+                {sponsor.name}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

@@ -1,0 +1,238 @@
+/* Loaded last so these states win over each control's base styles. */
+
+/*
+  Hover language. Three rules, carried over from the original site:
+
+  1. Outlined controls (a border on the page's own background) draw the
+     gradient outline: an Iris (light) / Aqua (dark) ring that sweeps
+     clockwise from the top over the 1px border. Add `.halo` to opt in.
+  2. Solid controls (the play buttons, primary actions) fill with the
+     gradient, left to right.
+  3. Icon controls turn the icon itself into the gradient, top to bottom.
+
+  All three fade; nothing swaps instantly. A key press stands in for a
+  hover via [data-flash].
+*/
+
+@property --icon-a {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: oklch(0% 0 0 / 0);
+}
+
+@property --icon-b {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: oklch(0% 0 0 / 0);
+}
+
+@property --fill-a {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: oklch(0% 0 0 / 0);
+}
+
+@property --fill-b {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: oklch(0% 0 0 / 0);
+}
+
+/* 1. The gradient outline. */
+:where(
+    .halo,
+    .btn,
+    .button-secondary,
+    .text-button,
+    .medium-switch
+  ) {
+  --halo: 0;
+  position: relative;
+  isolation: isolate;
+}
+
+:where(
+    .halo,
+    .btn,
+    .button-secondary,
+    .text-button,
+    .medium-switch
+  )::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(to bottom right, var(--glow-a), var(--glow-b));
+  mask:
+    conic-gradient(
+      from calc(var(--from, 0) * 1deg),
+      oklch(0% 0 0) calc(var(--halo) * 1%),
+      oklch(0% 0 0 / 0) calc(var(--halo) * 1%)
+    ),
+    linear-gradient(oklch(0% 0 0) 0 0) content-box,
+    linear-gradient(oklch(0% 0 0) 0 0);
+  mask-composite: intersect, exclude;
+  -webkit-mask-composite: source-in, xor;
+  /* Fully gone at rest: no antialiasing slivers left at rounded corners. */
+  opacity: clamp(0, var(--halo), 1);
+  pointer-events: none;
+  transition: --halo 500ms var(--ease-halo);
+}
+
+:where(
+    .halo,
+    .btn,
+    .button-secondary,
+    .text-button,
+    .medium-switch
+  ):is(:focus-visible, [data-flash]) {
+  --halo: 100;
+}
+
+/* 2. Solid fills. Each control states its resting colour in both stops so
+   the gradient can grow out of it. */
+.dock-play,
+.stage-play,
+.button-primary,
+.topbar-follow,
+.episode-row[data-current] .row-play {
+  --fill-a: var(--ink);
+  --fill-b: var(--ink);
+  /* Each solid button anchors its own buffering ring (::before). */
+  position: relative;
+  background: linear-gradient(to right, var(--fill-a), var(--fill-b));
+  transition:
+    --fill-a 300ms var(--ease-out),
+    --fill-b 300ms var(--ease-out),
+    color 300ms var(--ease-out),
+    border-color 300ms var(--ease-out),
+    opacity 400ms var(--ease-out),
+    transform 400ms var(--ease-spring),
+    scale 400ms var(--ease-spring);
+}
+
+.stage-play {
+  --fill-a: oklch(98% 0.005 285);
+  --fill-b: oklch(98% 0.005 285);
+}
+
+.episode-row[data-current] .row-play {
+  border-color: transparent;
+}
+
+.episode-row[data-current] .row-play::after {
+  display: none;
+}
+
+:is(.dock-play, .stage-play, .button-primary, .topbar-follow, .episode-row[data-current] .row-play):is(
+    :focus-visible,
+    [data-flash]
+  ) {
+  --fill-a: var(--glow-a);
+  --fill-b: var(--glow-b);
+  color: var(--on-glow);
+}
+
+/* The round play buttons also swell a little, as the original did. */
+:is(.dock-play, .episode-row[data-current] .row-play):is(:focus-visible, [data-flash]) {
+  scale: 1.08;
+}
+
+/* 3. Gradient icons. */
+.icon-stop-a {
+  stop-color: var(--icon-a);
+}
+
+.icon-stop-b {
+  stop-color: var(--icon-b);
+}
+
+/* The fade lives on whatever actually paints. An SVG gradient isn't
+   repainted while an inherited value animates on its ancestor, so the stops
+   transition their own colour; the platform marks (masked boxes) transition
+   their own copy of the stops. */
+.icon-stop-a,
+.icon-stop-b {
+  transition: stop-color 300ms ease;
+}
+
+.platform-icon {
+  transition:
+    --icon-a 300ms ease,
+    --icon-b 300ms ease;
+}
+
+.icon-button,
+.mini-button,
+.search-trigger,
+.platform,
+.rail-nav a,
+.sheet-nav a {
+  --icon-a: var(--text);
+  --icon-b: var(--text);
+  transition:
+    background 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+
+:is(.search-trigger, .rail-nav a, .sheet-nav a) {
+  --icon-a: var(--muted);
+  --icon-b: var(--muted);
+}
+
+:is(.rail-nav a, .sheet-nav a)[aria-current='page'] {
+  --icon-a: var(--accent-ink);
+  --icon-b: var(--accent-ink);
+}
+
+:is(.icon-button, .mini-button, .search-trigger, .rail-nav a, .sheet-nav a) svg {
+  stroke: var(--icon-paint);
+}
+
+:is(.icon-button, .mini-button, .search-trigger, .rail-nav a, .sheet-nav a)
+  svg
+  :is([fill='currentColor'], text) {
+  fill: var(--icon-paint);
+}
+
+/* Platform marks are masked artwork, so the gradient is their background. */
+.platform-icon {
+  background: linear-gradient(180deg, var(--icon-a), var(--icon-b)) !important;
+}
+
+:is(.icon-button, .mini-button, .search-trigger, .platform, .rail-nav a, .sheet-nav a):is(
+    :focus-visible,
+    [data-flash]
+  ) {
+  --icon-a: var(--glow-a);
+  --icon-b: var(--glow-b);
+}
+
+/* Pointer hover, for real pointers only: touch keeps :hover after a tap. */
+@media (hover: hover) {
+  :where(
+      .halo,
+    .btn,
+    .button-secondary,
+    .text-button,
+    .medium-switch
+    ):hover {
+    --halo: 100;
+  }
+
+  :is(.dock-play, .stage-play, .button-primary, .topbar-follow, .episode-row[data-current] .row-play):hover {
+    --fill-a: var(--glow-a);
+    --fill-b: var(--glow-b);
+    color: var(--on-glow);
+  }
+
+  :is(.dock-play, .episode-row[data-current] .row-play):hover {
+    scale: 1.08;
+  }
+
+  :is(.icon-button, .mini-button, .search-trigger, .platform, .rail-nav a, .sheet-nav a):hover {
+    --icon-a: var(--glow-a);
+    --icon-b: var(--glow-b);
+  }
+}

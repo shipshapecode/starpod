@@ -4,6 +4,7 @@ import {
   nonEmpty,
   object,
   optional,
+  picklist,
   pipe,
   safeParse,
   string,
@@ -38,6 +39,10 @@ export type Host = {
   website?: string;
 };
 
+/** Icons a nav link can show beside its label. */
+export const NAV_LINK_ICONS = ['external', 'heart', 'link', 'sponsor', 'store'] as const;
+export type NavLinkIcon = (typeof NAV_LINK_ICONS)[number];
+
 export type NavLink = {
   /**
    * Link text, e.g. "Store".
@@ -48,6 +53,11 @@ export type NavLink = {
    * custom page you added to your site's src/pages/.
    */
   href: string;
+  /**
+   * The icon beside the label. Defaults to `external` (an outward arrow) for
+   * URLs and `link` for local pages.
+   */
+  icon?: NavLinkIcon;
 };
 
 export type StarpodConfig = {
@@ -104,7 +114,10 @@ const HostSchema: GenericSchema<Host> = object({
 
 const NavLinkSchema: GenericSchema<NavLink> = object({
   label: pipe(string(), nonEmpty('every link needs a label')),
-  href: pipe(string(), nonEmpty('every link needs an href'))
+  href: pipe(string(), nonEmpty('every link needs an href')),
+  icon: optional(
+    picklist(NAV_LINK_ICONS, `link icon must be one of: ${NAV_LINK_ICONS.join(', ')}`)
+  )
 });
 
 const StarpodConfigSchema: GenericSchema<StarpodConfig> = object({

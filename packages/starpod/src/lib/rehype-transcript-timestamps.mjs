@@ -3,29 +3,12 @@
 // markdown transcripts in `src/content/transcripts` contain this pattern, so
 // this plugin effectively only affects them.
 //
-// The button keeps the original bracketed label as its text and carries the
-// resolved offset (in seconds) in `data-seek`; the client-side markdown
-// transcript island reads that attribute to drive the player. The class list
-// mirrors the RSS transcript timestamps (`Transcript.tsx`) so both look the
-// same. Those utilities are already emitted by Tailwind from that component,
-// so listing them here adds no new CSS.
-const TIMESTAMP = /\[(\d{1,2}):(\d{2})(?::(\d{2}))?\]/g;
+// Each timestamp becomes the shared seek chip (`seek-chip.mjs`), the same
+// one show notes and feed transcripts use; the client-side markdown
+// transcript island reads `data-seek` to drive the player.
+import { seekChipAttributes } from './seek-chip.mjs';
 
-const TIMESTAMP_CLASS = [
-  'transcript-timestamp',
-  'mr-1',
-  'align-baseline',
-  'font-mono',
-  'text-sm',
-  'font-medium',
-  'text-violet-600',
-  'tabular-nums',
-  'no-underline',
-  'transition-colors',
-  'hover:text-violet-500',
-  'dark:text-cyan-400',
-  'dark:hover:text-cyan-300'
-];
+const TIMESTAMP = /\[(\d{1,2}):(\d{2})(?::(\d{2}))?\]/g;
 
 function toSeconds(hours, minutes, seconds) {
   // `[MM:SS]` arrives as (minutes, seconds) with `seconds` undefined.
@@ -34,16 +17,12 @@ function toSeconds(hours, minutes, seconds) {
     : Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds);
 }
 
-function timestampButton(label, seconds) {
+function timestampButton(seconds) {
+  const { label, class: className, ...attributes } = seekChipAttributes(seconds);
   return {
     type: 'element',
     tagName: 'button',
-    properties: {
-      type: 'button',
-      className: [...TIMESTAMP_CLASS],
-      'data-seek': String(seconds),
-      'aria-label': `Play from ${label}`
-    },
+    properties: { ...attributes, className: [className] },
     children: [{ type: 'text', value: label }]
   };
 }
@@ -59,7 +38,7 @@ function splitTextNode(value) {
     if (match.index > lastIndex) {
       nodes.push({ type: 'text', value: value.slice(lastIndex, match.index) });
     }
-    nodes.push(timestampButton(label, toSeconds(a, b, c)));
+    nodes.push(timestampButton(toSeconds(a, b, c)));
     lastIndex = match.index + label.length;
   }
 

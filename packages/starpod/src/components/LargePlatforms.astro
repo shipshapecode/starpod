@@ -7,94 +7,37 @@ import SpotifyIcon from '../svgs/spotify.svg?raw';
 import YouTubeIcon from '../svgs/youtube.svg?raw';
 
 const { platforms, rssFeed } = starpodConfig;
+
+const RssIcon = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path class="fill-muted" d="M4 10.5a9.5 9.5 0 0 1 9.5 9.5H11a7 7 0 0 0-7-7zM4 4a16 16 0 0 1 16 16h-2.5A13.5 13.5 0 0 0 4 6.5z"/><circle class="fill-muted" cx="5.6" cy="18.4" r="2"/></svg>`;
+
+const entries = [
+  platforms?.apple && { href: platforms.apple, icon: AppleIcon, label: 'Apple Podcasts' },
+  platforms?.spotify && { href: platforms.spotify, icon: SpotifyIcon, label: 'Spotify' },
+  platforms?.youtube && { href: platforms.youtube, icon: YouTubeIcon, label: 'YouTube' },
+  platforms?.overcast && { href: platforms.overcast, icon: OvercastIcon, label: 'Overcast' },
+  platforms?.pocketCasts && {
+    href: platforms.pocketCasts,
+    icon: PocketCastsIcon,
+    label: 'Pocket Casts'
+  },
+  rssFeed && { href: rssFeed, icon: RssIcon, label: 'RSS feed' }
+].filter(Boolean) as Array<{ href: string; icon: string; label: string }>;
 ---
 
-<div
-  class="mt-7 grid grid-cols-2 gap-6 lg:mt-11 lg:grid-cols-3 lg:justify-start"
->
+<ul class="m-0 flex list-none flex-wrap gap-3 p-0">
   {
-    platforms?.apple && (
-      <a
-        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
-        href={platforms.apple}
-      >
-        <span class="flex items-center">
-          Apple Podcasts
-          <span class="ml-3 flex h-4 w-4 items-center">
-            <Fragment set:html={AppleIcon} />
+    entries.map((entry) => (
+      <li>
+        <a
+          class="halo text-ink border-line inline-flex items-center gap-2.5 rounded-full border py-2.5 pr-5 pl-4 text-[0.9375rem] font-semibold no-underline"
+          href={entry.href}
+        >
+          <span aria-hidden="true" class="flex size-[18px] items-center [&>svg]:size-full">
+            <Fragment set:html={entry.icon} />
           </span>
-        </span>
-      </a>
-    )
+          {entry.label}
+        </a>
+      </li>
+    ))
   }
-  {
-    platforms?.spotify && (
-      <a
-        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
-        href={platforms.spotify}
-      >
-        <span class="flex items-center">
-          Spotify
-          <span class="ml-3 flex h-4 w-4 items-center">
-            <Fragment set:html={SpotifyIcon} />
-          </span>
-        </span>
-      </a>
-    )
-  }
-  {
-    platforms?.overcast && (
-      <a
-        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
-        href={platforms.overcast}
-      >
-        <span class="flex items-center">
-          Overcast
-          <span class="ml-3 flex h-4 w-4 items-center">
-            <Fragment set:html={OvercastIcon} />
-          </span>
-        </span>
-      </a>
-    )
-  }
-  {
-    platforms?.pocketCasts && (
-      <a
-        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
-        href={platforms.pocketCasts}
-      >
-        <span class="flex items-center">
-          Pocket Casts
-          <span class="ml-3 flex h-4 w-4 items-center">
-            <Fragment set:html={PocketCastsIcon} />
-          </span>
-        </span>
-      </a>
-    )
-  }
-  {
-    platforms?.youtube && (
-      <a
-        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
-        href={platforms.youtube}
-      >
-        <span class="flex items-center">
-          YouTube
-          <span class="ml-3 flex h-4 w-4 items-center">
-            <Fragment set:html={YouTubeIcon} />
-          </span>
-        </span>
-      </a>
-    )
-  }
-  {
-    rssFeed && (
-      <a
-        class="animated-bottom-border text-light-text-heading font-bold after:mt-4 dark:text-white"
-        href={rssFeed}
-      >
-        <span class="flex items-center">RSS Feed</span>
-      </a>
-    )
-  }
-</div>
+</ul>
