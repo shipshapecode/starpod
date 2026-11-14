@@ -24,6 +24,7 @@ import {
   isPlaying,
   mediaDuration,
   mediaHost,
+  miniClosed,
   playbackRate,
   seekTo,
   type Medium,
@@ -328,6 +329,7 @@ function syncRootState() {
   root.medium = activeMedium.value;
   root.host = mediaHost.value;
   root.hasVideo = String(Boolean(episode?.video));
+  root.mini = miniClosed.value ? 'closed' : 'open';
 }
 
 function syncRootProgress() {

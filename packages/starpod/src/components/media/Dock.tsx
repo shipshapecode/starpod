@@ -4,17 +4,20 @@ import { useEffect, useState } from 'preact/hooks';
 import {
   ArrowOutIcon,
   BackIcon,
+  CloseIcon,
   ExpandIcon,
   ForwardIcon,
   VolumeIcon
 } from '../icons';
 import {
   activeMedium,
+  closeMini,
   currentEpisode,
   currentTime,
   isMuted,
   mediaDuration,
   mediaHost,
+  miniClosed,
   playbackRate,
 } from '../state';
 import { formatClock } from '../../utils/playable';
@@ -74,10 +77,14 @@ export default function Dock() {
   const duration = mediaDuration.value || episode.duration || 0;
   const time = currentTime.value;
   const href = `/${episode.slug ?? episode.episodeNumber}`;
-  const showArt = mediaHost.value === 'stage' || activeMedium.value === 'listen';
+  const showArt =
+    mediaHost.value === 'stage' || activeMedium.value === 'listen' || miniClosed.value;
 
   const floating =
-    mediaHost.value === 'dock' && activeMedium.value === 'watch' && Boolean(episode.video);
+    mediaHost.value === 'dock' &&
+    activeMedium.value === 'watch' &&
+    Boolean(episode.video) &&
+    !miniClosed.value;
 
   return (
     <>
@@ -97,6 +104,18 @@ export default function Dock() {
           type="button"
         >
           <ExpandIcon size={15} />
+        </button>
+        <button
+          aria-label="Close video"
+          class="mini-button"
+          onClick={(event) => {
+            event.stopPropagation();
+            closeMini();
+          }}
+          title="Close video"
+          type="button"
+        >
+          <CloseIcon size={15} />
         </button>
       </div>
     )}

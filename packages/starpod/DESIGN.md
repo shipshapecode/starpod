@@ -286,7 +286,7 @@ Layout is an app shell with a single main column.
 - **Home:** the episode list is the page: hairline-ruled rows with art, facts, title, two-line description, and a play disc.
 - **Episode stage (desktop):** the frame and meta sit on the left beside a sticky script column at 0.95fr. With no transcript the stage collapses to one column, max 1100px. On phones the script performs directly under the picture (max 34vh), then the meta.
 - **Standalone pages:** `PageHeader`, then sections separated by 4–5rem. About lays hosts out in two columns from 1024px. Contact keeps the form to 36rem with name and email side by side from 640px.
-- **Mini player:** when a watched episode's stage scrolls away, the video floats bottom-right at clamp(260px, 24vw, 400px) on desktop or min(52vw, 360px) on phones, and the desktop main column adds right padding so the video never covers a control.
+- **Mini player:** when a watched episode's stage scrolls away, the video floats bottom-right at clamp(260px, 24vw, 400px) on desktop or min(52vw, 360px) on phones. It is fixed above the page and never changes the page's layout.
 - **Foldables** (two viewport segments, or a coarse-pointer tablet aspect): the stage becomes two pages either side of a hinge gap of at least 40px; voice 0 takes the left page and voice 1 the right.
 - **Breakpoints:** 640px, 768px, 1024px, 1100px.
 
@@ -358,7 +358,7 @@ Timestamps in show notes and transcripts are 6px-radius chips in Accent Wash wit
 The stage lists the episode's hosts (configured order, then guest hosts) and guests (alphabetical) with full-colour 52px photos, names in their voice's face when they speak as voice 0 or 1, and a "Host"/"Guest" label. "Presented by" lists the episode's sponsors with inline logos (filled in ink) and hides when empty.
 
 ### Dock and mini player
-The dock is a fixed transport bar on Surface that slides in once per visit (600ms). On phones, progress is a 2px gradient light along its top edge. On desktop it has a full scrubber: a 4px track filled with the gradient to the playhead, a 14px ink thumb that grows to 1.25× on hover, tabular times, and a transcript preview of the line at the hovered time. The mini video sits on Media Ground with Float shadow under a Surface chrome strip (title, open episode, fullscreen). Keyboard: K/space play, J/L skip, M mute, W watch/listen, F fullscreen.
+The dock is a fixed transport bar on Surface that slides in once per visit (600ms). On phones, progress is a 2px gradient light along its top edge. On desktop it has a full scrubber: a 4px track filled with the gradient to the playhead, a 14px ink thumb that grows to 1.25× on hover, tabular times, and a transcript preview of the line at the hovered time. The mini video sits on Media Ground with Float shadow under a Surface chrome strip (title, fullscreen, close). Clicking the video opens its episode. Close pauses playback and hides the video; any play brings it back. Keyboard: K/space play, J/L skip, M mute, W watch/listen, F fullscreen.
 
 ### Signature: the ring
 A 1px gradient ring (Glow A to Glow B, to bottom right) that follows the element's own radius. On hover (pointer devices only) or keyboard focus it sweeps itself on over 500ms along `--ease-halo`, an animated `@property --halo` with `inherits: true`. It belongs only on outlined controls sitting on the page background.

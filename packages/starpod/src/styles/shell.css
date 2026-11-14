@@ -738,16 +738,9 @@
 
 /*
   The floating mini video: where a watched episode goes when its stage is
-  off-screen. Hidden whenever there is nothing to watch in it.
+  off-screen. Hidden whenever there is nothing to watch in it. It floats
+  above the page (fixed) and never changes the page's layout.
 */
-/* While a video floats, the page gives it room on desktop so it never
-   covers a control. */
-@media (min-width: 1024px) {
-  :root[data-host='dock'][data-medium='watch'][data-has-video='true'] .main {
-    padding-right: calc(clamp(260px, 24vw, 400px) + 48px);
-    transition: padding-right 400ms var(--ease-out);
-  }
-}
 
 .dock {
   --mini-right: 12px;
@@ -781,7 +774,7 @@
     scale 400ms var(--ease-spring);
 }
 
-:root[data-host='dock'][data-medium='watch'][data-has-video='true'] .dock-media:not(:empty) {
+:root[data-host='dock'][data-medium='watch'][data-has-video='true']:not([data-mini='closed']) .dock-media:not(:empty) {
   opacity: 1;
   scale: 1;
   pointer-events: auto;

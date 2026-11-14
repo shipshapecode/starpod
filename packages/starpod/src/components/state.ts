@@ -1,4 +1,4 @@
-import { computed, signal } from '@preact/signals';
+import { computed, effect, signal } from '@preact/signals';
 import type { Episode } from '../lib/rss';
 
 /**
@@ -86,6 +86,21 @@ export const isBuffering = signal(false);
 // Where the one media element currently lives: inside an episode stage on the
 // page, or in the persistent dock.
 export const mediaHost = signal<'stage' | 'dock'>('dock');
+
+// The visitor closed the floating mini video. Closing pauses playback; any
+// play (dock, stage, a row, the K shortcut) brings the video back.
+export const miniClosed = signal(false);
+
+export function closeMini() {
+  isPlaying.value = false;
+  miniClosed.value = true;
+}
+
+effect(() => {
+  if (isPlaying.value) {
+    miniClosed.value = false;
+  }
+});
 
 // Search state
 export const isSearchOpen = signal(false);

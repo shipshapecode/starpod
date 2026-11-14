@@ -6,6 +6,7 @@ import {
   activeMedium,
   currentEpisode,
   isPlaying,
+  miniClosed,
   playEpisode,
   preferredMedium,
   setMedium
@@ -32,6 +33,7 @@ describe('Dock', () => {
   beforeEach(() => {
     currentEpisode.value = null;
     isPlaying.value = false;
+    miniClosed.value = false;
     setMedium('watch');
   });
 
@@ -75,6 +77,24 @@ describe('Dock', () => {
     // The video floats because no stage holds it in this test.
     expect(screen.getByRole('button', { name: 'Fullscreen' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Stop watching, keep listening' })).toBeNull();
+  });
+
+  it('closes the floating video, pausing it, and brings it back on play', () => {
+    currentEpisode.value = withVideo;
+    isPlaying.value = true;
+    const { rerender } = render(<Dock />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close video' }));
+    expect(isPlaying.value).toBe(false);
+    expect(miniClosed.value).toBe(true);
+    rerender(<Dock />);
+    expect(screen.queryByRole('button', { name: 'Close video' })).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play' }));
+    expect(isPlaying.value).toBe(true);
+    expect(miniClosed.value).toBe(false);
+    rerender(<Dock />);
+    expect(screen.getByRole('button', { name: 'Close video' })).toBeInTheDocument();
   });
 });
 
