@@ -1,6 +1,6 @@
 /*
-  Starpod tokens. One palette (Iris for light, Aqua for dark), two worlds that
-  differ in type, shape, and their signature motion. All colour is OKLCH.
+  Starpod tokens. One palette (Iris for light, Aqua for dark) and one Stage
+  world; DESIGN.md documents the system. All colour is OKLCH.
 */
 
 @property --halo {
