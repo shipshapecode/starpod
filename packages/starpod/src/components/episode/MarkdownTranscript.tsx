@@ -30,7 +30,7 @@ export default function MarkdownTranscript({ episode, children }: Props) {
 
   return (
     <article
-      class="transcript prose prose-neutral dark:prose-invert line-clamp-4"
+      class="transcript line-clamp-4"
       onClick={handleClick}
     >
       {children}

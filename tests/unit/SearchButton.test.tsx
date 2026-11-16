@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/preact';
+import { fireEvent, render, screen } from '@testing-library/preact';
 import { beforeEach, describe, expect, it } from 'vitest';
 import SearchButton from 'starpod/src/components/SearchButton';
 import { isSearchOpen } from 'starpod/src/components/state';
@@ -8,41 +8,27 @@ describe('SearchButton', () => {
     isSearchOpen.value = false;
   });
 
-  it('renders the search button', () => {
+  it('renders the rail search with its shortcut', () => {
     render(<SearchButton />);
 
     const button = screen.getByRole('button');
-    expect(button).toBeInTheDocument();
     expect(button).toHaveAttribute('aria-label', 'Search episodes (⌘K)');
+    expect(screen.getByText('Search episodes')).toBeInTheDocument();
+    expect(screen.getByText('⌘K')).toBeInTheDocument();
   });
 
   it('opens search dialog when clicked', () => {
     render(<SearchButton />);
-
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
-
+    fireEvent.click(screen.getByRole('button'));
     expect(isSearchOpen.value).toBe(true);
   });
 
-  it('contains search text', () => {
-    render(<SearchButton />);
+  it('renders as a tab for the phone tab bar', () => {
+    render(<SearchButton variant="tab" />);
 
+    const button = screen.getByRole('button', { name: 'Search episodes' });
     expect(screen.getByText('Search')).toBeInTheDocument();
-  });
-
-  it('displays keyboard shortcut hint', () => {
-    render(<SearchButton />);
-
-    expect(screen.getByText('⌘')).toBeInTheDocument();
-    expect(screen.getByText('K')).toBeInTheDocument();
-  });
-
-  it('contains search icon', () => {
-    render(<SearchButton />);
-
-    const icon = screen.getByRole('button').querySelector('.search-icon');
-    expect(icon).toBeInTheDocument();
-    expect(icon).toHaveAttribute('aria-hidden', 'true');
+    fireEvent.click(button);
+    expect(isSearchOpen.value).toBe(true);
   });
 });

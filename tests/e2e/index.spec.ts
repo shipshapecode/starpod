@@ -35,7 +35,7 @@ test('index page has correct meta', async ({ page }) => {
   );
 
   const firstEpisodeThumbnail = page.locator(
-    '[aria-label="EpisodeList"] li:first-of-type > div > img'
+    '[aria-label="EpisodeList"] li:first-of-type > img'
   );
   await expect(firstEpisodeThumbnail).toHaveAttribute(
     'src',

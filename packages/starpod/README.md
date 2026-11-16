@@ -91,6 +91,15 @@ validates your config and lists every problem with its field path.
 - `links` (optional) — extra navigation links after About and Contact, e.g.
   `[{ label: 'Store', href: 'https://example.com/store' }]`
 
+## Video
+
+Starpod is video-first with no setup. When an episode's feed item carries a
+`<podcast:alternateEnclosure>` with a video or HLS type, its page leads with
+the video and offers a Watch / Listen switch; the visitor's choice is
+remembered. Episodes without video lead with their artwork and play the
+audio enclosure. Playback continues across pages: the video floats into a
+mini player when its stage scrolls away or the visitor navigates.
+
 ## Integration options
 
 ```js
@@ -105,7 +114,7 @@ starpod(starpodConfig, {
 });
 ```
 
-Overridable components: `Breadcrumbs`, `Dots`, `EpisodeList`, `Hosts`,
+Overridable components: `Breadcrumbs`, `EpisodeList`, `Hosts`,
 `InfoCard`, `LargePlatforms`, `NotFoundContent`, `Platforms`, `ShowArtwork`.
 
 ## Custom pages
@@ -146,7 +155,9 @@ export const collections = {
 
 `[HH:MM:SS]` timestamps become clickable and seek the player. Without a
 file, Starpod falls back to the transcript referenced by the feed's
-`<podcast:transcript>` tag.
+`<podcast:transcript>` tag. Write speakers as `[00:01:23] **Name:** text` and
+the two most frequent speakers each get their own typeface in the live
+transcript beside the player.
 
 ## Database (guests & sponsors)
 
