@@ -89,7 +89,9 @@ validates your config and lists every problem with its field path.
   and YouTube
 - `rssFeed` — the feed your episodes are read from at build time
 - `links` (optional) — extra navigation links after About and Contact, e.g.
-  `[{ label: 'Store', href: 'https://example.com/store' }]`
+  `[{ label: 'Store', href: 'https://example.com/store', icon: 'store' }]`.
+  `icon` is one of `external`, `heart`, `link`, `sponsor`, or `store`; it
+  defaults to `external` for URLs and `link` for local pages.
 
 ## Video
 

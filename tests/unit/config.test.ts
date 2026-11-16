@@ -28,6 +28,22 @@ describe('defineStarpodConfig', () => {
     expect(config.links).toHaveLength(1);
   });
 
+  it('accepts a known nav link icon and rejects an unknown one', () => {
+    expect(
+      defineStarpodConfig({
+        ...validConfig,
+        links: [{ label: 'Sponsor', href: '/sponsor', icon: 'sponsor' }]
+      }).links?.[0].icon
+    ).toBe('sponsor');
+    expect(() =>
+      validateStarpodConfig({
+        ...validConfig,
+        // @ts-expect-error: not one of the built-in icons
+        links: [{ label: 'Odd', href: '/odd', icon: 'rocket' }]
+      })
+    ).toThrow(/link icon must be one of/);
+  });
+
   it('rejects a non-URL rssFeed and names the field', () => {
     expect(() =>
       validateStarpodConfig({ ...validConfig, rssFeed: 'not a url' })
