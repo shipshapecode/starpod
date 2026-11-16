@@ -2,8 +2,8 @@ name: Lint & Tests
 on:
   push:
     branches: [main]
+  # Every PR, including ones stacked on another PR's branch.
   pull_request:
-    branches: [main]
 jobs:
   lint:
     timeout-minutes: 10
@@ -57,7 +57,8 @@ jobs:
 
   e2e:
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    # Playwright 1.60 can't install browsers on ubuntu-latest (26.04) yet.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
