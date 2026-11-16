@@ -1,0 +1,220 @@
+---
+import { chipLabel } from '../../lib/seek-chip.mjs';
+import { ArrowOutIcon } from '../icons';
+import type { PlayableEpisode } from '../state';
+import PersonFace from '../PersonFace.astro';
+import Tiles from './Tiles.astro';
+
+export interface Props {
+  /** This episode, for seeking to someone's first line. */
+  episode: PlayableEpisode;
+  people: Array<{
+    id: string;
+    name: string;
+    guest: boolean;
+    src: string;
+    /** Every episode they are on, this one included. */
+    count: number;
+    /** The line that says something about them (`personFact`). */
+    fact: string;
+    /** Transcript voice 0 or 1, when they speak as one. */
+    voice?: number;
+    /** The name the transcript gives them, when it names them. */
+    speaksAs?: string;
+    /** When they are first heard, in seconds. */
+    firstLine?: number;
+    /** Their share of the talking, 0–1. */
+    share?: number;
+    /** Their latest other episodes. */
+    others: Array<{ href: string; number: string; title: string; art: string }>;
+  }>;
+}
+
+const { episode, people } = Astro.props;
+
+// Who leads depends on the episode: with guests, the guests get the cards
+// and the hosts one compact line; with none, the hosts get the cards.
+const guests = people.filter((person) => person.guest);
+const cards = guests.length ? guests : people;
+const hosts = guests.length ? people.filter((person) => !person.guest) : [];
+---
+
+<ul class="ep-people" data-ep-people data-episode={JSON.stringify(episode)}>
+  {
+    cards.map((person) => {
+      const panel = `ep-person-${person.id}`;
+      // Only a guest with other episodes opens; nobody else is a dead button.
+      const opens = person.guest && person.others.length > 0;
+      const who = (
+        <>
+          <PersonFace size={64} src={person.src} />
+          <span class="ep-person-text">
+            <span class="ep-person-name">{person.name}</span>
+            <span class="person-fact">{person.fact}</span>
+            {person.share !== undefined && (
+              <span class="sr-only">
+                , {Math.round(person.share * 100)}% of the talking
+              </span>
+            )}
+            <span class="person-speaking">Speaking</span>
+          </span>
+        </>
+      );
+      return (
+        <li
+          class="ep-person ep-reveal PropFLIP fix-kids"
+          data-ep-person
+          data-props-for="pointer-local"
+          data-share={person.share !== undefined ? '' : undefined}
+          data-speaks-as={person.speaksAs}
+          data-voice={person.voice}
+          style={
+            person.share !== undefined
+              ? `--ep-share: ${person.share.toFixed(3)}`
+              : undefined
+          }
+        >
+          <div class="ep-person-head">
+            {opens ? (
+              <button
+                aria-controls={panel}
+                aria-expanded="false"
+                class="ep-person-who"
+                type="button"
+              >
+                {who}
+              </button>
+            ) : (
+              <div class="ep-person-who">{who}</div>
+            )}
+            {person.firstLine !== undefined ? (
+              <span class="ep-person-stat">
+                <span aria-hidden="true">First speaks</span>
+                <button
+                  aria-label={`First speaks at ${chipLabel(person.firstLine)}`}
+                  class="ep-chip"
+                  data-seek={person.firstLine}
+                  type="button"
+                >
+                  {chipLabel(person.firstLine)}
+                </button>
+              </span>
+            ) : (
+              <span class="ep-chip ep-chip-quiet">
+                {person.count} {person.count === 1 ? 'ep' : 'eps'}
+              </span>
+            )}
+            {opens && (
+              <svg
+                aria-hidden="true"
+                class="ep-person-caret"
+                fill="none"
+                height="16"
+                viewBox="0 0 16 16"
+                width="16"
+              >
+                <path
+                  d="m4 6 4 4 4-4"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                />
+              </svg>
+            )}
+          </div>
+          {opens && (
+            <div class="ep-person-more" hidden id={panel}>
+              <Tiles
+                items={person.others}
+                label={`Other episodes with ${person.name}`}
+              />
+              <a
+                class="ep-pill"
+                href={`/?guest=${encodeURIComponent(person.id)}`}
+              >
+                All {person.count} episodes with {person.name}
+                <ArrowOutIcon size={14} />
+              </a>
+            </div>
+          )}
+        </li>
+      );
+    })
+  }
+</ul>
+
+{
+  hosts.length > 0 && (
+    <p class="ep-hosted">
+      <span class="ep-hosted-label">Hosted by</span>
+      {hosts.map((host) => (
+        <a
+          class="person-chip"
+          data-speaks-as={host.speaksAs}
+          data-voice={host.voice}
+          href={`/?guest=${encodeURIComponent(host.id)}`}
+        >
+          <PersonFace size={32} src={host.src} />
+          {host.name}
+          <span class="person-speaking">Speaking</span>
+        </a>
+      ))}
+    </p>
+  )
+}
+
+<script>
+  import { flip, registerFlipTargets } from '../../motion/propflip';
+  import { seekToEpisode, type PlayableEpisode } from '../state';
+
+  const cards = () =>
+    Array.from(document.querySelectorAll<HTMLElement>('[data-ep-person]'));
+  const onScreen = (card: HTMLElement) => {
+    const { top, bottom } = card.getBoundingClientRect();
+    return bottom > 0 && top < innerHeight;
+  };
+  let layer = 1;
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element;
+
+    // Someone's first line: play the episode from there.
+    const chip = target.closest?.<HTMLElement>('[data-ep-people] [data-seek]');
+    if (chip) {
+      const list = chip.closest<HTMLElement>('[data-ep-people]')!;
+      seekToEpisode(
+        JSON.parse(list.dataset.episode!) as PlayableEpisode,
+        Number(chip.dataset.seek)
+      );
+      return;
+    }
+
+    // Opening a card re-flows the grid: it takes the full row and its
+    // neighbours slide into the gaps. Every card flips from where it was.
+    const button = target.closest?.('[data-ep-person] button[aria-expanded]');
+    const card = button?.closest<HTMLElement>('[data-ep-person]');
+    const panel = card?.querySelector<HTMLElement>('.ep-person-more');
+    if (!button || !card || !panel) {
+      return;
+    }
+    const open = button.getAttribute('aria-expanded') !== 'true';
+    // The card you touched flies over its neighbours, opening or closing,
+    // and the ripple through them starts from it.
+    card.style.zIndex = String(++layer);
+    const list = card.parentElement!;
+    list.style.setProperty(
+      '--ep-from',
+      String(Array.prototype.indexOf.call(list.children, card) + 1)
+    );
+    const moving = cards().filter((other) => other === card || onScreen(other));
+    flip(moving, () => {
+      button.setAttribute('aria-expanded', String(open));
+      card.toggleAttribute('data-open', open);
+      panel.hidden = !open;
+    });
+  });
+
+  // Carry the cards on screen through shell layout changes (the rail).
+  registerFlipTargets(() => cards().filter(onScreen));
+</script>

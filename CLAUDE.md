@@ -20,7 +20,7 @@ Whatnot podcast).
 - **Lint fix:** `pnpm lint:fix`
 - **All tests:** `pnpm test` (runs unit + e2e concurrently)
 - **Unit tests only:** `pnpm test:unit` (Vitest)
-- **Single unit test:** `pnpm exec vitest run tests/unit/Player.test.tsx`
+- **Single unit test:** `pnpm exec vitest run tests/unit/Dock.test.tsx`
 - **E2E tests only:** `pnpm test:e2e` (Playwright, auto-starts dev server)
 - **Seed remote DB:** `pnpm db:seed`
 - **Push schema to DB:** `pnpm db:push`
@@ -64,9 +64,24 @@ connection is configured in `db/index.ts`.
   `Accept: text/markdown` clients, and the styled 404 page otherwise. API
   routes return structured JSON errors via `src/lib/api-errors.ts`.
 - `src/components/` — Mix of `.astro` (static) and `.tsx` (Preact interactive)
-  components. The audio player (`src/components/player/`) and search dialog are
+  components. The media player (`src/components/media/`) and search dialog are
   Preact.
-- `src/components/state.ts` — Preact signals for shared player state.
+- `src/components/state.ts` — Preact signals for shared player state
+  (current episode, Watch/Listen preference, playback readouts).
+- `src/components/media/engine.ts` — one persistent `<video>` element for the
+  whole visit. It plays the episode's HLS video (hls.js outside Safari) or MP3,
+  and physically moves between an episode stage's `[data-media-slot]` and the
+  persisted dock's `[data-media-dock]`. It mirrors playback state onto
+  `<html data-*>` and `--playback-progress` so CSS can react without islands.
+- Styling: tokens in `src/styles/tokens.css`, app shell in `shell.css`, the
+  episode stage in `stage.css` and `worlds.css` (rules still scoped to
+  `<html data-world="stage">`), and hover/press states in `interactions.css`
+  (loaded last). Prefer Tailwind utilities for new work; the palette is
+  exposed as Tailwind colors via `@theme inline` in `tailwind.css`.
+- Video comes from the feed's `<podcast:alternateEnclosure>`, which
+  `rss-to-json` drops, so `src/lib/feed-media.ts` scans the raw XML.
+  `/api/cues/[episode].json` serves timed transcript lines for the stage's
+  live transcript (`src/lib/cues.ts`).
 - `src/lib/` — Core utilities: RSS fetching, image optimization, LLM content
   generation.
 - `src/content/transcripts/` — Markdown transcript files named by episode

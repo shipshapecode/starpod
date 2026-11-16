@@ -1,0 +1,480 @@
+/* =====================================================================
+   Stage
+   The conversation, typeset. Each voice in its own face; the line being
+   heard swells; spoken lines settle back into the page.
+   ===================================================================== */
+
+:root[data-world='stage'] {
+  --font-display: var(--astro-font-archivo), var(--font-ui);
+  --radius: 3px;
+  --radius-lg: 4px;
+}
+
+:root[data-world='stage'] .stage-title,
+:root[data-world='stage'] .section-title,
+:root[data-world='stage'] .rail-title {
+  font-stretch: 72%;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+:root[data-world='stage'] .stage-title {
+  font-size: clamp(2rem, 1.2rem + 3vw, 4rem);
+  line-height: 0.95;
+  max-width: 18ch;
+}
+
+:root[data-world='stage'] .rail-title {
+  font-size: 2.6rem;
+  font-stretch: 62%;
+  font-weight: 900;
+  line-height: 0.86;
+  letter-spacing: -0.005em;
+}
+
+:root[data-world='stage'] .cast {
+  display: flex;
+}
+
+:root[data-world='stage'] .cast-member[data-voice='0'] .cast-name {
+  color: var(--voice-0);
+  font-family: var(--font-voice-0);
+  font-stretch: 72%;
+  font-weight: 850;
+  font-size: 1.15rem;
+  text-transform: uppercase;
+}
+
+:root[data-world='stage'] .cast-member[data-voice='1'] .cast-name {
+  color: var(--voice-1);
+  font-family: var(--font-voice-1);
+  font-size: 1.1rem;
+}
+
+/* Phones: the script performs right under the picture. */
+@media (max-width: 1023px) {
+  :root[data-world='stage'] .stage {
+    grid-template-areas:
+      'frame'
+      'script'
+      'meta';
+  }
+
+  :root[data-world='stage'] .script {
+    min-height: 0;
+    max-height: 34vh;
+  }
+
+  :root[data-world='stage'] .script[data-state='preview'] {
+    max-height: 30vh;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root[data-world='stage'] .stage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+    grid-template-areas:
+      'frame script'
+      'meta script';
+    column-gap: clamp(28px, 4vw, 64px);
+    row-gap: 22px;
+    align-items: start;
+  }
+
+  :root[data-world='stage'] .stage-script {
+    position: sticky;
+    top: var(--gutter);
+    align-self: stretch;
+    min-height: 100%;
+  }
+
+  /* No transcript: the stage takes the room. */
+  :root[data-world='stage'] .stage:has(.script[data-state='empty']) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'frame' 'meta';
+    max-width: 1100px;
+  }
+}
+
+:root[data-world='stage'] .script {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 14px;
+  height: 100%;
+  min-height: clamp(260px, 34vw, 520px);
+  max-height: 72vh;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  mask-image: linear-gradient(transparent, oklch(0% 0 0) 34%);
+  /* Scrolled away, the lines stop restyling and animating as they change. */
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 300px;
+}
+
+:root[data-world='stage'] .script[data-state='preview'] {
+  justify-content: flex-start;
+  mask-image: linear-gradient(oklch(0% 0 0) 55%, transparent);
+}
+
+:root[data-world='stage'] .script[data-state='empty'] {
+  display: none;
+}
+
+:root[data-world='stage'] .script[data-state='loading'] {
+  background: repeating-linear-gradient(
+    transparent 0 22px,
+    var(--line) 22px 34px,
+    transparent 34px 52px
+  );
+  opacity: 0.6;
+}
+
+/* Size, width, and case change instantly in the layout; LiveScript animates
+   the move with transforms (FLIP) so text never re-wraps mid-motion. Only
+   the colour-ish properties transition here. */
+:root[data-world='stage'] .script-line {
+  --size: 1rem;
+  font-size: var(--size);
+  opacity: 0.5;
+  will-change: transform;
+  transition:
+    opacity 520ms var(--ease-out),
+    filter 520ms var(--ease-out),
+    color 520ms var(--ease-out);
+}
+
+:root[data-world='stage'] .script-line[data-v='1'] {
+  margin-left: auto;
+  text-align: right;
+  max-width: 88%;
+}
+
+:root[data-world='stage'] .script-line[data-v='0'] {
+  max-width: 92%;
+}
+
+:root[data-world='stage'] .script-line[data-d='-1'] {
+  --size: 1.4rem;
+  opacity: 0.78;
+}
+
+:root[data-world='stage'] .script-line[data-d='-2'] {
+  --size: 1.15rem;
+  opacity: 0.62;
+}
+
+:root[data-world='stage'] .script-line[data-d='0'] {
+  --size: clamp(2.25rem, 1.2rem + 2.8vw, 3.5rem);
+  opacity: 1;
+}
+
+/* Spoken lines don't only dim: they shrink, narrow, and soften back into
+   the page. */
+:root[data-world='stage'] .script-line:is([data-d='-3'], [data-d='-4'], [data-d='-5']) {
+  --size: 0.9rem;
+  opacity: 0.4;
+  filter: blur(0.4px);
+  letter-spacing: -0.01em;
+}
+
+:root[data-world='stage'] .script-line[data-d='0'][data-long] {
+  --size: clamp(1.75rem, 1rem + 1.9vw, 2.75rem);
+}
+
+:root[data-world='stage'] .script-line:is([data-d='1'], [data-d='2']) {
+  --size: 0.95rem;
+  opacity: 0.38;
+}
+
+:root[data-world='stage'] .script[data-state='preview'] .script-line:not([data-d='0']) {
+  --size: clamp(1rem, 0.9rem + 0.4vw, 1.25rem);
+  opacity: 0.55;
+}
+
+:root[data-world='stage'] .script-seek {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+:root[data-world='stage'] .script-meta {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-stretch: 100%;
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out);
+}
+
+:root[data-world='stage'] .script-line[data-d='0'] .script-meta,
+:root[data-world='stage'] .script-seek:hover .script-meta,
+:root[data-world='stage'] .script-seek:focus-visible .script-meta {
+  opacity: 1;
+}
+
+:root[data-world='stage'] .script-text {
+  display: block;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+/* Voices. */
+:root[data-world='stage'] .script-line[data-v='0'] {
+  color: var(--voice-0);
+  font-family: var(--font-voice-0);
+  font-stretch: 78%;
+  font-weight: 750;
+}
+
+:root[data-world='stage'] .script-line[data-v='0'][data-d='0'] {
+  font-stretch: 68%;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.98;
+}
+
+:root[data-world='stage'] .script-line[data-v='1'] {
+  color: var(--voice-1);
+  font-family: var(--font-voice-1);
+}
+
+:root[data-world='stage'] .script-line:is([data-v='2'], [data-v='3'], [data-v='4'], [data-v='5']) {
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+
+/* Captions without speakers: nobody's voice is claimed. A neutral
+   grotesque in ink, still performing at full scale. */
+:root[data-world='stage'] .script-line[data-v='none'] {
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-weight: 500;
+}
+
+:root[data-world='stage'] .script-line[data-v='none'][data-d='0'] {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+}
+
+
+
+@media (max-width: 1023px) {
+  :root[data-world='stage'] .script {
+    min-height: 220px;
+    max-height: 46vh;
+  }
+}
+
+/* =====================================================================
+   Foldables (iPhone Duo inner screen, two-segment viewports)
+   The open device is a spread: two pages on one hinge.
+   ===================================================================== */
+
+@media (horizontal-viewport-segments: 2),
+  (min-width: 700px) and (max-width: 1180px) and (min-aspect-ratio: 6/5) and (max-aspect-ratio: 8/5) and (max-height: 960px) and (pointer: coarse) {
+  :root {
+    --hinge: max(
+      40px,
+      calc(env(viewport-segment-left 1 0, 0px) - env(viewport-segment-right 0 0, 0px) + 32px)
+    );
+  }
+
+  .stage {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--hinge);
+    perspective: 1800px;
+  }
+
+  :root[data-world='stage'] .stage {
+    grid-template-areas:
+      'frame meta'
+      'script script';
+  }
+
+  :root[data-world='stage'] .stage-script {
+    position: static;
+  }
+
+  :root[data-world='stage'] .script {
+    min-height: 0;
+    max-height: none;
+    height: auto;
+    mask-image: none;
+  }
+
+  /* Keep the meta page compact so the conversation is in view. */
+  :root[data-world='stage'] .stage-meta .stage-desc {
+    display: none;
+  }
+
+  :root[data-world='stage'] .stage-title {
+    font-size: clamp(1.5rem, 0.9rem + 1.8vw, 2.1rem);
+    margin-bottom: 0.5rem;
+  }
+
+  :root[data-world='stage'] .stage-facts {
+    margin-bottom: 0.6rem;
+    font-size: 0.8125rem;
+  }
+
+  :root[data-world='stage'] .cast {
+    gap: 10px 16px;
+    margin-bottom: 0.75rem;
+  }
+
+  :root[data-world='stage'] .cast .person-face {
+    --person-size: 36px;
+  }
+
+  :root[data-world='stage'] .cast-member .cast-name {
+    font-size: 0.95rem !important;
+  }
+
+  :root[data-world='stage'] .stage {
+    row-gap: 14px;
+  }
+
+  /* Two voices argue across the hinge: one per page. */
+  :root[data-world='stage'] .script-line[data-v='0'] {
+    max-width: calc(50% - var(--hinge) / 2);
+  }
+
+  :root[data-world='stage'] .script-line[data-v='1'] {
+    max-width: calc(50% - var(--hinge) / 2);
+    margin-left: calc(50% + var(--hinge) / 2);
+    text-align: left;
+  }
+
+  /* Unfold: each page swings open from the hinge, once. */
+  :root[data-unfolding] :is(.stage-frame, .stage-meta) {
+    transform-origin: right center;
+    animation: unfold-left 1000ms var(--ease-out) both;
+  }
+
+  :root[data-unfolding] .stage-script {
+    transform-origin: left center;
+    animation: unfold-right 1000ms var(--ease-out) both;
+  }
+}
+
+@keyframes unfold-left {
+  from {
+    transform: rotateY(62deg);
+    opacity: 0.2;
+  }
+}
+
+@keyframes unfold-right {
+  from {
+    transform: rotateY(-62deg);
+    opacity: 0.2;
+  }
+}
+
+
+@media (horizontal-viewport-segments: 2),
+  (min-width: 700px) and (max-width: 1180px) and (min-aspect-ratio: 6/5) and (max-aspect-ratio: 8/5) and (max-height: 960px) and (pointer: coarse) {
+  /* On the spread the exchange stays in view: the last line, the live one,
+     and what comes next. */
+  :root[data-world='stage'] .script-line:is([data-d='-2'], [data-d='-3'], [data-d='-4'], [data-d='-5']) {
+    display: none;
+  }
+
+  :root[data-world='stage'] .script {
+    gap: 10px;
+  }
+}
+
+/* ---------- Stage light ---------- */
+
+/* The room around the stage takes its light from what's on it: the episode
+   art's glow at rest, brighter once the show starts, and the live picture's
+   own light while a video plays. */
+.stage-light {
+  display: none;
+}
+
+:root[data-world='stage'] .stage-light {
+  display: block;
+  position: absolute;
+  inset: 4% -5% -9%;
+  z-index: 0;
+  opacity: 0.4;
+  filter: blur(clamp(40px, 5.5vw, 80px)) saturate(1.7) brightness(1.15);
+  pointer-events: none;
+  transition: opacity 1200ms var(--ease-out);
+}
+
+:root[data-world='stage'] .stage-light::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--art) center / cover;
+}
+
+:root[data-world='stage'] .stage-light-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1400ms var(--ease-out);
+}
+
+:root[data-world='stage'] .stage[data-playing] .stage-light {
+  opacity: 0.85;
+}
+
+:root[data-world='stage'] .stage[data-playing][data-watching] .stage-light-canvas[data-lit] {
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: light) {
+  :root[data-world='stage'] .stage-light {
+    opacity: 0.22;
+  }
+
+  :root[data-world='stage'] .stage[data-playing] .stage-light {
+    opacity: 0.45;
+  }
+}
+
+/* ---------- Stage: scrubber preview speaks in the voice ---------- */
+
+:root[data-world='stage'] .scrub-preview-line[data-v='0'] {
+  color: var(--voice-0);
+  font-family: var(--font-voice-0);
+  font-size: 1rem;
+  font-stretch: 74%;
+  font-weight: 800;
+  line-height: 1.08;
+  text-transform: uppercase;
+}
+
+:root[data-world='stage'] .scrub-preview-line[data-v='1'] {
+  color: var(--voice-1);
+  font-family: var(--font-voice-1);
+  font-size: 0.9375rem;
+  line-height: 1.3;
+}
+
+:root[data-world='stage'] .scrub-preview-line:is([data-v='2'], [data-v='3'], [data-v='4'], [data-v='5']) {
+  font-weight: 600;
+}

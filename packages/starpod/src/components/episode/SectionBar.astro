@@ -1,0 +1,158 @@
+---
+/**
+ * A page's sticky bar: section links that track where you are, with one
+ * indicator that glides to the current link on its anchor. Whatever is in
+ * the default slot (the episode's play button and title) sits before the
+ * links and arrives once the bar docks. Wrap the bar and its sections in
+ * `.ep-body`, which drives the docking trigger and the reading progress.
+ */
+export interface Props {
+  label: string;
+  sections: Array<{ id: string; label: string }>;
+}
+
+const { label, sections } = Astro.props;
+---
+
+<div class="ep-bar">
+  <div class="ep-bar-row">
+    {
+      Astro.slots.has('default') && (
+        <div class="ep-bar-id">
+          <slot />
+        </div>
+      )
+    }
+    <nav aria-label={label} class="ep-nav" data-ep-nav>
+      <ol>
+        {
+          sections.map((section) => (
+            <li>
+              <a href={`#${section.id}`}>{section.label}</a>
+            </li>
+          ))
+        }
+      </ol>
+      <i aria-hidden="true" class="ep-nav-here"></i>
+    </nav>
+  </div>
+  <i aria-hidden="true" class="ep-bar-read"></i>
+</div>
+
+<script>
+  import { reducedMotion } from '../../motion/propflip';
+  import { focusInto } from './focus';
+
+  let tracking: AbortController | undefined;
+
+  // CSS shows where you are (`:target-current`); this mirrors it into
+  // `aria-current` once scrolling settles, keeps the current link in view
+  // when the links overflow, and stands in for `scroll-target-group` in
+  // browsers without it.
+  function track() {
+    tracking?.abort();
+    const nav = document.querySelector<HTMLElement>('[data-ep-nav]');
+    if (!nav) {
+      return;
+    }
+    tracking = new AbortController();
+    const { signal } = tracking;
+    const links = Array.from(nav.querySelectorAll('a'));
+
+    const show = (current: HTMLAnchorElement | undefined) => {
+      for (const link of links) {
+        if (link === current) {
+          link.setAttribute('aria-current', 'true');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      }
+      if (current && nav.scrollWidth > nav.clientWidth) {
+        nav.scrollTo({
+          left:
+            current.offsetLeft - (nav.clientWidth - current.offsetWidth) / 2,
+          behavior: reducedMotion() ? 'auto' : 'smooth'
+        });
+      }
+    };
+
+    // Glide to a section rather than jump (and leave history alone).
+    nav.addEventListener(
+      'click',
+      (event) => {
+        const link = (event.target as Element).closest('a');
+        const target =
+          link &&
+          document.getElementById(decodeURIComponent(link.hash.slice(1)));
+        if (!link || !target || reducedMotion()) {
+          return;
+        }
+        event.preventDefault();
+        history.replaceState(history.state, '', link.hash);
+        target.scrollIntoView({ behavior: 'smooth' });
+        glideOn(target);
+        // Where the glide is going is where Tab carries on from.
+        focusInto(target);
+      },
+      { signal }
+    );
+
+    // A glide sets its end before it starts, but transcript groups it passes
+    // render at their real height on the way and move the section: aim again
+    // where it settles, until it's there, the page can go no further, or
+    // you take over.
+    function glideOn(target: HTMLElement, tries = 2) {
+      const yours = new AbortController();
+      const done = () => yours.abort();
+      for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown']) {
+        addEventListener(type, done, { signal: yours.signal, passive: true });
+      }
+      signal.addEventListener('abort', done, { signal: yours.signal });
+      addEventListener(
+        'scrollend',
+        () => {
+          done();
+          const margin = parseFloat(getComputedStyle(target).scrollMarginTop);
+          const off = target.getBoundingClientRect().top - margin;
+          const room =
+            off > 0
+              ? document.documentElement.scrollHeight - innerHeight - scrollY
+              : scrollY;
+          if (tries && Math.abs(off) > 2 && room > 1) {
+            target.scrollIntoView({ behavior: 'smooth' });
+            glideOn(target, tries - 1);
+          }
+        },
+        { once: true, signal: yours.signal }
+      );
+    }
+
+    if (CSS.supports('scroll-target-group', 'auto')) {
+      const sync = () =>
+        show(links.find((link) => link.matches(':target-current')));
+      sync();
+      addEventListener('scrollend', sync, { signal });
+      return;
+    }
+
+    // Without it: the last section whose top has passed a third of the way
+    // down the screen, rechecked whenever one crosses into that third.
+    const targets = links.map((link) =>
+      document.getElementById(decodeURIComponent(link.hash.slice(1)))
+    );
+    const observer = new IntersectionObserver(
+      () => {
+        const line = innerHeight / 3;
+        const passed = targets.filter(
+          (target) => target && target.getBoundingClientRect().top <= line
+        );
+        show(links[targets.indexOf(passed.at(-1) ?? targets[0])]);
+      },
+      { rootMargin: '0px 0px -66% 0px' }
+    );
+    targets.forEach((target) => target && observer.observe(target));
+    signal.addEventListener('abort', () => observer.disconnect());
+  }
+
+  document.addEventListener('astro:page-load', track);
+</script>

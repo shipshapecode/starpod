@@ -1,0 +1,2427 @@
+/* =====================================================================
+   Player
+   One picture (the video, or the artwork standing in for it) and the
+   places it lives: an episode's stage, a corner of the screen, and the
+   player, an island with four homes (pill, dock, card, rail). Anchors say
+   where each place is; PropFLIP carries the picture between them
+   (media/engine.ts), so every journey is continuous and can turn around.
+   ===================================================================== */
+
+.dock,
+.player-air {
+  --pip-gap: 12px;
+  --pip-w: min(52vw, 360px);
+  --pip-bar-h: 36px;
+  /* The bar above (or below) the floating picture, and the gap round it. */
+  --pip-bar-space: calc(var(--pip-bar-h) + 12px);
+  /* Flights: across on an ease-out, up and down a little later with a
+     slight settle (a full spring would dip past the player on the long
+     drop from a stage), size on its own clock. The two clocks make it arc. */
+  --flip-dx: 0.52s;
+  --flip-dy: 0.66s;
+  --flip-ds: 0.56s;
+  --flip-ex: var(--ease-out);
+  --flip-ey: cubic-bezier(0.22, 1.08, 0.36, 1);
+  --flip-es: var(--ease-out);
+}
+
+@media (min-width: 1024px) {
+  .dock,
+  .player-air {
+    --pip-gap: 20px;
+    --pip-w: clamp(260px, 24vw, 400px);
+  }
+}
+
+/* The dock block holds the island's stations, the room the picture floats
+   in and the island itself, all fixed to the screen; it has no box of its
+   own, so it never blocks the page. */
+.dock {
+  /* The sidebar's own clock (rail.css), so the stations and the picture's
+     room follow it as it folds and unfolds. */
+  --rail-glide: calc(0.55s * var(--slomo)) var(--ease-out);
+  display: contents;
+}
+
+/* What is playing, as a colour, for the floating picture's glow: the live
+   picture's while watching (published on the glow alone, publish.ts, so a
+   change restyles one element), the artwork's while listening (on <html>).
+   Before either arrives it is transparent. */
+.player-glow {
+  --now-tone: var(--live-img-accent, transparent);
+}
+
+:root[data-medium='watch'] .player-glow {
+  --now-tone: var(--live-video-accent, transparent);
+}
+
+/* =====================================================================
+   The island (demos/island.html): one element, four homes.
+   The homes are empty stations. The island fills one by name
+   (data-⚓️-fill + data-⚓️-to) and changing the name re-homes it: its own
+   left, top, width and height tween to the new station (x and y each on a
+   spring), so the glass, radius and clipping never squish. The parts inside
+   are PropFLIP leaves in a grid that re-templates per data-state.
+   ===================================================================== */
+
+/* ---------- Stations ---------- */
+
+.island-home {
+  position: fixed;
+  pointer-events: none;
+}
+
+/* The pill sits low and central in the page column, clear of the sticky
+   bars at the top of main (the explorer's toolbar, the episode bar). */
+.island-home[data-home='pill'] {
+  left: var(--rail-w);
+  left: anchor(--rail-edge right, var(--rail-w));
+  right: 0;
+  bottom: calc(var(--tabbar-h) + 14px);
+  width: 300px;
+  height: 56px;
+  margin-inline: auto;
+}
+
+.island-home[data-home='dock'] {
+  left: calc(var(--rail-w) + 8px);
+  left: calc(anchor(--rail-edge right, var(--rail-w)) + 8px);
+  right: 8px;
+  bottom: calc(var(--tabbar-h) + 8px);
+  height: calc(var(--dock-h) - 12px);
+}
+
+.island-home[data-home='card'] {
+  inset: max(8px, env(safe-area-inset-top)) 0 0;
+}
+
+@media (min-width: 1024px) {
+  .island-home[data-home='pill'] {
+    bottom: 22px;
+    width: 320px;
+  }
+
+  .island-home[data-home='dock'] {
+    left: calc(var(--rail-w) + 14px);
+    left: calc(anchor(--rail-edge right, var(--rail-w)) + 14px);
+    right: 14px;
+    bottom: 12px;
+  }
+
+  .island-home[data-home='card'] {
+    inset: 24px 24px 24px calc(var(--rail-w) + 24px);
+    left: calc(anchor(--rail-edge right, var(--rail-w)) + 24px);
+  }
+}
+
+/* The rail's home is a slot in the sidebar's flow (Layout.astro, inside the
+   rail). It takes room only while the island lives there, and the rail's
+   pieces below it travel as it grows: a vertical stack in the icon rail, a
+   compact card in the open one. */
+.rail-island-slot {
+  display: block;
+  flex: none;
+  width: var(--col, 100%);
+  height: 0;
+  margin-bottom: calc(-1 * var(--gap, 1.25rem));
+  transition:
+    height calc(0.6s * var(--slomo)) var(--ease-out),
+    margin calc(0.6s * var(--slomo)) var(--ease-out);
+}
+
+:root[data-island='rail'] .rail-island-slot {
+  height: 132px;
+  margin-bottom: 0;
+}
+
+/* The icon rail, at rest or under the shell's hand (html[data-rail-form]
+   while the divider is held, so the slot re-forms mid-drag with the rail).
+   The icon column keeps to the leading edge; -2px centres the 52px slot on
+   its 48px icons. */
+:root[data-island='rail']:where([data-rail-form='icons'], [data-rail='collapsed']:not([data-rail-form]))
+  .rail-island-slot {
+  align-self: flex-start;
+  width: 52px;
+  height: 222px;
+  margin-left: -2px;
+}
+
+/* On short screens the stack is art, bars and play, so the rail's own
+   pieces stay above the fold. */
+@media (max-height: 800px) {
+  :root[data-island='rail']:where([data-rail-form='icons'], [data-rail='collapsed']:not([data-rail-form]))
+    .rail-island-slot {
+    height: 132px;
+  }
+}
+
+/* ---------- Where the island is ----------
+   The stations are named in CSS as well as by their data-⚓️-name, and the
+   island points at its station per state, so the homes work where typed
+   attr() does not (WebKit) as well as through Anchored Auto Layout. */
+@supports (anchor-name: --a) {
+  .island-home[data-home='pill'] {
+    anchor-name: --home-pill;
+  }
+
+  .island-home[data-home='dock'] {
+    anchor-name: --home-dock;
+  }
+
+  .island-home[data-home='card'] {
+    anchor-name: --home-card;
+  }
+
+  .rail-island-slot {
+    anchor-name: --home-rail;
+  }
+
+  .island {
+    inset: anchor(inside);
+    width: anchor-size(width);
+    height: anchor-size(height);
+  }
+
+  .island[data-state='pill'] {
+    position-anchor: --home-pill;
+  }
+
+  .island[data-state='dock'] {
+    position-anchor: --home-dock;
+  }
+
+  .island[data-state='card'] {
+    position-anchor: --home-card;
+  }
+
+  .island[data-state='rail'] {
+    position-anchor: --home-rail;
+  }
+
+  .island-station-on {
+    position: absolute;
+    position-anchor: --home-on;
+    inset: anchor(inside);
+    width: anchor-size(width);
+    height: anchor-size(height);
+  }
+}
+
+/* Without anchor positioning the island still has its homes; it steps
+   between them instead of travelling. */
+@supports not (anchor-name: --a) {
+  .island[data-state='pill'] {
+    inset: auto 0 calc(var(--tabbar-h) + 14px) var(--rail-w);
+    width: 300px;
+    height: 56px;
+    margin-inline: auto;
+  }
+
+  .island[data-state='dock'] {
+    inset: auto 8px calc(var(--tabbar-h) + 8px) calc(var(--rail-w) + 8px);
+    height: calc(var(--dock-h) - 12px);
+  }
+
+  .island[data-state='card'] {
+    inset: 8px 0 0;
+  }
+
+  .island-station-on {
+    display: none;
+  }
+
+  .island-station label:has(:checked) {
+    background: var(--ink);
+  }
+}
+
+/* ---------- The island ---------- */
+
+.island {
+  /* Its springs, from the demo (soft for x and size, livelier for y). */
+  --spring-soft: linear(0, 0.012, 0.044, 0.09, 0.147, 0.211, 0.278, 0.346, 0.414, 0.48, 0.542, 0.601,
+      0.656, 0.706, 0.752, 0.792, 0.829, 0.861, 0.888, 0.912, 0.933, 0.951, 0.965, 0.977, 0.987,
+      0.995, 1.001, 1.006, 1.01, 1.012, 1.014, 1.015, 1.015, 1.015, 1.015, 1.014, 1.013, 1.012,
+      1.011, 1.01, 1.009, 1.008, 1.007, 1.006, 1.006, 1.005, 1.004, 1.003, 1);
+  --spring: linear(0, 0.021, 0.077, 0.158, 0.255, 0.36, 0.467, 0.572, 0.67, 0.759, 0.838, 0.905, 0.961,
+      1.006, 1.04, 1.065, 1.082, 1.091, 1.095, 1.094, 1.089, 1.082, 1.073, 1.063, 1.053, 1.043,
+      1.033, 1.025, 1.017, 1.01, 1.005, 1, 0.997, 0.994, 0.993, 0.992, 0.991, 0.991, 0.991, 0.992,
+      0.993, 0.994, 0.995, 0.996, 0.997, 0.997, 0.998, 0.999, 1);
+  --flip-dx: 0.7s;
+  --flip-ex: var(--spring-soft);
+  --flip-dy: 0.8s;
+  --flip-ey: var(--spring);
+  --flip-ds: 0.6s;
+  --flip-es: var(--spring-soft);
+  --lay: calc(var(--flip-ds) * var(--slomo)) var(--flip-es);
+  --r: var(--r-tray);
+  --art-w: 56px;
+  --art-h: 56px;
+  position: fixed;
+  z-index: 45;
+  display: grid;
+  align-items: center;
+  place-content: start;
+  overflow: clip;
+  border-radius: var(--r);
+  color: var(--ink);
+  /* Glass, tinted by the playing artwork; the tint tweens on a change of
+     episode, as the demo's --hue does. */
+  background: color-mix(
+    in oklch,
+    var(--live-img-accent, transparent) 16%,
+    color-mix(in oklch, var(--surface) 80%, transparent)
+  );
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  backdrop-filter: blur(28px) saturate(1.5);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--ink) 11%, transparent),
+    0 30px 60px -30px oklch(8% 0.03 280 / 0.6);
+  cursor: pointer;
+  pointer-events: auto;
+  position-visibility: always;
+  view-transition-name: player-island;
+  transition:
+    --live-img-accent calc(1.2s * var(--slomo)) var(--ease-out),
+    opacity calc(0.4s * var(--slomo)) var(--ease-out),
+    translate calc(0.5s * var(--slomo)) var(--ease-out);
+}
+
+/* It travels on its springs only while it is changing home (go() marks it);
+   the rest of the time it sits on its station exactly, so it rides the
+   sidebar's divider, held or gliding, and a growing rail slot. */
+/* While the sidebar's divider is held (the shell marks it), nothing here
+   tweens: the island rides the edge. */
+:root[data-rail-held] .island {
+  transition: none;
+}
+
+.island[data-moving] {
+  transition:
+    left calc(var(--flip-dx) * var(--slomo)) var(--flip-ex),
+    top calc(var(--flip-dy) * var(--slomo)) var(--flip-ey),
+    width var(--lay),
+    height var(--lay),
+    --r var(--lay),
+    --live-img-accent calc(1.2s * var(--slomo)) var(--ease-out),
+    opacity calc(0.4s * var(--slomo)) var(--ease-out),
+    translate calc(0.5s * var(--slomo)) var(--ease-out);
+}
+
+@starting-style {
+  .island {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+.island[data-medium='watch'] {
+  --art-w: calc(56px * 16 / 9);
+}
+
+/* Across navigations the island persists like the picture, and its view
+   transition group shows it live (engine.ts flies the picture the same way). */
+:root::view-transition-group(player-island),
+:root::view-transition-new(player-island),
+:root::view-transition-new(player-island):only-child {
+  animation: none;
+}
+
+:root::view-transition-old(player-island),
+:root::view-transition-old(player-island):only-child {
+  display: none;
+}
+
+/* ---------- The parts: PropFLIP leaves in a grid that re-templates ----------
+   Every track is a fixed size laid out from the top left (vw at most, never
+   fr), so a part's offset never depends on the island's size while that size
+   is mid-tween. */
+.island > * {
+  --also:
+    opacity calc(0.3s * var(--slomo)) ease, visibility calc(0.3s * var(--slomo)), --r var(--lay);
+  grid-area: var(--area);
+}
+
+/* The parts cascade in tree order, and back from the far end on the way
+   home; under reduced motion --slomo is 0, so there is no cascade at all. */
+@supports (transition-delay: calc(sibling-index() * 1ms)) {
+  .island > * {
+    --flip-delay: calc(min(sibling-index() - 1, 12) * 18ms);
+  }
+
+  .island[data-going='in'] > * {
+    --flip-delay: calc(min(sibling-count() - sibling-index(), 12) * 18ms);
+  }
+}
+
+.island-art {
+  --area: art;
+  --r: var(--r-thumb);
+  position: relative;
+  width: var(--art-w);
+  height: var(--art-h);
+  overflow: clip;
+  background: var(--media-ground);
+}
+
+/* A hairline over the picture, so light and dark art meet the glass alike. */
+.island-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  pointer-events: none;
+}
+
+.island-art[data-hot] {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* The picture inside keeps its final size and is clipped by the part as the
+   part's box changes shape, so a 16:9 picture never squishes into a circle. */
+.island-art-in {
+  position: absolute;
+  inset: 0;
+}
+
+.island-art img,
+.player-cell-media,
+.island-art video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:root[data-medium='listen'] .island-art video {
+  opacity: 0;
+}
+
+.island-title {
+  --area: title;
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  min-width: 0;
+  width: var(--title-w, 170px);
+}
+
+.island-name {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.island-name b {
+  overflow: hidden;
+  font: 650 var(--title-size, 14px) / 1.15 var(--font-display);
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.island-name span {
+  overflow: hidden;
+  color: var(--muted);
+  font: 500 12px/1.2 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.island-name:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.island-open {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.island-open {
+  transition: color var(--quick);
+}
+
+.island-open:hover {
+  color: var(--ink);
+}
+
+/* On-air bars: they run while the engine says playing and rest otherwise. */
+.island-eq {
+  --area: eq;
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  width: 18px;
+  height: 16px;
+}
+
+.island-eq i {
+  flex: 1;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--accent);
+  transform-origin: bottom;
+  scale: 1 0.25;
+  animation: island-eq 0.9s ease-in-out infinite alternate paused;
+}
+
+@supports (animation-duration: calc(sibling-index() * 1s)) {
+  .island-eq i {
+    /* 0.9s, 0.65s, 1s, 0.75s: the bars out of step, from their place. */
+    animation-duration: calc((0.55 + mod(sibling-index() * 0.35, 0.6)) * 1s);
+  }
+}
+
+/* They run while the engine says playing (a root attribute, which restyles
+   only what selects on it), so a clock tick never touches them. */
+:root[data-playing='true'] .island-eq i {
+  animation-play-state: running;
+}
+
+@keyframes island-eq {
+  to {
+    scale: 1 1;
+  }
+}
+
+.island-scrub {
+  --area: scrub;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.island-scrub .scrubber {
+  min-width: 0;
+  /* Painted from the player's exact clock, not a re-rendered style. */
+  --fill: calc(var(--live-progress) * 100%);
+}
+
+/* The clock rewrites the times every second and moves the slider's thumb
+   on every tick. A flex item cannot keep a layout change to itself (the row
+   lays it out), so each sits in a fixed box, and what changes is a contained
+   block inside it: a tick lays out only that, never the island, the rail or
+   the anchored homes around them. */
+.island-track {
+  display: block;
+  flex: 1;
+  min-width: 0;
+}
+
+.island-track .scrubber {
+  display: block;
+  contain: strict;
+  inline-size: 100%;
+  block-size: 20px;
+  /* Room for the thumb's hover growth at either end. */
+  overflow-clip-margin: 4px;
+}
+
+/* ---------- The ship (the original player's progress indicator) ----------
+   The thumb is the rocket, and sparks trail from its tail while the episode
+   plays, or while the track is hovered or held (as they did there). The
+   rocket is a mask in the start colour of the glow: the original's purple
+   by day and aqua by night. The sparks sit outside the contained track,
+   carried to the thumb by the media clock's progress on the compositor. */
+.island-track {
+  --ship: 16px;
+  --rocket: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.64211 11.1128C10.6315 10.9201 15.2706 9.53335 15.2886 7.88488C15.3065 6.23642 10.638 4.86161 4.64537 4.68182C4.48335 3.62107 3.97229 2.64461 3.19305 1.90691C2.4138 1.16921 1.41085 0.712354 0.342822 0.608639L0.358346 15.1865C1.42356 15.0801 2.42295 14.6218 3.19869 13.8841C3.97444 13.1464 4.48232 12.1713 4.64211 11.1128Z'/%3E%3C/svg%3E");
+  position: relative;
+}
+
+.island-track .scrubber::-webkit-slider-thumb {
+  width: var(--ship);
+  height: var(--ship);
+  margin-top: calc((4px - var(--ship)) / 2);
+  border-radius: 0;
+  background: var(--glow-b);
+  mask: var(--rocket) center / contain no-repeat;
+}
+
+.island-track .scrubber::-moz-range-thumb {
+  width: var(--ship);
+  height: var(--ship);
+  border-radius: 0;
+  background: var(--glow-b);
+  mask: var(--rocket) center / contain no-repeat;
+}
+
+/* The thumb's travel, moved along by the progress: its left edge is the
+   thumb's centre, and the sparks start just behind the tail. */
+.ship-particles {
+  position: absolute;
+  inset: -1px calc(var(--ship) / 2) 1px;
+  display: none;
+  align-content: center;
+  translate: calc(var(--live-progress, 0) * 100%) 0;
+  pointer-events: none;
+}
+
+.ship-particles > i {
+  grid-area: 1 / 1;
+  width: 4px;
+  height: 4px;
+  margin-left: -10px;
+  border-radius: 999px;
+  background-color: var(--glow-b);
+  opacity: 0;
+  animation:
+    ship-particles-x 1s ease infinite,
+    ship-particles-y 1s ease infinite;
+  animation-composition: add;
+}
+
+.ship-particles > i:nth-child(1) {
+  animation-delay: 0.4s;
+  --y-offset: -10px;
+  --x-offset: -20px;
+}
+
+.ship-particles > i:nth-child(2) {
+  animation-delay: 0.8s;
+  --y-offset: -20px;
+  --x-offset: -15px;
+}
+
+.ship-particles > i:nth-child(3) {
+  animation-delay: 0.1s;
+  --y-offset: 15px;
+  --x-offset: -25px;
+}
+
+.ship-particles > i:nth-child(4) {
+  animation-delay: 0.3s;
+  --y-offset: 25px;
+  --x-offset: -10px;
+}
+
+.ship-particles > i:nth-child(5) {
+  animation-delay: 0.7s;
+  --y-offset: 17px;
+  --x-offset: -15px;
+}
+
+@keyframes ship-particles-x {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(var(--x-offset)) scale(0.25) translateY(var(--y-offset));
+  }
+}
+
+@keyframes ship-particles-y {
+  0%,
+  15% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(var(--y-offset));
+  }
+}
+
+/* Playing, in a home that shows the scrubber; or hovered, held or focused. */
+:root[data-playing='true'] .island:is([data-state='dock'], [data-state='card'], [data-state='rail']) .ship-particles,
+.scrubber:is(:hover, :active, :focus-visible) ~ .ship-particles {
+  display: grid;
+}
+
+/* Not where the scrubber is parked: a phone's dock, and the icon rail. */
+@media (max-width: 1023px) {
+  :root[data-playing='true'] .island[data-state='dock'] .ship-particles {
+    display: none;
+  }
+}
+
+:root[data-playing='true']:is([data-rail-form='icons'], [data-rail='collapsed']:not([data-rail-form]))
+  .island[data-state='rail']
+  .ship-particles {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ship-particles > i {
+    animation: none;
+  }
+}
+
+.dock-time {
+  display: block;
+  flex: none;
+  /* Fits "-9:59:59" in tabular figures. */
+  inline-size: 6.5ch;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.dock-time > span {
+  display: block;
+  contain: strict;
+  block-size: 1lh;
+  white-space: nowrap;
+}
+
+.island-prev {
+  --area: prev;
+}
+
+.island-play {
+  --area: play;
+}
+
+.island-next {
+  --area: next;
+}
+
+.island-skip {
+  --area: skip;
+}
+
+:is(.island-prev, .island-play, .island-next, .island-skip) {
+  display: grid;
+  place-items: center;
+  width: var(--key, 40px);
+  height: var(--key, 40px);
+}
+
+.island-play {
+  --key: 40px;
+  width: var(--play, 40px);
+  height: var(--play, 40px);
+}
+
+.island-play .dock-play {
+  width: 100%;
+  height: 100%;
+}
+
+.island-tools {
+  --area: tools;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: max-content;
+}
+
+.island-station {
+  --area: station;
+  position: relative;
+  display: inline-flex;
+  width: max-content;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: default;
+}
+
+.island-station label {
+  position: relative;
+  z-index: 1;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: var(--muted);
+  font: 600 12px/1 var(--font-ui);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--quick);
+}
+
+/* The checked option is the anchor; one indicator glides to it. */
+.island-station label:has(:checked) {
+  anchor-name: --home-on;
+  color: var(--on-ink);
+}
+
+.island-station label:has(:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.island-station input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.island-station-on {
+  border-radius: 999px;
+  background: var(--ink);
+}
+
+@media (max-width: 1023px) {
+  .island-station label[data-home='rail'] {
+    display: none;
+  }
+}
+
+/* ---------- Pill ---------- */
+
+.island[data-state='pill'] {
+  --r: 28px;
+  --title-w: 156px;
+  --art-w: 40px;
+  --art-h: 40px;
+  padding: 8px;
+  gap: 10px;
+  grid-template: 'art title eq play' 40px / 40px var(--title-w) 18px 40px;
+}
+
+@media (min-width: 1024px) {
+  .island[data-state='pill'] {
+    --title-w: 176px;
+  }
+}
+
+[data-state='pill'] .island-art {
+  --r: 20px;
+}
+
+/* ---------- Dock: the full transport bar ---------- */
+
+.island[data-state='dock'] {
+  --r: var(--r-tray);
+  --art-h: 44px;
+  --art-w: 44px;
+  --title-w: calc(100vw - 154px - var(--art-w));
+  padding: 6px 10px 6px 6px;
+  gap: 10px;
+  grid-template:
+    'art title play skip' 44px
+    / var(--art-w) var(--title-w) 44px 44px;
+}
+
+.island[data-state='dock'][data-medium='watch'] {
+  --art-w: calc(44px * 16 / 9);
+}
+
+/* Progress lights hold the clock themselves, so a tick restyles only them.
+   They step with it (four times a second): a tween between ticks would
+   restyle them every frame for as long as anything plays. Paused, they dim. */
+.island-light,
+.pip-bar-light {
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--glow-b), var(--glow-a));
+  transform-origin: left;
+  scale: var(--live-progress, 0) 1;
+  opacity: calc(1 - 0.6 * var(--live-paused, 0));
+  transition: opacity 400ms var(--ease-out);
+  pointer-events: none;
+}
+
+/* On phones the progress is a thin light under the title. */
+.island-light {
+  display: none;
+}
+
+[data-state='dock'] .island-title {
+  position: relative;
+}
+
+[data-state='dock'] .island-light {
+  display: block;
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+}
+
+@media (min-width: 1024px) {
+  .island[data-state='dock'] {
+    --art-h: 56px;
+    --art-w: 56px;
+    --title-w: 180px;
+    --play: 48px;
+    padding: 8px 20px 8px 8px;
+    gap: 14px;
+    grid-template:
+      'art title prev play next skip eq tools station scrub' 56px
+      / var(--art-w) var(--title-w) 40px 48px 40px 40px 18px auto auto minmax(0, 1fr);
+  }
+
+  .island[data-state='dock'][data-medium='watch'] {
+    --art-w: calc(56px * 16 / 9);
+  }
+
+  [data-state='dock'] .island-light {
+    display: none;
+  }
+}
+
+
+/* ---------- Card: the large now-playing surface, with Up next ---------- */
+
+.island[data-state='card'] {
+  --r: var(--r-card);
+  --cw: calc(100vw - 32px);
+  --tools-w: calc(var(--cw) - 208px - 48px);
+  --art-w: var(--cw);
+  --art-h: calc(var(--cw) * 9 / 16);
+  --title-w: var(--cw);
+  --title-size: 22px;
+  --play: 64px;
+  align-items: center;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 16px 28px;
+  gap: 14px 12px;
+  scrollbar-width: thin;
+  grid-template:
+    'station station station station station' 36px
+    'art art art art art' var(--art-h)
+    'title title title title title' 64px
+    'scrub scrub scrub scrub scrub' 28px
+    'prev play next skip .' 64px
+    'tools tools tools tools tools' 44px
+    'queue queue queue queue queue' auto
+    'shelf shelf shelf shelf shelf' auto
+    / 48px 64px 48px 48px var(--tools-w);
+  cursor: default;
+}
+
+.island[data-state='card'][data-medium='listen'] {
+  --art-w: min(var(--cw), 280px);
+  --art-h: min(var(--cw), 280px);
+}
+
+@media (min-width: 1024px) {
+  .island[data-state='card'] {
+    --q-w: 240px;
+    --cw: calc(100vw - var(--rail-w) - 48px - 56px - var(--q-w) - 40px);
+    --tools-w: calc(var(--cw) - 208px - 48px);
+    --title-size: 28px;
+    padding: 24px 28px 32px;
+    gap: 16px 12px;
+    grid-template:
+      'station station station station station . queue' 36px
+      'art art art art art . queue' var(--art-h)
+      'title title title title title . queue' 72px
+      'scrub scrub scrub scrub scrub . queue' 28px
+      'prev play next skip tools . queue' 64px
+      '. . . . . . queue' auto
+      'shelf shelf shelf shelf shelf shelf shelf' auto
+      / 48px 64px 48px 48px var(--tools-w) 16px var(--q-w);
+  }
+
+  .island[data-state='card'][data-medium='listen'] {
+    --art-w: min(var(--cw), 320px);
+    --art-h: min(var(--cw), 320px);
+  }
+}
+
+@media (min-width: 1280px) {
+  .island[data-state='card'] {
+    --q-w: 300px;
+  }
+}
+
+/* Below 1440px the tools take their own row under the transport. */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .island[data-state='card'] {
+    grid-template:
+      'station station station station station . queue' 36px
+      'art art art art art . queue' var(--art-h)
+      'title title title title title . queue' 72px
+      'scrub scrub scrub scrub scrub . queue' 28px
+      'prev play next skip . . queue' 64px
+      'tools tools tools tools tools . queue' 44px
+      '. . . . . . queue' auto
+      'shelf shelf shelf shelf shelf shelf shelf' auto
+      / 48px 64px 48px 48px var(--tools-w) 16px var(--q-w);
+  }
+
+  [data-state='card'] .island-tools {
+    justify-self: start;
+  }
+}
+
+[data-state='card'] .island-art {
+  --r: var(--r-tile);
+}
+
+[data-state='card'] .island-name b {
+  display: -webkit-box;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+[data-state='card'] .island-open {
+  display: inline-flex;
+}
+
+[data-state='card'] .island-title {
+  align-content: start;
+}
+
+[data-state='card'] .island-tools {
+  justify-self: start;
+}
+
+@media (min-width: 1440px) {
+  [data-state='card'] .island-tools {
+    justify-self: end;
+  }
+}
+
+/* Behind the card, the page steps back. */
+.player-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 44;
+  background: oklch(12% 0.02 280 / 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity calc(0.4s * var(--slomo)) var(--ease-out),
+    visibility 0s calc(0.4s * var(--slomo));
+}
+
+:root[data-island='card'] .player-scrim {
+  z-index: 59;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity calc(0.4s * var(--slomo)) var(--ease-out);
+}
+
+/* The card goes over the page's own sticky chrome (the episode bar is 47),
+   and the picture flying into it goes over the card. */
+.island[data-state='card'] {
+  z-index: 60;
+}
+
+:root[data-island='card'] .player-media {
+  z-index: 61;
+}
+
+/* ---------- Rail: inside the sidebar ---------- */
+
+/* The open rail: a compact card. */
+.island[data-state='rail'] {
+  --r: var(--r-tray);
+  --art-w: 40px;
+  --art-h: 40px;
+  --title-w: auto;
+  --title-size: 13px;
+  --key: 34px;
+  padding: 10px;
+  gap: 8px 6px;
+  justify-items: center;
+  grid-template:
+    'art title title title title' 40px
+    'scrub scrub scrub scrub scrub' 12px
+    'eq prev play next skip' 40px
+    / 40px 34px 40px 34px 34px;
+}
+
+[data-state='rail'] .island-title {
+  justify-self: stretch;
+}
+
+[data-state='rail'] .island-scrub {
+  justify-self: stretch;
+}
+
+[data-state='rail'] .dock-time {
+  display: none;
+}
+
+/* The icon rail: a vertical stack, as in the demo. */
+:where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) .island[data-state='rail'] {
+  --r: 26px;
+  padding: 6px;
+  gap: 8px;
+  grid-template: 'art' 40px 'eq' 22px 'prev' 34px 'play' 40px 'next' 34px / 40px;
+}
+
+@media (max-height: 800px) {
+  :where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) .island[data-state='rail'] {
+    grid-template: 'art' 40px 'eq' 22px 'play' 40px / 40px;
+  }
+
+  :where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) [data-state='rail'] :is(.island-prev, .island-next) {
+    --area: play;
+    position: absolute;
+    inset: 0;
+    place-self: center;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+[data-state='rail'] .island-art {
+  --r: 20px;
+}
+
+/* ---------- Parked parts ----------
+   Parts a home doesn't use park behind a neighbour and fade. They still have
+   a rect, so they fly out of it and back into it, and nothing unmounts. */
+[data-state='pill']
+  :is(.island-scrub, .island-prev, .island-next, .island-skip, .island-tools, .island-station, .island-more, .island-queue),
+[data-state='card'] :is(.island-eq, .island-more),
+[data-state='rail'] :is(.island-tools, .island-station, .island-more, .island-queue),
+:where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) [data-state='rail'] :is(.island-title, .island-scrub, .island-skip) {
+  position: absolute;
+  inset: 0;
+  place-self: center;
+  opacity: 0;
+  visibility: hidden;
+}
+
+[data-state='pill'] :is(.island-prev, .island-next, .island-skip, .island-tools, .island-more) {
+  --area: play;
+}
+
+[data-state='pill'] :is(.island-scrub, .island-station) {
+  --area: title;
+}
+
+[data-state='card'] .island-eq {
+  --area: title;
+}
+
+[data-state='card'] .island-more {
+  --area: station;
+}
+
+[data-state='rail'] :is(.island-tools, .island-station, .island-more) {
+  --area: play;
+}
+
+:where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) [data-state='rail'] :is(.island-title, .island-scrub) {
+  --area: eq;
+}
+
+:where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) [data-state='rail'] .island-skip {
+  --area: next;
+}
+
+/* The icon rail has no room for the title, but keyboards still need the way
+   into the card: the title stays focusable there, unseen, and the whole
+   island shows the focus. */
+:where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) [data-state='rail'] .island-title {
+  visibility: visible;
+  pointer-events: none;
+}
+
+:where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) .island[data-state='rail']:has(.island-name:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+:is([data-state='pill'], [data-state='dock'], [data-state='rail']) .island-queue {
+  --area: art;
+}
+
+/* The dock keeps what fits: on phones art, title, play and next (the card
+   holds the rest); from 1024px it re-forms by its own width, below. */
+[data-state='dock'] :is(.island-tools, .island-station, .island-more, .island-queue) {
+  position: absolute;
+  inset: 0;
+  place-self: center;
+  opacity: 0;
+  visibility: hidden;
+}
+
+[data-state='dock'] :is(.island-tools, .island-station, .island-more) {
+  --area: play;
+}
+
+@media (max-width: 1023px) {
+  [data-state='dock'] :is(.island-eq, .island-scrub, .island-prev, .island-next) {
+    position: absolute;
+    inset: 0;
+    place-self: center;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  [data-state='dock'] :is(.island-prev, .island-next) {
+    --area: play;
+  }
+
+  [data-state='dock'] :is(.island-eq, .island-scrub) {
+    --area: title;
+  }
+
+  .island[data-state='dock'] .island-eq i {
+    animation-play-state: paused;
+  }
+}
+
+/* From 1024px the dock re-forms by its own width (data-fit, which
+   Island.tsx sets from the dock station's width: the station does not tween
+   when the island travels, so a journey flies straight to its final form).
+   The scrubber keeps a real track in every form, and what a form does not
+   show is one button away, in the More popover. Widest first:
+   full   everything, the home control as a segmented control;
+   move   the home control folds into one "Move player" button;
+   icon   the watch/listen switch shows its icons only;
+   fold   speed and mute go into the popover;
+   lean   so do the switch, the picture button and the bars;
+   tight  and the times and Play next; the title gives way. */
+@media (min-width: 1024px) {
+  [data-state='dock'] .island-tools {
+    --area: tools;
+    position: static;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .island[data-state='dock']:not([data-fit]) .island-station,
+  .island[data-state='dock'][data-fit='full'] .island-station {
+    --area: station;
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .island[data-state='dock'][data-fit]:not([data-fit='full']) {
+    grid-template:
+      'art title prev play next skip eq tools more scrub' 56px
+      / var(--art-w) var(--title-w) 40px 48px 40px 40px 18px auto 40px minmax(0, 1fr);
+  }
+
+  .island[data-state='dock'][data-fit]:not([data-fit='full']) .island-more {
+    --area: more;
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .island[data-state='dock']:is([data-fit='icon'], [data-fit='fold']) .island-tools .medium-option span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .island[data-state='dock']:is([data-fit='fold'], [data-fit='lean'], [data-fit='tight']) .island-tools :is(.island-speed, .island-mute) {
+    display: none;
+  }
+
+  /* From here the title gives way before the scrubber's track does. */
+  .island[data-state='dock'][data-fit]:is([data-fit='lean'], [data-fit='tight']) {
+    grid-template:
+      'art title prev play next skip more scrub' 56px
+      / var(--art-w) minmax(140px, var(--title-w)) 40px 48px 40px 40px 40px minmax(344px, 1fr);
+  }
+
+  .island[data-state='dock']:is([data-fit='lean'], [data-fit='tight']) :is(.island-eq, .island-tools),
+  .island[data-state='dock'][data-fit='tight'] .island-skip {
+    --area: more;
+    position: absolute;
+    inset: 0;
+    place-self: center;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .island[data-state='dock']:is([data-fit='lean'], [data-fit='tight']) .island-eq i {
+    animation-play-state: paused;
+  }
+
+  .island[data-state='dock']:is([data-fit='lean'], [data-fit='tight']) .island-title {
+    width: auto;
+  }
+
+  .island[data-state='dock'][data-fit][data-fit='tight'] {
+    gap: 10px;
+    grid-template:
+      'art title prev play next more scrub' 56px
+      / var(--art-w) minmax(96px, var(--title-w)) 40px 48px 40px 40px minmax(240px, 1fr);
+  }
+
+  .island[data-state='dock'][data-fit='tight'] .dock-time {
+    display: none;
+  }
+}
+
+/* ---------- More: what a narrow dock folds away ---------- */
+
+.island-more-button {
+  anchor-name: --island-more;
+}
+
+.island-more-dots,
+.island:is([data-fit='fold'], [data-fit='lean'], [data-fit='tight']) .island-more-move {
+  display: none;
+}
+
+.island:is([data-fit='fold'], [data-fit='lean'], [data-fit='tight']) .island-more-dots {
+  display: block;
+}
+
+/* Without anchor positioning it sits above the dock's right end. */
+.island-more-pop {
+  position: fixed;
+  inset: auto 24px calc(var(--dock-h) + 20px) auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+
+@supports (anchor-name: --a) {
+  .island-more-pop {
+    position-anchor: --island-more;
+    inset: auto;
+    right: anchor(right);
+    bottom: anchor(top);
+    margin: 0 -6px 12px 0;
+    position-try-fallbacks: --island-more-below;
+    container-type: anchored;
+  }
+}
+
+@position-try --island-more-below {
+  bottom: auto;
+  top: anchor(bottom);
+  margin: 12px -6px 0 0;
+}
+
+.island-more-in {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-tray);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-float);
+}
+
+/* The caret points at the button, and turns when the popover flips below. */
+.island-more-in::after {
+  content: '';
+  position: absolute;
+  right: 21px;
+  bottom: -5px;
+  width: 9px;
+  height: 9px;
+  background: inherit;
+  rotate: 45deg;
+  border-radius: 0 0 2px;
+}
+
+@container anchored(fallback: --island-more-below) {
+  .island-more-in::after {
+    top: -5px;
+    bottom: auto;
+    border-radius: 2px 0 0;
+  }
+}
+
+.island-more-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.island-more-times {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 0 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.island-more-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 280px;
+}
+
+.island-more-next span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The popover's own radio group is not one of the island's parts: it is
+   never parked, and it fills its checked option (no indicator to glide, and
+   no anchor name to take from the dock's). */
+.island .island-more-pop .island-station {
+  position: relative;
+  inset: auto;
+  place-self: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Its checked option is filled. */
+.island-more-pop .island-station label:has(:checked) {
+  anchor-name: none;
+  background: var(--ink);
+}
+
+/* Which rows show follows the dock's form. */
+.island-more-times,
+.island-more-sound,
+.island-more-picture,
+.island-more-next {
+  display: none;
+}
+
+.island[data-fit='tight'] .island-more-times,
+.island:is([data-fit='fold'], [data-fit='lean'], [data-fit='tight']) .island-more-sound,
+.island:is([data-fit='lean'], [data-fit='tight']) .island-more-picture {
+  display: flex;
+}
+
+.island[data-fit='tight'] .island-more-next {
+  display: inline-flex;
+}
+
+/* Bars behind a neighbour have nothing to show. */
+.island[data-state='card'] .island-eq i {
+  animation-play-state: paused;
+}
+
+/* ---------- Up next: the board (demos/queue.html) ----------
+   In the card the board spans every track as a subgrid, so its slots sit in
+   the island's own areas: now playing exactly where the art is, Up next in
+   the queue column, the shelf along the bottom. The covers are siblings at
+   the end, filling a slot by name. */
+.island-queue {
+  --area: queue;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Parked, nothing inside is styled, laid out or painted. */
+:is([data-state='pill'], [data-state='dock'], [data-state='rail']) .island-queue {
+  content-visibility: hidden;
+}
+
+[data-state='card'] .island-queue {
+  grid-area: 1 / 1 / -1 / -1;
+  display: grid;
+  grid-template: subgrid / subgrid;
+  align-self: stretch;
+}
+
+.board-title {
+  margin: 0 0 10px 4px;
+  color: var(--ink);
+  font: 650 14px/1.2 var(--font-ui);
+}
+
+.board-hint {
+  max-width: 62ch;
+  margin: -4px 0 12px 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* Read out, not shown. */
+.board-quiet {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.slot {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--r-tile);
+  background: color-mix(in oklch, var(--ink) 5%, transparent);
+  outline: 1px dashed color-mix(in oklch, var(--ink) 22%, transparent);
+  outline-offset: -1px;
+  pointer-events: none;
+}
+
+.slot[data-hot] {
+  outline: 1.5px solid var(--ink);
+}
+
+/* Now playing: a square in the middle of the art, where a cover lands and
+   then gives way to the picture. */
+.slot-now {
+  grid-area: art;
+  justify-self: start;
+  width: var(--art-h);
+  height: var(--art-h);
+  margin-left: calc((var(--art-w) - var(--art-h)) / 2);
+  border-radius: var(--r-tile);
+  background: none;
+  outline-color: transparent;
+}
+
+.slot-now[data-hot] {
+  outline-color: var(--ink);
+}
+
+/* Up next and the shelf are trays inside the card: the card's radius minus
+   their inset, holding covers at the tile radius (and the small ones at the
+   thumb radius). */
+.board-next,
+.board-shelf {
+  min-width: 0;
+  padding: 12px;
+  border-radius: var(--r-tray);
+  background: color-mix(in oklch, var(--ink) 5%, transparent);
+}
+
+.board-next {
+  grid-area: queue;
+  align-self: start;
+}
+
+.board-row .slot {
+  border-radius: var(--r-thumb);
+}
+
+.board-next-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  transition:
+    opacity calc(0.35s * var(--slomo)) var(--ease-out),
+    translate calc(0.35s * var(--slomo)) var(--ease-out);
+}
+
+@starting-style {
+  .board-row {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+
+@supports (transition-delay: calc(sibling-index() * 1ms)) {
+  .board-row {
+    transition-delay: calc(min(sibling-index() - 1, 8) * 24ms * var(--slomo));
+  }
+}
+
+.board-row-name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board-row[data-drop] .board-row-name {
+  color: var(--muted);
+  font-weight: 500;
+  /* A hint, not a title: it wraps rather than losing its end. */
+  white-space: normal;
+}
+
+.board-shelf {
+  grid-area: shelf;
+}
+
+/* Imagery leads; its title and one unit of proof sit 8px under it, 4px in. */
+.shelf-cell {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+}
+
+.shelf-cell-title {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 8px 4px 0;
+  color: var(--ink);
+  font: 600 13px/1.3 var(--font-ui);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.shelf-cell-meta,
+.board-row-meta {
+  color: var(--muted);
+  font: 500 12px/1.3 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+.shelf-cell-meta {
+  margin: 2px 4px 0;
+}
+
+.board-row-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.board-shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 1024px) {
+  .board-shelf-grid {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 14px;
+  }
+}
+
+.board-tiles {
+  display: contents;
+}
+
+/* ---------- Covers ----------
+   A cover is two boxes. The tile fills its slot by name (Anchored Auto
+   Layout) and keeps its style while covers fly; its face flies (PropFLIP),
+   is dragged and draws the art. Chrome lays an anchor-positioned box out
+   again on any change to its style, so flying the anchored box itself cost
+   a layout every frame of a flight. */
+.tile {
+  /* The queue demo's clocks: across on an ease-out, up and down on a spring. */
+  --flip-dx: 0.55s;
+  --flip-ex: var(--ease-out);
+  --flip-dy: 0.85s;
+  --flip-ey: var(--spring);
+  --flip-ds: 0.5s;
+  --flip-es: var(--ease-out);
+  z-index: 2;
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Off screen (scrolled out of the card), a cover costs nothing to render. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 96px auto 96px;
+}
+
+.tile[hidden] {
+  display: none;
+}
+
+.tile-face {
+  --r: var(--r-tile);
+  --also: opacity calc(0.15s * var(--slomo)) ease;
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  background: var(--media-ground);
+  /* Covers barely float; only a held one has real elevation. */
+  box-shadow: 0 2px 8px color-mix(in oklch, var(--ink) 6%, transparent);
+}
+
+/* A cover that appears while the card is open (the shelf arriving after the
+   island has landed) fades in, one after another in slot order. */
+.tile[data-arriving] .tile-face {
+  --also: opacity calc(0.3s * var(--slomo)) var(--ease-out) calc(var(--slot-i, 0) * 22ms * var(--slomo));
+}
+
+@starting-style {
+  .tile[data-arriving] .tile-face {
+    opacity: 0;
+  }
+}
+
+/* Each cover fills its slot by data-⚓️-fill, through Anchored Auto Layout's
+   typed attr(). Where that is missing (WebKit), the covers line up in slot
+   order instead: everything still works, without the travel. */
+@supports not (width: attr(x type(<length>))) {
+  /* WebKit does not tween the island's anchor-size(); go() sizes its
+     journeys in pixels instead, except into the rail, whose slot grows as
+     the island arrives. On that journey the box takes its size at once, so
+     its parts fly in unclipped rather than out of sight. */
+  :root[data-island='rail'] .island[data-moving] {
+    overflow: visible;
+  }
+
+  /* WebKit resets the scroll of an anchor-positioned scroller whenever it
+     lays it out again, so its card is placed directly. */
+  .island[data-state='card'] {
+    inset: max(8px, env(safe-area-inset-top)) 0 0;
+    width: auto;
+    height: auto;
+  }
+
+  @media (min-width: 1024px) {
+    .island[data-state='card'] {
+      inset: 24px 24px 24px calc(var(--rail-w) + 24px);
+    }
+  }
+
+  [data-state='card'] .board-tiles {
+    grid-area: shelf;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 10px;
+    align-self: end;
+  }
+
+  .tile {
+    position: relative;
+    order: var(--slot-i);
+    aspect-ratio: 1;
+  }
+
+  .tile.is-now,
+  .slot,
+  .board-shelf-grid {
+    display: none;
+  }
+}
+
+.tile-hit {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: none;
+  cursor: inherit;
+}
+
+.tile-hit img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The hairline over the art. */
+.tile-hit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  pointer-events: none;
+}
+
+.tile-hit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Its number, as a glass chip on the art. */
+/* The chip shows only on the shelf's covers (Up next and now playing hide
+   it), so it takes the shelf's size rather than the cover's: a cover is not
+   a size container, which would restyle every flying cover twice a frame. */
+.tile-chip {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: oklch(18% 0.02 280 / 0.5);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: oklch(98% 0 0);
+  font: 600 9px / 1.4 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 1024px) {
+  .tile-chip {
+    top: 8px;
+    left: 8px;
+    font-size: 10px;
+  }
+}
+
+/* Remove sits on a queued cover, out of sight until the cover is hovered or
+   holds focus. */
+.tile-remove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: oklch(18% 0.02 280 / 0.6);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: oklch(98% 0 0);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--quick),
+    background var(--quick);
+}
+
+.tile[data-queued] .tile-remove {
+  display: grid;
+}
+
+.tile:is(:hover, :focus-within) .tile-remove {
+  opacity: 1;
+}
+
+.tile-remove:hover {
+  background: oklch(18% 0.02 280 / 0.85);
+}
+
+.tile[data-queued] .tile-chip,
+.tile.is-now .tile-chip {
+  display: none;
+}
+
+/* The cover in the now-playing slot lands, then gives way to the picture. */
+.tile[data-queued] .tile-face {
+  --r: var(--r-thumb);
+}
+
+.tile.is-now {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.tile.is-now .tile-face {
+  --r: var(--r-tile);
+  --also: opacity calc(0.3s * var(--slomo)) ease calc(0.6s * var(--slomo));
+  opacity: 0;
+  box-shadow: 0 30px 60px -20px oklch(0% 0 0 / 0.8);
+}
+
+.tile[data-held] {
+  z-index: 10;
+  cursor: grabbing;
+}
+
+.tile[data-held] .tile-face {
+  box-shadow: 0 30px 60px -10px oklch(0% 0 0 / 0.85);
+}
+
+/* ---------- The picture ---------- */
+
+/* .player-media is the anchored box: it is never transformed. The flyer
+   inside it is what you see, drag and PropFLIP. Above the player (45). */
+.player-media {
+  position: fixed;
+  z-index: 46;
+  right: var(--pip-gap);
+  bottom: calc(var(--dock-h) + var(--tabbar-h) + var(--pip-gap));
+  width: var(--pip-w);
+  height: calc(var(--pip-w) * 9 / 16);
+  /* Size is real and tweens; travel is PropFLIP's (the hybrid). */
+  transition:
+    width calc(var(--flip-ds) * var(--slomo)) var(--flip-es),
+    height calc(var(--flip-ds) * var(--slomo)) var(--flip-es);
+}
+
+@media (min-width: 1024px) {
+  .player-media {
+    bottom: calc(var(--dock-h) + var(--pip-gap));
+  }
+}
+
+/* Waiting, invisible, over the home the picture is in. */
+.player-media[data-parked] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.player-media[data-parked] {
+  transition: none;
+}
+
+.player-media-box {
+  --r: var(--r-tile);
+  --also:
+    --r calc(var(--flip-ds) * var(--slomo)) var(--flip-es),
+    box-shadow calc(var(--flip-ds) * var(--slomo)) var(--flip-es);
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  background: var(--media-ground);
+  box-shadow: var(--shadow-float);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* A hairline over the picture wherever it is. */
+.player-media-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  pointer-events: none;
+}
+
+/* Floating, the picture glows in the colour of what is playing. The glow is
+   its own layer under the picture: its colour steps when the scene changes
+   (one repaint, no transition), and it fades in once the picture has landed
+   and out when it leaves or is held, on opacity alone. */
+.player-media[data-station='corner'] .player-media-box {
+  cursor: grab;
+}
+
+.player-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--r-tile);
+  box-shadow: 0 24px 70px -28px color-mix(in oklch, var(--now-tone) 85%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity calc(0.25s * var(--slomo)) var(--ease-out);
+}
+
+.player-media[data-station='corner']:not([data-parked], [data-held]) .player-glow {
+  opacity: 1;
+  transition: opacity calc(0.4s * var(--slomo)) var(--ease-out) calc(0.6s * var(--slomo));
+}
+
+/* A sheen that follows the pointer across the floating picture: a light
+   twice its size, moved on the compositor (pointer-local on the picture). */
+.player-media-box::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(closest-side, oklch(100% 0 0 / 0.16), transparent);
+  opacity: 0;
+  translate: calc((var(--live-local-pointer-x-ratio) - 1) * 50%)
+    calc((var(--live-local-pointer-y-ratio) - 1) * 50%);
+  pointer-events: none;
+  transition:
+    opacity 300ms var(--ease-out),
+    translate 200ms var(--ease-out);
+}
+
+.player-media[data-station='corner']:not([data-held]) .player-media-box::after {
+  opacity: var(--live-local-pointer-inside, 0);
+}
+
+/* It leans toward the pointer, the way the demos' cards do (pointer-local,
+   written on the picture itself; a transform, so it costs no layout). */
+.player-media[data-station='corner'] .player-media-frame {
+  --lean: var(--live-local-pointer-inside);
+  transform: perspective(900px)
+    rotateY(calc((var(--live-local-pointer-x-ratio) - 0.5) * var(--lean) * 9deg))
+    rotateX(calc((0.5 - var(--live-local-pointer-y-ratio)) * var(--lean) * 9deg))
+    scale(calc(1 + var(--lean) * 0.05));
+  transition: transform 450ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-media[data-station='corner'] .player-media-frame {
+    transform: none;
+  }
+}
+
+.player-media[data-held] .player-media-box {
+  cursor: grabbing;
+  box-shadow:
+    var(--shadow-float),
+    0 40px 80px -24px oklch(10% 0.04 280 / 0.6);
+}
+
+.player-media[data-station='stage'] .player-media-box {
+  --r: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.player-media[data-station='cell'] .player-media-box {
+  --r: var(--r-thumb);
+  box-shadow: none;
+}
+
+/* The artwork stands in for the picture: its colour field, and the square
+   art on it, filling the box as the box turns square. */
+.player-media-frame {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  container-type: size;
+}
+
+.player-media-frame::before,
+.player-media-frame::after {
+  content: '';
+  position: absolute;
+  background: var(--art, none) center / cover;
+}
+
+.player-media-frame::before {
+  inset: -12%;
+  filter: blur(28px) saturate(1.35) brightness(0.55);
+}
+
+.player-media-frame::after {
+  --side: min(100cqw, max(74cqh, 100cqh - 2 * (100cqw - 100cqh)));
+  inset: 0;
+  width: var(--side);
+  height: var(--side);
+  margin: auto;
+  border-radius: min(6px, 6cqh);
+  box-shadow: var(--shadow-float);
+}
+
+.player-media-frame video {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+:root[data-medium='listen'] .player-media-frame video {
+  opacity: 0;
+}
+
+/* Across navigations the picture keeps flying in its box (engine.ts), which
+   persists like the dock: its view transition group holds still and shows it
+   live, mid-flight, above the pages changing underneath. */
+.player-media {
+  view-transition-name: player-media;
+}
+
+:root::view-transition-group(player-media),
+:root::view-transition-new(player-media),
+:root::view-transition-new(player-media):only-child {
+  animation: none;
+}
+
+:root::view-transition-old(player-media),
+:root::view-transition-old(player-media):only-child {
+  display: none;
+}
+
+/* ---------- Picture-in-picture: the room and its corners ---------- */
+
+/* The screen between the chrome: below the top bar (and room for sticky
+   page headers), above the player, beside the sidebar. */
+.player-room {
+  position: fixed;
+  inset: calc(var(--topbar-h) + env(safe-area-inset-top)) 0 calc(var(--dock-h) + var(--tabbar-h))
+    var(--rail-w);
+  pointer-events: none;
+  transition: left var(--rail-glide);
+}
+
+@media (min-width: 1024px) {
+  .player-room {
+    bottom: var(--dock-h);
+  }
+}
+
+/* The room ends above the island wherever the island sits at the bottom. */
+.player-room {
+  transition:
+    left var(--rail-glide),
+    bottom calc(0.6s * var(--slomo)) var(--ease-out);
+}
+
+:root[data-island='pill'] .player-room {
+  bottom: calc(var(--tabbar-h) + 70px);
+}
+
+:root[data-island='rail'] .player-room {
+  bottom: var(--tabbar-h);
+}
+
+@media (min-width: 1024px) {
+  :root[data-island='pill'] .player-room {
+    bottom: 78px;
+  }
+
+  :root[data-island='rail'] .player-room {
+    bottom: 0;
+  }
+}
+
+/* While the picture is held, its four landing places show. */
+.pip-zone {
+  position: fixed;
+  z-index: 1;
+  display: none;
+  border: 1.5px dashed color-mix(in oklch, var(--ink) 35%, transparent);
+  border-radius: 12px;
+  background: color-mix(in oklch, var(--surface) 35%, transparent);
+  pointer-events: none;
+  transition:
+    border-color 200ms var(--ease-out),
+    background 200ms var(--ease-out);
+}
+
+.dock:has(~ .player-air .player-media[data-held]) .pip-zone {
+  display: block;
+}
+
+.pip-zone[data-hot] {
+  border-color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 14%, transparent);
+}
+
+@supports (anchor-name: --a) {
+  .player-room {
+    anchor-name: --player-room;
+  }
+
+  .stage[data-current] [data-media-slot] {
+    anchor-name: --player-stage;
+  }
+
+  [data-media-cell] {
+    anchor-name: --player-cell;
+  }
+
+  /* Every anchored part of the player stays drawn: its anchors are
+     invisible stations (the room) or homes it is about to leave. */
+  :is(.player-media, .pip-zone, .pip-bar) {
+    position-visibility: always;
+  }
+
+  .player-media {
+    anchor-name: --player-pip;
+    inset: anchor(inside);
+  }
+
+  /* On its stage the box belongs to the page and scrolls with it, so no
+     scroll compensation is involved (Chrome applies that a frame late,
+     which a flip measured at the switch would see). */
+  .player-media[data-station='stage'] {
+    position: absolute;
+    position-anchor: --player-stage;
+    width: anchor-size(width);
+    height: anchor-size(height);
+  }
+
+  .player-media[data-station='cell'] {
+    position-anchor: --player-cell;
+    width: anchor-size(width);
+    height: anchor-size(height);
+  }
+
+  /* A corner: the room is the inset-modified containing block, and
+     self-alignment picks the corner. The picture is as large as it may be
+     and still leave room for its bar, so it never covers the player. */
+  :is(.player-media[data-station='corner'], .pip-zone) {
+    --pip-fit: min(
+      var(--pip-w),
+      anchor-size(width) - 2 * var(--pip-gap),
+      (anchor-size(height) - 2 * var(--pip-gap) - var(--pip-bar-space)) * 16 / 9
+    );
+    position-anchor: --player-room;
+    inset: anchor(inside);
+    width: var(--pip-fit);
+    height: calc(var(--pip-fit) * 9 / 16);
+    margin: var(--pip-gap);
+    align-self: end;
+    justify-self: end;
+  }
+
+  :is(.player-media[data-corner^='n'], .pip-zone[data-pip-zone^='n']) {
+    align-self: start;
+  }
+
+  :is(.player-media[data-corner$='w'], .pip-zone[data-pip-zone$='w']) {
+    justify-self: start;
+  }
+}
+
+/* Without anchor positioning the picture still floats in its corner; it
+   just steps between places instead of flying. */
+@supports not (anchor-name: --a) {
+  .player-media[data-corner^='n'] {
+    top: calc(var(--topbar-h) + env(safe-area-inset-top) + var(--pip-gap));
+    bottom: auto;
+  }
+
+  .player-media[data-corner$='w'] {
+    left: calc(var(--rail-w) + var(--pip-gap));
+    right: auto;
+    transition: left var(--rail-glide);
+  }
+}
+
+/* The floating picture's bar: anchored above it, and below it when there is
+   no room above (a top corner). Which side won is an anchored container
+   query, so the little caret always points at the picture. */
+.pip-bar {
+  position: fixed;
+  z-index: 47;
+  right: var(--pip-gap);
+  bottom: calc(var(--dock-h) + var(--tabbar-h) + var(--pip-gap) + var(--pip-w) * 9 / 16 + 6px);
+  width: var(--pip-w);
+  height: var(--pip-bar-h);
+  transition: opacity 260ms var(--ease-out) calc(var(--flip-dy) * var(--slomo) * 0.7);
+}
+
+@starting-style {
+  .pip-bar {
+    opacity: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pip-bar {
+    bottom: calc(var(--dock-h) + var(--pip-gap) + var(--pip-w) * 9 / 16 + 6px);
+  }
+}
+
+@supports not (anchor-name: --a) {
+  .player-media[data-corner^='n'] ~ [data-pip-bar-host] .pip-bar {
+    top: calc(var(--topbar-h) + env(safe-area-inset-top) + var(--pip-gap) + var(--pip-w) * 9 / 16 + 6px);
+    bottom: auto;
+  }
+
+  .player-media[data-corner$='w'] ~ [data-pip-bar-host] .pip-bar {
+    left: calc(var(--rail-w) + var(--pip-gap));
+    right: auto;
+    transition:
+      opacity 260ms var(--ease-out) calc(var(--flip-dy) * var(--slomo) * 0.7),
+      left var(--rail-glide);
+  }
+}
+
+.player-media[data-held] ~ [data-pip-bar-host] .pip-bar,
+.player-media:not([data-station='corner']) ~ [data-pip-bar-host] .pip-bar {
+  opacity: 0;
+  transition-delay: 0s;
+  transition-duration: 120ms;
+}
+
+@supports (anchor-name: --a) {
+  .pip-bar {
+    position-anchor: --player-pip;
+    left: anchor(left);
+    right: auto;
+    width: anchor-size(width);
+    top: anchor(--player-room top);
+    bottom: anchor(top);
+    margin-block: 6px;
+    align-self: end;
+    position-try-fallbacks: --pip-bar-below;
+    container-type: anchored;
+  }
+}
+
+@position-try --pip-bar-below {
+  top: anchor(bottom);
+  bottom: anchor(--player-room bottom);
+  align-self: start;
+}
+
+.pip-bar-in {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 100%;
+  padding: 0 4px 0 12px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+/* The floating picture's progress, along the foot of its bar. */
+.pip-bar-light {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 3px;
+}
+
+.pip-bar-in::after {
+  content: '';
+  position: absolute;
+  left: 18px;
+  bottom: -4px;
+  width: 9px;
+  height: 9px;
+  background: inherit;
+  rotate: 45deg;
+  border-radius: 0 0 2px;
+}
+
+@container anchored(fallback: --pip-bar-below) {
+  .pip-bar-in::after {
+    top: -4px;
+    bottom: auto;
+    border-radius: 2px 0 0;
+  }
+}
+
+.pip-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 650;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pip-title:hover {
+  text-decoration: underline;
+}
+
+.mini-button {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background var(--quick),
+    color var(--quick);
+}
+
+/* The bar's title and controls arrive one after another, in tree order. */
+.pip-bar-in > :is(a, button) {
+  transition:
+    background var(--quick),
+    color var(--quick),
+    opacity calc(0.3s * var(--slomo)) var(--ease-out),
+    translate calc(0.3s * var(--slomo)) var(--ease-out);
+}
+
+@supports (transition-delay: calc(sibling-index() * 1ms)) {
+  .pip-bar-in > :is(a, button) {
+    transition-delay: 0s, 0s, calc((sibling-index() - 1) * 30ms * var(--slomo)),
+      calc((sibling-index() - 1) * 30ms * var(--slomo));
+  }
+}
+
+@starting-style {
+  .pip-bar-in > :is(a, button) {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+/* A play button's buffering ring spins only while the button is on screen
+   (PlayToggle marks it); elsewhere there is no ring to animate. */
+.play-toggle[data-buffering]:not([data-onscreen])::before {
+  content: none;
+}
+
+/* ---------- The stage hands its picture over ---------- */
+
+/* Scroll-triggered: when the stage leaves the screen (and again when it
+   comes back), its room plays a time-based animation that reverses from
+   wherever it is. The live light from the picture fades with the picture
+   as it leaves; a 1ms sentinel on the same trigger tells the engine to fly
+   the picture out, or home. Browsers without triggers use an
+   IntersectionObserver (engine.ts). */
+@property --player-presence {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+@keyframes player-presence {
+  from {
+    --player-presence: 0;
+  }
+
+  to {
+    --player-presence: 1;
+  }
+}
+
+@keyframes player-stage-sentinel {
+  from {
+    --player-sentinel: 0;
+  }
+
+  to {
+    --player-sentinel: 1;
+  }
+}
+
+@supports (timeline-trigger: --t view()) {
+  .stage-frame {
+    timeline-trigger: --player-stage view() entry 50% exit 50% / entry 25% exit 75%;
+  }
+
+  .stage-room {
+    animation-name: player-presence, player-stage-sentinel;
+    animation-duration: calc(700ms * var(--slomo)), 1ms;
+    animation-timing-function: var(--ease-out), linear;
+    animation-fill-mode: both;
+    /* One per animation: Chrome does not repeat this list. */
+    animation-trigger:
+      --player-stage play-forwards play-backwards,
+      --player-stage play-forwards play-backwards;
+  }
+
+  :root[data-world='stage'] .stage[data-playing][data-watching] .stage-light-canvas[data-lit] {
+    opacity: var(--player-presence);
+  }
+}
+
+/* The house ring (--halo, interactions.css) sweeps on from wherever the
+   pointer comes in, on the player's outlined controls (pointer-local). */
+:is(.text-button, .medium-switch)[data-props-for~='pointer-local'] {
+  --from: calc(
+    (atan2(var(--live-local-pointer-y-ratio) - 0.5, var(--live-local-pointer-x-ratio) - 0.5) / 1deg +
+      90) * var(--live-local-pointer-inside)
+  );
+}

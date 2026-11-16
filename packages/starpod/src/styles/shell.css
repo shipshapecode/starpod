@@ -1,0 +1,976 @@
+/* ---------- App shell: rail, top bar, main, tab bar, dock, sheets ---------- */
+
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--on-ink);
+  translate: 0 -200%;
+  transition: translate 200ms var(--ease-out);
+}
+
+.skip-link:focus {
+  translate: 0 0;
+}
+
+/* The player is there only while an episode is loaded (the island renders
+   nothing before), so its skip link waits for one. */
+:root:is(:not([data-episode]), [data-episode='']) .skip-link[href='#player'] {
+  display: none;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  min-height: 100dvh;
+}
+
+@media (min-width: 1024px) {
+  .app {
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+  }
+}
+
+/* Rail (desktop): everything a visitor came for, always on screen. */
+.rail {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .rail {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100dvh;
+    padding: 28px 22px calc(var(--dock-h) + 20px);
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .topbar,
+  .tabbar {
+    display: none !important;
+  }
+}
+
+.rail > * {
+  flex-shrink: 0;
+}
+
+.rail-title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.rail-title a {
+  text-decoration: none;
+}
+
+.rail-blurb {
+  margin: -0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--ground);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: color 200ms var(--ease-out);
+}
+
+@media (hover: hover) {
+  .search-trigger:hover {
+    color: var(--text);
+  }
+}
+
+.search-trigger kbd {
+  margin-left: auto;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.rail-nav,
+.sheet-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rail-nav a,
+.sheet-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+
+.rail-nav a svg,
+.sheet-nav a svg {
+  flex: none;
+  color: var(--muted);
+}
+
+.rail-nav a:hover,
+.sheet-nav a:hover {
+  background: var(--raised);
+  color: var(--ink);
+}
+
+.rail-nav a[aria-current='page'],
+.sheet-nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.rail-nav a[aria-current='page'] svg {
+  color: var(--accent-ink);
+}
+
+.rail-follow {
+  margin-top: auto;
+}
+
+.rail-label {
+  margin: 0 0 0.6rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.platform {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--ground);
+}
+
+.platform-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  background: var(--text);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  transition: background 300ms var(--ease-out);
+}
+
+.platform-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+:root[data-world='stage'] [data-world-link='stage'] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* Top bar (phones, tablets, foldables). */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: var(--topbar-h);
+  padding: 0 var(--gutter);
+  padding-top: env(safe-area-inset-top);
+  box-sizing: content-box;
+  background: color-mix(in oklch, var(--ground) 86%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-show {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.topbar-show img {
+  flex: none;
+  border-radius: 8px;
+}
+
+.topbar-show span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-follow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding: 0.5rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--on-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+/* Main column. */
+.main {
+  min-width: 0;
+  /* Stage light may spill past the column; it never scrolls the page. */
+  overflow-x: clip;
+  padding: var(--gutter) var(--gutter) calc(var(--dock-h) + var(--tabbar-h) + 48px);
+}
+
+@media (min-width: 1024px) {
+  .main {
+    grid-column: 2;
+    padding-bottom: calc(var(--dock-h) + 64px);
+  }
+}
+
+.main-page {
+  max-width: 1280px;
+}
+
+.main:has(.stage[data-variant='page']) .crumbs {
+  display: none;
+}
+
+.crumbs {
+  margin-bottom: 1.25rem;
+  font-size: 0.8125rem;
+}
+
+
+.section-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.section-count {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Tab bar (phones, tablets). */
+.tabbar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: var(--tabbar-h);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+}
+
+.tabbar > a,
+.tabbar > button,
+.tabbar astro-island > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.rail-nav astro-island,
+.tabbar astro-island {
+  display: contents;
+}
+
+.tabbar [aria-current='page'] {
+  color: var(--accent-ink);
+}
+
+/* Bottom sheets (native popovers). */
+.sheet {
+  inset: auto 0 0;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80dvh;
+  margin: 0 auto;
+  padding: 22px var(--gutter) calc(28px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 22px 22px 0 0;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-float);
+  overflow: auto;
+  translate: 0 0;
+  transition:
+    translate calc(420ms * var(--slomo)) var(--ease-out),
+    display calc(420ms * var(--slomo)) allow-discrete,
+    overlay calc(420ms * var(--slomo)) allow-discrete;
+}
+
+.sheet:not(:popover-open) {
+  translate: 0 105%;
+}
+
+@starting-style {
+  .sheet:popover-open {
+    translate: 0 105%;
+  }
+}
+
+.sheet::backdrop {
+  background: oklch(10% 0.02 280 / 0.45);
+}
+
+.sheet-title {
+  margin: 0 0 1rem;
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.sheet .platforms {
+  margin-bottom: 1.25rem;
+}
+
+/* Labelled pills: the follow sheet and the collapsed rail's flyout. */
+:is(.sheet, .rail-fly) .platform {
+  width: auto;
+  height: auto;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+}
+
+:is(.sheet, .rail-fly) .platform-name {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.sheet-nav {
+  margin-bottom: 1.25rem;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+
+.text-button {
+  min-width: 48px;
+  height: 34px;
+  padding: 0 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background 200ms var(--ease-out),
+    color 200ms var(--ease-out);
+}
+
+.text-button:hover {
+  color: var(--ink);
+}
+
+.dock-play {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--on-ink);
+  cursor: pointer;
+  transition: transform 300ms var(--ease-spring);
+}
+
+.dock-play:active {
+  transform: scale(0.92);
+}
+
+/* Every play button (PlayToggle) carries its own buffering ring, anchored
+   here so it can never escape to a distant positioned ancestor. */
+.play-toggle {
+  position: relative;
+}
+
+.play-toggle[data-buffering]::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid transparent;
+  border-top-color: var(--accent);
+  pointer-events: none;
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.scrubber {
+  flex: 1;
+  height: 20px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  --fill: 0%;
+}
+
+.scrubber::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--glow-b), var(--glow-a)) 0 0 / var(--fill) 100% no-repeat,
+    var(--line);
+}
+
+.scrubber::-moz-range-track {
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--glow-b), var(--glow-a)) 0 0 / var(--fill) 100% no-repeat,
+    var(--line);
+}
+
+.scrubber::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  appearance: none;
+  transition: transform 200ms var(--ease-spring);
+}
+
+.scrubber::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+}
+
+.scrubber:hover::-webkit-slider-thumb {
+  transform: scale(1.25);
+}
+
+/* ---------- Medium switch ---------- */
+
+.medium-switch {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--ground);
+}
+
+.medium-option {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.45rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: color 300ms var(--ease-out);
+}
+
+.medium-option[aria-checked='true'] {
+  color: var(--on-ink);
+}
+
+.medium-thumb {
+  position: absolute;
+  inset: 3px auto 3px 3px;
+  width: calc(50% - 3px);
+  border-radius: 999px;
+  background: var(--ink);
+  transition: translate 520ms var(--ease-spring);
+}
+
+.medium-switch:has(.medium-option:last-of-type[aria-checked='true']) .medium-thumb {
+  translate: 100% 0;
+}
+
+.medium-switch[data-compact] .medium-option {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.75rem;
+}
+
+/* ---------- Buttons ---------- */
+
+.button-primary,
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 300ms var(--ease-spring);
+}
+
+.button-primary {
+  border: 0;
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.button-secondary {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.button-primary:active,
+.button-secondary:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Empty states ---------- */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0 3rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.empty-art {
+  width: min(280px, 70vw);
+}
+
+/* ---------- Search dialog: keep it in the palette ---------- */
+
+[role='dialog'] input[type='search'],
+[role='dialog'] input[type='text'] {
+  font-family: var(--font-ui);
+}
+
+/* ---------- Play glyph and on-air bars ---------- */
+
+.glyph {
+  display: grid;
+  place-items: center;
+}
+
+.glyph[data-swap] {
+  animation: glyph-in 380ms var(--ease-spring) both;
+}
+
+@keyframes glyph-in {
+  from {
+    opacity: 0;
+    scale: 0.45;
+    rotate: -24deg;
+  }
+}
+
+/* Live levels on the row that is playing; the pause glyph waits underneath
+   for a hover or focus. */
+.row-play > * {
+  grid-area: 1 / 1;
+}
+
+.onair {
+  display: flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 14px;
+  transition:
+    opacity 200ms var(--ease-out),
+    scale 260ms var(--ease-out);
+}
+
+.onair i {
+  width: 3px;
+  height: 100%;
+  border-radius: 1.5px;
+  background: currentColor;
+  transform-origin: 50% 100%;
+  animation: onair 820ms ease-in-out infinite alternate;
+}
+
+.onair i:nth-child(2) {
+  animation-duration: 560ms;
+  animation-delay: -240ms;
+}
+
+.onair i:nth-child(3) {
+  animation-duration: 700ms;
+  animation-delay: -460ms;
+}
+
+@keyframes onair {
+  from {
+    scale: 1 0.22;
+  }
+
+  to {
+    scale: 1 1;
+  }
+}
+
+:root:not([data-playing='true']) .onair i {
+  animation-play-state: paused;
+}
+
+/* Off screen the bars rest: a view timeline marks the bars' box as seen
+   only while it is in the viewport, and the bars run only then. */
+@property --onair-seen {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@keyframes onair-seen {
+  from,
+  to {
+    --onair-seen: 1;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .onair {
+    animation: onair-seen linear none;
+    animation-timeline: view();
+    animation-range: cover;
+  }
+
+  @container style(--onair-seen: 0) {
+    .onair i {
+      animation-play-state: paused;
+    }
+  }
+}
+
+.onair + .glyph {
+  opacity: 0;
+  scale: 0.6;
+  transition:
+    opacity 200ms var(--ease-out),
+    scale 260ms var(--ease-spring);
+}
+
+.row-play:is(:hover, :focus-visible) .onair {
+  opacity: 0;
+  scale: 0.6;
+}
+
+.row-play:is(:hover, :focus-visible) .onair + .glyph {
+  opacity: 1;
+  scale: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onair i {
+    animation: none;
+  }
+
+  .onair i:nth-child(1) {
+    scale: 1 0.55;
+  }
+
+  .onair i:nth-child(3) {
+    scale: 1 0.75;
+  }
+}
+
+/* ---------- Scrubber preview ---------- */
+
+.scrub-preview {
+  position: fixed;
+  top: var(--top, 100vh);
+  left: var(--x, 50vw);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(320px, calc(100vw - 24px));
+  padding: 10px 13px 11px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  opacity: 0;
+  scale: 0.94;
+  transform-origin: 50% 100%;
+  translate: -50% calc(-100% - 14px);
+  pointer-events: none;
+  transition:
+    opacity 160ms var(--ease-out),
+    scale 240ms var(--ease-out);
+}
+
+.scrub-preview[data-open] {
+  opacity: 1;
+  scale: 1;
+}
+
+.scrub-preview-time {
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.scrub-preview-name {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.scrub-preview-line {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.875rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  text-wrap: pretty;
+}
+
+/* ---------- Page transitions ---------- */
+
+/* The app frame holds still; only the page moves. */
+.rail {
+  view-transition-name: rail;
+}
+
+.topbar {
+  view-transition-name: topbar;
+}
+
+.tabbar {
+  view-transition-name: tabbar;
+}
+
+:root::view-transition-old(rail),
+:root::view-transition-new(rail),
+:root::view-transition-old(topbar),
+:root::view-transition-new(topbar),
+:root::view-transition-old(tabbar),
+:root::view-transition-new(tabbar) {
+  animation-duration: 180ms;
+}
+
+/* The dock persists across pages, so it holds still. Astro moves it into
+   the new page during the swap, which can leave the new snapshot unpaired;
+   the :only-child forms keep the curtain rules below from claiming it. */
+:root::view-transition-group(dock),
+:root::view-transition-new(dock),
+:root::view-transition-new(dock):only-child {
+  animation: none;
+}
+
+:root::view-transition-old(dock),
+:root::view-transition-old(dock):only-child {
+  display: none;
+}
+
+/* The old page steps back into the dark; the new one rises in behind a
+   soft-edged curtain. Going back, the curtain falls from the top instead. */
+:root::view-transition-old(root) {
+  animation: page-out 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+:root::view-transition-new(root) {
+  mask-image: linear-gradient(to top, oklch(0% 0 0) 40%, oklch(0% 0 0 / 0) 60%);
+  mask-repeat: no-repeat;
+  mask-size: 100% 250%;
+  animation: page-in 640ms var(--ease-out) 60ms both;
+}
+
+:root[data-astro-transition='back']::view-transition-new(root) {
+  mask-image: linear-gradient(to bottom, oklch(0% 0 0) 40%, oklch(0% 0 0 / 0) 60%);
+  animation-name: page-in-back;
+}
+
+/* Named elements with no partner on the other page (a headline arriving,
+   artwork leaving) travel with the curtain rather than fading on their own. */
+:root::view-transition-old(*):only-child {
+  animation: page-out 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+:root::view-transition-new(*):only-child {
+  animation: page-in-solo 640ms var(--ease-out) 160ms both;
+}
+
+@keyframes page-in-solo {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    scale: 0.985;
+    filter: blur(3px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+    mask-position: 0 0%;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  to {
+    mask-position: 0 100%;
+  }
+}
+
+@keyframes page-in-back {
+  from {
+    opacity: 0;
+    translate: 0 -24px;
+    mask-position: 0 100%;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  to {
+    mask-position: 0 0%;
+  }
+}
+
+:root::view-transition-group(*) {
+  animation-duration: 480ms;
+  animation-timing-function: var(--ease-out);
+}

@@ -1,0 +1,305 @@
+/* ---------- The episode stage ---------- */
+
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'frame'
+    'meta'
+    'script';
+  gap: 20px;
+  margin-bottom: clamp(40px, 6vw, 80px);
+}
+
+.stage-room {
+  grid-area: frame;
+  position: relative;
+  min-width: 0;
+}
+
+.stage-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--media-ground);
+  box-shadow: var(--shadow-soft);
+  isolation: isolate;
+}
+
+/* The artwork, at home on its own colour field: the fallback stage for
+   audio-only episodes and for anyone choosing to listen. */
+.stage-ambient {
+  position: absolute;
+  inset: -12%;
+  background: var(--art) center / cover;
+  filter: blur(48px) saturate(1.35) brightness(0.55);
+  transform: scale(1.1);
+}
+
+.stage-art {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 74%;
+  width: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: calc(var(--radius-lg) - 2px);
+  box-shadow: var(--shadow-float);
+  translate: -50% -50%;
+  transition:
+    scale 700ms var(--ease-out),
+    opacity 500ms var(--ease-out);
+}
+
+.stage[data-playing]:not([data-watching]) .stage-art {
+  scale: 1.04;
+}
+
+.stage-slot {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.stage-slot video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: transparent;
+}
+
+/* Until the picture has a frame to show (engine.ts marks it ready), the
+   artwork holds the stage; then the picture fades in over it. */
+.stage-slot video:not([data-ready]) {
+  opacity: 0;
+}
+
+.stage-slot video[data-ready] {
+  transition: opacity 300ms var(--ease-out);
+}
+
+/* Listening: the element plays sound, the artwork holds the stage. */
+:root[data-medium='listen'] .stage-slot video {
+  opacity: 0;
+}
+
+.stage[data-watching] .stage-slot video {
+  background: var(--media-ground);
+}
+
+.stage-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: clamp(14px, 2.5vw, 28px);
+  pointer-events: none;
+}
+
+.stage-play {
+  display: grid;
+  place-items: center;
+  width: clamp(56px, 6vw, 76px);
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 999px;
+  background: oklch(98% 0.005 285);
+  color: oklch(20% 0.04 285);
+  box-shadow: var(--shadow-float);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    opacity 400ms var(--ease-out),
+    transform 400ms var(--ease-spring);
+}
+
+.stage-play:hover {
+  transform: scale(1.06);
+}
+
+.stage[data-playing][data-watching] .stage-play {
+  opacity: 0;
+}
+
+.stage[data-playing][data-watching] .stage-frame:hover .stage-play,
+.stage[data-playing][data-watching] .stage-play:focus-visible {
+  opacity: 1;
+}
+
+.stage-resume {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: oklch(15% 0.02 280 / 0.72);
+  color: oklch(97% 0.005 280);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  backdrop-filter: blur(8px);
+}
+
+/* Meta block. */
+.stage-meta {
+  grid-area: meta;
+  min-width: 0;
+}
+
+.stage-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 1rem;
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.stage-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--accent-ink);
+  font-weight: 650;
+}
+
+.stage-title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.1rem + 2.4vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  max-width: 22ch;
+}
+
+.stage-desc {
+  max-width: 62ch;
+  margin: 0 0 1.25rem;
+  color: var(--text);
+  font-size: 1.0625rem;
+}
+
+.stage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Up next leaves the row once the episode plays: no taller than Play (its
+   border inside the same height), so the page under the stage stays put. */
+.stage-actions .button-secondary {
+  padding-block: calc(0.75rem - 1px);
+}
+
+.link-on {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 1.1rem;
+  color: var(--accent-ink);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.link-on svg {
+  transition: translate 300ms var(--ease-spring);
+}
+
+.link-on:hover svg {
+  translate: 3px -3px;
+}
+
+.stage-script {
+  grid-area: script;
+  min-width: 0;
+}
+
+/* Desktop composition is the worlds' call; see worlds.css. */
+
+/* ---------- Hosts ---------- */
+
+.hosts-band {
+  padding-top: 8px;
+}
+
+.hosts-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.host {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.host-photo {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.host-name {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.host-bio {
+  margin: 0.2rem 0 0;
+  font-size: 0.9375rem;
+}
+
+/* ---------- Episode page body ---------- */
+
+.transcript-section {
+  max-width: 82ch;
+}
+
+.transcript {
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.transcript p {
+  margin: 0 0 1.1rem;
+}
+
+/* Islands that are direct stage children take part in its grid. */
+.stage > astro-island {
+  display: contents;
+}
+
+/* The cast: shown by the Stage world, beside the voices they speak in. */
+.cast {
+  display: none;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.cast-member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cast .person-face {
+  --person-size: 52px;
+}

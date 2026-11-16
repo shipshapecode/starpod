@@ -1,0 +1,35 @@
+---
+/**
+ * Square episode art tiles, imagery first: a glass "Ep 240" chip on the art,
+ * the title beneath in two lines. On phones the row scrolls sideways and the
+ * next tile peeks (`.ep-tiles` in episode.css).
+ */
+export interface Props {
+  items: Array<{ href: string; number: string; title: string; art: string }>;
+  label: string;
+}
+
+const { items, label } = Astro.props;
+---
+
+<ul aria-label={label} class="ep-tiles">
+  {
+    items.map((item) => (
+      <li>
+        <a class="ep-tile" href={item.href}>
+          <span class="ep-tile-art">
+            <img
+              alt=""
+              height="320"
+              loading="lazy"
+              src={item.art}
+              width="320"
+            />
+            <span class="ep-tile-chip">{item.number}</span>
+          </span>
+          <span class="ep-tile-title">{item.title}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>

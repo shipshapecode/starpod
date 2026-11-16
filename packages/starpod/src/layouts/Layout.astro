@@ -7,14 +7,21 @@ import SpeedInsights from '@vercel/speed-insights/astro';
 import { getPublicationAtUri } from '@bryanguffey/astro-standard-site';
 
 import Breadcrumbs from 'virtual:starpod/components/Breadcrumbs';
-import Dots from 'virtual:starpod/components/Dots';
 import Hosts from 'virtual:starpod/components/Hosts';
 import InfoCard from 'virtual:starpod/components/InfoCard';
 import Platforms from 'virtual:starpod/components/Platforms';
-import Player from '../components/Player';
+import ShowArtwork from 'virtual:starpod/components/ShowArtwork';
+import Island from '../components/media/Island';
 import SearchButton from '../components/SearchButton';
 import SearchDialog from '../components/SearchDialog';
-import ShowArtwork from 'virtual:starpod/components/ShowArtwork';
+import { loadPeople } from '../components/explorer/archive';
+import {
+  CloseIcon,
+  FollowIcon,
+  ListIcon,
+  MoreIcon,
+  RailIcon
+} from '../components/icons';
 
 import { getShowInfo } from '../lib/rss';
 import starpodConfig from 'virtual:starpod/config';
@@ -25,6 +32,13 @@ import '../styles/global.css';
 import 'virtual:starpod/user-css';
 
 const show = await getShowInfo();
+// The palette's people: the explorer's With filter choices. The show's first
+// two hosts wear their transcript voices' colours, as on the About posters.
+const hostNames = starpodConfig.hosts.map((host) => host.name);
+const people = (await loadPeople()).map((person) => {
+  const voice = hostNames.indexOf(person.label);
+  return voice === 0 || voice === 1 ? { ...person, voice } : person;
+});
 
 export interface Props {
   /**
@@ -41,6 +55,8 @@ const { imageUrl, title } = Astro.props;
 const canonicalURL =
   Astro.props.canonicalURL ?? new URL(Astro.url.pathname, Astro.site);
 const description = Astro.props.description ?? starpodConfig.description;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isHome = path === '/';
 
 // standard.site publication discovery hint. Bluesky's AppView needs this
 // `<link rel="site.standard.publication">` tag on every page (home + episodes)
@@ -59,10 +75,27 @@ const publicationLinkTag =
 ---
 
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" data-world="stage" data-props-typed>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The sidebar's state, applied before first paint so a collapsed rail
+         never flashes open. Navigations carry it over in astro:before-swap. -->
+    <script is:inline>
+      {
+        let rail = 'expanded';
+        try {
+          if (localStorage.getItem('starpod:rail') === 'collapsed')
+            rail = 'collapsed';
+        } catch {
+          // No storage (private mode): the rail opens expanded.
+        }
+        document.documentElement.dataset.rail = rail;
+      }
+    </script>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <meta name="generator" content={Astro.generator} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
@@ -85,12 +118,12 @@ const publicationLinkTag =
     <link rel="manifest" href="/site.webmanifest" />
     <meta
       name="theme-color"
-      content="#ffffff"
+      content="oklch(97.65% 0.005 274.97)"
       media="(prefers-color-scheme: light)"
     />
     <meta
       name="theme-color"
-      content="#1a1a1a"
+      content="oklch(13.85% 0.025 273.24)"
       media="(prefers-color-scheme: dark)"
     />
 
@@ -112,8 +145,9 @@ const publicationLinkTag =
     <meta property="og:site_name" content={show.title} />
 
     <link rel="preload" as="image" href={show.image} />
-
-    <Font cssVariable="--astro-font-inter" preload />
+    <Font cssVariable="--astro-font-familjen" preload />
+    <Font cssVariable="--astro-font-archivo" />
+    <Font cssVariable="--astro-font-young-serif" />
 
     <Schema
       slot="head"
@@ -144,82 +178,1030 @@ const publicationLinkTag =
     <slot name="head" />
     <ClientRouter />
   </head>
-  <body
-    class="font-inter text-light-text-body dark:bg-dark-background dark:text-dark-text-body antialiased"
-  >
-    <header
-      class="custom-scrollbar lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
-      transition:persist="sidenav"
-    >
-      <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
-        <div
-          class="bg-light-card dark:bg-dark-card m-2 rounded-lg pt-10 pb-4 lg:pt-16 lg:pb-12"
-        >
-          <ShowArtwork image={show.image} />
+  <body>
+    <!-- Skip links are plain fragment jumps in this document: the router
+         leaves them alone (data-astro-reload), as it would otherwise compare
+         against a location the explorer's pushState has moved on from and
+         fetch and swap the whole page. -->
+    <a class="skip-link" data-astro-reload href="#main">Skip to content</a>
+    <!-- The island sits at the end of the page and this reaches it in one
+         step (it takes focus, its title is next). It is shown only while an
+         episode is loaded, when there is an island (shell.css). -->
+    <a class="skip-link" data-astro-reload href="#player">Skip to the player</a>
 
-          <div class="px-4 sm:px-6 md:px-4 lg:px-16">
-            <p
-              class="text-light-text-heading mt-8 text-center text-2xl font-bold lg:text-left dark:text-white"
+    <div class="app">
+      <!-- The divider between the rail and the page, and the only anchor the
+           layout hangs on (demos/split.html): drag it, fling it, double-click
+           it, or step it with the arrow keys. It comes first: a fixed box can
+           only anchor to a fixed box laid out before it. -->
+      <div
+        aria-controls="rail"
+        aria-label="Resize sidebar"
+        aria-orientation="vertical"
+        aria-valuemax="272"
+        aria-valuemin="72"
+        aria-valuenow="272"
+        class="rail-edge PropFLIP"
+        role="separator"
+        tabindex="0"
+        {...{ 'data-⚓️-name': '--rail-edge' }}
+      >
+      </div>
+
+      <!-- The rail rides the divider: its right edge is anchored to
+           --rail-edge, the one line that holds the layout (rail.css). -->
+      <aside
+        aria-label="Show"
+        class="rail"
+        id="rail"
+        {...{
+          'data-⚓️-to': '--rail-edge',
+          'data-⚓️-before': '',
+          'data-⚓️-pin-leading': '',
+          'data-⚓️-pin-y': ''
+        }}
+      >
+        <div class="rail-in">
+          <div class="rail-head">
+            <span
+              class="rail-slot rail-slot-art"
+              {...{ 'data-⚓️-name': '--slot', 'data-⚓️-scope-name': '--slot' }}
             >
-              {show.title}
+              <div
+                class="rail-art"
+                data-tip={show.title}
+                {...{ 'data-⚓️-to': '--slot', 'data-⚓️-fill': '' }}
+              >
+                <ShowArtwork image={show.image} />
+                <!-- The now-playing ring holds the media clock itself: the art
+                     is an anchored piece, and a write to it re-lays them all. -->
+                <i
+                  aria-hidden="true"
+                  class="rail-ring"
+                  data-props-for="media-clock"></i>
+              </div>
+            </span>
+            <span
+              class="rail-slot rail-slot-toggle"
+              {...{ 'data-⚓️-name': '--slot', 'data-⚓️-scope-name': '--slot' }}
+            >
+              <button
+                aria-controls="rail"
+                aria-expanded="true"
+                aria-keyshortcuts="["
+                aria-label="Sidebar"
+                class="rail-toggle"
+                data-tip="Collapse sidebar"
+                data-tip-key="["
+                type="button"
+                {...{ 'data-⚓️-to': '--slot', 'data-⚓️-fill': '' }}
+              >
+                <RailIcon />
+              </button>
+            </span>
+          </div>
+
+          <div class="rail-about">
+            <p class="rail-title">
+              <a href="/">{show.title}</a>
             </p>
-
-            <p class="mt-2 text-center text-lg lg:text-left">
-              {starpodConfig.blurb}
-            </p>
+            <p class="rail-blurb">{starpodConfig.blurb}</p>
           </div>
 
-          <div class="px-4 sm:px-6 md:px-4 lg:px-16">
-            <Platforms />
-          </div>
-          <div class="hidden lg:block">
-            <Hosts />
-          </div>
-        </div>
-
-        <div class="hidden lg:block">
-          <InfoCard />
-        </div>
-      </div>
-    </header>
-    <main
-      class="bg-light-card dark:bg-dark-card mx-2 mb-2 rounded-lg lg:relative lg:ml-112 lg:min-h-screen xl:ml-120"
-    >
-      <div class="absolute top-4 right-4 z-30">
-        <SearchButton client:load />
-      </div>
-      <div class="relative mt-2 pt-16">
-        <div
-          class="bg-gradient-light dark:bg-gradient-dark absolute top-0 right-0 left-0 z-0 h-80 w-full opacity-30"
-        >
-        </div>
-
-        <Dots />
-
-        <div class="max-w-4xl">
           <div
-            class:list={[
-              'dark:border-dark-border relative z-20 mb-12 border-b pb-6 lg:mb-16 lg:pb-10',
-              Astro.url.pathname === '/' && 'hidden'
-            ]}
+            class="rail-slot rail-slot-search"
+            {...{ 'data-⚓️-name': '--slot', 'data-⚓️-scope-name': '--slot' }}
           >
-            <div class="ml-8 lg:ml-18">
-              <Breadcrumbs title={title} />
+            <div
+              class="rail-search"
+              data-tip="Search episodes"
+              data-tip-key="⌘K"
+              {...{ 'data-⚓️-to': '--slot', 'data-⚓️-fill': '' }}
+            >
+              <SearchButton client:load />
             </div>
           </div>
 
-          <slot />
+          <nav aria-label="Main" class="rail-nav">
+            <span
+              class="rail-slot"
+              {...{ 'data-⚓️-name': '--slot', 'data-⚓️-scope-name': '--slot' }}
+            >
+              <a
+                aria-current={isHome ? 'page' : undefined}
+                data-tip
+                href="/"
+                {...{ 'data-⚓️-to': '--slot', 'data-⚓️-fill': '' }}
+              >
+                <ListIcon />
+                <span data-props-for="truncated">Episodes</span>
+              </a>
+            </span>
+            <InfoCard anchored />
+            <!-- One highlight for the nav: hovered, focused, or current. -->
+            <i aria-hidden="true" class="rail-hl"></i>
+          </nav>
+
+          <!-- The now-playing island's rail home; the player sizes it. -->
+          <i class="rail-island-slot" {...{ 'data-⚓️-name': '--home-rail' }}
+          ></i>
+
+          <div class="rail-follow">
+            <p
+              class="rail-label"
+              {...{
+                'data-⚓️-to': '--rail-platforms',
+                'data-⚓️-above': '',
+                'data-⚓️-align-leading': ''
+              }}
+            >
+              Follow the show
+            </p>
+            <!-- The group's own place, kept by the layout so an overriding
+                 component only renders content: it names the anchor the
+                 label, stack and flyout ride, and the icon rail makes it
+                 inert. The built-in list names the same anchor on itself,
+                 and the later name in the tree wins, so it rides its list. -->
+            <div
+              class="rail-follow-body"
+              {...{ 'data-⚓️-name': '--rail-platforms' }}
+            >
+              <Platforms anchored />
+            </div>
+            <button
+              aria-label="Follow the show"
+              class="rail-stack"
+              data-tip="Follow the show"
+              {...{ 'data-⚓️-to': '--rail-platforms', 'data-⚓️-fill': '' }}
+              popovertarget="rail-follow-fly"
+              type="button"></button>
+          </div>
+
+          <div class="rail-hosts">
+            <!-- As for the platforms: the stack and flyout's anchor and the
+                 inert hook, whatever the Hosts component renders. -->
+            <div
+              class="rail-hosts-body"
+              {...{ 'data-⚓️-name': '--rail-hosts' }}
+            >
+              <Hosts anchored />
+            </div>
+            <button
+              aria-label="Hosted by"
+              class="rail-stack"
+              data-tip="Hosted by"
+              {...{ 'data-⚓️-to': '--rail-hosts', 'data-⚓️-fill': '' }}
+              popovertarget="rail-hosts-fly"
+              type="button"></button>
+          </div>
         </div>
-      </div>
-    </main>
-    <footer class="block lg:hidden">
-      <Hosts />
-      <InfoCard />
-    </footer>
-    <div id="audio-player">
-      <Player client:only="preact" transition:persist="player" />
+      </aside>
+
+      <header class="topbar">
+        <a class="topbar-show" href="/">
+          <img alt="" height="36" src={show.image} width="36" />
+          <span>{show.title}</span>
+        </a>
+        <button
+          class="topbar-follow"
+          popovertarget="follow-sheet"
+          type="button"
+        >
+          <FollowIcon size={18} />
+          <span>Follow</span>
+        </button>
+      </header>
+
+      <main id="main" class:list={['main relative', !isHome && 'main-page']}>
+        {
+          !isHome && (
+            <div class="crumbs">
+              <Breadcrumbs title={title} />
+            </div>
+          )
+        }
+        <slot />
+      </main>
     </div>
-    <SearchDialog client:load transition:persist="search-dialog" />
+
+    <div class="dock" transition:persist="dock">
+      <!-- Where the picture may float: the screen between the chrome. Its
+           corners are the picture-in-picture places (player.css). -->
+      <i aria-hidden="true" class="player-room" data-player-room></i>
+      <i aria-hidden="true" class="pip-zone" data-pip-zone="se"></i>
+      <i aria-hidden="true" class="pip-zone" data-pip-zone="sw"></i>
+      <i aria-hidden="true" class="pip-zone" data-pip-zone="nw"></i>
+      <i aria-hidden="true" class="pip-zone" data-pip-zone="ne"></i>
+      <!-- The island's homes: empty stations it fills (the fourth, the
+           rail's, is in the sidebar). player.css places them. -->
+      <i aria-hidden="true" class="island-home" data-home="pill" {...{ 'data-⚓️-name': '--home-pill' }}></i>
+      <i aria-hidden="true" class="island-home" data-home="dock" {...{ 'data-⚓️-name': '--home-dock' }}></i>
+      <i aria-hidden="true" class="island-home" data-home="card" {...{ 'data-⚓️-name': '--home-card' }}></i>
+      <Island client:only="preact" />
+      <script>
+        // The media clock's source, registered ahead of prop-for-that/auto so
+        // markup that asks for it binds without a warning (publish.ts).
+        import '../components/media/publish';
+        // Who is speaking, lit wherever they appear, on every page.
+        import '../components/episode/speaking-source';
+      </script>
+    </div>
+    <!-- The picture in the air, outside the fixed dock so that on its stage it
+         can scroll with the page. After the player (its cell is an anchor for
+         the picture) and before the picture's bar (anchored to the picture). -->
+    <div class="player-air" transition:persist="player-air">
+      <div
+        class="player-media"
+        data-parked
+        data-player-media
+        data-station="corner"
+      >
+        <div
+          class="player-media-box PropFLIP"
+          data-props-hover="pointer-local"
+          title="Open episode"
+        >
+          <div class="player-media-frame" data-media-dock></div>
+        </div>
+        <i aria-hidden="true" class="player-glow"></i>
+      </div>
+      <div data-pip-bar-host></div>
+    </div>
+
+    <nav aria-label="Main" class="tabbar">
+      <a aria-current={isHome ? 'page' : undefined} href="/">
+        <ListIcon />
+        <span>Episodes</span>
+      </a>
+      <SearchButton client:load variant="tab" />
+      <button popovertarget="more-sheet" type="button">
+        <MoreIcon />
+        <span>More</span>
+      </button>
+    </nav>
+
+    <div class="sheet" id="follow-sheet" popover>
+      <div class="sheet-head">
+        <p class="sheet-title">Follow {show.title}</p>
+        <button
+          aria-label="Close"
+          class="sheet-close"
+          popovertarget="follow-sheet"
+          popovertargetaction="hide"
+          type="button"
+        >
+          <CloseIcon size={20} />
+        </button>
+      </div>
+      <Platforms />
+    </div>
+    <div class="sheet" id="more-sheet" popover>
+      <div class="sheet-head">
+        <p class="sheet-title">{show.title}</p>
+        <button
+          aria-label="Close"
+          class="sheet-close"
+          popovertarget="more-sheet"
+          popovertargetaction="hide"
+          type="button"
+        >
+          <CloseIcon size={20} />
+        </button>
+      </div>
+      <nav aria-label="More" class="sheet-nav">
+        <InfoCard />
+      </nav>
+      <p class="rail-label">Follow the show</p>
+      <Platforms />
+    </div>
+
+    <!-- The collapsed rail's names and flyouts. One tooltip travels between
+         the icons; each stack opens a flyout that flips up near the bottom. -->
+    <div
+      aria-hidden="true"
+      class="rail-tip"
+      {...{ 'data-⚓️-to': '--rail-tip-at', 'data-⚓️-side': 'after' }}
+      id="rail-tip"
+      popover="hint"
+    >
+      <span class="rail-tip-box"><span></span><kbd></kbd></span>
+    </div>
+    <div
+      class="rail-fly"
+      {...{
+        'data-⚓️-to': '--rail-platforms',
+        'data-⚓️-side': 'after',
+        'data-⚓️-align-top': '',
+        'data-⚓️-try': 'flip-y'
+      }}
+      id="rail-follow-fly"
+      popover
+    >
+      <div class="rail-fly-box">
+        <p class="rail-fly-title">Follow the show</p>
+        <Platforms />
+      </div>
+    </div>
+    <div
+      class="rail-fly"
+      {...{
+        'data-⚓️-to': '--rail-hosts',
+        'data-⚓️-side': 'after',
+        'data-⚓️-align-top': '',
+        'data-⚓️-try': 'flip-y'
+      }}
+      id="rail-hosts-fly"
+      popover
+    >
+      <div class="rail-fly-box">
+        <Hosts />
+      </div>
+    </div>
+
+    <SearchDialog
+      client:load
+      people={people}
+      transition:persist="search-dialog"
+    />
     <SpeedInsights />
+
+    <script>
+      // The sidebar is held by one divider (demos/split.html). While it is
+      // held the layout is one number: the divider's x, written to the line
+      // and to the page's column, and the rail (anchored to the line) follows
+      // in CSS, re-forming by its own width. Letting go projects the throw,
+      // picks a stop and PropFLIPs only the divider there; the rail rides it,
+      // the page re-lays once and glides, and other areas' registered boxes
+      // flip. The toggle, "[", double-click and the arrow keys take the same
+      // glide. Also runs the collapsed rail's travelling tooltip.
+      import { flipLayout, nudge, reducedMotion } from '../motion/propflip';
+
+      const root = document.documentElement;
+      const wide = window.matchMedia('(min-width: 1024px)');
+      const anchors = CSS.supports(
+        'anchor-name',
+        'attr(data-a type(<custom-ident>))'
+      );
+      // The tooltip needs only plain anchor positioning (rail.css places it
+      // without attributes where typed attr() is missing).
+      const placeable = CSS.supports('anchor-name', '--a');
+      const collapsed = () => root.dataset.rail === 'collapsed';
+      const $ = (selector: string) =>
+        document.querySelector<HTMLElement>(selector);
+      // The two stops, from rail.css; the rail re-forms halfway between them.
+      // Read once: a computed-style read here, on every move of a drag and in
+      // every settle, would force a style recalc each time.
+      let railStops: number[] | null = null;
+      const stops = () =>
+        (railStops ??= ['--rail-shut', '--rail-open'].map((name) =>
+          parseFloat(getComputedStyle(root).getPropertyValue(name))
+        ));
+      const nearest = (x: number, snaps: number[]) =>
+        snaps.reduce((a, b) => (Math.abs(b - x) < Math.abs(a - x) ? b : a));
+      const tip = () => document.getElementById('rail-tip');
+      const tipText = (el: HTMLElement) =>
+        el.dataset.tip || el.textContent?.trim() || '';
+      let tipTimer = 0;
+
+      function sync() {
+        const shut = collapsed();
+        const toggle = document.querySelector<HTMLElement>('.rail-toggle');
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', String(!shut));
+          toggle.dataset.tip = shut ? 'Expand sidebar' : 'Collapse sidebar';
+        }
+        // Stacked, the platform and host links sit under the stack's button.
+        document
+          .querySelectorAll<HTMLElement>('.rail-follow-body, .rail-hosts-body')
+          .forEach((list) => (list.inert = shut));
+        $('.rail-edge')?.setAttribute(
+          'aria-valuenow',
+          String(stops()[shut ? 0 : 1])
+        );
+        // Without anchored tooltips, native titles name the icons.
+        if (!placeable) {
+          document
+            .querySelectorAll<HTMLElement>('.rail [data-tip], .rail-nav a')
+            .forEach((el) => {
+              el.title = shut || el === toggle ? tipText(el) : '';
+            });
+        }
+      }
+
+      // Held: one number, on the line and the page's column (never on :root,
+      // which would restyle the whole page every frame).
+      function apply(x: number) {
+        $('.rail-edge')!.style.left = `${x}px`;
+        $('.app')!.style.gridTemplateColumns = `${x}px minmax(0, 1fr)`;
+        $('.rail-edge')!.setAttribute('aria-valuenow', String(Math.round(x)));
+      }
+
+      // The rail's form while held: the icon rail below the middle. At a
+      // change the filling pieces are anchored again first (data-reforming
+      // lets them out of the flow), so the re-form travels from where they
+      // are, then holds for long enough to land.
+      function form(narrow: boolean, travel: boolean) {
+        const next = narrow ? 'icons' : 'open';
+        if (travel) {
+          reform();
+        }
+        root.dataset.railForm = next;
+      }
+
+      // The pieces sit in their slots in flow at rest (rail.css). A re-form
+      // anchors them again (data-reforming) so they travel from where they
+      // are, and lets them back into flow once they have landed (their
+      // longest leg, stagger included, at the page's --slomo). The switch
+      // itself takes no transition (data-anchoring, held for one style
+      // flush): only the change of form that follows travels. The hold is
+      // timed from the frame after the one that draws the change, as the
+      // legs are: a slow first frame would otherwise cut their ends short.
+      let reformed = 0;
+      function reform() {
+        const rail = $('.rail')!;
+        rail.dataset.anchoring = '';
+        rail.dataset.reforming = '';
+        void getComputedStyle(rail).transitionDuration;
+        delete rail.dataset.anchoring;
+        clearTimeout(reforming);
+        const slomo =
+          parseFloat(getComputedStyle(root).getPropertyValue('--slomo')) || 1;
+        const at = ++reformed;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            if (at === reformed) {
+              reforming = window.setTimeout(
+                () => delete rail.dataset.reforming,
+                760 * slomo
+              );
+            }
+          })
+        );
+      }
+
+      // A click on the toggle or a release settles in the next frame: the
+      // input event returns at once, and the flip's measurement at the new
+      // width lands in the frame that lays the page out there anyway. Keys
+      // and double-clicks settle at once, so the divider's value is right as
+      // they return; any settle replaces one still waiting.
+      let settleFrame = 0;
+      let settleTo: number | null = null;
+      function settleSoon(width: number) {
+        cancelAnimationFrame(settleFrame);
+        settleTo = width;
+        settleFrame = requestAnimationFrame(() => settle(width));
+      }
+      // Collapsed, counting a settle still waiting for its frame.
+      const shutSoon = () => {
+        const [shut, open] = stops();
+        return settleTo === null ? collapsed() : settleTo < (shut + open) / 2;
+      };
+
+      // Glide the divider to a stop. The page's column snaps there, the page
+      // glides in from where it was (picking up mid-flight), and the divider
+      // and every registered box flip; the rail rides the divider.
+      function settle(width: number) {
+        cancelAnimationFrame(settleFrame);
+        settleTo = null;
+        const [shut, open] = stops();
+        const next = width < (shut + open) / 2 ? 'collapsed' : 'expanded';
+        try {
+          localStorage.setItem('starpod:rail', next);
+        } catch {
+          // No storage: the choice lasts for this page only.
+        }
+        hideTip();
+        document
+          .querySelectorAll<HTMLElement>('.rail-fly:popover-open')
+          .forEach((fly) => fly.hidePopover());
+        const main = $('.main');
+        const rest = () => {
+          root.dataset.rail = next;
+          delete root.dataset.railForm;
+          $('.rail-edge')?.style.removeProperty('left');
+          $('.app')?.style.removeProperty('grid-template-columns');
+        };
+        if (!wide.matches || !anchors || reducedMotion() || !main) {
+          rest();
+          main?.style.removeProperty('translate');
+          sync();
+          return;
+        }
+        // Where the page column starts now (its grid column, plus any glide
+        // or ride in progress) and where it will start: known numbers, so
+        // nothing here forces a layout of the page.
+        const shift =
+          main.dataset.gliding || main.style.translate
+            ? parseFloat(getComputedStyle(main).translate) || 0
+            : 0;
+        const column = parseFloat($('.app')!.style.gridTemplateColumns);
+        const from =
+          (Number.isNaN(column) ? stops()[collapsed() ? 0 : 1]! : column) +
+          shift;
+        // The page column starts its glide where it was, set inside the
+        // update so the flip's own commit (the one reflow) commits it too.
+        // (Boxes in the column are measured against it, so its translate
+        // never reads as a move.)
+        // Anchored again before the flip's first read, so the pieces travel
+        // from their slots now to their slots in the new form.
+        reform();
+        const moves = flipLayout(
+          () => {
+            rest();
+            main.style.transition = 'none';
+            main.style.translate = `${from - width}px 0`;
+            main.dataset.gliding = '';
+          },
+          {
+            frame: (el) => (main.contains(el) ? main : null),
+            extra: [$('.rail-edge')]
+          }
+        );
+        // Nothing moved, so nothing was committed: a style flush is enough to
+        // start from here (a layout flush would re-lay every anchored box).
+        if (!moves.length) {
+          void getComputedStyle(main).translate;
+        }
+        main.style.transition = '';
+        main.style.translate = '';
+        main.ontransitionend = (event) => {
+          if (event.target === main) {
+            delete main.dataset.gliding;
+          }
+        };
+        sync();
+      }
+
+      // Grabbing mid-glide: make the layout equal what is on screen (the
+      // divider where its pixels are, the page column under it) with no
+      // transition, and carry on from there.
+      function freeze() {
+        const edge = $('.rail-edge')!;
+        const main = $('.main')!;
+        const x = edge.getBoundingClientRect().left;
+        // At rest there is nothing in flight to catch, and nothing to measure.
+        if (!main.dataset.gliding && !edge.getAnimations().length) {
+          apply(x);
+          return { x, caught: false };
+        }
+        flipLayout(
+          () => {
+            edge.style.transition = 'none';
+            nudge(edge, { tx: 0, ty: 0, sx: 1, sy: 1 });
+            main.style.transition = 'none';
+            main.style.translate = '';
+            delete main.dataset.gliding;
+            apply(x);
+          },
+          { frame: (el) => (main.contains(el) ? main : null) }
+        );
+        void edge.offsetWidth;
+        edge.style.transition = '';
+        main.style.transition = '';
+        return { x, caught: true };
+      }
+
+      type Drag = {
+        x0: number;
+        w0: number;
+        // Where the hand wants the divider, and the frame that will put it
+        // there (0 when none is waiting).
+        x: number;
+        frame: number;
+        samples: Array<[number, number]>;
+        moved: boolean;
+        narrow: boolean;
+        costs: number[];
+        ride: boolean;
+      };
+      let drag: Drag | null = null;
+      let reforming = 0;
+
+      document.addEventListener('pointerdown', (event) => {
+        const edge = (event.target as Element).closest<HTMLElement>(
+          '.rail-edge'
+        );
+        if (!edge || event.button) {
+          return;
+        }
+        // No text selection, no native drag: on a long page either costs more
+        // than the whole layout. A settle still waiting is the hand's now.
+        event.preventDefault();
+        cancelAnimationFrame(settleFrame);
+        settleTo = null;
+        edge.setPointerCapture(event.pointerId);
+        const { x: w0, caught } = freeze();
+        const [shut, open] = stops();
+        const rail = $('.rail')!;
+        const narrow = w0 < (shut + open) / 2;
+        // Caught mid-glide, pieces in flight finish travelling, and a rail
+        // held on the far side of the middle from its form re-forms.
+        const inFlight = caught || narrow !== collapsed();
+        edge.dataset.held = '';
+        rail.dataset.held = '';
+        form(narrow, inFlight);
+        // For anything riding --rail-edge that would otherwise ease after it
+        // (an attribute on the root restyles only what selects on it).
+        root.dataset.railHeld = '';
+        drag = {
+          x0: event.clientX,
+          w0,
+          x: w0,
+          frame: 0,
+          samples: [[event.timeStamp, event.clientX]],
+          moved: false,
+          narrow,
+          costs: [],
+          ride: false
+        };
+      });
+
+      // A move only records the hand; the next frame puts the divider and the
+      // page's column there, once however many moves arrive. Writing the width
+      // in the event would leave layout dirty for whatever reads boxes in the
+      // same event (prop-for-that's pointer-local does, for whatever is
+      // hovered), forcing a layout of the page on every move.
+      document.addEventListener('pointermove', (event) => {
+        if (!drag) {
+          return;
+        }
+        const dx = event.clientX - drag.x0;
+        drag.moved ||= Math.abs(dx) > 3;
+        drag.samples.push([event.timeStamp, event.clientX]);
+        while (
+          drag.samples.length > 2 &&
+          event.timeStamp - drag.samples[0]![0] > 100
+        ) {
+          drag.samples.shift();
+        }
+        const [shut, open] = stops();
+        drag.x = Math.min(open + 48, Math.max(shut, drag.w0 + dx));
+        drag.frame ||= requestAnimationFrame(follow);
+      });
+
+      function follow() {
+        if (!drag) {
+          return;
+        }
+        drag.frame = 0;
+        const { x } = drag;
+        const [shut, open] = stops();
+        const main = $('.main')!;
+        if (drag.ride) {
+          // Too long a page to re-lay every frame: the line and the rail
+          // follow the hand, the page rides on a translate and re-lays once
+          // when it is let go.
+          $('.rail-edge')!.style.left = `${x}px`;
+          $('.rail-edge')!.setAttribute('aria-valuenow', String(Math.round(x)));
+          main.style.translate = `${x - drag.w0}px 0`;
+        } else {
+          // The page re-lays under the hand while that fits in a frame: the
+          // first few frames are timed, and a page that takes longer rides.
+          // (Without anchors the rail is the grid's column, so it never does.)
+          const start = performance.now();
+          apply(x);
+          if (anchors && drag.costs.length < 3) {
+            void main.offsetWidth;
+            drag.costs.push(performance.now() - start);
+            if (
+              drag.costs.length === 3 &&
+              [...drag.costs].sort((a, b) => a - b)[1]! > 8
+            ) {
+              drag.ride = true;
+              $('.app')!.style.gridTemplateColumns =
+                `${drag.w0}px minmax(0, 1fr)`;
+              main.style.translate = `${x - drag.w0}px 0`;
+            }
+          }
+        }
+        // Crossing halfway re-forms the rail; its pieces travel for that,
+        // then sit in their slots again.
+        const narrow = x < (shut + open) / 2;
+        if (narrow !== drag.narrow) {
+          drag.narrow = narrow;
+          form(narrow, true);
+        }
+      }
+
+      // Letting go: the last 100ms of movement is a velocity; a throw coasts
+      // about 220ms, and the stop nearest where it would come to rest wins. A
+      // hand that stopped before lifting threw nothing.
+      function release(event: PointerEvent) {
+        if (!drag) {
+          return;
+        }
+        const [[t0, x0], [t1, x1]] = [drag.samples[0]!, drag.samples.at(-1)!];
+        const v =
+          t1 > t0 && event.timeStamp - t1 < 80 ? (x1 - x0) / (t1 - t0) : 0;
+        // Where the hand let go, though the frame showing it may not have
+        // come: that frame is dropped, and the glide starts from what is on
+        // screen.
+        cancelAnimationFrame(drag.frame);
+        const { x } = drag;
+        const target = drag.moved
+          ? nearest(x + v * 220, stops())
+          : stops()[collapsed() ? 0 : 1]!;
+        drag = null;
+        delete $('.rail-edge')!.dataset.held;
+        delete $('.rail')!.dataset.held;
+        delete root.dataset.railHeld;
+        settleSoon(target);
+      }
+      document.addEventListener('pointerup', release);
+      document.addEventListener('pointercancel', release);
+      // Capture can go without an up or a cancel (the pointer's page lost
+      // focus, say): the hold still ends.
+      document.addEventListener('lostpointercapture', release);
+
+      document.addEventListener('dblclick', (event) => {
+        if ((event.target as Element).closest('.rail-edge')) {
+          settle(stops()[shutSoon() ? 1 : 0]!);
+        }
+      });
+
+      function showTip(el: HTMLElement) {
+        const box = tip();
+        if (!placeable || !box) {
+          return;
+        }
+        clearTimeout(tipTimer);
+        document.querySelector('[data-tip-at]')?.removeAttribute('data-tip-at');
+        el.setAttribute('data-tip-at', '');
+        box.querySelector('.rail-tip-box > span')!.textContent = tipText(el);
+        box.querySelector('kbd')!.textContent = el.dataset.tipKey ?? '';
+        if (!box.matches(':popover-open')) {
+          box.showPopover();
+        }
+      }
+
+      function hideTip() {
+        clearTimeout(tipTimer);
+        const box = tip();
+        if (box?.matches(':popover-open')) {
+          box.hidePopover();
+        }
+      }
+
+      // Icons are named while collapsed, and the toggle always is. Open, a
+      // link is named only when prop-for-that reports its label clipped.
+      const clipped = (el: HTMLElement) => {
+        const label = el.querySelector('[data-props-for~="truncated"]');
+        return (
+          !!label &&
+          getComputedStyle(label)
+            .getPropertyValue('--live-truncated')
+            .trim() === '1'
+        );
+      };
+      function tipTarget(node: EventTarget | null) {
+        // A nav link from an overriding component may not carry data-tip;
+        // its text names it.
+        const el = (node as Element | null)?.closest?.<HTMLElement>(
+          '.rail [data-tip], .rail-nav a'
+        );
+        return el &&
+          wide.matches &&
+          (collapsed() || el.matches('.rail-toggle') || clipped(el))
+          ? el
+          : null;
+      }
+
+      const typing = (node: EventTarget | null) =>
+        Boolean(
+          (node as Element | null)?.closest?.(
+            'input, textarea, select, [contenteditable=""], [contenteditable="true"]'
+          )
+        );
+
+      document.addEventListener('click', (event) => {
+        if ((event.target as Element).closest('.rail-toggle')) {
+          settleSoon(stops()[shutSoon() ? 1 : 0]!);
+        }
+      });
+
+      // A touch has no hover: the first tap on the hosts' stack fans it out
+      // (instead of following a link), and a tap anywhere else gathers it.
+      let pointerType = '';
+      document.addEventListener(
+        'pointerdown',
+        (event) => (pointerType = event.pointerType),
+        { capture: true }
+      );
+      document.addEventListener('click', (event) => {
+        const hosts = $('.rail-hosts');
+        if (!hosts) {
+          return;
+        }
+        const inside = hosts.contains(event.target as Node);
+        if (
+          inside &&
+          pointerType === 'touch' &&
+          !collapsed() &&
+          !('open' in hosts.dataset)
+        ) {
+          event.preventDefault();
+          hosts.dataset.open = '';
+        } else if (!inside) {
+          delete hosts.dataset.open;
+        }
+      });
+
+      // "[" toggles the sidebar (the player owns K, J, L, M, W, F and space);
+      // on the divider, the arrow keys (and Home/End) step between the stops
+      // and Enter toggles, as a window splitter does.
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          hideTip();
+        }
+        // A held modifier belongs to the browser or system (Alt+Left is Back
+        // on Windows and Linux), so it never steps the divider.
+        const modified = event.altKey || event.ctrlKey || event.metaKey;
+        const step = {
+          ArrowLeft: 0,
+          Home: 0,
+          ArrowRight: 1,
+          End: 1,
+          Enter: shutSoon() ? 1 : 0
+        }[event.key];
+        if (
+          step !== undefined &&
+          !modified &&
+          (event.target as Element).closest?.('.rail-edge')
+        ) {
+          event.preventDefault();
+          settle(stops()[step]!);
+          return;
+        }
+        if (
+          event.key !== '[' ||
+          event.metaKey ||
+          event.ctrlKey ||
+          event.altKey ||
+          event.defaultPrevented ||
+          !wide.matches ||
+          typing(event.target) ||
+          document.querySelector(':modal') ||
+          // The now-playing card is modal too (an ARIA dialog over an inert
+          // page, not a <dialog>, so :modal doesn't see it).
+          root.dataset.island === 'card'
+        ) {
+          return;
+        }
+        event.preventDefault();
+        settle(stops()[shutSoon() ? 1 : 0]!);
+      });
+
+      // The first name waits a beat; moving along the rail, it travels.
+      document.addEventListener('pointerover', (event) => {
+        const el = tipTarget(event.target);
+        if (!el || event.pointerType === 'touch') {
+          return;
+        }
+        clearTimeout(tipTimer);
+        if (tip()?.matches(':popover-open')) {
+          showTip(el);
+        } else {
+          tipTimer = window.setTimeout(() => showTip(el), 350);
+        }
+      });
+      document.addEventListener('pointerout', (event) => {
+        const el = tipTarget(event.target);
+        if (el && !el.contains(event.relatedTarget as Node | null)) {
+          clearTimeout(tipTimer);
+          tipTimer = window.setTimeout(hideTip, 150);
+        }
+      });
+      document.addEventListener('pointerdown', hideTip);
+
+      // Pointer-local reads a box and writes three properties on every pointer
+      // move anywhere on the page, for every element bound to it. So these
+      // bind only while hovered: an element with data-props-hover="…" takes
+      // those tokens into data-props-for on pointerenter, and gives them back
+      // a beat after pointerleave, once what they drive has eased out. Unbound,
+      // prop-for-that removes its values and the CSS falls back to rest.
+      // Two capturing listeners for the page, no reads of layout.
+      const hoverRelease = new WeakMap<Element, number>();
+      function hoverBind(el: HTMLElement, on: boolean) {
+        const tokens = el.dataset.propsHover!.split(/\s+/);
+        const apply = () => {
+          const now = el.getAttribute('data-props-for') ?? '';
+          const list = new Set(now.split(/\s+/).filter(Boolean));
+          tokens.forEach((token) =>
+            on ? list.add(token) : list.delete(token)
+          );
+          const next = [...list].join(' ');
+          if (next === now) {
+            return;
+          }
+          if (next) {
+            el.setAttribute('data-props-for', next);
+          } else {
+            el.removeAttribute('data-props-for');
+          }
+        };
+        clearTimeout(hoverRelease.get(el));
+        if (on) {
+          apply();
+          return;
+        }
+        const slomo = parseFloat(root.style.getPropertyValue('--slomo')) || 1;
+        hoverRelease.set(el, window.setTimeout(apply, 700 * slomo));
+      }
+      for (const [type, on] of [
+        ['pointerenter', true],
+        ['pointerleave', false]
+      ] as const) {
+        document.addEventListener(
+          type,
+          (event) => {
+            const host = event.target;
+            if (host instanceof HTMLElement && host.dataset.propsHover) {
+              hoverBind(host, on);
+            }
+          },
+          true
+        );
+      }
+
+      // A flyout that flipped up near the bottom moves its caret down to the
+      // stack's last mark. Chrome reads the flip in CSS (an anchored
+      // container query); where that is missing (WebKit), it is measured
+      // once as the flyout opens. (Toggle events don't bubble: capture.)
+      if (!CSS.supports('container-type', 'anchored')) {
+        document.addEventListener(
+          'toggle',
+          (event) => {
+            const fly = event.target as HTMLElement;
+            if (
+              !fly.matches?.('.rail-fly') ||
+              (event as ToggleEvent).newState !== 'open'
+            ) {
+              return;
+            }
+            const stack = document.querySelector(`[popovertarget="${fly.id}"]`);
+            fly.toggleAttribute(
+              'data-flipped',
+              !!stack &&
+                fly.getBoundingClientRect().top <
+                  stack.getBoundingClientRect().top
+            );
+          },
+          true
+        );
+      }
+      // Focus can land mid-way through a flyout closing (it hands focus back
+      // to its stack), so the name follows on the next frame.
+      document.addEventListener('focusin', (event) => {
+        const el = tipTarget(event.target);
+        if (el && (event.target as Element).matches(':focus-visible')) {
+          requestAnimationFrame(
+            () => el.matches(':focus-within') && showTip(el)
+          );
+        }
+      });
+      document.addEventListener('focusout', () => {
+        clearTimeout(tipTimer);
+        tipTimer = window.setTimeout(hideTip, 100);
+      });
+
+      document.addEventListener('astro:before-swap', (event) => {
+        event.newDocument.documentElement.dataset.rail = root.dataset.rail;
+      });
+
+      // Pieces only glide once the fonts have settled the skeleton, so a
+      // first paint never animates.
+      document.addEventListener('astro:page-load', () => {
+        sync();
+        const rail = document.querySelector<HTMLElement>('.rail');
+        document.fonts.ready.then(() =>
+          requestAnimationFrame(() => rail?.setAttribute('data-ready', ''))
+        );
+      });
+    </script>
+
+    <script>
+      // prop-for-that: binds every `data-props-for` element and keeps up with
+      // the DOM, loading each source on demand.
+      import 'prop-for-that/auto';
+    </script>
+
+    <script>
+      // Foldables: when the viewport opens from the cover screen into the
+      // inner "spread" (two segments, or the near-square inner display), the
+      // page unfolds from the hinge once. Purely decorative and skipped under
+      // reduced motion.
+      const spread = window.matchMedia(
+        '(horizontal-viewport-segments: 2), (min-width: 700px) and (max-width: 1180px) and (min-aspect-ratio: 6/5) and (max-aspect-ratio: 8/5) and (max-height: 960px) and (pointer: coarse)'
+      );
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+      spread.addEventListener('change', (event) => {
+        if (!event.matches || calm.matches) {
+          return;
+        }
+        const root = document.documentElement;
+        root.dataset.unfolding = '';
+        window.setTimeout(() => delete root.dataset.unfolding, 1100);
+      });
+    </script>
   </body>
 </html>

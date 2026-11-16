@@ -35,10 +35,10 @@ test('index page has correct meta', async ({ page }) => {
   );
 
   const firstEpisodeThumbnail = page.locator(
-    '[aria-label="EpisodeList"] li:first-of-type > div > img'
+    '[aria-label="Episodes"] li:first-of-type .xp-art img'
   );
   await expect(firstEpisodeThumbnail).toHaveAttribute(
     'src',
-    RegExp('^/_image[?]href=.*w=160&q=75$')
+    RegExp('^/_image[?]href=.*w=320&q=75$')
   );
 });
