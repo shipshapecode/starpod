@@ -111,6 +111,34 @@ export const ArrowOutIcon = (p: IconProps) => (
   </Svg>
 );
 
+export const BagIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5.5 8h13l-1 11.2a1.5 1.5 0 0 1-1.5 1.3H8a1.5 1.5 0 0 1-1.5-1.3Z" />
+    <path d="M9 10.5V7a3 3 0 0 1 6 0v3.5" />
+  </Svg>
+);
+
+export const MegaphoneIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 10v4a1 1 0 0 0 1 1h2.5l7.5 4.5v-15L7.5 9H5a1 1 0 0 0-1 1Z" />
+    <path d="M18.5 9.2a4 4 0 0 1 0 5.6" />
+    <path d="M7.5 15 9 20" />
+  </Svg>
+);
+
+export const HeartIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 19.5s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10Z" />
+  </Svg>
+);
+
+export const LinkIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+    <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+  </Svg>
+);
+
 export const VideoIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect height="11" rx="2" width="13" x="2.5" y="6.5" />

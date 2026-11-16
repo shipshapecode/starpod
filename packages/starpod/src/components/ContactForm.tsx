@@ -1,11 +1,21 @@
 import { useState } from 'preact/hooks';
 
+type Status =
+  | { state: 'idle' }
+  | { state: 'sending' }
+  | { state: 'sent'; message: string }
+  | { state: 'error'; message: string };
+
+const FIELD =
+  'block w-full rounded-xl border border-line bg-surface px-4 py-3 text-ink placeholder:text-muted outline-none! transition-[border-color,box-shadow] duration-200 focus:border-accent focus:ring-4 focus:ring-accent-soft';
+const LABEL = 'text-ink mb-2 block text-sm font-semibold';
+
 export default function ContactForm() {
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [responseMessage, setResponseMessage] = useState('');
+  const [status, setStatus] = useState<Status>({ state: 'idle' });
 
   async function submit(e: SubmitEvent) {
     e.preventDefault();
+    setStatus({ state: 'sending' });
 
     const formData = new FormData(e.target as HTMLFormElement);
     try {
@@ -13,58 +23,91 @@ export default function ContactForm() {
         method: 'POST',
         body: formData
       });
+      const data = await response.json().catch(() => ({}));
+      const message: string | undefined = data.message ?? data.error?.message;
 
-      const data = await response.json();
-
-      if (data.message) {
-        setResponseMessage(data.message);
-      }
-      if (response.ok) {
-        setFormSubmitted(true);
-      }
-    } catch {}
+      setStatus(
+        response.ok
+          ? { state: 'sent', message: message ?? 'Thanks! Your message is on its way.' }
+          : {
+              state: 'error',
+              message: message ?? 'Your message didn’t go through. Please try again.'
+            }
+      );
+    } catch {
+      setStatus({
+        state: 'error',
+        message: 'We couldn’t reach the server. Check your connection and try again.'
+      });
+    }
   }
 
+  if (status.state === 'sent') {
+    return (
+      <div
+        class="border-line bg-surface max-w-xl rounded-2xl border p-6"
+        role="status"
+      >
+        <p class="text-ink m-0 text-lg font-bold">Message sent</p>
+        <p class="text-text mt-1 mb-0">{status.message}</p>
+      </div>
+    );
+  }
+
+  const sending = status.state === 'sending';
+
   return (
-    <>
-      {formSubmitted ? (
-        `${responseMessage}`
-      ) : (
-        <form class="flex flex-col gap-2" onSubmit={submit}>
+    <form class="flex max-w-xl flex-col gap-5" onSubmit={submit}>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label class={LABEL} for="name">
+            Name
+          </label>
+          <input autocomplete="name" class={FIELD} id="name" name="name" required type="text" />
+        </div>
+        <div>
+          <label class={LABEL} for="email">
+            Email
+          </label>
           <input
-            class="input"
-            type="text"
-            id="name"
-            name="name"
-            placeholder="Enter your name"
-            required
-          />
-          <input
-            class="input"
-            type="email"
+            autocomplete="email"
+            class={FIELD}
             id="email"
             name="email"
-            placeholder="Enter your email"
             required
+            type="email"
           />
+        </div>
+      </div>
 
-          <textarea
-            class="input"
-            id="message"
-            name="message"
-            placeholder="Write a message"
-            required
-          />
+      <div>
+        <label class={LABEL} for="message">
+          Message
+        </label>
+        <textarea
+          class={`${FIELD} min-h-40 resize-y`}
+          id="message"
+          name="message"
+          placeholder="A question, a topic for the show, a whiskey we should try…"
+          required
+        />
+      </div>
 
-          <div class="my-6 flex w-full justify-end">
-            <button class="btn w-full justify-center lg:w-auto">
-              <span class="text-light-text-heading rounded-full px-12 py-3 text-center text-sm dark:text-white">
-                Submit
-              </span>
-            </button>
-          </div>
-        </form>
+      {status.state === 'error' && (
+        <p class="text-ink border-line m-0 rounded-xl border px-4 py-3 text-sm" role="alert">
+          {status.message}
+        </p>
       )}
-    </>
+
+      <div>
+        <button
+          class="button-primary w-full justify-center disabled:cursor-progress disabled:opacity-70 sm:w-auto"
+          disabled={sending}
+          type="submit"
+        >
+          {sending ? 'Sending…' : 'Send message'}
+        </button>
+      </div>
+    </form>
   );
 }

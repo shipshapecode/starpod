@@ -8,9 +8,9 @@ export interface Props {
 const { bullets, heading, price } = Astro.props;
 ---
 
-<div class="dark:bg-dark-background relative z-10 mb-6 rounded-lg bg-white p-1">
+<div class="bg-surface relative z-10 mb-6 rounded-lg p-1">
   <h2
-    class="bg-light-card text-light-text-heading dark:bg-dark-card px-5 py-4 font-bold lg:py-6 dark:text-white"
+    class="bg-raised text-ink px-5 py-4 font-bold lg:py-6"
   >
     {heading}
   </h2>
@@ -18,20 +18,20 @@ const { bullets, heading, price } = Astro.props;
   <ul class="list-disc px-8">
     {
       bullets.map((bullet) => {
-        return <li class="dark:border-dark-border border-b py-6">{bullet}</li>;
+        return <li class="border-line border-b py-6">{bullet}</li>;
       })
     }
 
     <h3
-      class="text-light-text-heading mt-8 mb-12 px-5 text-4xl font-bold tabular-nums dark:text-white"
+      class="text-ink mt-8 mb-12 px-5 text-4xl font-bold tabular-nums"
     >
       {price}
       <span
-        class="text-light-text-body dark:text-dark-text-body text-3xl font-light"
+        class="text-text text-3xl font-light"
       >
         /
       </span>
-      <span class="text-light-text-body dark:text-dark-text-body text-2xl">
+      <span class="text-text text-2xl">
         per episode
       </span>
     </h3>
@@ -39,7 +39,7 @@ const { bullets, heading, price } = Astro.props;
     <div class="flex w-full">
       <a class="btn mb-8 w-full justify-center" href="/contact">
         <span
-          class="text-light-text-heading rounded-full px-8 py-3 text-center text-sm dark:text-white"
+          class="text-ink rounded-full px-8 py-3 text-center text-sm"
         >
           Become a sponsor
         </span>
