@@ -10,6 +10,7 @@ import {
   union
 } from 'valibot';
 
+import { fetchFeedVideos, type FeedVideo } from './feed-media';
 import { optimizeImage } from './optimize-episode-image';
 import type { StarpodConfig } from '../utils/config';
 import { dasherize } from '../utils/dasherize';
@@ -60,6 +61,10 @@ export interface Episode {
     src: string;
     type: string;
   };
+  // The episode's video stream, from a `<podcast:alternateEnclosure>` with a
+  // video or HLS type. When present the site leads with video and offers a
+  // switch to audio.
+  video?: FeedVideo;
   // A transcript referenced by the feed's `<podcast:transcript>` tag, if any.
   // Used as a fallback when no explicit markdown transcript is provided for the
   // episode.
@@ -146,7 +151,11 @@ export async function getAllEpisodes(config?: StarpodConfig) {
     )
   });
 
-  let feed = (await parseRssFeed(await resolveRssFeed(config))) as Show;
+  const feedUrl = await resolveRssFeed(config);
+  const [feed, videos] = await Promise.all([
+    parseRssFeed(feedUrl) as Promise<Show>,
+    fetchFeedVideos(feedUrl)
+  ]);
   let items = parse(FeedSchema, feed).items;
 
   let episodes: Array<Episode> = await Promise.all(
@@ -192,7 +201,8 @@ export async function getAllEpisodes(config?: StarpodConfig) {
             audio: {
               src: audioEnclosure.url,
               type: audioEnclosure.type ?? 'audio/mpeg'
-            }
+            },
+            video: videos.get(id)
           };
         }
       )
