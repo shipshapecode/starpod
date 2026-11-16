@@ -1,0 +1,7 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+reviews:
+  auto_review:
+    enabled: true
+    # Review stacked PRs too, not only PRs that target the default branch.
+    base_branches:
+      - '.*'
