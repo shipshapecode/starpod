@@ -75,11 +75,14 @@ export function voiceFor(
   if (!cues?.length) {
     return undefined;
   }
-  for (const voice of [0, 1]) {
-    const speaker = cues.find((cue) => cue.v === voice && cue.n)?.n;
-    if (speaker && sameName(name, speaker)) {
-      return voice;
-    }
-  }
-  return undefined;
+  const speakers = [0, 1].map((voice) => ({
+    voice,
+    speaker: cues.find((cue) => cue.v === voice && cue.n)?.n
+  }));
+  // An exact name wins over a loose one, whichever voice comes first.
+  const exact = tokens(name).join(' ');
+  const match =
+    speakers.find(({ speaker }) => speaker && tokens(speaker).join(' ') === exact) ??
+    speakers.find(({ speaker }) => speaker && sameName(name, speaker));
+  return match?.voice;
 }

@@ -60,6 +60,15 @@ describe('voiceFor', () => {
     expect(voiceFor('Robbie Wagner', chuck)).toBeUndefined();
   });
 
+  it('prefers an exact name over a loose first-name match', () => {
+    const adams = [
+      { s: 0, t: 'Hi', v: 0, n: 'Adam Smith' },
+      { s: 5, t: 'Hey', v: 1, n: 'Adam Argyle' }
+    ];
+    expect(voiceFor('Adam Argyle', adams)).toBe(1);
+    expect(voiceFor('Adam Smith', adams)).toBe(0);
+  });
+
   it('gives no voice to guests outside the two main voices, or without a transcript', () => {
     expect(voiceFor('Denver Cramer', cues)).toBeUndefined();
     expect(voiceFor('Robbie Wagner', null)).toBeUndefined();
