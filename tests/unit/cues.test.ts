@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  jsonSegments,
   mergeIntoLines,
   parseMarkdownCues
 } from 'starpod/src/lib/cues';
@@ -13,6 +14,10 @@ describe('parseMarkdownCues', () => {
     '[00:00:40] **Adam Argyle:** Cheers.'
   ].join('\n\n');
   const cues = parseMarkdownCues(markdown);
+
+  it('reads Windows (CRLF) line endings the same way', () => {
+    expect(parseMarkdownCues(markdown.replace(/\n/g, '\r\n'))).toEqual(cues);
+  });
 
   it('reads bold speaker names and strips inline markdown', () => {
     expect(cues[0].n).toBe('Intro');
@@ -51,5 +56,25 @@ describe('mergeIntoLines', () => {
       { start: 2, text: 'Three', speaker: 'B' }
     ]);
     expect(lines.map((line) => line.t)).toEqual(['One two', 'Three']);
+  });
+});
+
+describe('jsonSegments', () => {
+  it('reads the Podcast Namespace startTime/body fields', () => {
+    expect(
+      jsonSegments({ segments: [{ startTime: 0.5, body: ' Hello ', speaker: 'Alice' }] })
+    ).toEqual([{ start: 0.5, text: 'Hello', speaker: 'Alice' }]);
+  });
+
+  it('also reads start/text, and drops segments without a time or text', () => {
+    expect(
+      jsonSegments({
+        segments: [
+          { start: 2, text: 'Hi' },
+          { start: 3, text: '   ' },
+          { text: 'No time' }
+        ]
+      })
+    ).toEqual([{ start: 2, text: 'Hi', speaker: undefined }]);
   });
 });
