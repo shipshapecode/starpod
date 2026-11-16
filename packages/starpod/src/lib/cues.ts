@@ -106,7 +106,7 @@ function stripInlineMarkdown(text: string): string {
  */
 export function parseMarkdownCues(markdown: string): Array<TranscriptCue> {
   const paragraphs: Array<{ start: number; speaker?: string; sentences: Array<string> }> = [];
-  for (const block of markdown.split(/\n{2,}/)) {
+  for (const block of markdown.replace(/\r\n?/g, '\n').split(/\n{2,}/)) {
     const match = block.replace(/\n/g, ' ').match(MARKDOWN_LINE);
     if (!match) {
       continue;
@@ -144,6 +144,28 @@ export function parseMarkdownCues(markdown: string): Array<TranscriptCue> {
   return mergeIntoLines(segments);
 }
 
+type JsonSegment = {
+  body?: string;
+  speaker?: string;
+  start?: number;
+  startTime?: number;
+  text?: string;
+};
+
+/**
+ * Segments from a JSON transcript. The Podcast Namespace format names its
+ * fields `startTime` and `body`; `start` and `text` are accepted as well.
+ */
+export function jsonSegments(data: { segments?: Array<JsonSegment> }): Array<Segment> {
+  return (data.segments ?? []).flatMap((segment) => {
+    const start = segment.startTime ?? segment.start;
+    const text = (segment.body ?? segment.text)?.trim();
+    return typeof start === 'number' && text
+      ? [{ start, text, speaker: segment.speaker || undefined }]
+      : [];
+  });
+}
+
 /**
  * Timed lines from the feed's `<podcast:transcript>` (VTT/SRT cues or JSON
  * segments). Returns `null` when none is available.
@@ -170,7 +192,9 @@ async function fetchRssCues(
   url: string
 ): Promise<Array<TranscriptCue> | null> {
   try {
-    const response = await fetch(url);
+    // A deadline on the whole request, body included, so a stalled
+    // transcript can't hold up the build.
+    const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
     if (!response.ok) {
       return null;
     }
@@ -182,16 +206,7 @@ async function fetchRssCues(
     ).toLowerCase();
 
     if (type.includes('json')) {
-      const data = JSON.parse(raw) as {
-        segments?: Array<{ text?: string; start?: number; speaker?: string }>;
-      };
-      const segments = (data.segments ?? [])
-        .filter((s) => s.text?.trim() && typeof s.start === 'number')
-        .map((s) => ({
-          start: s.start!,
-          text: s.text!.trim(),
-          speaker: s.speaker || undefined
-        }));
+      const segments = jsonSegments(JSON.parse(raw));
       return segments.length ? mergeIntoLines(segments) : null;
     }
 

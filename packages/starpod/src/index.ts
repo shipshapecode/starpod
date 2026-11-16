@@ -144,11 +144,11 @@ const ROUTES: Array<{ pattern: string; entrypoint: string }> = [
   { pattern: '/robots.txt', entrypoint: 'robots.txt.ts' },
   { pattern: '/api/contact', entrypoint: 'api/contact.ts' },
   { pattern: '/api/episodes/[page].json', entrypoint: 'api/episodes/[page].json.ts' },
+  { pattern: '/api/cues/[episode].json', entrypoint: 'api/cues/[episode].json.ts' },
   {
     pattern: '/api/episodes/search.json',
     entrypoint: 'api/episodes/search.json.ts'
-  },
-  { pattern: '/api/cues/[episode].json', entrypoint: 'api/cues/[episode].json.ts' }
+  }
 ];
 
 const MISSING_CONFIG_MESSAGE = `[starpod] Missing podcast config.

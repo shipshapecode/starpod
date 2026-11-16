@@ -10,6 +10,9 @@ const feed = `<?xml version="1.0"?>
 <item><title>Audio only</title><guid>flightcast:BBB</guid>
 <enclosure url="https://example.com/b.mp3" type="audio/mpeg"/>
 </item>
+<item><title>Quoting</title><guid><![CDATA[episode-A]]></guid>
+<podcast:alternateEnclosure type='video/mp4'><podcast:source uri='https://example.com/q.mp4?a=1&#38;b=&amp;lt;2'/></podcast:alternateEnclosure>
+</item>
 <item><title>Audio alternate first</title><guid>CCC</guid>
 <podcast:alternateEnclosure type="audio/opus"><podcast:source uri="https://example.com/c.opus"/></podcast:alternateEnclosure>
 <podcast:alternateEnclosure type="video/mp4"><podcast:source uri="https://example.com/c.mp4"/></podcast:alternateEnclosure>
@@ -23,6 +26,13 @@ describe('extractVideosByGuid', () => {
     expect(videos.get('flightcast:AAA')).toEqual({
       src: 'https://example.com/v/a.m3u8?x=1&y=2',
       type: 'application/x-mpegURL'
+    });
+  });
+
+  it('reads CDATA guids, single-quoted attributes, and each reference once', () => {
+    expect(videos.get('episode-A')).toEqual({
+      src: 'https://example.com/q.mp4?a=1&b=&lt;2',
+      type: 'video/mp4'
     });
   });
 
