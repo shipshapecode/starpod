@@ -2,8 +2,8 @@
   "solution": {
     "starpod": {
       "impact": "minor",
-      "oldVersion": "1.0.1",
-      "newVersion": "1.1.0",
+      "oldVersion": "1.1.0",
+      "newVersion": "1.2.0",
       "tagName": "latest",
       "constraints": [
         {
@@ -14,5 +14,5 @@
       "pkgJSONPath": "./packages/starpod/package.json"
     }
   },
-  "description": "## Release (2026-09-02)\n\n* starpod 1.1.0 (minor)\n\n#### :rocket: Enhancement\n* `starpod`\n  * [#66](https://github.com/shipshapecode/starpod/pull/66) Generalize Breadcrumbs and drop legacy favicon tags ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n\n#### Committers: 1\n- Robbie Wagner ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n"
+  "description": "## Release (2026-11-18)\n\n* starpod 1.2.0 (minor)\n\n#### :rocket: Enhancement\n* `starpod`\n  * [#72](https://github.com/shipshapecode/starpod/pull/72) Read episode video and timed transcript lines from the feed ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n\n#### Committers: 1\n- Robbie Wagner ([@RobbieTheWagner](https://github.com/RobbieTheWagner))\n"
 }
