@@ -1,5 +1,16 @@
 # Changelog
 
+## Release (2026-11-18)
+
+* starpod 1.2.0 (minor)
+
+#### :rocket: Enhancement
+* `starpod`
+  * [#72](https://github.com/shipshapecode/starpod/pull/72) Read episode video and timed transcript lines from the feed ([@RobbieTheWagner](https://github.com/RobbieTheWagner))
+
+#### Committers: 1
+- Robbie Wagner ([@RobbieTheWagner](https://github.com/RobbieTheWagner))
+
 ## Release (2026-09-02)
 
 * starpod 1.1.0 (minor)
