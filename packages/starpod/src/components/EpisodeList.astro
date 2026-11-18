@@ -81,10 +81,14 @@ const { cards, episodes, people, show, years } = Astro.props;
             type="button"
           >
             <QueueIcon size={18} />
-            <span>Add to Up next</span>
+            <span>
+              <span class="xp-long">Add to </span>Up next
+            </span>
           </button>
           <a class="button-secondary xp-open">
-            Open episode
+            <span>
+              Open<span class="xp-long"> episode</span>
+            </span>
             <ArrowOutIcon size={16} />
           </a>
           <button class="icon-button xp-close" type="button">

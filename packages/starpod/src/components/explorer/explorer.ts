@@ -341,10 +341,14 @@ export function startExplorer() {
     }
     const seen: Array<Card> = [];
     for (const card of shown.slice(lo)) {
-      if (card.li.getBoundingClientRect().top >= innerHeight) {
+      const box = card.li.getBoundingClientRect();
+      if (box.top >= innerHeight) {
         break;
       }
-      seen.push(card);
+      // (A phone's strip runs past the screen's sides.)
+      if (box.right > 0 && box.left < innerWidth) {
+        seen.push(card);
+      }
     }
     return seen;
   }
@@ -387,10 +391,14 @@ export function startExplorer() {
   // Shown cards [from, to) in display order are in the grid.
   let win = { from: 0, to: Infinity };
   let windowed = false;
-  // The grid's columns and its row pitch, read from style (no layout).
+  // The grid's columns and its row pitch, read from style (no layout). On a
+  // phone the close-up's strip is one row that scrolls sideways (`across`):
+  // there every cell is a "row" of the window, a column wide.
   let span = 1;
   let pitch = 0;
+  let gap = 0;
   let inset = 0;
+  let across = false;
 
   const inGrid = (card: Card) => card.li.parentElement === list;
   const activeTransition = () => {
@@ -403,21 +411,34 @@ export function startExplorer() {
 
   function metrics() {
     const style = getComputedStyle(list);
-    const row = parseFloat(style.gridAutoRows);
+    across = style.gridAutoFlow.startsWith('column');
+    const row = parseFloat(across ? style.gridAutoColumns : style.gridAutoRows);
     span = parseInt(style.getPropertyValue('--xp-span'), 10) || 1;
-    pitch = row + (parseFloat(style.rowGap) || 0);
-    inset = parseFloat(style.paddingTop) || 0;
+    gap = parseFloat(across ? style.columnGap : style.rowGap) || 0;
+    pitch = row + gap;
+    inset = parseFloat(across ? style.paddingLeft : style.paddingTop) || 0;
     return row > 0 && pitch > 0;
   }
 
+  /** How far the window looks: the viewport's height, or a strip's width. */
+  const extent = () => (across ? innerWidth : innerHeight);
+
   /** Rows above and below the viewport the window keeps. */
-  const margin = () => Math.max(2, Math.ceil(innerHeight / pitch));
+  const margin = () => Math.max(2, Math.ceil(extent() / pitch));
 
   /** The rows in the viewport now (one layout read). */
   // The first row whose top is in the viewport, and where: noted with every
   // read of the rows in view (no read of its own), so a resize can hold it.
   let seenRow: { row: number; y: number; span: number } | null = null;
   function viewRows() {
+    if (across) {
+      // The first cell's left edge, wherever the strip is scrolled.
+      const left = list.getBoundingClientRect().left + inset - list.scrollLeft;
+      return [
+        Math.max(0, Math.floor(-left / pitch)),
+        Math.max(0, Math.floor((innerWidth - left) / pitch))
+      ] as const;
+    }
     const top = list.getBoundingClientRect().top + inset;
     const row = Math.max(0, Math.ceil(-top / pitch));
     seenRow = { row, y: top + row * pitch, span };
@@ -432,14 +453,18 @@ export function startExplorer() {
    * or centred) and a screen either side, as following the scroll keeps,
    * so the window that settles after a change is the one it made.
    */
-  function rowsAround(card: Card, y = (innerHeight - pitch) / 2) {
+  function rowsAround(card: Card, y?: number) {
     const shown = order.filter((other) => !other.li.hidden);
     const row = Math.floor(Math.max(0, shown.indexOf(card)) / span);
-    const at = Math.min(Math.max(y, 0), innerHeight);
+    // (A phone's strip is always placed with the card in the middle.)
+    const at =
+      y === undefined || across
+        ? (extent() - pitch) / 2
+        : Math.min(Math.max(y, 0), innerHeight);
     const reach = margin();
     return [
       row - Math.ceil(at / pitch) - reach,
-      row + Math.ceil((innerHeight - at) / pitch) + reach
+      row + Math.ceil((extent() - at) / pitch) + reach
     ] as const;
   }
 
@@ -600,7 +625,7 @@ export function startExplorer() {
     if (open) {
       const [top, bottom] = viewRows();
       const reach = settled
-        ? Math.max(1, Math.ceil(innerHeight / pitch / 4))
+        ? Math.max(1, Math.ceil(extent() / pitch / 4))
         : margin();
       order
         .filter((card) => !card.li.hidden)
@@ -965,11 +990,69 @@ export function startExplorer() {
   /** Where the dock and the phone's tab bar start covering the page. */
   function floor() {
     const style = getComputedStyle(root);
+    // (On a phone the tab bar itself is measured: its height has the safe
+    // area in it, which its custom property can't give as a number.)
+    const tabs = across
+      ? (document.querySelector<HTMLElement>('.tabbar')?.offsetHeight ?? 0)
+      : parseFloat(style.getPropertyValue('--tabbar-h')) || 0;
     return (
       innerHeight -
       (parseFloat(style.getPropertyValue('--dock-h')) || 0) -
-      (wide.matches ? 0 : parseFloat(style.getPropertyValue('--tabbar-h')) || 0)
+      (wide.matches ? 0 : tabs)
     );
+  }
+
+  /**
+   * On a phone (the strip one row under the close-up, which scrolls with
+   * the page: explorer.css): the page brings the close-up under the
+   * toolbar, and the strip brings `card`'s cell into view, in the middle
+   * when the close-up opens, the least distance when stepping. While the
+   * archive folds into the strip it isn't a scroller yet (nothing flying
+   * into it is clipped): it is laid out shifted along by as much
+   * (--xp-strip-x), and scrolls by that much once it lands.
+   */
+  function placeAcross(card: Card, centre: boolean, smooth: boolean) {
+    const top = ceiling();
+    const view = closeup.getBoundingClientRect();
+    const shift = stage.getBoundingClientRect().top - top;
+    if ((centre || view.top < top - 1) && Math.abs(shift) > 0.5) {
+      // The folded archive is short: the page is given the room it needs
+      // below the strip for the close-up to come up under the toolbar.
+      const room = parseFloat(stage.style.getPropertyValue('--xp-room')) || 0;
+      const spare =
+        document.documentElement.scrollHeight - room - innerHeight - scrollY;
+      const need = Math.max(0, Math.ceil(shift - spare));
+      if (need !== room) {
+        stage.style.setProperty('--xp-room', `${need}px`);
+      }
+      window.scrollBy({ top: shift, behavior: smooth ? 'smooth' : 'instant' });
+    }
+    const shown = order.filter((other) => !other.li.hidden);
+    const at = shown.indexOf(card);
+    const landing = root.dataset.folding !== undefined;
+    const now = landing
+      ? parseFloat(list.style.getPropertyValue('--xp-strip-x')) || 0
+      : list.scrollLeft;
+    // The strip's width in view (landing, its box reaches further back by
+    // the shift), the cells in full view at once, and how far it scrolls.
+    const width = list.clientWidth - (landing ? now : 0);
+    const fit = Math.max(1, Math.floor((width - 2 * inset + gap) / pitch));
+    const most = Math.max(0, 2 * inset + shown.length * pitch - gap - width);
+    // Every place it stops at has a cell at its start (scroll snapping).
+    let x = now;
+    if (centre) {
+      x = (at - Math.floor((fit - 1) / 2)) * pitch;
+    } else if (at * pitch < now) {
+      x = at * pitch;
+    } else if ((at + 1) * pitch - gap > now + width - 2 * inset) {
+      x = (at - fit + 1) * pitch;
+    }
+    x = Math.min(Math.max(x, 0), most);
+    if (landing) {
+      list.style.setProperty('--xp-strip-x', `${x}px`);
+    } else if (Math.abs(x - now) > 0.5) {
+      list.scrollTo({ left: x, behavior: smooth ? 'smooth' : 'instant' });
+    }
   }
 
   /**
@@ -979,6 +1062,10 @@ export function startExplorer() {
    * the least distance when stepping.
    */
   function placeStrip(card: Card, centre: boolean, smooth = false) {
+    if (metrics() && across) {
+      placeAcross(card, centre, smooth);
+      return;
+    }
     const top = ceiling();
     const box = stage.getBoundingClientRect();
     const view = closeup.getBoundingClientRect();
@@ -1016,6 +1103,7 @@ export function startExplorer() {
    * the cards are carried through the scroll).
    */
   function placeHome(card: Card) {
+    stage.style.removeProperty('--xp-room');
     const top = ceiling();
     const bottom = floor();
     const box = card.li.getBoundingClientRect();
@@ -1485,16 +1573,22 @@ export function startExplorer() {
   function fillResume(card: Card) {
     const seconds = readPosition(card.li.dataset.id!);
     resume.hidden = seconds < 30;
-    resume.textContent = `You stopped at ${clock(seconds)}, and play picks up there.`;
+    // (A phone's close-up leaves out the long part: explorer.css.)
+    const rest = document.createElement('span');
+    rest.className = 'xp-long';
+    rest.textContent = ', and play picks up there';
+    resume.replaceChildren(`You stopped at ${clock(seconds)}`, rest, '.');
+    closeup.toggleAttribute('data-resume', !resume.hidden);
   }
 
   /** The Up next button says whether its episode is queued. */
   function syncQueue(card: Card, ids = new Set(queue.value.map((e) => e.id))) {
     const queued = ids.has(card.li.dataset.id!);
     queueButton.setAttribute('aria-pressed', String(queued));
-    queueButton.querySelector('span')!.textContent = queued
-      ? 'In Up next'
-      : 'Add to Up next';
+    // (A phone's close-up shows "Up next" alone: explorer.css.)
+    queueButton.querySelector('.xp-long')!.textContent = queued
+      ? 'In '
+      : 'Add to ';
   }
 
   /**
@@ -1596,6 +1690,10 @@ export function startExplorer() {
     // containment would carry it with the page as the close scrolls).
     const shell = document.createElement('div');
     shell.className = 'xp-fading-detail';
+    shell.style.setProperty(
+      '--xp-phone',
+      getComputedStyle(stage).getPropertyValue('--xp-phone')
+    );
     shell.inert = true;
     shell.setAttribute('aria-hidden', 'true');
     copy.style.cssText = `position: fixed; inset: auto; top: ${box.top}px; left: ${box.left}px; width: ${box.width}px; height: ${box.height}px; margin: 0;`;
@@ -1633,7 +1731,13 @@ export function startExplorer() {
     root.dataset.folding = '';
     folded = window.setTimeout(() => {
       folded = 0;
+      // A phone's strip, landed, scrolls from where it was laid out.
+      const x = parseFloat(list.style.getPropertyValue('--xp-strip-x')) || 0;
+      list.style.removeProperty('--xp-strip-x');
       delete root.dataset.folding;
+      if (open && x) {
+        list.scrollLeft = x;
+      }
       deepen(true);
     }, SWAP_MS * slomo());
   }
@@ -1999,20 +2103,19 @@ export function startExplorer() {
 
   // While the page scrolls the window follows; once it settles, the
   // strip's depth is trimmed to the cells in view.
+  // (So does a phone's strip, which scrolls sideways on its own.)
   let settle = 0;
-  addEventListener(
-    'scroll',
-    () => {
-      scrolled = true;
-      followSoon();
-      clearTimeout(settle);
-      settle = window.setTimeout(() => {
-        settle = 0;
-        deepen(true);
-      }, 150);
-    },
-    { passive: true, signal }
-  );
+  const onScroll = () => {
+    scrolled = true;
+    followSoon();
+    clearTimeout(settle);
+    settle = window.setTimeout(() => {
+      settle = 0;
+      deepen(true);
+    }, 150);
+  };
+  addEventListener('scroll', onScroll, { passive: true, signal });
+  list.addEventListener('scroll', onScroll, { passive: true, signal });
   signal.addEventListener('abort', () => clearTimeout(settle));
 
   // A card's controls carry a scroll margin that clears the sticky toolbar

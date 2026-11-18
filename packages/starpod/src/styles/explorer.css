@@ -544,13 +544,14 @@
         visibility 300ms allow-discrete;
     }
 
+    /* (Not in the close-up, which sits under the whole toolbar.) */
     @container xp-page scroll-state(scrolled: bottom) {
       @container xp-bar scroll-state(stuck: top) {
-        .xp-bar-in {
+        .xp:not([data-open]) .xp-bar-in {
           clip-path: inset(0 0 calc(100% - 64px) 0);
         }
 
-        .xp-chips {
+        .xp:not([data-open]) .xp-chips {
           visibility: hidden;
           opacity: 0;
         }
@@ -2904,7 +2905,16 @@
   }
 }
 
-/* ---------- Phones: the close-up on top, the strip along the bottom ---------- */
+/* ---------- Phones: the close-up on top, the strip along the bottom ----------
+   An upright phone (the explorer under 40rem, its own breakpoint) and a
+   phone on its side (the shared landscape form) both mark the stage
+   (--xp-phone), and share one close-up: the artwork with the facts line
+   and the title beside it, the close button in the corner, three lines of
+   description and one row of actions, as tall as that and no taller, and
+   the strip one row of thumbnails under it that scrolls sideways (and
+   snaps). With the strip a row, the folded archive is short: the
+   close-up scrolls with the page (stuck, the strip would only slide under
+   it), and the page brings it up under the toolbar (explorer.ts). */
 
 @container xp (width < 40rem) {
   .xp-cu-title,
@@ -2913,8 +2923,9 @@
   }
 
   .xp-stage {
+    --xp-phone: 1;
     --xp-tag-size: 6.5cqi;
-    --xp-strip: calc((var(--xp-w, 358px) - 3 * 12px) / 4);
+    --xp-strip: 72px;
     /* As 30px deep, 900px and 2.6 cells above, for a cell about 80px wide. */
     --xp-lean-r: x 24deg;
     --xp-lean-s: 0.97;
@@ -2923,29 +2934,70 @@
     --xp-vantage-y: -260cqi;
   }
 
-  .xp[data-open] .xp-card[data-depth]:not([data-on]) .xp-tilt {
-    animation: none;
+  /* (With the room the page needs under the strip: explorer.ts.) */
+  .xp[data-open] .xp-stage {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    padding-bottom: var(--xp-room, 0px);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .xp-cu-title,
+  .xp-card[data-on] .xp-title {
+    --xp-cu-title-size: 1.25rem;
+  }
+
+  .xp-stage {
+    --xp-phone: 1;
+    --xp-tag-size: 6.5cqi;
+    --xp-strip: 72px;
+    --xp-lean-r: x 24deg;
+    --xp-lean-s: 0.97;
+    --xp-depth: 1125cqi;
+    --xp-vantage-x: 50%;
+    --xp-vantage-y: -260cqi;
   }
 
   .xp[data-open] .xp-stage {
     grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    padding-bottom: var(--xp-room, 0px);
+  }
+}
+
+@container style(--xp-phone: 1) {
+  .xp[data-open] .xp-card[data-depth]:not([data-on]) .xp-tilt {
+    animation: none;
+  }
+
+  /* Three lines of description, a line to resume from (when there is
+     one), and the row of actions. */
+  .xp-closeup {
+    --xp-cu-body-h: calc(3 * 0.9375rem * 1.5 + 12px + 44px);
+  }
+
+  .xp-closeup[data-resume] {
+    --xp-cu-body-h: calc(
+      3 * 0.9375rem * 1.5 + 12px + 0.875rem * 1.4 + 8px + 44px
+    );
   }
 
   .xp[data-open] .xp-closeup {
-    grid-template-columns: 50% minmax(0, 1fr);
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-columns: 44% minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr var(--xp-cu-body-h);
     grid-template-areas:
       'art facts'
       'art title'
       'art .'
-      'detail detail';
+      'body body';
     align-items: start;
-    gap: 14px 16px;
+    gap: 0 16px;
+    position: relative;
+    top: auto;
     height: auto;
     min-height: 0;
     padding-bottom: 14px;
-    background: var(--ground);
-    box-shadow: 0 18px 24px -24px oklch(10% 0.03 280 / 0.6);
   }
 
   .xp-cu-glow {
@@ -2954,36 +3006,196 @@
 
   .xp-cu-art {
     width: 100%;
-    margin: 4px 0 0;
+    margin: 4px 0 14px;
   }
 
   .xp-cu-col {
     display: contents;
   }
 
+  /* The facts line leaves the corner to the close button, and the title
+     starts under it. */
   .xp-cu-facts {
     grid-area: facts;
-    margin: 4px 0 0.4rem;
+    min-height: 34px;
+    margin: 4px 52px 0.4rem 0;
   }
 
   .xp-cu-title {
     grid-area: title;
-    margin: 0;
+    margin: 0 0 14px;
   }
 
+  /* The detail spans the whole close-up: the close button in its top
+     corner, the description and the actions along its foot (the last
+     row's height is theirs). It lets taps through to the art and title
+     under its empty part. */
   .xp-cu-detail {
-    grid-area: detail;
-    height: min(250px, 30dvh);
+    grid-area: 1 / 1 / -1 / -1;
+    align-self: stretch;
+    height: auto;
     min-height: 0;
   }
 
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-detail {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-detail > * {
+    pointer-events: auto;
+  }
+
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-desc {
+    flex: none;
+    max-width: none;
+    min-height: 3lh;
+    margin: 0 0 12px;
+    -webkit-line-clamp: 3;
+  }
+
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-people {
+    display: none;
+  }
+
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-resume:not([hidden]) {
+    flex: none;
+    margin: 0 0 8px;
+    overflow: hidden;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-actions {
+    flex: none;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 0;
+  }
+
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-actions .button-secondary {
+    min-height: 44px;
+    padding-inline: 1rem;
+    white-space: nowrap;
+  }
+
+  /* "Up next", "Open": the rest is still their name. */
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-long {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .xp-resume .xp-long {
+    display: none;
+  }
+
+  :is(.xp-card[data-on], .xp-fading-detail) .xp-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+  }
+
+  /* The actions rise one by one (the row itself holds still: it is what the
+     close button is placed against while it rises). */
+  .xp-card[data-on] .xp-detail > .xp-actions {
+    animation: none;
+  }
+
+  .xp-card[data-on] .xp-actions > * {
+    animation: xp-rise calc(600ms * var(--slomo)) cubic-bezier(0.2, 0.8, 0.2, 1)
+      backwards;
+    animation-delay: calc(400ms * var(--slomo));
+    animation-delay: calc(
+      (400ms + min(sibling-index() - 1, 4) * 60ms) * var(--slomo)
+    );
+  }
+
+  /* The strip: one row of thumbnails under the close-up, reaching the
+     screen's sides, that scrolls sideways and comes to rest with a cell at
+     its start. (Near one: only the cells around the view are laid out, and
+     a fling past them may not be pulled back to the last.) While the
+     archive folds into it, it isn't a scroller yet (the cards flying into
+     it would be clipped): it is laid out shifted along by what it will
+     scroll to (explorer.ts). */
   .xp[data-open] .xp-stage .xp-list {
-    --xp-span: 4;
+    --xp-span: 1;
     grid-row: 2;
     grid-column: 1;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-template-rows: var(--xp-strip);
+    grid-auto-columns: var(--xp-strip);
     gap: 12px;
-    padding-block: 16px;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 14px var(--gutter) 18px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+
+  .xp[data-open][data-folding] .xp-stage .xp-list {
+    margin-inline-start: calc(var(--gutter) * -1 - var(--xp-strip-x, 0px));
+    overflow: visible;
+  }
+
+  .xp[data-open] .xp-stage .xp-card {
+    scroll-snap-align: start;
+  }
+
+  .xp[data-open] .xp-stage .xp-park {
+    grid-row: 1;
+    grid-column: span var(--xp-rows, 1);
+  }
+}
+
+/* On its side the picture takes the close-up's height, and the words, the
+   description and the actions stand beside it, the close button in their
+   corner. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .xp[data-open] .xp-closeup {
+    grid-template-columns: clamp(120px, 26%, 220px) minmax(0, 1fr);
+    grid-template-areas:
+      'art facts'
+      'art title'
+      'art .'
+      'art body';
+  }
+
+  .xp[data-open] .xp-closeup {
+    padding-bottom: 8px;
+  }
+
+  .xp-cu-art {
+    margin: 4px 0 0;
+  }
+
+  /* The words are a line or two wide here: both leave the corner to the
+     close button. */
+  .xp-cu-facts {
+    min-height: 0;
+    margin: 4px 52px 0.3rem 0;
+  }
+
+  .xp-cu-title {
+    margin: 0 52px 8px 0;
+  }
+
+  .xp-cu-detail {
+    grid-area: 1 / 2 / -1 / -1;
   }
 }
 
