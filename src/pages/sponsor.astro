@@ -7,6 +7,7 @@ import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 
 import AdPackageCard from 'starpod/components/AdPackageCard';
+import PageHeader from 'starpod/components/PageHeader';
 import Layout from 'starpod/layout';
 import { getShowInfo } from 'starpod/rss';
 
@@ -27,19 +28,15 @@ const countries = [
 ---
 
 <Layout title="Sponsor">
-  <div class="relative z-10 px-8 lg:px-18">
-    <h1
-      class="mb-4 text-2xl font-bold text-ink lg:mb-6 lg:text-5xl"
-    >
-      Sponsor {title}
-    </h1>
-
-    <p class="mb-5">
-      Want to dazzle a crowd of tech nerds and whiskey connoisseurs? Throw your
-      brand into the mix! Our listeners love innovation, good banter, and a
-      stiff drink—so get in on the fun and make some magic happen. Stay classy,
-      sponsor.
-    </p>
+  <div class="relative z-10">
+    <PageHeader title={`Sponsor ${title}`}>
+      <p class="m-0">
+        Want to dazzle a crowd of tech nerds and whiskey connoisseurs? Throw
+        your brand into the mix! Our listeners love innovation, good banter,
+        and a stiff drink—so get in on the fun and make some magic happen. Stay
+        classy, sponsor.
+      </p>
+    </PageHeader>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <div class="ep-reveal">

@@ -31,7 +31,7 @@ import type { ImageMetadata } from 'astro';
 import avatarLight from '../assets/avatar-light.png';
 
 import Layout from '../layouts/Layout.astro';
-import { matchNames, personFact, sortCast } from '../lib/cast';
+import { factGivesCount, matchNames, personFact, sortCast } from '../lib/cast';
 import { getEpisodeCues } from '../lib/episode-cues';
 import { optimizeImage } from '../lib/optimize-episode-image';
 import { getAllEpisodes, getShowInfo, type Episode } from '../lib/rss';
@@ -244,6 +244,7 @@ const people = await Promise.all(
     const theirs = episodesOf(person.id);
     // Which of their episodes this is, oldest first.
     const newest = theirs.findIndex((item) => item.id === episode.id);
+    const appearance = newest === -1 ? undefined : theirs.length - newest;
     const earliest = theirs.at(-1);
     const speaker = speakerOf.get(person.name);
     const said = speaker ? talk.get(speaker) : undefined;
@@ -260,9 +261,14 @@ const people = await Promise.all(
       ).src,
       count: theirs.length,
       fact: personFact({
-        appearance: newest === -1 ? undefined : theirs.length - newest,
+        appearance,
         count: theirs.length,
         first: earliest && numberOf(earliest),
+        host: person.isHost
+      }),
+      counted: factGivesCount({
+        appearance,
+        count: theirs.length,
         host: person.isHost
       }),
       voice:
@@ -632,6 +638,7 @@ const documentLinkTag =
   // filling in) would leave the bar's trigger off by that much. Re-arm it
   // whenever the stage changes size.
   let stageWatch: ResizeObserver | undefined;
+  let splitWatch: MutationObserver | undefined;
   let groupWatch: ResizeObserver | undefined;
   let railWatch: MutationObserver | undefined;
 
@@ -645,26 +652,27 @@ const documentLinkTag =
 
   document.addEventListener('astro:page-load', () => {
     stageWatch?.disconnect();
+    splitWatch?.disconnect();
     groupWatch?.disconnect();
     railWatch?.disconnect();
-    const owed = new Map<ResizeObserver, Element>();
+    // What to do on release, per watch: observe its targets afresh.
+    const owed = new Map<ResizeObserver, () => void>();
     const whenFree = (
       observer: ResizeObserver,
-      target: Element,
+      again: () => void,
       work: () => void
-    ) => (held() ? owed.set(observer, target) : work());
+    ) => (held() ? owed.set(observer, again) : work());
     railWatch = new MutationObserver(() => {
       if (!held()) {
-        owed.forEach((target, observer) => {
-          observer.unobserve(target);
-          observer.observe(target);
-        });
+        owed.forEach((again) => again());
         owed.clear();
       }
     });
     railWatch.observe(root, { attributeFilter: ['data-rail-held'] });
 
-    const stage = document.querySelector('[data-stage][data-variant="page"]');
+    const stage = document.querySelector<HTMLElement>(
+      '[data-stage][data-variant="page"]'
+    );
     const meta = stage?.querySelector<HTMLElement>('.stage-meta');
     if (stage && meta) {
       const rearm = () => {
@@ -672,10 +680,25 @@ const documentLinkTag =
         void meta.offsetHeight;
         meta.style.removeProperty('timeline-trigger-name');
       };
+      // The stage, or once split.ts lays it out split, the parts of its
+      // picture side: there split.ts sets the stage's height from them in
+      // its own observer, which an observer of the stage would only be told
+      // of a frame late ("ResizeObserver loop completed with undelivered
+      // notifications"). The parts are what moves the meta there.
+      let targets: Array<Element> = [];
+      const watch = () => {
+        targets.forEach((target) => stageWatch!.unobserve(target));
+        targets = stage.hasAttribute('data-split-on')
+          ? Array.from(stage.querySelector('.stage-side')?.children ?? [])
+          : [stage];
+        targets.forEach((target) => stageWatch!.observe(target));
+      };
       stageWatch = new ResizeObserver((_, observer) =>
-        whenFree(observer, stage, rearm)
+        whenFree(observer, watch, rearm)
       );
-      stageWatch.observe(stage);
+      watch();
+      splitWatch = new MutationObserver(watch);
+      splitWatch.observe(stage, { attributeFilter: ['data-split-on'] });
     }
 
     // Groups of turns off screen hold the height of the first group (read
@@ -689,7 +712,14 @@ const documentLinkTag =
           String(Math.round(group.offsetHeight))
         );
       groupWatch = new ResizeObserver((_, observer) =>
-        whenFree(observer, group, measure)
+        whenFree(
+          observer,
+          () => {
+            observer.unobserve(group);
+            observer.observe(group);
+          },
+          measure
+        )
       );
       groupWatch.observe(group);
     }

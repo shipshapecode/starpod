@@ -268,3 +268,19 @@ export function personFact({
     ? `${ordinal(appearance)} appearance · first on ${first}`
     : `${ordinal(appearance)} appearance`;
 }
+
+/**
+ * Whether `personFact`'s line already says how many episodes they are on
+ * (a first time says it's one), so a tally beside it would repeat it.
+ */
+export function factGivesCount({
+  appearance,
+  count,
+  host
+}: {
+  appearance?: number;
+  count: number;
+  host: boolean;
+}) {
+  return host || appearance === undefined || count <= 1 || appearance === 1;
+}

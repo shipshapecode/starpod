@@ -456,8 +456,14 @@ test('leans the strip cells in view, and the ones it scrolls to', async ({
         ).length
       };
     });
-  await expect.poll(depth).toMatchObject({ flat: 0, upright: 0, far: 0 });
-  expect((await depth()).seen).toBeGreaterThan(2);
+  // (Polled together: opened from the top of the page, the page scrolls up
+  // to the archive as the cards fly.)
+  await expect
+    .poll(async () => {
+      const { seen, ...rest } = await depth();
+      return { many: seen > 2, ...rest };
+    })
+    .toMatchObject({ many: true, flat: 0, upright: 0, far: 0 });
   // A screen down the strip and back: cells take depth as they come.
   const screen = await page.evaluate(() => innerHeight);
   for (const by of [screen, -screen]) {

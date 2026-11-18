@@ -166,6 +166,30 @@
   font-weight: 650;
 }
 
+/* "Episode 230 · Feb 5, 2026 · 1 hr 2 min · Video", as on the home hero:
+   each fact carries its separator in the gap before it, and the line clips,
+   so whichever fact starts a line, wrapped or not, loses its separator. */
+.stage-facts {
+  overflow: hidden;
+}
+
+.stage-facts > * {
+  margin-inline-start: -1rem;
+}
+
+.stage-facts > ::before {
+  content: '·';
+  display: inline-block;
+  width: 1rem;
+  color: var(--muted);
+  font-weight: 500;
+  text-align: center;
+}
+
+.stage-kind::before {
+  margin-inline-end: -0.35rem;
+}
+
 .stage-title {
   margin: 0 0 0.75rem;
   font-family: var(--font-display);
@@ -191,9 +215,15 @@
 }
 
 /* Up next leaves the row once the episode plays: no taller than Play (its
-   border inside the same height), so the page under the stage stays put. */
+   border inside the same height), and it keeps its place unseen
+   (StageControls), so the page under the stage stays put even where it
+   had a line to itself. */
 .stage-actions .button-secondary {
   padding-block: calc(0.75rem - 1px);
+}
+
+.stage-actions .button-secondary[inert] {
+  visibility: hidden;
 }
 
 .link-on {

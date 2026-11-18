@@ -31,8 +31,9 @@ import {
   mediaDuration,
   mediaHost,
   miniClosed,
+  phoneScreen,
+  pictureDocked,
   pipCorner,
-  pipDocked,
   playbackRate,
   playerExpanded,
   playNext,
@@ -431,7 +432,7 @@ function decideStation(fresh = false): Station {
   if (slot && (!away || resting)) {
     return 'stage';
   }
-  return hasCell && (miniClosed.value || pipDocked.value[activeMedium.value])
+  return hasCell && (miniClosed.value || pictureDocked.value)
     ? 'cell'
     : 'corner';
 }
@@ -610,6 +611,10 @@ function syncRootState() {
   root.host = mediaHost.value;
   root.hasVideo = String(Boolean(episode?.video));
   root.mini = miniClosed.value ? 'closed' : 'open';
+  // Where the picture is (a phone makes room under a floating one).
+  root.picture = episode ? mediaStation.value : '';
+  // A phone's screen (state.ts's one phone query), for the player's styles.
+  document.documentElement.toggleAttribute('data-phone', phoneScreen.value);
 }
 
 /** Start the engine once; safe to call from every island. */
@@ -668,7 +673,7 @@ export function startEngine() {
     void isPlaying.value;
     void miniClosed.value;
     void pipCorner.value;
-    void pipDocked.value;
+    void pictureDocked.value;
     void playerExpanded.value;
     placeMedia();
   });

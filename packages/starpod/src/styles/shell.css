@@ -305,6 +305,14 @@
   font-size: 0.8125rem;
 }
 
+/* On touch a crumb's link is 44px tall, its line where it was. */
+@media (pointer: coarse) {
+  .crumbs a {
+    margin-block: -12px;
+    padding-block: 12px;
+  }
+}
+
 
 .section-title {
   display: flex;
@@ -332,7 +340,8 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   height: var(--tabbar-h);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
   box-sizing: border-box;
   background: var(--surface);
   border-top: 1px solid var(--line);
@@ -365,6 +374,83 @@
 
 .tabbar [aria-current='page'] {
   color: var(--accent-ink);
+}
+
+/* Below the desktop form, whatever the browser scrolls into view (a
+   focused field, find in page, a skip link's target) clears the stuck top
+   bar and the tab bar, and the dock once an episode is loaded. The amounts
+   are tokens, 0 on the desktop form, for a target that sets its own
+   scroll-margin past the bars to subtract. */
+:root {
+  --scroll-pad-top: 0px;
+  --scroll-pad-bottom: 0px;
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --scroll-pad-top: calc(var(--topbar-h) + env(safe-area-inset-top) + 8px);
+    --scroll-pad-bottom: calc(var(--tabbar-h) + 8px);
+    scroll-padding: var(--scroll-pad-top) 0 var(--scroll-pad-bottom);
+  }
+
+  :root[data-episode]:not([data-episode='']) {
+    --scroll-pad-bottom: calc(var(--tabbar-h) + var(--dock-h) + 8px);
+  }
+}
+
+/* Landscape phones, a short screen: the top bar scrolls away with the page
+   instead of holding 60px of it, and the tab bar is one 48px line, each
+   tab's icon beside its label. (The query every part of the site uses for
+   this form.) */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Only where there is a tab bar: a short desktop window keeps its form. */
+  @media (max-width: 1023px) {
+    :root {
+      --tabbar-h: calc(48px + env(safe-area-inset-bottom));
+    }
+  }
+
+  .topbar {
+    position: relative;
+  }
+
+  @media (max-width: 1023px) {
+    :root {
+      --scroll-pad-top: calc(env(safe-area-inset-top) + 8px);
+    }
+  }
+
+  .tabbar > a,
+  .tabbar > button,
+  .tabbar astro-island > button {
+    flex-direction: row;
+    gap: 8px;
+    font-size: 0.75rem;
+  }
+}
+
+/* The 404's art keeps to its column. */
+.four-zero-four svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* The 404's helpful links: on touch, 44px pills in a wrapping row. */
+@media (pointer: coarse) {
+  .nf-links ul {
+    gap: 8px;
+  }
+
+  .nf-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 16px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    text-decoration: none;
+  }
 }
 
 /* Bottom sheets (native popovers). */
@@ -864,7 +950,10 @@
   view-transition-name: rail;
 }
 
-.topbar {
+/* The top bar is named only through a page transition: a named element is a
+   backdrop root, so at rest the name kept its glass from frosting the page
+   under it. */
+:root[data-astro-transition] .topbar {
   view-transition-name: topbar;
 }
 

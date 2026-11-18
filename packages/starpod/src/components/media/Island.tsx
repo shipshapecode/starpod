@@ -24,6 +24,8 @@ import {
   currentEpisode,
   currentTime,
   dockPicture,
+  anchorPositioning,
+  homeOnScreen,
   isMuted,
   islandAt,
   islandBack,
@@ -31,12 +33,12 @@ import {
   ISLAND_HOMES,
   mediaDuration,
   miniClosed,
+  phoneScreen,
+  pictureDocked,
   pipCorner,
-  pipDocked,
   playbackRate,
   playEpisode,
   queue,
-  wideScreen,
   type Corner,
   type IslandHome,
   type PlayableEpisode
@@ -219,7 +221,14 @@ function keepFocusIn(event: FocusEvent) {
   if (islandAt.value !== 'card' || !island || !(target instanceof Element) || island.contains(target)) {
     return;
   }
-  island.querySelector<HTMLElement>('.island-station input:checked')?.focus({ preventScroll: true });
+  cardStart(island)?.focus({ preventScroll: true });
+}
+
+/** Where focus starts in the card: its close on phones, or else its home control. */
+function cardStart(island: HTMLElement) {
+  return island.querySelector<HTMLElement>(
+    phoneScreen.value ? '.island-close button' : '.island-station input[value="card"]'
+  );
 }
 
 function holdPage(card: HTMLElement | null) {
@@ -259,7 +268,7 @@ function focusIsland(selector: string) {
  */
 export function go(home: IslandHome) {
   const island = document.getElementById('player');
-  const to: IslandHome = home === 'rail' && !wideScreen.value ? 'dock' : home;
+  const to = homeOnScreen(home);
   if (!island || island.dataset.state === to) {
     islandHome.value = home;
     return;
@@ -339,14 +348,14 @@ function keepFocus(island: HTMLElement, to: IslandHome) {
   if (!(focused instanceof HTMLElement) || !island.contains(focused)) {
     // The card is a dialog: opened from anywhere, focus goes into it.
     if (to === 'card') {
-      island.querySelector<HTMLElement>('.island-station input[value="card"]')?.focus({ preventScroll: true });
+      cardStart(island)?.focus({ preventScroll: true });
     }
     return;
   }
   const part = focused.closest<HTMLElement>('#player > *');
   const target =
     to === 'card' && !focused.closest('.island-queue')
-      ? island.querySelector<HTMLElement>('.island-station input[value="card"]')
+      ? cardStart(island)
       : part && getComputedStyle(part).position === 'absolute'
         ? island.querySelector<HTMLElement>('.island-name')
         : null;
@@ -362,6 +371,14 @@ export function toggleCard() {
 function PipBar({ episode, href }: { episode: PlayableEpisode; href: string }) {
   const watching = activeMedium.value === 'watch';
   const next = NEXT_CORNER[pipCorner.value];
+  // On phones closing it only puts the picture back in the player (closeMini).
+  const close = phoneScreen.value
+    ? watching
+      ? 'Put the video back in the player'
+      : 'Put the artwork back in the player'
+    : watching
+      ? 'Close video'
+      : 'Close artwork';
   return (
     <div class="pip-bar">
       <div class="pip-bar-in">
@@ -377,15 +394,17 @@ function PipBar({ episode, href }: { episode: PlayableEpisode; href: string }) {
         >
           <PipIcon corner={next} size={16} />
         </button>
-        <button
-          aria-label="Open the now-playing card"
-          class="mini-button"
-          onClick={() => go('card')}
-          title="Open the now-playing card"
-          type="button"
-        >
-          <ChevronUpIcon size={16} />
-        </button>
+        {anchorPositioning.value && (
+          <button
+            aria-label="Open the now-playing card"
+            class="mini-button"
+            onClick={() => go('card')}
+            title="Open the now-playing card"
+            type="button"
+          >
+            <ChevronUpIcon size={16} />
+          </button>
+        )}
         {watching && (
           <button
             aria-label="Fullscreen"
@@ -399,14 +418,14 @@ function PipBar({ episode, href }: { episode: PlayableEpisode; href: string }) {
           </button>
         )}
         <button
-          aria-label={watching ? 'Close video' : 'Close artwork'}
+          aria-label={close}
           class="mini-button"
           onClick={() => {
             // The bar goes with the picture: focus moves to the island first.
             focusIsland('.player-pip');
             closeMini();
           }}
-          title={watching ? 'Close video' : 'Close artwork'}
+          title={close}
           type="button"
         >
           <CloseIcon size={15} />
@@ -423,6 +442,10 @@ function PipBar({ episode, href }: { episode: PlayableEpisode; href: string }) {
  */
 function Stations({ popover = false }: { popover?: boolean }) {
   const at = islandAt.value;
+  // Without anchor positioning there is only the dock: nothing to choose.
+  if (!anchorPositioning.value) {
+    return null;
+  }
   return (
     <div
       aria-label="Player home"
@@ -569,6 +592,86 @@ function skipLabel(following?: PlayableEpisode) {
   return queue.value[0]?.id === following.id ? `Play next: ${following.title}` : `Skip to ${following.title}`;
 }
 
+/** The card's close, pointing down to where it goes. */
+const ChevronDownIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="m6 9.5 6 6 6-6" />
+  </Svg>
+);
+
+/**
+ * Phones: the card follows a finger down from its top strip (the grabber's),
+ * and goes home when let go a third of the way down or flicked, springing
+ * back otherwise; a tap on the strip closes it too. The island rides its own
+ * translate, so letting go anywhere continues from the pixels it is on.
+ */
+function swipeToClose(strip: HTMLElement) {
+  let from: { y: number; t: number; id: number } | null = null;
+  let dy = 0;
+  const island = () => document.getElementById('player');
+  const down = (event: PointerEvent) => {
+    if (event.button || islandAt.value !== 'card') {
+      return;
+    }
+    from = { y: event.clientY, t: event.timeStamp, id: event.pointerId };
+    dy = 0;
+    strip.setPointerCapture(event.pointerId);
+  };
+  const move = (event: PointerEvent) => {
+    const el = island();
+    if (!from || event.pointerId !== from.id || !el) {
+      return;
+    }
+    dy = Math.max(0, event.clientY - from.y);
+    el.style.transition = 'none';
+    el.style.translate = `0 ${dy}px`;
+  };
+  const up = (event: PointerEvent) => {
+    const el = island();
+    if (!from || event.pointerId !== from.id || !el) {
+      return;
+    }
+    const speed = dy / Math.max(1, event.timeStamp - from.t);
+    from = null;
+    el.style.removeProperty('transition');
+    if (event.type === 'pointerup' && (dy < 6 || dy > innerHeight / 3 || speed > 0.6)) {
+      go(islandBack.value);
+    }
+    el.style.removeProperty('translate');
+  };
+  strip.addEventListener('pointerdown', down);
+  strip.addEventListener('pointermove', move);
+  strip.addEventListener('pointerup', up);
+  strip.addEventListener('pointercancel', up);
+  return () => {
+    strip.removeEventListener('pointerdown', down);
+    strip.removeEventListener('pointermove', move);
+    strip.removeEventListener('pointerup', up);
+    strip.removeEventListener('pointercancel', up);
+  };
+}
+
+type Watcher = { onclose: (() => void) | null; destroy: () => void };
+const CloseWatcherType = (globalThis as { CloseWatcher?: new () => Watcher }).CloseWatcher;
+
+/**
+ * Phones: the system's back gesture closes the card (a close watcher, where
+ * there is one: Android). It adds no history entry, so back and forward
+ * still move between pages exactly as before.
+ */
+function closeOnBack() {
+  if (!CloseWatcherType) {
+    return () => {};
+  }
+  const watcher = new CloseWatcherType();
+  watcher.onclose = () => {
+    if (islandAt.value === 'card') {
+      go(islandBack.value);
+    }
+  };
+  return () => watcher.destroy();
+}
+
 const typing = (target: EventTarget | null) =>
   target instanceof HTMLElement &&
   (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) &&
@@ -654,7 +757,7 @@ export default function Island() {
         return;
       }
       const home = ISLAND_HOMES[Number(event.key) - 1];
-      if (home && (home !== 'rail' || wideScreen.value)) {
+      if (home && homeOnScreen(home) === home) {
         go(home);
       } else if (event.key === 'Escape' && islandAt.value === 'card') {
         go(islandBack.value);
@@ -676,16 +779,38 @@ export default function Island() {
     };
   }, []);
 
+  // Phones: the card's grabber strip and the back gesture close it.
+  const grab = useRef<HTMLDivElement>(null);
+  const phone = phoneScreen.value;
+  const cardOpen = islandAt.value === 'card';
+  useLayoutEffect(() => {
+    if (!cardOpen || !phone || !grab.current) {
+      return;
+    }
+    const stops = [swipeToClose(grab.current), closeOnBack()];
+    return () => stops.forEach((stop) => stop());
+  }, [cardOpen, phone, hasEpisode]);
+
   if (!episode) {
     return null;
   }
 
   const href = `/${episode.slug ?? episode.episodeNumber}`;
   const at = islandAt.value;
-  const docked = miniClosed.value || pipDocked.value[activeMedium.value];
+  const docked = miniClosed.value || pictureDocked.value;
   const floating = mediaStation.value === 'corner' && !docked;
   const following = nextEpisode();
   const watching = activeMedium.value === 'watch';
+  const name = (
+    <>
+      <b>{episode.title}</b>
+      <span>
+        {episode.episodeNumber !== 'Bonus' ? `Ep ${episode.episodeNumber}` : 'Bonus'}
+        {' · '}
+        {watching ? 'Watching' : 'Listening'}
+      </span>
+    </>
+  );
 
   // The bar is anchored to the picture, so it has to come after it.
   const barHost = document.querySelector('[data-pip-bar-host]');
@@ -694,7 +819,7 @@ export default function Island() {
   // Clicking the island's body (not one of its controls) opens or closes the card.
   const onBody = (event: MouseEvent) => {
     const hit = event.target as Element;
-    if (!hit.closest('button, a, input, label, select, .island-scrub, .island-queue, .island-station, .island-more')) {
+    if (!hit.closest('button, a, input, label, select, .island-scrub, .island-queue, .island-station, .island-more, .island-grab')) {
       toggleCard();
     }
   };
@@ -715,6 +840,28 @@ export default function Island() {
         tabIndex={-1}
         {...{ 'data-⚓️-to': `--home-${at}`, 'data-⚓️-fill': '' }}
       >
+        {/* Phones: the card's way out, a grabber strip to swipe it down by and
+            a close, standing in for the home control (phones offer only the
+            dock and the card). Other screens never render them. */}
+        {phone && (
+          <div aria-hidden="true" class="island-grab" ref={grab}>
+            <i />
+          </div>
+        )}
+        {phone && (
+          <div class="island-close PropFLIP">
+            <button
+              aria-label="Close the now-playing card"
+              class="icon-button"
+              onClick={() => go(islandBack.value)}
+              title="Close"
+              type="button"
+            >
+              <ChevronDownIcon size={24} />
+            </button>
+          </div>
+        )}
+
         <div class="island-art PropFLIP fix-kids" data-pip-zone="dock">
           <div class="island-art-in">
             {/* The artwork's palette, for the whole page to take its accent
@@ -735,21 +882,23 @@ export default function Island() {
         </div>
 
         <div class="island-title PropFLIP">
-          <button
-            aria-controls="player"
-            aria-expanded={at === 'card'}
-            aria-label={`${episode.title}. ${at === 'card' ? 'Close' : 'Open'} the now-playing card`}
-            class="island-name"
-            onClick={toggleCard}
-            type="button"
-          >
-            <b>{episode.title}</b>
-            <span>
-              {episode.episodeNumber !== 'Bonus' ? `Ep ${episode.episodeNumber}` : 'Bonus'}
-              {' · '}
-              {watching ? 'Watching' : 'Listening'}
-            </span>
-          </button>
+          {anchorPositioning.value ? (
+            <button
+              aria-controls="player"
+              aria-expanded={at === 'card'}
+              aria-label={`${episode.title}. ${at === 'card' ? 'Close' : 'Open'} the now-playing card`}
+              class="island-name"
+              onClick={toggleCard}
+              type="button"
+            >
+              {name}
+            </button>
+          ) : (
+            // No card to open without anchor positioning: the name goes to its episode.
+            <a class="island-name" href={href}>
+              {name}
+            </a>
+          )}
           <a class="island-open" href={href}>
             Open the episode
             <ArrowOutIcon size={14} />

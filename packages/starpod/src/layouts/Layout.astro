@@ -84,7 +84,14 @@ const publicationLinkTag =
       {
         let rail = 'expanded';
         try {
-          if (localStorage.getItem('starpod:rail') === 'collapsed')
+          // A touch tablet's rail starts collapsed, leaving the page its
+          // width, until the visitor opens it.
+          const kept = localStorage.getItem('starpod:rail');
+          if (
+            kept === 'collapsed' ||
+            (!kept &&
+              matchMedia('(pointer: coarse) and (max-width: 1180px)').matches)
+          )
             rail = 'collapsed';
         } catch {
           // No storage (private mode): the rail opens expanded.
@@ -473,6 +480,7 @@ const publicationLinkTag =
       </nav>
       <p class="rail-label">Follow the show</p>
       <Platforms />
+      <Hosts />
     </div>
 
     <!-- The collapsed rail's names and flyouts. One tooltip travels between
@@ -856,11 +864,20 @@ const publicationLinkTag =
           main.style.translate = `${x - drag.w0}px 0`;
         } else {
           // The page re-lays under the hand while that fits in a frame: the
-          // first few frames are timed, and a page that takes longer rides.
-          // (Without anchors the rail is the grid's column, so it never does.)
+          // first few frames time the page's own re-lay, and a page that
+          // takes longer rides. The rail re-lays at the line's every move
+          // either way, riding or not, so it is laid out first and left out
+          // of the time: in WebKit it alone took ~10ms, and riding saved
+          // none of it. (Without anchors the rail is the grid's column, so
+          // the page never rides.)
+          const timed = anchors && drag.costs.length < 3;
+          if (timed) {
+            $('.rail-edge')!.style.left = `${x}px`;
+            void $('.rail')!.offsetWidth;
+          }
           const start = performance.now();
           apply(x);
-          if (anchors && drag.costs.length < 3) {
+          if (timed) {
             void main.offsetWidth;
             drag.costs.push(performance.now() - start);
             if (

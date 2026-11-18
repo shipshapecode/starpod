@@ -917,4 +917,86 @@ test.describe('phone shell', () => {
       page.locator('#more-sheet').getByRole('link', { name: 'About' })
     ).toBeVisible();
   });
+
+  test('holds the page still under an open sheet', async ({ page }) => {
+    await page.goto('/');
+    await page.addStyleTag({
+      content: 'astro-dev-toolbar { display: none !important; }'
+    });
+    await page.evaluate(() => scrollTo(0, 300));
+    const scrolled = () => page.evaluate(() => Math.round(scrollY));
+    const before = await scrolled();
+
+    await page.locator('.tabbar').getByRole('button', { name: 'More' }).click();
+    const sheet = page.locator('#more-sheet');
+    await expect(sheet).toBeVisible();
+    // The sheet has nothing of its own to scroll, nor has its scrim.
+    const box = (await sheet.boundingBox())!;
+    for (const y of [box.y + 60, 40]) {
+      await page.mouse.move(box.x + box.width / 2, y);
+      await page.mouse.wheel(0, 600);
+      await page.waitForTimeout(250);
+      expect(await scrolled()).toBe(before);
+    }
+    // The hosts are listed under the follow marks.
+    await expect(sheet.locator('.host-row')).not.toHaveCount(0);
+
+    await sheet.getByRole('button', { name: 'Close' }).click();
+    await expect(sheet).toBeHidden();
+    await page.mouse.wheel(0, 300);
+    await expect.poll(scrolled).toBeGreaterThan(before);
+  });
+
+  test('keeps the gutter and bars clear of the safe areas', async ({
+    page,
+    browserName
+  }) => {
+    test.skip(browserName !== 'chromium', 'insets are emulated through CDP');
+    await page.setViewportSize({ width: 844, height: 390 });
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setSafeAreaInsetsOverride', {
+      insets: { top: 0, left: 47, bottom: 21, right: 47 }
+    });
+    await page.goto('/');
+    const edges = await page.evaluate(() => {
+      const box = (selector: string) =>
+        document.querySelector(selector)!.getBoundingClientRect();
+      const tabs = document.querySelectorAll('.tabbar > *');
+      return {
+        show: box('.topbar-show').left,
+        follow: box('.topbar-follow').right,
+        main: parseFloat(
+          getComputedStyle(document.querySelector('.main')!).paddingLeft
+        ),
+        firstTab: tabs[0]!.getBoundingClientRect().left,
+        lastTab: tabs[tabs.length - 1]!.getBoundingClientRect().right
+      };
+    });
+    expect(edges.show).toBeGreaterThanOrEqual(47);
+    expect(edges.main).toBeGreaterThanOrEqual(47);
+    expect(edges.firstTab).toBeGreaterThanOrEqual(47);
+    expect(edges.follow).toBeLessThanOrEqual(844 - 47);
+    expect(edges.lastTab).toBeLessThanOrEqual(844 - 47);
+  });
+
+  test('sets the tab bar on one 48px line in landscape, and lets the top bar go', async ({
+    page
+  }) => {
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto('/');
+    expect((await page.locator('.tabbar').boundingBox())!.height).toBe(48);
+    // Each tab's icon sits beside its label.
+    const tab = page.locator('.tabbar > a').first();
+    const icon = (await tab.locator('svg').boundingBox())!;
+    const label = (await tab.locator('span').boundingBox())!;
+    expect(icon.x + icon.width).toBeLessThanOrEqual(label.x);
+    expect(
+      Math.abs(icon.y + icon.height / 2 - (label.y + label.height / 2))
+    ).toBeLessThan(2);
+
+    await page.evaluate(() => scrollTo(0, 400));
+    await expect
+      .poll(async () => (await page.locator('.topbar').boundingBox())!.y)
+      .toBeLessThan(0);
+  });
 });

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  factGivesCount,
   matchNames,
   matchPageNames,
   ordinal,
@@ -135,6 +136,23 @@ describe('personFact', () => {
   it('falls back to role and tally away from an episode', () => {
     expect(personFact({ count: 1, host: false })).toBe('Guest · 1 episode');
     expect(personFact({ count: 106, host: true })).toBe('Host · 106 episodes');
+  });
+});
+
+describe('factGivesCount', () => {
+  it('is true wherever the fact line says how many episodes', () => {
+    expect(factGivesCount({ appearance: 40, count: 106, host: true })).toBe(
+      true
+    );
+    expect(factGivesCount({ count: 4, host: false })).toBe(true);
+    expect(factGivesCount({ appearance: 1, count: 1, host: false })).toBe(true);
+    expect(factGivesCount({ appearance: 1, count: 3, host: false })).toBe(true);
+  });
+
+  it("is false for a returning guest's ordinal, which doesn't", () => {
+    expect(factGivesCount({ appearance: 3, count: 5, host: false })).toBe(
+      false
+    );
   });
 });
 

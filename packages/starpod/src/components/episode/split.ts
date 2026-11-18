@@ -25,6 +25,8 @@ const KEY = 'starpod:split';
 /** Share of the stage the picture side takes at each preset. */
 const PRESETS = { read: 0.36, balanced: 0.52, watch: 0.66 } as const;
 type Preset = keyof typeof PRESETS;
+/** Where the stage starts on Watch when nothing has been chosen. */
+const WATCH_FIRST = '(pointer: coarse) and (max-width: 1180px)';
 const SIDE_MIN = 280;
 const SCRIPT_MIN = 240;
 
@@ -54,7 +56,10 @@ function readChoice(): { chosen: Preset | null; share: number } {
   }
   const share = Number(saved);
   if (!(share > 0 && share < 1)) {
-    return { chosen: 'balanced', share: PRESETS.balanced };
+    // Nothing chosen yet: Balanced, or Watch on a touch screen up to a
+    // tablet's width, where Balanced leaves the picture small.
+    const preset = matchMedia(WATCH_FIRST).matches ? 'watch' : 'balanced';
+    return { chosen: preset, share: PRESETS[preset] };
   }
   // Saved as a share before presets were kept by name.
   return { chosen: KEYS.find((key) => PRESETS[key] === share) ?? null, share };
@@ -126,18 +131,30 @@ function split(
   // Reported straight after layout, in the same frame: the stage's width
   // (the divider keeps its share of it) and the picture side's height (the
   // side is anchored and out of flow, so the stage takes its height from it).
-  // While the sidebar's divider is held (`html[data-rail-held]`) the stage
-  // narrows every frame: the divider stays put meanwhile, and is placed once
-  // on release.
+  // The width comes from a gauge across the stage, not the stage itself, and
+  // the height from the side's parts, not the side: an observer callback
+  // that resizes an ancestor of, or a peer of, what it was told about leaves
+  // that change undelivered for the frame ("ResizeObserver loop completed
+  // with undelivered notifications"), and here a width moves the side and a
+  // height resizes the stage. The gauge is a child of the stage, so the
+  // side's parts are deeper than it, and neither depends on the stage's
+  // height. While the sidebar's divider is held (`html[data-rail-held]`)
+  // the stage narrows every frame: the divider stays put meanwhile, and is
+  // placed once on release.
   const root = document.documentElement;
   const held = () => root.hasAttribute('data-rail-held');
+  const gauge = document.createElement('i');
+  gauge.className = 'ep-split-gauge';
+  gauge.setAttribute('aria-hidden', 'true');
+  stage.append(gauge);
+  const parts = Array.from(side.children);
   let lastWidth = 0;
   const sizes = new ResizeObserver((entries) => {
     for (const entry of entries) {
-      if (entry.target === side) {
+      if (entry.target !== gauge) {
         stage.style.setProperty(
           '--ep-h',
-          String(entry.borderBoxSize[0].blockSize)
+          String(side.getBoundingClientRect().height)
         );
       } else if (entry.contentRect.width !== lastWidth && !held()) {
         lastWidth = entry.contentRect.width;
@@ -145,12 +162,12 @@ function split(
       }
     }
   });
-  // On release the stage is re-observed, so the divider is placed after the
+  // On release the gauge is re-observed, so the divider is placed after the
   // next layout instead of forcing one in the release's pointerup.
   const released = new MutationObserver(() => {
     if (!held()) {
-      sizes.unobserve(stage);
-      sizes.observe(stage);
+      sizes.unobserve(gauge);
+      sizes.observe(gauge);
     }
   });
   released.observe(root, { attributeFilter: ['data-rail-held'] });
@@ -169,10 +186,14 @@ function split(
       }
     }
     stage.toggleAttribute('data-split-on', split);
-    if (split) {
-      sizes.observe(side);
-    } else {
-      sizes.unobserve(side);
+    for (const part of parts) {
+      if (split) {
+        sizes.observe(part);
+      } else {
+        sizes.unobserve(part);
+      }
+    }
+    if (!split) {
       stage.style.removeProperty('--ep-h');
     }
   }
@@ -352,10 +373,11 @@ function split(
     { signal }
   );
 
-  sizes.observe(stage);
+  sizes.observe(gauge);
   signal.addEventListener('abort', () => {
     sizes.disconnect();
     released.disconnect();
+    gauge.remove();
   });
 }
 

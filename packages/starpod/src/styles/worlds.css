@@ -52,9 +52,12 @@
   font-size: 1.1rem;
 }
 
-/* Phones: the script performs right under the picture. */
+/* Phones: the title and Play come first; once this episode is in the
+   player, the script performs right under the picture. (The player's
+   episode, not the script's own state: that is a preview again before the
+   first line and after a seek back to the top, and would move the title.) */
 @media (max-width: 1023px) {
-  :root[data-world='stage'] .stage {
+  :root[data-world='stage'] .stage[data-current] {
     grid-template-areas:
       'frame'
       'script'
@@ -68,6 +71,65 @@
 
   :root[data-world='stage'] .script[data-state='preview'] {
     max-height: 30vh;
+  }
+}
+
+/* Landscape phones (the query the whole site uses for that form): the
+   picture is held to the height between the bars at 16:9, with the title,
+   facts and Play beside it on the first screen, and the script below. */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 1023px) {
+  :root[data-world='stage'] .stage,
+  :root[data-world='stage'] .stage[data-current] {
+    /* Below the top bar (its border too) and the page's top margin, and
+       clear of the tab bar. */
+    --stage-frame-h: calc(
+      100dvh - var(--topbar-h) - env(safe-area-inset-top) - 1px -
+        var(--gutter) - var(--tabbar-h) - 12px
+    );
+    --stage-frame-w: min(calc(var(--stage-frame-h) * 16 / 9), 58%);
+    grid-template-columns: var(--stage-frame-w) minmax(0, 1fr);
+    grid-template-areas:
+      'frame meta'
+      'script script';
+    align-items: start;
+  }
+
+  /* Play straight after the facts, then the cast and sponsors. The summary
+     opens the show notes below, so it waits for them, as on the spread. */
+  :root[data-world='stage'] .stage-meta {
+    display: flex;
+    flex-direction: column;
+  }
+
+  :root[data-world='stage']
+    .stage-meta
+    > :not(.stage-title, .stage-facts, astro-island) {
+    order: 1;
+  }
+
+  :root[data-world='stage'] .stage-desc {
+    display: none;
+  }
+
+  /* The full column, and three lines at most, so a long title never pushes
+     Play off the screen. */
+  :root[data-world='stage'] .stage-title {
+    display: -webkit-box;
+    max-width: none;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    font-size: clamp(1.25rem, 0.5rem + 2.4vw, 1.75rem);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  :root[data-world='stage'] .stage-facts {
+    margin-bottom: 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  :root[data-world='stage'] .stage-meta .cast {
+    margin-top: 1rem;
   }
 }
 

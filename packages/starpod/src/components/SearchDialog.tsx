@@ -340,6 +340,11 @@ export default function SearchDialog({
               placeholder="Search episodes..."
               value={query}
               onInput={onInput}
+              autocapitalize="off"
+              autocomplete="off"
+              autocorrect="off"
+              enterkeyhint="search"
+              spellcheck={false}
               role="combobox"
               aria-label="Search episodes"
               aria-autocomplete="list"
@@ -349,9 +354,17 @@ export default function SearchDialog({
                 items[selectedIndex] && optionId(items[selectedIndex])
               }
             />
-            <kbd class="text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs sm:inline-flex">
+            <kbd class="sp-esc text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs sm:inline-flex">
               <span class="text-xs">ESC</span>
             </kbd>
+            {/* On touch, where there is no Escape key to show. */}
+            <button
+              class="sp-cancel"
+              onClick={() => (isSearchOpen.value = false)}
+              type="button"
+            >
+              Cancel
+            </button>
           </div>
 
           {/* Results */}

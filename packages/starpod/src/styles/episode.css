@@ -41,18 +41,32 @@
   }
 }
 
+/* Landscape phones: the top bar scrolls away with the page (shell.css), so
+   the sticky chrome starts at the top, under the safe area. */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 1023px) {
+  :root {
+    --ep-stick: env(safe-area-inset-top);
+  }
+}
+
 /* Links into a section land below the bar. (A margin on the sections, not
    padding on html:has(.ep-bar): that :has() restyles the whole document
-   whenever anything in the page changes.) */
+   whenever anything in the page changes.) The root's scroll padding on
+   phones (--scroll-pad-top/-bottom, from the shell) already clears the top
+   and tab bars and adds to these margins, so they leave it out. */
 .ep-body section[id] {
-  scroll-margin-top: calc(var(--ep-under-bar) + 16px);
+  scroll-margin-top: calc(
+    var(--ep-under-bar) + 16px - var(--scroll-pad-top, 0px)
+  );
 }
 
 /* Focus moving onto a control scrolls it clear of the bar above and the
    dock below, rather than leaving it under either. */
 .ep-body :is(a[href], button, input, select, textarea, [tabindex]) {
-  scroll-margin-block: calc(var(--ep-under-bar) + 16px)
-    calc(var(--ep-floor) + 16px);
+  scroll-margin-block: calc(
+      var(--ep-under-bar) + 16px - var(--scroll-pad-top, 0px)
+    )
+    calc(var(--ep-floor) + 16px - var(--scroll-pad-bottom, 0px));
 }
 
 /* The stage's title and play button have gone once its meta has passed
@@ -171,6 +185,18 @@
   }
 }
 
+/* Without trigger animations SectionBar's script marks the bar docked
+   (data-docked); until then the episode is collapsed and hidden the same
+   way, and it arrives without the tween. */
+@supports not (animation-trigger: --ep-docked play-forwards) {
+  .ep-bar:not([data-docked]) .ep-bar-id {
+    width: 0;
+    margin-inline-end: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 /* Hidden as well as collapsed while undocked, so its controls are not in
    the tab order or the accessibility tree until they can be seen. */
 @keyframes ep-bar-arrive {
@@ -264,6 +290,27 @@
 
 .ep-bar-play:active {
   scale: 0.92;
+}
+
+/* Touch: the disc stays 40px, and its button answers a 44px square. The
+   episode's clip grows to take it in (WebKit has no overflow-clip-margin)
+   without moving anything: 2px above and below, and 4px before the disc,
+   since on phones nothing follows the disc and the clip ends at it. */
+@media (pointer: coarse) {
+  .ep-bar-play::after {
+    content: '';
+    position: absolute;
+    inset-block: -5px;
+    inset-inline: -7px -3px;
+    border-radius: 999px;
+  }
+
+  .ep-bar-id {
+    margin-block: -2px;
+    margin-inline-start: -4px;
+    padding-block: 2px;
+    padding-inline-start: 4px;
+  }
 }
 
 .ep-bar-title {
@@ -441,6 +488,21 @@
   transition:
     left calc(520ms * var(--slomo)) var(--ease-spring),
     width calc(420ms * var(--slomo)) var(--ease-out);
+}
+
+/* Touch: each link is a 44px-tall target, and the pill under the current
+   one keeps its size. */
+@media (pointer: coarse) {
+  .ep-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .ep-nav-here {
+    top: calc(anchor(top) + 4px);
+    height: calc(anchor-size(height) - 8px);
+  }
 }
 
 @supports not (anchor-name: --ep-here) {
@@ -741,6 +803,11 @@ button.ep-person-who:focus-visible::after {
     flex-direction: row;
     align-items: center;
     gap: 8px;
+  }
+
+  /* A tally the fact line above already gives would only repeat it. */
+  .ep-person-head > .ep-chip-quiet[data-counted] {
+    display: none;
   }
 
   .ep-person-caret {
@@ -1190,6 +1257,31 @@ button.ep-chip {
   margin: 0;
 }
 
+/* Touch: a timestamp (lib/seek-chip.mjs) answers a 44px-tall target
+   without changing the line it sits in. */
+@media (pointer: coarse) {
+  .seek-chip {
+    position: relative;
+  }
+
+  .seek-chip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: 44px;
+    translate: -50% -50%;
+  }
+
+  /* A turn's chip sits 6px under the turn's clipped top: its area reaches
+     5px up and the rest down. */
+  .ep-turn-head .seek-chip::after {
+    top: -5px;
+    translate: -50% 0;
+  }
+}
+
 .ep-turn-head strong {
   max-width: 100%;
   color: var(--ink);
@@ -1280,12 +1372,15 @@ button.ep-chip {
   }
 }
 
-/* Who is speaking: one card anchored to the active name (SpeakerCard).
-   Above the name by choice, below it when there is no room (a name stuck
-   under the bar); the caret reads which from an anchored container query.
-   The popover is never transformed; PropFLIP moves the box inside it. */
+/* Who is speaking: one card anchored to the active turn's head, timestamp
+   and name (SpeakerCard), so it never covers the timestamp. Above the head
+   by choice, below it when there is no room (a head stuck under the bar);
+   the caret reads which from an anchored container query. It takes no
+   pointer events, so a click always reaches what is under it. The popover
+   is never transformed; PropFLIP moves the box inside it. */
 .ep-who {
   position-anchor: --ep-who;
+  pointer-events: none;
   inset: auto;
   /* Room above the name stops at the bar, so a card that would hide under
      it flips below instead. */
@@ -1304,6 +1399,14 @@ button.ep-chip {
   transition:
     display calc(200ms * var(--slomo)) allow-discrete,
     overlay calc(200ms * var(--slomo)) allow-discrete;
+}
+
+/* Without anchor positioning it has no place by its name (it would open at
+   the corner of the screen), so it stays away. */
+@supports not (anchor-name: --ep-who) {
+  .ep-who {
+    display: none;
+  }
 }
 
 .ep-who-box {
@@ -1901,6 +2004,16 @@ button.ep-chip {
   display: none;
 }
 
+/* split.ts reads the stage's width from this: across the stage, and no
+   taller with it. */
+.ep-split-gauge {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* Outside the split, the side is no box: the room and the meta stay grid
    items of the stage. */
 .stage-side {
@@ -2035,6 +2148,13 @@ button.ep-chip {
     font-weight: 650;
     cursor: pointer;
     transition: color 300ms var(--ease-out);
+  }
+
+  /* Touch: a 40px target each. */
+  @media (pointer: coarse) {
+    .ep-presets button {
+      min-height: 40px;
+    }
   }
 
   .ep-presets [aria-pressed='true'] {

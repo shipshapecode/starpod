@@ -1159,15 +1159,18 @@
   padding: 0;
   list-style: none;
   /* Every part travels in a straight line and lands without overshoot:
-     across, down and in size on one clock and one curve, gentle at both
-     ends. */
-  --xp-glide: cubic-bezier(0.3, 0, 0.15, 1);
-  --flip-dx: 0.6s;
-  --flip-dy: 0.6s;
-  --flip-ds: 0.6s;
-  --flip-ex: var(--xp-glide);
-  --flip-ey: var(--xp-glide);
-  --flip-es: var(--xp-glide);
+     across, down and in size on one clock and one curve. It is the page
+     column's own (rail.css: its glide as the sidebar folds), so a card the
+     sidebar carries rides the column's motion and its own as one. */
+  --flip-dx: 0.55s;
+  --flip-dy: 0.55s;
+  --flip-ds: 0.55s;
+  --flip-ex: var(--ease-out);
+  --flip-ey: var(--ease-out);
+  --flip-es: var(--ease-out);
+  /* A card turning (the strip's lean, the close-up's turn and the title's
+     tumble) turns on a clock of its own. */
+  --xp-turn-d: 0.7s;
 }
 
 /* As many columns as the old auto-fill gave (150px, then 196px, then
@@ -1349,10 +1352,7 @@
 
 .xp-art {
   --r: var(--r-tile);
-  /* The layers inside round their corners to match the box as it is seen:
-     the box's own radius, undone by its flip scale (one value, read once
-     per frame only while the card flies). */
-  --xp-r: calc(var(--r) / var(--sx));
+  --xp-r: var(--r-tile);
   /* What the open card holds (its depth, its back's lettering) is sized
      from its own width, so a card in flight is the open card scaled. */
   container-type: inline-size;
@@ -1385,8 +1385,10 @@
 /* The layers stack in one grid cell rather than by absolute positioning:
    a positioned box is a paint layer of its own, and a wall of cards with
    eight each would cost the compositor dearly on every frame of a scroll.
-   They round their corners from --xp-r, the box's radius undone by its
-   flip scale: it changes only while that card flies. */
+   They round their corners from a plain token (--xp-r), not from the
+   box's radius, which eases with every flight and would restyle every
+   layer with it; only the card in or leaving the close-up, whose box
+   doesn't clip them, follows its box (below). */
 .xp-tilt,
 .xp-turn,
 .xp-face {
@@ -1412,6 +1414,19 @@
   overflow: visible;
 }
 
+/* Unclipped, the layers inside round their own corners. A strip cell's
+   keep the strip's (a value that never changes, so its layers are never
+   restyled as it flies); the card in or leaving the close-up's match its
+   box as it is seen, its radius undone by its flip scale. Flat, the box
+   clips them. */
+.xp .xp-card[data-depth] .xp-art {
+  --xp-r: var(--r-thumb);
+}
+
+.xp-card:is([data-on], [data-swap]) .xp-art {
+  --xp-r: calc(var(--r) / var(--sx));
+}
+
 /* In depth the face is what its layers sit on. */
 :is(.xp .xp-card[data-depth], .xp-card:is([data-on], [data-swap])) .xp-face {
   position: relative;
@@ -1425,40 +1440,17 @@
   perspective-origin: var(--xp-vantage-x, 50%) var(--xp-vantage-y, 50%);
 }
 
-/* How far the turn stands off its box: lifted toward you in the close-up,
-   sunk back in the strip. Each is a share (0 to 1) of a depth measured in
-   the box's own width, and the shares are what ease: a card in flight is
-   laid out at its new size and scaled to look like its old one, so a depth
-   eased in pixels would start at the wrong size. Its shadow follows the
-   same shares. */
-@property --xp-lift {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --xp-sink {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
-.xp-card:is([data-depth], [data-on], [data-swap]) .xp-turn {
-  translate: 0 0
-    calc(var(--xp-lift) * 9cqi + var(--xp-sink) * var(--xp-lean-z, 0px));
-}
-
 /* The turn travels while the archive folds (the strip's cells lean in or
-   out) and while a card turns over; a cell that takes depth as the strip
+   out, set back by a scale rather than a depth: a scale has no unit, so it
+   holds as the cell is laid out at its new size, and the compositor runs
+   it) and while a card turns over; a cell that takes depth as the strip
    scrolls leans at once. */
 .xp[data-folding] .xp-turn,
 .xp-card:is([data-on], [data-swap]) .xp-turn {
   transition:
-    rotate calc(var(--flip-dy) * var(--slomo)) var(--xp-spring-1)
+    rotate calc(var(--xp-turn-d) * var(--slomo)) var(--xp-spring-1)
       calc(var(--flip-delay, 0s) * var(--slomo)),
-    --xp-lift calc(var(--flip-dy) * var(--slomo)) var(--ease-out)
-      calc(var(--flip-delay, 0s) * var(--slomo)),
-    --xp-sink calc(var(--flip-dy) * var(--slomo)) var(--ease-out)
+    scale calc(var(--xp-turn-d) * var(--slomo)) var(--ease-out)
       calc(var(--flip-delay, 0s) * var(--slomo));
 }
 
@@ -1482,13 +1474,11 @@
   background: var(--media-ground);
 }
 
-/* Cards in depth cast a shadow, the flat wall none: the open card's and a
-   strip cell's, by how far each stands off (above). */
-.xp-card:is([data-depth], [data-on], [data-swap]) .xp-face {
-  box-shadow: 0 calc(2.8cqi * var(--xp-lift) + 12.5cqi * var(--xp-sink))
-    calc(4.4cqi * var(--xp-lift) + 19.6cqi * var(--xp-sink))
-    calc(-3.2cqi * var(--xp-lift) - 14.3cqi * var(--xp-sink))
-    oklch(0% 0 0 / 0.5);
+/* Cards in depth cast a shadow, the flat wall none: the strip's cells
+   while the close-up is open, and the card in or leaving it. */
+.xp[data-open] .xp-card[data-depth] .xp-face,
+.xp-card:is([data-on], [data-swap]) .xp-face {
+  box-shadow: 0 14px 22px -16px oklch(0% 0 0 / 0.5);
 }
 
 .xp-card:is([data-on], [data-swap]) .xp-face {
@@ -1507,9 +1497,11 @@
   inset: 0;
 }
 
-/* A picture fades in once it has loaded (prop-for-that img on the box),
-   through a number, so no composited layer comes and goes for it. One
-   already loaded shows at once. */
+/* On a card arriving through a change (joining the cut, or rising into
+   view: data-join), the picture fades in once it has loaded (prop-for-that
+   img on the box), through a number, so no composited layer comes and goes
+   for it. One already loaded shows at once; one that loads as the page
+   scrolls appears as it always has, so a scroll repaints nothing more. */
 @property --xp-shown {
   syntax: '<number>';
   inherits: false;
@@ -1517,7 +1509,7 @@
 }
 
 @container style(--live-loaded: 0) {
-  .xp-face img {
+  .xp-card[data-join] .xp-face img {
     --xp-shown: 0;
   }
 }
@@ -1802,7 +1794,7 @@
 }
 
 .xp-card[data-swap] .xp-title {
-  --xp-lay: calc(var(--flip-dy) * var(--slomo)) linear(0, 0 20%, 1 20%, 1)
+  --xp-lay: calc(var(--xp-turn-d) * var(--slomo)) linear(0, 0 20%, 1 20%, 1)
     calc(var(--flip-delay, 0s) * var(--slomo));
   --also:
     font-size var(--xp-lay), line-height var(--xp-lay),
@@ -1812,7 +1804,7 @@
 .xp-card[data-swap] .xp-title a {
   transition:
     color 300ms var(--ease-out),
-    rotate calc(var(--flip-dy) * var(--slomo)) var(--xp-spring-1)
+    rotate calc(var(--xp-turn-d) * var(--slomo)) var(--xp-spring-1)
       calc(var(--flip-delay, 0s) * var(--slomo)),
     -webkit-line-clamp var(--xp-lay);
   transition-behavior: allow-discrete;
@@ -1826,7 +1818,7 @@
   text-decoration: none;
   transition:
     color 300ms var(--ease-out),
-    rotate calc(var(--flip-dy) * var(--slomo)) var(--xp-spring-1)
+    rotate calc(var(--xp-turn-d) * var(--slomo)) var(--xp-spring-1)
       calc(var(--flip-delay, 0s) * var(--slomo));
 }
 
@@ -1894,10 +1886,14 @@
   align-items: center;
   gap: 2px;
   padding-left: 2.5rem;
-  /* It fades into the row, lit or not (--xp-row, below). */
-  background:
-    linear-gradient(to right, transparent, var(--xp-row) 2rem),
-    linear-gradient(to right, transparent, var(--ground) 2rem);
+  /* It fades into the row, lit or not (--xp-lit, below). */
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in oklch, var(--raised) calc(var(--xp-lit) * 100%), var(--ground))
+      2rem
+  );
+  transition: --xp-lit calc(240ms * var(--slomo)) ease;
   color: var(--accent-ink);
   font-size: 0.8125rem;
   font-weight: 650;
@@ -1991,23 +1987,40 @@
   column-gap: 14px;
   margin: 0;
   padding: 14px 6px;
-  border-radius: var(--r-thumb);
-  background-color: var(--xp-row);
 }
 
 /* Under the pointer a row lights up (a Raised fill, eased in and out) as
-   its thumb grows: a response the whole row gives, not only the thumb. */
-@property --xp-row {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: transparent;
+   its thumb grows: a response the whole row gives, not only the thumb. The
+   fill is its own box under the row (the row's paint containment keeps it
+   there), faded through a number that nothing inherits, so a hover
+   restyles that box and the "More" over the description, nothing else. */
+@property --xp-lit {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.xp-list[data-view='list'] .xp-card:not([data-on])::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--r-thumb);
+  background: var(--raised);
+  opacity: var(--xp-lit);
+  transition: --xp-lit calc(240ms * var(--slomo)) ease;
+  pointer-events: none;
 }
 
 @media (hover: hover) {
   .xp:not([data-open], [data-still])
     .xp-list[data-view='list']
-    .xp-card:not([data-on], [data-swap]):hover {
-    --xp-row: var(--raised);
+    .xp-card:not([data-on], [data-swap]):hover::before,
+  .xp:not([data-open], [data-still])
+    .xp-list[data-view='list']
+    .xp-card:not([data-on], [data-swap]):hover
+    .xp-more {
+    --xp-lit: 1;
   }
 }
 
@@ -2018,6 +2031,7 @@
 /* A thumb's corners, not a tile's. */
 .xp-list[data-view='list'] .xp-card:not([data-on]) .xp-art {
   --r: var(--r-thumb);
+  --xp-r: var(--r-thumb);
 }
 
 :is(.xp-list, .xp-fading-text)[data-view='list'] .xp-text {
@@ -2090,12 +2104,13 @@
   --xp-cu-h: calc(
     100dvh - var(--xp-cu-top) - var(--dock-h) - var(--tabbar-h) - 12px
   );
-  /* The filmstrip leans back in space. Its depth, perspective and vantage
-     are in a cell's own width (cqi), so a cell folding back into the wall,
-     laid out at its new size and scaled from its old one, is seen as it
-     was: 90px, 900px and 3.4 cells to the left of a 112px cell. */
+  /* The filmstrip leans back in space, set back to 91% (as 90px deep under
+     its 900px perspective). Its perspective and vantage are in a cell's
+     own width (cqi), so a cell folding back into the wall, laid out at its
+     new size and scaled from its old one, is seen as it was: 900px, and
+     3.4 cells to the left of a 112px cell. */
   --xp-lean-r: y -26deg;
-  --xp-lean-z: -80cqi;
+  --xp-lean-s: 0.91;
   --xp-depth: 804cqi;
   --xp-vantage-x: -340cqi;
   --xp-vantage-y: 50%;
@@ -2163,12 +2178,21 @@
   z-index: 3;
 }
 
-/* The parts that open and close take a little longer, on the same one
-   curve (the turn and the title's tumble keep their spring). */
+/* The parts that open and close travel a little longer, still straight
+   (across and down on one clock and curve). Opening, the artwork grows
+   slowly at first (in and out), so the facts line and title are mostly
+   clear of it before it covers where they were; closing, it shrinks
+   at once, before they arrive home under it. The turn and the title's
+   tumble keep their spring. */
 .xp-card[data-swap] {
-  --flip-dx: 0.7s;
-  --flip-dy: 0.7s;
-  --flip-ds: 0.7s;
+  --flip-dx: 0.6s;
+  --flip-dy: 0.6s;
+  --flip-ds: 0.6s;
+  --xp-turn-d: 0.85s;
+}
+
+.xp-card[data-swap][data-on] {
+  --flip-es: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .xp-closeup {
@@ -2374,7 +2398,6 @@
 
 .xp-card[data-on] .xp-turn {
   rotate: y 180deg;
-  --xp-lift: 1;
 }
 
 .xp-card[data-on] .xp-facts {
@@ -2598,6 +2621,12 @@
   pointer-events: none;
 }
 
+/* The text, re-wrapped to the strip's width, goes at once: a copy of it as
+   it was fades out where it stood (explorer.ts). */
+.xp[data-open] .xp-card:not([data-on]) .xp-text {
+  --also: visibility 0s;
+}
+
 /* Once the fold has landed they leave the page, out of the tab order. */
 .xp[data-open]:not([data-folding])
   .xp-card:not([data-on])
@@ -2622,7 +2651,7 @@
    back once they have landed (explorer.ts). */
 .xp[data-open] .xp-card[data-depth]:not([data-on]) .xp-turn {
   rotate: var(--xp-lean-r);
-  --xp-sink: 1;
+  scale: var(--xp-lean-s);
 }
 
 .xp[data-open] .xp-card:not([data-on]) .xp-art {
@@ -2664,9 +2693,9 @@
   .xp-stage {
     --xp-tag-size: 6.5cqi;
     --xp-strip: calc((var(--xp-w, 358px) - 3 * 12px) / 4);
-    /* As 30px, 900px and 2.6 cells above, for a cell about 80px wide. */
+    /* As 30px deep, 900px and 2.6 cells above, for a cell about 80px wide. */
     --xp-lean-r: x 24deg;
-    --xp-lean-z: -37cqi;
+    --xp-lean-s: 0.97;
     --xp-depth: 1125cqi;
     --xp-vantage-x: 50%;
     --xp-vantage-y: -260cqi;
@@ -2797,8 +2826,7 @@
     opacity calc(320ms * var(--slomo)) var(--ease-out)
       calc(140ms * var(--slomo)),
     scale calc(480ms * var(--slomo)) var(--ease-out) calc(140ms * var(--slomo)),
-    display calc(460ms * var(--slomo)) allow-discrete,
-    --xp-row calc(240ms * var(--slomo)) ease;
+    display calc(460ms * var(--slomo)) allow-discrete;
 }
 
 @starting-style {
@@ -2841,6 +2869,14 @@
   height: var(--xp-h);
   margin: 0;
   pointer-events: none;
+}
+
+/* Its text clears first, in 120ms (LEAVE_MS, explorer.ts), before any card
+   arriving in its place comes up, so two cards' words never read over each
+   other in one cell; its picture fades on. */
+.xp-card:is([hidden][data-exit], [data-away]) .xp-text {
+  opacity: 0;
+  --also: opacity calc(120ms * var(--slomo)) ease-out;
 }
 
 /* A page that arrives with a query waits for it to be applied; should the

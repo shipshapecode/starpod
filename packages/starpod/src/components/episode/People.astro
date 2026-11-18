@@ -17,6 +17,8 @@ export interface Props {
     count: number;
     /** The line that says something about them (`personFact`). */
     fact: string;
+    /** Whether that line already gives `count` (`factGivesCount`). */
+    counted: boolean;
     /** Transcript voice 0 or 1, when they speak as one. */
     voice?: number;
     /** The name the transcript gives them, when it names them. */
@@ -100,7 +102,10 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
                 </button>
               </span>
             ) : (
-              <span class="ep-chip ep-chip-quiet">
+              <span
+                class="ep-chip ep-chip-quiet"
+                data-counted={person.counted ? '' : undefined}
+              >
                 {person.count} {person.count === 1 ? 'ep' : 'eps'}
               </span>
             )}

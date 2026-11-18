@@ -9,6 +9,8 @@
 
 .dock,
 .player-air {
+  /* Where the picture's room starts: under the top bar. */
+  --room-top: calc(var(--topbar-h) + env(safe-area-inset-top));
   --pip-gap: 12px;
   --pip-w: min(52vw, 360px);
   --pip-bar-h: 36px;
@@ -30,6 +32,20 @@
   .player-air {
     --pip-gap: 20px;
     --pip-w: clamp(260px, 24vw, 400px);
+  }
+}
+
+/* A phone on its side: the top bar scrolls away with the page (shell.css),
+   so the room starts under the safe area, or under the episode page's
+   section bar, which sticks there. */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 1023px) {
+  .dock,
+  .player-air {
+    --room-top: env(safe-area-inset-top);
+  }
+
+  .app:has(.ep-bar) ~ :is(.dock, .player-air) {
+    --room-top: calc(env(safe-area-inset-top) + var(--ep-bar-h, 56px));
   }
 }
 
@@ -207,31 +223,17 @@
   }
 }
 
-/* Without anchor positioning the island still has its homes; it steps
-   between them instead of travelling. */
+/* Without anchor positioning the dock is the player's one home (state.ts),
+   placed directly; the More menu that held only the choice of home gives
+   way. */
 @supports not (anchor-name: --a) {
-  .island[data-state='pill'] {
-    inset: auto 0 calc(var(--tabbar-h) + 14px) var(--rail-w);
-    width: 300px;
-    height: 56px;
-    margin-inline: auto;
-  }
-
   .island[data-state='dock'] {
     inset: auto 8px calc(var(--tabbar-h) + 8px) calc(var(--rail-w) + 8px);
     height: calc(var(--dock-h) - 12px);
   }
 
-  .island[data-state='card'] {
-    inset: 8px 0 0;
-  }
-
-  .island-station-on {
+  .island:is([data-fit='move'], [data-fit='icon']) .island-more {
     display: none;
-  }
-
-  .island-station label:has(:checked) {
-    background: var(--ink);
   }
 }
 
@@ -537,6 +539,9 @@
   block-size: 20px;
   /* Room for the thumb's hover growth at either end. */
   overflow-clip-margin: 4px;
+  /* The track's unplayed part reads at 3:1 or more against the glass, in
+     both schemes (--line was about 1.2:1). */
+  --line: color-mix(in oklch, var(--muted) 85%, var(--line-strong));
 }
 
 /* ---------- The ship (the original player's progress indicator) ----------
@@ -1021,6 +1026,286 @@
 
 :root[data-island='card'] .player-media {
   z-index: 61;
+}
+
+/* ---------- Phones ----------
+   A phone's screen, upright or turned: <html data-phone>, which the media
+   engine sets from state.ts's one phone query (phoneScreen), so script and
+   styles cannot disagree. Only the dock and the card are offered there, so
+   the card's home control gives way to its own way out: a grabber strip to
+   swipe it down by and a close (Island.tsx renders both only on phones).
+   Everything is a 44px target, and the transport is centred. */
+.island-grab,
+.island-close {
+  display: none;
+}
+
+:root[data-phone] .island-station label[data-home='pill'],
+:root[data-phone] [data-state='card'] .island-station {
+  display: none;
+}
+
+:root[data-phone] .island[data-state='card'] {
+  --key: 44px;
+  /* The transport's four keys and their gaps, centred in the card. */
+  --side: calc((var(--cw) - 3 * 44px - 64px - 5 * 12px) / 2);
+  grid-template:
+    'top top top top top top' 44px
+    'art art art art art art' var(--art-h)
+    'title title title title title title' 96px
+    'scrub scrub scrub scrub scrub scrub' 44px
+    '. prev play next skip .' 64px
+    'tools tools tools tools tools tools' 52px
+    'queue queue queue queue queue queue' auto
+    'shelf shelf shelf shelf shelf shelf' auto
+    / var(--side) 44px 64px 44px 44px var(--side);
+}
+
+:root[data-phone] [data-state='card'] .island-tools {
+  justify-self: center;
+}
+
+/* Narrower than the tools' row (318px), they take two lines. */
+@media (max-width: 359px) {
+  :root[data-phone] .island[data-state='card'] {
+    grid-template-rows: 44px var(--art-h) 96px 44px 64px 104px auto auto;
+  }
+
+  :root[data-phone] [data-state='card'] .island-tools {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 8px;
+    width: var(--cw);
+  }
+}
+
+:root[data-phone] [data-state='card'] :is(.island-prev, .island-next, .island-skip, .island-tools) .icon-button {
+  width: 44px;
+  height: 44px;
+}
+
+:root[data-phone] [data-state='card'] .text-button {
+  height: 44px;
+}
+
+:root[data-phone] [data-state='card'] .medium-option {
+  min-height: 44px;
+}
+
+/* The link to the episode is a 44px target in 20px of the title's room
+   (the title's row is fixed: the board's subgrid spans it, so it does not
+   grow to fit), and the scrubber's hit box is 44px with its 4px track (and
+   the ship) centred in it. */
+:root[data-phone] [data-state='card'] .island-open {
+  min-height: 44px;
+  margin-block: -12px;
+}
+
+:root[data-phone] [data-state='card'] .island-track .scrubber {
+  block-size: 44px;
+}
+
+/* A queued cover's remove shows only on hover or focus, which a phone has
+   not got, and a 44px one on its 56px cover would take its taps. Its row's
+   end holds it instead: always shown, 44px, off the cover. */
+:root[data-phone] .board-next-list .board-row {
+  grid-template-columns: 56px minmax(0, 1fr) 44px;
+}
+
+:root[data-phone] .board-row-remove:not([hidden]) {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  /* The board itself lets taps through to its covers. */
+  pointer-events: auto;
+}
+
+:root[data-phone] .board-row-remove:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+:root[data-phone] .board-tiles .tile[data-queued] .tile-remove {
+  display: none;
+}
+
+:root[data-phone] [data-state='card'] :is(.island-grab, .island-close) {
+  --area: top;
+  display: grid;
+}
+
+/* The strip along the card's top takes the swipe (the card does not scroll
+   from it); its grabber sits centred at the top. */
+:root[data-phone] [data-state='card'] .island-grab {
+  align-self: stretch;
+  justify-items: center;
+  align-items: start;
+  margin-top: -12px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.island-grab i {
+  width: 40px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--ink) 28%, transparent);
+}
+
+:root[data-phone] [data-state='card'] .island-close {
+  z-index: 1;
+  justify-self: start;
+  width: 44px;
+  height: 44px;
+}
+
+.island-close .icon-button {
+  width: 100%;
+  height: 100%;
+}
+
+/* The narrow dock. Watching, the picture lives in it (it floats only when
+   asked): its art grows to a readable 16:9, and the dock with it, which the
+   page's own room for the dock follows (--dock-h). Its play and skip fill
+   their 44px cells. */
+@media (max-width: 1023px) {
+  :root[data-phone] .island[data-state='dock'] {
+    --key: 44px;
+    --play: 44px;
+  }
+
+  :root[data-phone] [data-state='dock'] .island-skip .icon-button {
+    width: 44px;
+    height: 44px;
+  }
+
+  :root[data-phone][data-island][data-medium='watch'] {
+    --dock-h: 78px;
+  }
+
+  :root[data-phone] .island[data-state='dock'][data-medium='watch'] {
+    --art-w: 96px;
+    --art-h: 54px;
+    grid-template:
+      'art title play skip' 54px
+      / var(--art-w) var(--title-w) 44px 44px;
+  }
+}
+
+/* A phone on its side (the site's landscape form): the card lays out in two
+   columns, the picture on the left beside its controls (Up next and the
+   shelf below them), and the dock is 48px tall, its art at 44px. */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root[data-phone] .island[data-state='card'] {
+    /* The picture leaves its controls at least 318px (the tools' row). */
+    --art-w: min(var(--cw) - 330px, (100dvh - 96px) * 16 / 9);
+    --art-h: calc(var(--art-w) * 9 / 16);
+    --side: max(0px, (var(--cw) - var(--art-w) - 3 * 44px - 64px - 6 * 12px) / 2);
+    --title-w: calc(var(--cw) - var(--art-w) - 12px);
+    align-items: start;
+    grid-template:
+      'art top top top top top top' 44px
+      'art title title title title title title' 96px
+      'art scrub scrub scrub scrub scrub scrub' 44px
+      'art . prev play next skip .' 64px
+      'art tools tools tools tools tools tools' 52px
+      'queue queue queue queue queue queue queue' auto
+      'shelf shelf shelf shelf shelf shelf shelf' auto
+      / var(--art-w) var(--side) 44px 64px 44px 44px var(--side);
+  }
+
+  :root[data-phone] .island[data-state='card'][data-medium='listen'] {
+    --art-w: min(40vw, 100dvh - 96px);
+    --art-h: var(--art-w);
+  }
+
+  @media (max-width: 1023px) {
+    :root[data-phone][data-island],
+    :root[data-phone][data-island][data-medium='watch'] {
+      --dock-h: 60px;
+    }
+
+    :root[data-phone] .island[data-state='dock'],
+    :root[data-phone] .island[data-state='dock'][data-medium='watch'] {
+      --art-h: 44px;
+      padding-block: 2px;
+      grid-template:
+        'art title play skip' 44px
+        / var(--art-w) var(--title-w) 44px 44px;
+    }
+
+    :root[data-phone] .island[data-state='dock'][data-medium='watch'] {
+      --art-w: calc(44px * 16 / 9);
+    }
+  }
+}
+
+/* A phone's safe areas (a notch or rounded corners at either side, mostly
+   on its side): the island's stations and the picture's room keep inside
+   them. */
+@media (max-width: 1023px) {
+  :root[data-phone] .island-home[data-home='dock'] {
+    left: calc(8px + env(safe-area-inset-left));
+    right: calc(8px + env(safe-area-inset-right));
+  }
+
+  :root[data-phone] .island[data-state='dock'] {
+    --title-w: calc(
+      100vw - 154px - var(--art-w) - env(safe-area-inset-left) - env(safe-area-inset-right)
+    );
+  }
+
+  :root[data-phone] .island-home[data-home='card'] {
+    left: env(safe-area-inset-left);
+    right: env(safe-area-inset-right);
+  }
+
+  :root[data-phone] .island[data-state='card'] {
+    --cw: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
+  }
+
+  :root[data-phone] .player-room {
+    left: env(safe-area-inset-left);
+    right: env(safe-area-inset-right);
+  }
+
+  /* WebKit places the card directly (see below), not on its station. */
+  @supports not (width: attr(x type(<length>))) {
+    :root[data-phone] .island[data-state='card'] {
+      left: env(safe-area-inset-left);
+      right: env(safe-area-inset-right);
+    }
+  }
+
+  /* Without anchor positioning, the dock, the floating picture and its
+     bar, and the More menu are placed from the screen's edges. */
+  @supports not (anchor-name: --a) {
+    :root[data-phone] .island[data-state='dock'] {
+      left: calc(8px + env(safe-area-inset-left));
+      right: calc(8px + env(safe-area-inset-right));
+    }
+
+    :root[data-phone] :is(.player-media, .pip-bar) {
+      right: calc(var(--pip-gap) + env(safe-area-inset-right));
+    }
+
+    :root[data-phone] .player-media[data-corner$='w'],
+    :root[data-phone] .player-media[data-corner$='w'] ~ [data-pip-bar-host] .pip-bar {
+      left: calc(var(--pip-gap) + env(safe-area-inset-left));
+      right: auto;
+    }
+
+    :root[data-phone] .island-more-pop {
+      right: calc(24px + env(safe-area-inset-right));
+    }
+  }
 }
 
 /* ---------- Rail: inside the sidebar ---------- */
@@ -1553,6 +1838,10 @@
   white-space: nowrap;
 }
 
+.board-row-remove {
+  display: none;
+}
+
 .board-row[data-drop] .board-row-name {
   color: var(--muted);
   font-weight: 500;
@@ -1668,8 +1957,8 @@
 }
 
 /* Each cover fills its slot by data-⚓️-fill, through Anchored Auto Layout's
-   typed attr(). Where that is missing (WebKit), the covers line up in slot
-   order instead: everything still works, without the travel. */
+   typed attr(). Where that is missing (WebKit 26, Firefox), the rest of the
+   layout that leans on it has its own way. */
 @supports not (width: attr(x type(<length>))) {
   /* WebKit does not tween the island's anchor-size(); go() sizes its
      journeys in pixels instead, except into the rail, whose slot grows as
@@ -1693,24 +1982,15 @@
     }
   }
 
-  [data-state='card'] .board-tiles {
-    grid-area: shelf;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-    gap: 10px;
-    align-self: end;
-  }
-
-  .tile {
-    position: relative;
-    order: var(--slot-i);
-    aspect-ratio: 1;
-  }
-
-  .tile.is-now,
-  .slot,
-  .board-shelf-grid {
-    display: none;
+  /* The board names the slots and the covers' anchors in style instead
+     (board.ts), so each cover fills its slot as it does everywhere else.
+     Always rendered: Firefox misjudges which anchored covers are on screen
+     and leaves some of those scrolled into view blank. */
+  .tile[data-slot] {
+    inset: anchor(inside);
+    width: anchor-size(width);
+    height: anchor-size(height);
+    content-visibility: visible;
   }
 }
 
@@ -2050,7 +2330,7 @@
    page headers), above the player, beside the sidebar. */
 .player-room {
   position: fixed;
-  inset: calc(var(--topbar-h) + env(safe-area-inset-top)) 0 calc(var(--dock-h) + var(--tabbar-h))
+  inset: var(--room-top) 0 calc(var(--dock-h) + var(--tabbar-h))
     var(--rail-w);
   pointer-events: none;
   transition: left var(--rail-glide);
@@ -2181,7 +2461,7 @@
    just steps between places instead of flying. */
 @supports not (anchor-name: --a) {
   .player-media[data-corner^='n'] {
-    top: calc(var(--topbar-h) + env(safe-area-inset-top) + var(--pip-gap));
+    top: calc(var(--room-top) + var(--pip-gap));
     bottom: auto;
   }
 
@@ -2219,7 +2499,7 @@
 
 @supports not (anchor-name: --a) {
   .player-media[data-corner^='n'] ~ [data-pip-bar-host] .pip-bar {
-    top: calc(var(--topbar-h) + env(safe-area-inset-top) + var(--pip-gap) + var(--pip-w) * 9 / 16 + 6px);
+    top: calc(var(--room-top) + var(--pip-gap) + var(--pip-w) * 9 / 16 + 6px);
     bottom: auto;
   }
 
@@ -2315,6 +2595,33 @@
 
 .pip-title:hover {
   text-decoration: underline;
+}
+
+/* Phones float the picture only when asked. When they do, its bar's controls
+   are 44px (the dock under it names the episode, so the bar's title gives
+   way), and the page makes room for the picture under its content. */
+:root[data-phone] :is(.dock, .player-air) {
+  --pip-bar-h: 44px;
+}
+
+:root[data-phone] .pip-bar-in {
+  justify-content: space-between;
+  padding-inline: 4px;
+}
+
+:root[data-phone] .pip-title {
+  display: none;
+}
+
+:root[data-phone] .pip-bar .mini-button {
+  width: 44px;
+  height: 44px;
+}
+
+:root[data-phone][data-picture='corner'] .main {
+  padding-bottom: calc(
+    var(--dock-h) + var(--tabbar-h) + 48px + min(52vw, 360px) * 9 / 16 + 44px + 3 * 12px
+  );
 }
 
 .mini-button {

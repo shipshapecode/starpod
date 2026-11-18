@@ -300,3 +300,53 @@ test('flies back to its own stage from its corner after a client-side navigation
     expect(width).toBeGreaterThan(0);
   }
 });
+
+test('a queued cover dragged onto another slot reorders Up next', async ({ page }) => {
+  await open(page, VIDEO_EPISODE);
+  await page.locator('.stage-play').click();
+  await expectPlaying(page);
+  const island = page.locator('#player');
+  await page.keyboard.press('2');
+  await expect(island).toHaveAttribute('data-state', 'card');
+
+  // Queue two from the shelf: each tap puts its cover first in Up next.
+  const shelfCover = island.locator('.tile[data-slot="--slot-s0"]');
+  const second = await shelfCover.getAttribute('data-id');
+  await shelfCover.click();
+  await expect(island.locator(`.tile[data-id="${second}"]`)).toHaveAttribute('data-slot', '--slot-q0');
+  const first = await shelfCover.getAttribute('data-id');
+  await shelfCover.click();
+  await expect(island.locator(`.tile[data-id="${first}"]`)).toHaveAttribute('data-slot', '--slot-q0');
+  await expect(island.locator(`.tile[data-id="${second}"]`)).toHaveAttribute('data-slot', '--slot-q1');
+  // Let the covers land before taking hold of one.
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document
+            .getAnimations()
+            .filter((animation) => (animation.effect as KeyframeEffect)?.target?.closest('.tile'))
+            .length
+      )
+    )
+    .toBe(0);
+
+  // Drag the second by its art, with real pointer moves, onto the first's
+  // slot (Up next scrolled back into view: the taps scrolled to the shelf).
+  await island.locator('.board-next').evaluate((tray) => tray.scrollIntoView({ block: 'nearest' }));
+  const from = (await island.locator(`.tile[data-id="${second}"] .tile-face`).boundingBox())!;
+  const to = (await island.locator('.slot[data-slot="--slot-q0"]').boundingBox())!;
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+  await expect(island.locator(`.tile[data-id="${second}"]`)).toHaveAttribute('data-held', '');
+  await page.mouse.up();
+
+  await expect(island.locator(`.tile[data-id="${second}"]`)).toHaveAttribute('data-slot', '--slot-q0');
+  await expect(island.locator(`.tile[data-id="${first}"]`)).toHaveAttribute('data-slot', '--slot-q1');
+  expect(
+    await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('starpod:queue')!).map((episode: { id: string }) => episode.id)
+    )
+  ).toEqual([second, first]);
+});

@@ -33,6 +33,10 @@ import {
 } from '../state';
 
 const A = 'data-⚓️-';
+/* Anchored Auto Layout names a slot and fills it through typed attr().
+   Where that is missing (WebKit 26, Firefox), the board writes the same
+   names in style instead, so every cover still fills its slot. */
+const typedAttr = globalThis.CSS?.supports?.('width: attr(x type(<length>))') ?? true;
 const MAX_NEXT = 6;
 const SHELF = 12;
 const STAGGER = 22;
@@ -182,11 +186,13 @@ export function mountBoard(host: HTMLElement): Board {
       return tile;
     }
     // A cover: the art (the button you tap or drag), a glass chip with its
-    // number on it, and a remove control that shows on hover or focus.
+    // number on it, and a remove control that shows on hover or focus. The
+    // image is not draggable: the browser's own drag of it would take the
+    // pointer from the cover's at the first move.
     tile = document.createElement('div');
     tile.className = 'tile';
     tile.dataset.id = episode.id;
-    tile.innerHTML = `<div class="tile-face PropFLIP"><button aria-describedby="board-hint" class="tile-hit" tabindex="-1" type="button"><img alt="" decoding="async" loading="lazy"><span class="tile-chip"></span></button><button class="tile-remove" tabindex="-1" type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>`;
+    tile.innerHTML = `<div class="tile-face PropFLIP"><button aria-describedby="board-hint" class="tile-hit" tabindex="-1" type="button"><img alt="" decoding="async" draggable="false" loading="lazy"><span class="tile-chip"></span></button><button class="tile-remove" tabindex="-1" type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>`;
     const img = tile.querySelector('img')!;
     if (episode.image) {
       img.src = episode.image;
@@ -208,6 +214,9 @@ export function mountBoard(host: HTMLElement): Board {
   const name = (el: HTMLElement, anchor: string) => {
     set(el, `${A}name`, anchor);
     set(el, 'data-slot', anchor);
+    if (!typedAttr && el.style.getPropertyValue('anchor-name') !== anchor) {
+      el.style.setProperty('anchor-name', anchor);
+    }
   };
 
   /** Write the ring onto the slots and covers. Synchronous, so flip() can measure it. */
@@ -242,7 +251,9 @@ export function mountBoard(host: HTMLElement): Board {
     slots(nextList, next.length + 1, () => {
       const row = document.createElement('li');
       row.className = 'board-row';
-      row.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="board-row-text"><span class="board-row-name"></span><span class="board-row-meta"></span></span>`;
+      // On phones a queued row's remove sits at its end (player.css), off
+      // the cover, so a tap on the cover still plays it.
+      row.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="board-row-text"><span class="board-row-name"></span><span class="board-row-meta"></span></span><button class="board-row-remove" hidden type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
       return row;
     });
     // The row after Up next says how to add one: the shelf is under it in
@@ -256,6 +267,12 @@ export function mountBoard(host: HTMLElement): Board {
       );
       text(row.querySelector('.board-row-meta')!, i < next.length ? caption(next[i]!) : '');
       row.toggleAttribute('data-drop', i === next.length);
+      const remove = row.querySelector<HTMLButtonElement>('.board-row-remove')!;
+      remove.hidden = i >= next.length;
+      if (i < next.length) {
+        set(remove, 'data-id', next[i]!.id);
+        set(remove, 'aria-label', `Remove ${next[i]!.title} from Up next`);
+      }
     });
     // Each shelf slot carries its occupant's title and caption beneath it.
     slots(shelfGrid, rest.length, () => {
@@ -276,6 +293,9 @@ export function mountBoard(host: HTMLElement): Board {
       const episode = known.get(id)!;
       set(tile, `${A}fill`, place.name);
       set(tile, 'data-slot', place.name);
+      if (!typedAttr && tile.style.getPropertyValue('position-anchor') !== place.name) {
+        tile.style.setProperty('position-anchor', place.name);
+      }
       set(tile, 'data-order', String(place.order));
       if (tile.style.getPropertyValue('--slot-i') !== String(place.order)) {
         tile.style.setProperty('--slot-i', String(place.order));
@@ -440,6 +460,22 @@ export function mountBoard(host: HTMLElement): Board {
     say(`${episode.title} moved.`);
   }
 
+  /** Take one out of Up next (its cover's remove, or its row's on phones). */
+  function remove(id: string | undefined) {
+    const episode = known.get(id ?? '');
+    if (episode) {
+      commit(() => dequeue(episode.id));
+      say(`${episode.title} is out of Up next.`);
+    }
+  }
+
+  nextList.addEventListener('click', (event) => {
+    const button = (event.target as Element).closest<HTMLElement>('.board-row-remove');
+    if (button) {
+      remove(button.dataset.id);
+    }
+  });
+
   // ---------- pointer: tap, or drag onto any slot ----------
 
   let drag: {
@@ -549,13 +585,7 @@ export function mountBoard(host: HTMLElement): Board {
       }
       tap(tile);
     });
-    tile.querySelector('.tile-remove')!.addEventListener('click', () => {
-      const episode = known.get(tile.dataset.id!);
-      if (episode) {
-        commit(() => dequeue(episode.id));
-        say(`${episode.title} is out of Up next.`);
-      }
-    });
+    tile.querySelector('.tile-remove')!.addEventListener('click', () => remove(tile.dataset.id));
     tile.addEventListener('focusin', () => (focusId = tile.dataset.id));
     hit(tile).addEventListener('keydown', (event) => key(tile, event));
   }

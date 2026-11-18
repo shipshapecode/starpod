@@ -31,6 +31,7 @@
     "./db/schema": "./src/db/schema.ts",
     "./layout": "./src/layouts/Layout.astro",
     "./components/AdPackageCard": "./src/components/AdPackageCard.astro",
+    "./components/PageHeader": "./src/components/PageHeader.astro",
     "./rss": "./src/lib/rss.ts",
     "./src/*": "./src/*"
   },

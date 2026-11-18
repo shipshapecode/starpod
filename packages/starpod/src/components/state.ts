@@ -183,7 +183,12 @@ export const pipDocked = signal<Record<Medium, boolean>>({
 effect(() => store('starpod:pip-corner', pipCorner.value));
 effect(() => store('starpod:pip-docked', pipDocked.value));
 
+/** Dock the picture in the player, or float it (on phones, for this visit: phoneFloat). */
 export function dockPicture(docked: boolean) {
+  if (phoneScreen.value) {
+    phoneFloat.value = !docked;
+    return;
+  }
   pipDocked.value = { ...pipDocked.value, [activeMedium.value]: docked };
 }
 
@@ -220,15 +225,69 @@ const wideQuery = globalThis.matchMedia?.('(min-width: 1024px)');
 export const wideScreen = signal(wideQuery?.matches ?? true);
 wideQuery?.addEventListener?.('change', (event) => (wideScreen.value = event.matches));
 
-/** Where the island is: its chosen home, unless that home is not on screen. */
-export const islandAt = computed<IslandHome>(() =>
-  islandHome.value === 'rail' && !wideScreen.value ? 'dock' : islandHome.value
+/**
+ * A phone's screen, upright or turned on its side (the query every part of
+ * the site uses for phones), and the one place the player keeps it: the
+ * player offers only the dock and the card there, the picture watches from
+ * the dock, and its styles read it as <html data-phone> (engine.ts).
+ */
+const phoneQuery = globalThis.matchMedia?.(
+  '(max-width: 767px), (orientation: landscape) and (max-height: 500px)'
 );
+export const phoneScreen = signal(phoneQuery?.matches ?? false);
+phoneQuery?.addEventListener?.('change', (event) => (phoneScreen.value = event.matches));
+
+/**
+ * Anchor positioning, which places every home but the dock (Safari before
+ * 26 has none). Without it the dock is the player's one home.
+ */
+export const anchorPositioning = signal(globalThis.CSS?.supports?.('anchor-name: --a') ?? true);
+
+/**
+ * A home as the screen offers it: the rail only beside a sidebar, the pill
+ * not on phones, and only the dock without anchor positioning; the dock
+ * stands in for the others (and the choice is kept for screens that offer
+ * it).
+ */
+export function homeOnScreen(home: IslandHome): IslandHome {
+  if (
+    !anchorPositioning.value ||
+    (home === 'rail' && !wideScreen.value) ||
+    (home === 'pill' && phoneScreen.value)
+  ) {
+    return 'dock';
+  }
+  return home;
+}
+
+/** Where the island is: its chosen home, unless that home is not on screen. */
+export const islandAt = computed<IslandHome>(() => homeOnScreen(islandHome.value));
 
 // The island is the large now-playing card (the picture docks in it).
 export const playerExpanded = computed(() => islandAt.value === 'card');
 
+/**
+ * Phones have no room for a picture floating over the page: it watches
+ * from the dock, and floats only when the visitor asks (the card's
+ * picture-in-picture button), for this visit.
+ */
+export const phoneFloat = signal(false);
+
+/** Is the picture kept in the player rather than floating in a corner? */
+export const pictureDocked = computed(() =>
+  phoneScreen.value ? !phoneFloat.value : pipDocked.value[activeMedium.value]
+);
+
+/**
+ * The floating picture's close. Elsewhere it pauses and tucks the picture
+ * into the player; on phones it only sends the picture back to the dock,
+ * playing on.
+ */
 export function closeMini() {
+  if (phoneScreen.value) {
+    phoneFloat.value = false;
+    return;
+  }
   isPlaying.value = false;
   miniClosed.value = true;
 }

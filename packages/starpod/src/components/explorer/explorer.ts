@@ -94,10 +94,17 @@ const MAX_DELAY = 240;
 const PART_STEP = 60;
 /** How long a change to the close-up takes to land, at --slomo 1. */
 const SWAP_MS = 1300;
-/** How long a part takes to travel, in the archive and to or from the
- * close-up (explorer.css: --flip-dx, --flip-dy and --flip-ds). */
-const TRAVEL_MS = 600;
-const SWAP_TRAVEL_MS = 700;
+/** When a card in the archive has all but arrived (explorer.css: its
+ * flight eases out over 550ms, 97% of the way by half of it), and when one
+ * coming home from the close-up has (its title, last of its parts, sets
+ * out 120ms in, over 600ms). */
+const ARRIVED_MS = 280;
+/** When a card the sidebar carries has nearly arrived (the column glides on
+ * the same clock, so its text may come back sooner). */
+const CARRIED_MS = 140;
+/** How long a card leaving the cut takes to clear its text (explorer.css). */
+const LEAVE_MS = 120;
+const SWAP_ARRIVED_MS = 480;
 // Where the reading order can follow `order`, a sort only restyles the
 // cards; elsewhere the cards move in the DOM so keyboard and screen readers
 // meet them in the order they are shown.
@@ -283,8 +290,10 @@ export function startExplorer() {
   const swapping = new Map<Card, number>();
   // While the explorer runs a flip of its own, its listener adds the cascade.
   let mine = false;
-  // The view the archive was in when the change began (its text's look).
+  // The view the archive was in when the change began (its text's look),
+  // and where the stage was once it had changed.
   let fromView = 'grid';
+  let stageAt: DOMRect | null = null;
   let scale = 1;
 
   /* ---------- What is on screen ---------- */
@@ -722,12 +731,13 @@ export function startExplorer() {
   function fadeOutText(
     texts: Array<[HTMLElement, number, FlipRect]>,
     view: string,
-    s: number
+    s: number,
+    at?: DOMRect | null
   ) {
     if (!texts.length || reducedMotion()) {
       return;
     }
-    const frame = stage.getBoundingClientRect();
+    const frame = at ?? stage.getBoundingClientRect();
     const layer = document.createElement('div');
     layer.className = 'xp-fading-text';
     layer.dataset.view = view;
@@ -847,9 +857,7 @@ export function startExplorer() {
       if (mine) {
         move.el.style.setProperty('--flip-delay', `${delay}ms`);
       }
-      // (Not into the strip: there the text fades out and leaves.)
       if (
-        !open &&
         move.el.classList.contains('xp-text') &&
         Math.abs(move.first.width - move.last.width) > 2
       ) {
@@ -861,12 +869,17 @@ export function startExplorer() {
     // Re-wrapped text can't be stretched into place: a copy of it as it was
     // fades out where it stood, and the text fades in where it lands once
     // the artwork has carried the card there (a list row's description
-    // with it).
-    fadeOutText(refits, mine ? fromView : (list.dataset.view ?? 'grid'), s);
-    for (const [el, delay] of refits) {
+    // with it). Into the strip it only fades out: it leaves there.
+    fadeOutText(
+      refits,
+      mine ? fromView : (list.dataset.view ?? 'grid'),
+      s,
+      mine ? stageAt : null
+    );
+    for (const [el, delay] of open ? [] : refits) {
       const detail = cardOf.get(el.closest<HTMLElement>('.xp-card')!)?.detail;
       for (const part of detail ? [el, detail] : [el]) {
-        fadeIn(part, (delay + TRAVEL_MS) * s, s);
+        fadeIn(part, (delay + (mine ? ARRIVED_MS : CARRIED_MS)) * s, s);
       }
     }
   });
@@ -961,7 +974,7 @@ export function startExplorer() {
    * toolbar. Bring `card`'s cell into view: centred when the close-up opens,
    * the least distance when stepping.
    */
-  function placeStrip(card: Card, centre: boolean) {
+  function placeStrip(card: Card, centre: boolean, smooth = false) {
     const top = ceiling();
     const box = stage.getBoundingClientRect();
     const view = closeup.getBoundingClientRect();
@@ -983,9 +996,14 @@ export function startExplorer() {
     const most = Math.max(least, box.bottom - top - view.height);
     shift = Math.min(Math.max(shift, least), most);
     if (Math.abs(shift) > 0.5) {
-      window.scrollBy({ top: shift, behavior: 'instant' });
+      window.scrollBy({ top: shift, behavior: smooth ? 'smooth' : 'instant' });
     }
   }
+
+  /** The toolbar is stuck under the top of the page. */
+  const stuck = () =>
+    bar.getBoundingClientRect().top <=
+    parseFloat(getComputedStyle(bar).top) + 0.5;
 
   /**
    * Back in the archive, the closed card is in view, under the toolbar.
@@ -1007,29 +1025,6 @@ export function startExplorer() {
         window.scrollBy({ top: shift, behavior: 'instant' });
       }
     }
-  }
-
-  /**
-   * Scroll the page smoothly by `dy`, then `done` (once it arrives, or stops
-   * short: the reader took over, or the page ended). Returns a cancel.
-   */
-  function glideBy(dy: number, done: () => void) {
-    const target = Math.round(scrollY + dy);
-    window.scrollTo({ top: target, behavior: 'smooth' });
-    let frame = 0;
-    let last = NaN;
-    let still = 0;
-    const check = () => {
-      still = scrollY === last ? still + 1 : 0;
-      last = scrollY;
-      if (Math.abs(scrollY - target) < 1 || still > 3) {
-        done();
-        return;
-      }
-      frame = requestAnimationFrame(check);
-    };
-    frame = requestAnimationFrame(check);
-    return () => cancelAnimationFrame(frame);
   }
 
   /**
@@ -1161,6 +1156,9 @@ export function startExplorer() {
         // In the close-up, the strip's cells in view and the cards flying
         // into it are in depth; closing, none are.
         deepen(true, before);
+        // Where the stage is now, for the copies of re-wrapped text (read
+        // here, where the flip is about to lay the page out anyway).
+        stageAt = stage.getBoundingClientRect();
       },
       // The cascade runs in the order the cards are shown.
       { order: (a, b) => rank(a) - rank(b) }
@@ -1180,19 +1178,30 @@ export function startExplorer() {
     // Cards that were shown but far away and now slide into view rise in.
     // Found at the start of the next frame (still before it paints), where
     // the layout this read needs is computed once, with the frame's own,
-    // rather than forced a second time inside the handler.
+    // rather than forced a second time inside the handler. Where cards on
+    // screen are leaving, they rise once those have cleared their text
+    // (explorer.css), so the two never read over each other.
     const s = scale;
+    const clearing = leaving.some(
+      (card) =>
+        card.li.dataset.exit !== undefined || card.li.dataset.away !== undefined
+    )
+      ? LEAVE_MS
+      : 0;
     requestAnimationFrame(() =>
       onScreen()
         .filter((card) => !before.has(card) && shownBefore.has(card))
         .forEach((card, i) => {
+          // (Arriving, its picture fades in once loaded: explorer.css.)
+          card.li.dataset.join = '';
+          window.setTimeout(() => delete card.li.dataset.join, 700 * s);
           card.li.animate(
             [
               { opacity: 0, translate: '0 32px' },
               { opacity: 1, translate: '0 0' }
             ],
             {
-              delay: Math.min(i * STEP, MAX_DELAY) * s,
+              delay: (clearing + Math.min(i * STEP, MAX_DELAY)) * s,
               duration: 520 * s,
               easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
               fill: 'backwards'
@@ -1629,34 +1638,18 @@ export function startExplorer() {
    * Show a card in the close-up, swap it for another (mid-flight too: the
    * old parts turn for home as the new ones leave), or close it (`null`).
    */
-  // An open waiting for the page to glide up to the archive (below).
-  let gliding: (() => void) | null = null;
-  signal.addEventListener('abort', () => gliding?.());
   function show(next: Card | null) {
-    gliding?.();
-    gliding = null;
     if (next === open) {
       return;
     }
-    // Opening from above the archive (the toolbar not yet stuck), the page
-    // glides up to it first, and the close-up opens under a toolbar already
-    // stuck: nothing above the archive is thrown out of view in one frame.
-    // (Stuck, only the toolbar's empty margin lies between it and the
-    // archive, and the cards are carried through the scroll.)
-    if (next && !open && !reducedMotion()) {
-      const rise = stage.getBoundingClientRect().top - ceiling();
-      const stuck =
-        bar.getBoundingClientRect().top <=
-        parseFloat(getComputedStyle(bar).top) + 0.5;
-      if (rise > 1 && !stuck) {
-        gliding = glideBy(rise, () => {
-          gliding = null;
-          show(next);
-        });
-        return;
-      }
-    }
     const prev = open;
+    // Opening from above the archive (the toolbar not yet stuck), the page
+    // scrolls up to it smoothly as the card flies, rather than at once: the
+    // card and the archive set out at once, and nothing above the archive
+    // is thrown out of view in one frame. (Stuck, only the toolbar's empty
+    // margin lies between it and the archive, and the cards are carried
+    // through the scroll: it happens at once.)
+    const glide = Boolean(next && !prev && !reducedMotion() && !stuck());
     // The detail column it leaves fades where it stood.
     if (prev) {
       fadeOutDetail(prev);
@@ -1712,13 +1705,14 @@ export function startExplorer() {
         root.toggleAttribute('data-open', Boolean(next));
       },
       {
-        place: () => (next ? placeStrip(next, !prev) : prev && placeHome(prev)),
+        place: () =>
+          next ? placeStrip(next, !prev, glide) : prev && placeHome(prev),
         anchor: next ?? prev
       }
     );
     // Back in a list row, its description fades in as the title lands.
     if (prev && list.dataset.view === 'list' && !reducedMotion()) {
-      fadeIn(prev.detail, SWAP_TRAVEL_MS * slomo(), slomo());
+      fadeIn(prev.detail, SWAP_ARRIVED_MS * slomo(), slomo());
     }
     if (next) {
       status.textContent = `Episode ${

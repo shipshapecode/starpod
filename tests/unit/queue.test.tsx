@@ -77,7 +77,7 @@ describe('Up next queue', () => {
   });
 
   it('adds and removes an episode from its stage', () => {
-    render(<StageControls episode={episode(4)} part="actions" />);
+    const { container } = render(<StageControls episode={episode(4)} part="actions" />);
     const toggle = screen.getByRole('button', { name: 'Up next' });
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(toggle);
@@ -86,11 +86,13 @@ describe('Up next queue', () => {
     fireEvent.click(toggle);
     expect(ids()).toEqual([]);
 
-    // Not offered for the episode that is already playing.
+    // Not offered for the episode that is already playing, though it keeps
+    // its place in the row (unseen and out of reach), so the row keeps its height.
     act(() => {
       currentEpisode.value = episode(4);
     });
     expect(screen.queryByRole('button', { name: 'Up next' })).toBeNull();
+    expect(container.querySelector('.button-secondary')).toHaveAttribute('inert');
   });
 });
 
@@ -196,6 +198,16 @@ describe('the Up next board', () => {
     expect(document.body.textContent).not.toContain('Drop a cover here');
   });
 
+  it("gives each queued row a remove of its own, off the cover", () => {
+    act(() => enqueue(episode(2)));
+    const removes = [...document.querySelectorAll<HTMLButtonElement>('.board-row-remove')];
+    // One per queued row; the row after them has none.
+    expect(removes.map((button) => button.hidden)).toEqual([false, true]);
+    expect(removes[0]).toHaveAccessibleName('Remove Episode Title 2 from Up next');
+    fireEvent.click(removes[0]!);
+    expect(ids()).toEqual([]);
+  });
+
   it('queues a shelf cover on a tap, and plays a queued one, sending the old one to the shelf', async () => {
     await waitFor(() => expect(fill('ep-5')).toMatch(/^--slot-s/));
     fireEvent.click(document.querySelector('.tile[data-id="ep-5"] .tile-hit')!);
@@ -294,7 +306,8 @@ describe('the Up next board', () => {
     // Captions in sentence case, and a remove control on the queued cover.
     expect(document.querySelector('.board-row-meta')).toHaveTextContent('Ep 2 · 30 min');
     expect(document.querySelector('.shelf-cell-meta')).toHaveTextContent(/^Ep \d+ · 30 min$/);
-    fireEvent.click(screen.getByRole('button', { name: 'Remove Episode Title 2 from Up next' }));
+    // (Its row's remove, for phones, has the same name; CSS shows one or the other.)
+    fireEvent.click(document.querySelector('.tile[data-id="ep-2"] .tile-remove')!);
     expect(ids()).toEqual([]);
   });
 });

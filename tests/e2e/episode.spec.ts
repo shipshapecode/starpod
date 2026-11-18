@@ -129,6 +129,59 @@ test.describe('transcripts', () => {
     ).toHaveCount(0);
   });
 
+  // A real mouse on its way to a timestamp crosses the turn's head, which
+  // can open the speaker's card; the click must still reach the timestamp.
+  test('a timestamp takes a mouse click, with the speaker card about', async ({
+    page
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/230');
+    await page.evaluate(() => {
+      const clicks: Array<string> = ((window as any).__clicks = []);
+      document.addEventListener(
+        'click',
+        (event) => clicks.push(String((event.target as Element).className)),
+        true
+      );
+    });
+    const heads = page
+      .locator('article.transcript .ep-turn-head')
+      .filter({ has: page.locator('strong') });
+    const clickOn = async (head: number) => {
+      const box = (await heads.nth(head).locator('[data-seek]').boundingBox())!;
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, {
+        steps: 5
+      });
+      await page.waitForTimeout(500);
+      await page.mouse.down();
+      await page.mouse.up();
+      return page.evaluate(() => (window as any).__clicks.at(-1) as string);
+    };
+    // Once the card's island is up, the turns in the middle of the screen.
+    await expect(page.locator('.ep-who')).toBeAttached();
+    await heads
+      .nth(1)
+      .evaluate((head) => head.scrollIntoView({ block: 'center' }));
+    await expect
+      .poll(() =>
+        heads.nth(1).evaluate((head) => head.getBoundingClientRect().top)
+      )
+      .toBeLessThan(900);
+
+    // Straight onto a timestamp: it seeks, loading the episode.
+    expect(await clickOn(1)).toContain('seek-chip');
+    await expect(page.locator('.dock-controls')).toBeVisible();
+
+    // Its speaker's name opens the card; from there onto the timestamp.
+    await heads.nth(2).locator('strong').hover();
+    await expect
+      .poll(() =>
+        page.locator('.ep-who').evaluate((el) => el.matches(':popover-open'))
+      )
+      .toBe(true);
+    expect(await clickOn(2)).toContain('seek-chip');
+  });
+
   // Clicking a timestamp should load the episode into the audio player. We
   // assert the player mounts with the episode (a real click is a trusted user
   // gesture); we don't assert the exact seek position because that depends on
@@ -166,24 +219,25 @@ test.describe('episode page navigation', () => {
   const page239 = '/239';
 
   test('a sticky bar docks the episode once the stage scrolls away, and plays it', async ({
-    page,
-    browserName
+    page
   }) => {
     await page.goto(page239);
     const bar = page.locator('.ep-bar');
     const identity = bar.locator('.ep-bar-id');
     const play = bar.getByRole('button', { name: 'Play this episode' });
 
-    if (browserName === 'chromium') {
-      // The identity waits for the scroll trigger, out of reach until then.
-      await expect
-        .poll(() => identity.evaluate((el) => el.getBoundingClientRect().width))
-        .toBeLessThan(1);
-      await expect(play).toBeHidden();
-    }
+    // The identity waits for the scroll trigger (or, without trigger
+    // animations, the script's stand-in), out of reach until then, with the
+    // bar in view under the stage too.
+    await bar.evaluate((el) =>
+      scrollBy(0, el.getBoundingClientRect().top - 300)
+    );
+    await expect
+      .poll(() => identity.evaluate((el) => el.getBoundingClientRect().width))
+      .toBeLessThan(1);
+    await expect(play).toBeHidden();
 
-    await page.locator('#notes').scrollIntoViewIfNeeded();
-    await page.mouse.wheel(0, 400);
+    await page.locator('#people').evaluate((el) => el.scrollIntoView());
     await expect
       .poll(() => bar.evaluate((el) => el.getBoundingClientRect().top))
       .toBeLessThan(2);
@@ -238,6 +292,59 @@ test.describe('episode page navigation', () => {
     }
   });
 
+  // Focus moves to the section's heading either way; it is ringed only when
+  // the link was followed from the keyboard (WebKit ringed it after a click).
+  test('a clicked section link focuses its heading without a ring; Enter rings it', async ({
+    page
+  }) => {
+    await page.goto(page239);
+    const nav = page.getByRole('navigation', { name: 'Episode sections' });
+    const ringed = (id: string) =>
+      page.locator(`#${id} h2`).evaluate((h) => ({
+        focused: h === document.activeElement,
+        ring: h.matches(':focus-visible')
+      }));
+
+    await nav.getByRole('link', { name: 'Transcript' }).click();
+    await expect
+      .poll(() => ringed('transcript'))
+      .toEqual({ focused: true, ring: false });
+
+    await nav.getByRole('link', { name: 'People' }).focus();
+    await page.keyboard.press('Enter');
+    await expect
+      .poll(() => ringed('people'))
+      .toEqual({ focused: true, ring: true });
+  });
+
+  // With reduced motion a link jumps rather than glides. The link marked is
+  // the one clicked, a short section included (Ep 230's sponsors), down the
+  // page and back up, and the indicator sits on it.
+  test('with reduced motion, the clicked section link is the one marked', async ({
+    page
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/230');
+    const nav = page.getByRole('navigation', { name: 'Episode sections' });
+    // The bar's script is up once it marks the first section.
+    await expect(nav.locator('a[aria-current]')).toHaveCount(1);
+    const names = await nav.getByRole('link').allTextContents();
+    for (const name of [...names, ...names.slice(0, -1).reverse()]) {
+      const link = nav.getByRole('link', { name, exact: true });
+      await link.click();
+      await expect(link).toHaveAttribute('aria-current', 'true');
+      await expect(nav.locator('a[aria-current]')).toHaveCount(1);
+      await expect
+        .poll(async () => {
+          const here = await nav.locator('.ep-nav-here').boundingBox();
+          const box = await link.boundingBox();
+          return here && here.width ? Math.abs(here.x - box!.x) : 0;
+        })
+        .toBeLessThan(2);
+    }
+  });
+
   test('a section link lands on its section across an open transcript', async ({
     page
   }) => {
@@ -258,6 +365,68 @@ test.describe('episode page navigation', () => {
       )
       .toBeLessThan(3);
   });
+
+  // On phones the root's scroll padding adds to the sections' own margins,
+  // and in landscape the bar sticks at the top: every link, clicked first
+  // on a fresh page and then again from section to section, lands its
+  // section 16px under the bar, and stays there.
+  for (const [form, viewport] of [
+    ['portrait', { width: 412, height: 839 }],
+    ['landscape', { width: 839, height: 412 }]
+  ] as const) {
+    test(`on a ${form} phone, every section link lands its section just under the bar`, async ({
+      page
+    }) => {
+      await page.setViewportSize(viewport);
+      const nav = page.getByRole('navigation', { name: 'Episode sections' });
+      const underBar = (href: string) =>
+        page.evaluate((href) => {
+          const bar = document
+            .querySelector('.ep-bar')!
+            .getBoundingClientRect();
+          const top = document.querySelector(href)!.getBoundingClientRect().top;
+          return Math.round(top - bar.bottom);
+        }, href);
+      // Where it settles: the same for 400ms, so a late re-aim can't pass.
+      const settled = (href: string) =>
+        expect
+          .poll(async () => {
+            const before = await underBar(href);
+            await page.waitForTimeout(400);
+            return (await underBar(href)) === before ? before : NaN;
+          })
+          .toBe(16);
+
+      await page.goto(page239);
+      const hrefs = await nav
+        .getByRole('link')
+        .evaluateAll((links) =>
+          links.map((link) => link.getAttribute('href')!)
+        );
+      expect(hrefs.length).toBe(5);
+
+      // First click, each on a fresh page at the top.
+      for (const href of hrefs) {
+        await page.goto(page239);
+        await nav.locator(`a[href="${href}"]`).click();
+        await settled(href);
+      }
+
+      // Repeated: from section to section, back up the page, the same link
+      // twice, and across an open transcript.
+      for (const href of [...hrefs].reverse()) {
+        await nav.locator(`a[href="${href}"]`).click();
+        await settled(href);
+      }
+      await nav.locator(`a[href="${hrefs[0]}"]`).click();
+      await settled(hrefs[0]);
+      await page.locator('.transcript-section .ep-more').click();
+      for (const href of ['#more', '#notes', '#more']) {
+        await nav.locator(`a[href="${href}"]`).click();
+        await settled(href);
+      }
+    });
+  }
 
   test('a person opens in place to their other episodes', async ({ page }) => {
     await page.goto(page239);
@@ -692,11 +861,93 @@ test.describe('the stage, split', () => {
     }
   });
 
+  test('presets and a resize leave no ResizeObserver loop', async ({
+    page,
+    browserName
+  }) => {
+    test.skip(
+      browserName !== 'chromium',
+      'anchored-auto-layout needs typed attr() (Chromium); elsewhere the stage keeps its grid'
+    );
+    await page.addInitScript(() => {
+      (window as any).__loops = 0;
+      addEventListener('error', (event) => {
+        if (String(event.message).includes('ResizeObserver')) {
+          (window as any).__loops++;
+        }
+      });
+    });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/230');
+    const presets = page.getByRole('group', { name: 'Stage layout' });
+    for (const name of ['Watch', 'Read', 'Balanced']) {
+      await presets.getByRole('button', { name }).click();
+      await page.waitForTimeout(400);
+    }
+    await page.setViewportSize({ width: 1100, height: 900 });
+    await page.waitForTimeout(300);
+    expect(await page.evaluate(() => (window as any).__loops)).toBe(0);
+  });
+
   test('phones keep the stacked stage with no divider', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/230');
     await expect(page.locator('.stage-room')).toBeVisible();
     await expect(page.locator('.ep-split')).toBeHidden();
     await expect(page.locator('.ep-presets')).toBeHidden();
+  });
+});
+
+test.describe('the stage on phones', () => {
+  const top = (page: Page, selector: string) =>
+    page
+      .locator(selector)
+      .first()
+      .evaluate((el) => Math.round(el.getBoundingClientRect().top));
+
+  test('the title comes before the transcript preview, and the live script takes its place once playing', async ({
+    page
+  }) => {
+    await page.setViewportSize({ width: 393, height: 659 });
+    await page.goto('/230');
+    await expect(page.locator('.script[data-state="preview"]')).toBeVisible();
+
+    // Before playback: picture, then the title on the first screen, then
+    // the preview.
+    const title = await top(page, '.stage-title');
+    expect(title).toBeLessThan(await top(page, '.stage-script'));
+    expect(title).toBeLessThan(await top(page, '.tabbar'));
+
+    // Playing: the script moves up under the picture, which stays put.
+    const frame = await top(page, '.stage-frame');
+    await page.locator('.stage-play').click();
+    await expect(page.locator('.stage[data-current]')).toBeVisible();
+    await expect
+      .poll(
+        async () =>
+          (await top(page, '.stage-script')) < (await top(page, '.stage-title'))
+      )
+      .toBe(true);
+    expect(await top(page, '.stage-frame')).toBe(frame);
+  });
+
+  test('landscape: the picture fits between the bars, with the title and Play beside it', async ({
+    page
+  }) => {
+    await page.setViewportSize({ width: 734, height: 343 });
+    await page.goto('/230');
+    const box = async (selector: string) =>
+      (await page.locator(selector).first().boundingBox())!;
+    const floor = (await box('.tabbar')).y;
+    const frame = await box('.stage-frame');
+    const title = await box('.stage-title');
+
+    expect(frame.y + frame.height).toBeLessThanOrEqual(floor);
+    expect(frame.width / frame.height).toBeCloseTo(16 / 9, 1);
+    expect(title.x).toBeGreaterThan(frame.x + frame.width);
+    for (const play of ['.stage-play', '.stage-actions .button-primary']) {
+      const { y, height } = await box(play);
+      expect(y + height).toBeLessThanOrEqual(floor);
+    }
   });
 });

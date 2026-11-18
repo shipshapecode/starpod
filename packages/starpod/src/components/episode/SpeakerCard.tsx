@@ -21,13 +21,15 @@ type Props = {
 };
 
 /**
- * Who is speaking: hover a speaker in the transcript's gutter (or focus the
- * turn's timestamp) for the person behind the name. One card serves every
- * turn, anchored to whichever name is active. Moving to another name flips
- * the card across (PropFLIP); near the top of the screen, where stuck names
- * sit, the browser flips it below its name instead and an anchored container
- * query turns the caret. Scrolling puts it away, so nothing is measured
- * while the page moves.
+ * Who is speaking: hover a speaker's name in the transcript's gutter (or
+ * focus the turn's timestamp) for the person behind the name. One card
+ * serves every turn, anchored to whichever turn's head (timestamp and name)
+ * is active, so it never sits over the timestamp; it takes no pointer
+ * events either, so it can't take a click meant for one. Moving to another
+ * name flips the card across (PropFLIP); near the top of the screen, where
+ * stuck heads sit, the browser flips it below the head instead and an
+ * anchored container query turns the caret. Scrolling puts it away, so
+ * nothing is measured while the page moves.
  */
 export default function SpeakerCard({ root, speakers }: Props) {
   const card = useRef<HTMLDivElement>(null);
@@ -70,12 +72,12 @@ export default function SpeakerCard({ root, speakers }: Props) {
         return;
       }
       clearTimeout(hide);
-      if (label === anchor && tip.matches(':popover-open')) {
+      if (head === anchor && tip.matches(':popover-open')) {
         return;
       }
       const move = () => {
         anchor?.style.removeProperty('anchor-name');
-        anchor = label;
+        anchor = head as HTMLElement;
         anchor.style.setProperty('anchor-name', '--ep-who');
         photo.current!.src = person.src;
         name.current!.textContent = person.name;
@@ -96,18 +98,31 @@ export default function SpeakerCard({ root, speakers }: Props) {
       }
     };
 
-    const enter = (event: Event) =>
+    // A pointer opens it from the name only, and a pointer on a timestamp
+    // puts it away at once; focus opens it from the timestamp.
+    const point = (event: Event) => {
+      const target = event.target as Element;
+      if (target.closest('[data-seek]')) {
+        clearTimeout(hide);
+        close();
+        return;
+      }
+      show(
+        target.closest('.ep-turn-head strong')?.closest('.ep-turn-head') ?? null
+      );
+    };
+    const focus = (event: Event) =>
       show((event.target as Element).closest('.ep-turn-head'));
-    article.addEventListener('pointerover', enter);
-    article.addEventListener('focusin', enter);
+    article.addEventListener('pointerover', point);
+    article.addEventListener('focusin', focus);
     article.addEventListener('pointerleave', later);
     article.addEventListener('focusout', later);
     addEventListener('scroll', close, { passive: true });
     return () => {
       stopLight();
       removeEventListener('scroll', close);
-      article.removeEventListener('pointerover', enter);
-      article.removeEventListener('focusin', enter);
+      article.removeEventListener('pointerover', point);
+      article.removeEventListener('focusin', focus);
       article.removeEventListener('pointerleave', later);
       article.removeEventListener('focusout', later);
     };

@@ -15,7 +15,7 @@ const { bullets, heading, price } = Astro.props;
     {heading}
   </h2>
 
-  <ul class="list-disc px-8">
+  <ul class="list-disc px-5 sm:px-8">
     {
       bullets.map((bullet) => {
         return <li class="border-line border-b py-6">{bullet}</li>;
@@ -23,7 +23,7 @@ const { bullets, heading, price } = Astro.props;
     }
 
     <h3
-      class="text-ink mt-8 mb-12 px-5 text-4xl font-bold tabular-nums"
+      class="text-ink mt-8 mb-12 text-4xl font-bold tabular-nums sm:px-5"
     >
       {price}
       <span

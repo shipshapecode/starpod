@@ -8,7 +8,7 @@
  * Client-only; started once by the media engine.
  */
 import { hold, nudge, reducedMotion, type FlipProps } from '../../motion/propflip';
-import { dockPicture, pipCorner, pipDocked, activeMedium, type Corner } from '../state';
+import { dockPicture, pictureDocked, pipCorner, type Corner } from '../state';
 
 const THRESHOLD = 5;
 
@@ -95,14 +95,14 @@ export function startPip(outer: HTMLElement, place: (mode?: 'again') => void) {
       flyer.style.transition = '';
       nudge(flyer, { tx: 0, ty: 0, sx: 1, sy: 1 });
     }
-    const before = [pipCorner.value, pipDocked.value[activeMedium.value]].join();
+    const before = [pipCorner.value, pictureDocked.value].join();
     if (zone === 'dock') {
       dockPicture(true);
     } else {
       pipCorner.value = zone;
     }
     // Let go where it came from: nothing changed, so fly it home explicitly.
-    if ([pipCorner.value, pipDocked.value[activeMedium.value]].join() === before) {
+    if ([pipCorner.value, pictureDocked.value].join() === before) {
       place('again');
     }
   };

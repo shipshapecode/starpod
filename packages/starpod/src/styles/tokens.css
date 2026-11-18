@@ -107,7 +107,14 @@
   --topbar-h: 60px;
   --tabbar-h: calc(62px + env(safe-area-inset-bottom));
   --dock-h: 68px;
-  --gutter: clamp(16px, 3.2vw, 48px);
+  /* The page's side margin, and never less than a landscape phone's notch
+     or rounded corners (viewport-fit=cover runs the page under them), so
+     everything set in from the edges by it clears them. */
+  --gutter: max(
+    clamp(16px, 3.2vw, 48px),
+    env(safe-area-inset-left),
+    env(safe-area-inset-right)
+  );
 
   color-scheme: light;
 }

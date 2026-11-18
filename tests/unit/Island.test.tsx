@@ -1,14 +1,18 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/preact';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Island from 'starpod/src/components/media/Island';
 import MediumSwitch from 'starpod/src/components/media/MediumSwitch';
 import {
   activeMedium,
+  anchorPositioning,
   currentEpisode,
   currentTime,
   enqueue,
   isPlaying,
   miniClosed,
+  phoneFloat,
+  phoneScreen,
+  pictureDocked,
   pipCorner,
   islandHome,
   pipDocked,
@@ -334,6 +338,106 @@ describe('Island', () => {
     expect(miniClosed.value).toBe(false);
     rerender(<Island />);
     expect(screen.getByRole('button', { name: 'Close video' })).toBeInTheDocument();
+  });
+});
+
+describe('on a phone', () => {
+  beforeEach(() => {
+    currentEpisode.value = withVideo;
+    isPlaying.value = true;
+    miniClosed.value = false;
+    islandHome.value = 'dock';
+    wideScreen.value = false;
+    phoneScreen.value = true;
+    phoneFloat.value = false;
+    pipDocked.value = { watch: false, listen: true };
+    setMedium('watch');
+  });
+
+  afterEach(() => {
+    phoneScreen.value = false;
+    phoneFloat.value = false;
+    wideScreen.value = true;
+  });
+
+  it('keeps the picture in the dock, floating it only when asked, for this visit', () => {
+    render(<Island />);
+    expect(pictureDocked.value).toBe(true);
+    const pip = screen.getAllByRole('button', { name: 'Picture-in-picture' })[0]!;
+    expect(pip).toHaveAttribute('aria-pressed', 'false');
+
+    fireEvent.click(pip);
+    expect(phoneFloat.value).toBe(true);
+    expect(pictureDocked.value).toBe(false);
+    // What wider screens remember is left alone.
+    expect(pipDocked.value.watch).toBe(false);
+  });
+
+  it('offers only the dock and the card: a remembered pill is the dock', () => {
+    islandHome.value = 'pill';
+    const { rerender } = render(<Island />);
+    expect(document.getElementById('player')).toHaveAttribute('data-state', 'dock');
+
+    islandHome.value = 'dock';
+    rerender(<Island />);
+    fireEvent.keyDown(document, { key: '1' });
+    rerender(<Island />);
+    expect(document.getElementById('player')).toHaveAttribute('data-state', 'dock');
+  });
+
+  it("closes the card from its own close, where focus starts", () => {
+    islandHome.value = 'card';
+    const { rerender } = render(<Island />);
+    const close = screen.getByRole('button', { name: 'Close the now-playing card' });
+
+    fireEvent.click(close);
+    rerender(<Island />);
+    expect(document.getElementById('player')).toHaveAttribute('data-state', 'dock');
+  });
+
+  it('closes the floating picture back into the dock, playing on', () => {
+    phoneFloat.value = true;
+    render(<Island />);
+    fireEvent.click(screen.getByRole('button', { name: 'Put the video back in the player' }));
+    expect(phoneFloat.value).toBe(false);
+    expect(isPlaying.value).toBe(true);
+    expect(miniClosed.value).toBe(false);
+  });
+});
+
+describe('without anchor positioning', () => {
+  beforeEach(() => {
+    currentEpisode.value = withVideo;
+    isPlaying.value = true;
+    miniClosed.value = false;
+    islandHome.value = 'pill';
+    wideScreen.value = true;
+    anchorPositioning.value = false;
+  });
+
+  afterEach(() => {
+    anchorPositioning.value = true;
+    islandHome.value = 'dock';
+  });
+
+  it('offers only the dock: no choice of home, no keys to the others, no card to open', () => {
+    const { rerender } = render(<Island />);
+    const island = () => document.getElementById('player')!;
+    // A remembered pill is the dock.
+    expect(island()).toHaveAttribute('data-state', 'dock');
+    expect(screen.queryByRole('radiogroup', { name: 'Player home' })).toBeNull();
+
+    for (const key of ['1', '2', '4']) {
+      fireEvent.keyDown(document, { key });
+      rerender(<Island />);
+      expect(island()).toHaveAttribute('data-state', 'dock');
+    }
+
+    // The name goes to its episode instead of opening the card.
+    expect(screen.queryByRole('button', { name: /now-playing card/ })).toBeNull();
+    const name = island().querySelector('.island-name')!;
+    expect(name.tagName).toBe('A');
+    expect(name).toHaveAttribute('href', '/video-episode');
   });
 });
 

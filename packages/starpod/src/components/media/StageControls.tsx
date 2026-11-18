@@ -98,18 +98,21 @@ export default function StageControls({ episode, part }: Props) {
         </span>
       </button>
       {episode.video && <MediumSwitch />}
-      {!isCurrent && (
-        <button
-          aria-pressed={queued}
-          class="button-secondary"
-          onClick={() => (queued ? dequeue(episode.id) : enqueue(episode))}
-          title={queued ? 'Remove from Up next' : 'Play after the current episode'}
-          type="button"
-        >
-          <QueueIcon queued={queued} size={18} />
-          <span>Up next</span>
-        </button>
-      )}
+      {/* Not offered for the episode that is playing, but it keeps its place
+          (unseen, and out of reach), so the row never changes height: on a
+          phone it can be a line of its own. */}
+      <button
+        aria-hidden={isCurrent ? 'true' : undefined}
+        aria-pressed={queued}
+        class="button-secondary"
+        inert={isCurrent}
+        onClick={() => (queued ? dequeue(episode.id) : enqueue(episode))}
+        title={queued ? 'Remove from Up next' : 'Play after the current episode'}
+        type="button"
+      >
+        <QueueIcon queued={queued} size={18} />
+        <span>Up next</span>
+      </button>
     </div>
   );
 }

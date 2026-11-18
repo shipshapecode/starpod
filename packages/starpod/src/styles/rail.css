@@ -289,8 +289,39 @@
     margin-top: 26px;
   }
 
+  /* A mark's place in the list, for the deck below: sibling-index(), or
+     where that's missing (Firefox) a count by nth-child, so the first mark
+     still lies in front and each after it smaller and further back. */
+  @supports not (z-index: sibling-index()) {
+    .rail .platforms > .platform-item {
+      &:nth-child(1) {
+        --sib: 1;
+      }
+
+      &:nth-child(2) {
+        --sib: 2;
+      }
+
+      &:nth-child(3) {
+        --sib: 3;
+      }
+
+      &:nth-child(4) {
+        --sib: 4;
+      }
+
+      &:nth-child(5) {
+        --sib: 5;
+      }
+
+      &:nth-child(n + 6) {
+        --sib: 6;
+      }
+    }
+  }
+
   .rail .platforms > .platform-item {
-    z-index: calc(20 - sibling-index());
+    z-index: calc(20 - var(--sib, sibling-index()));
     flex: none;
     width: 36px;
     height: 36px;
@@ -397,24 +428,20 @@
     }
 
     .rail .platforms > .platform-item {
-      width: 32px;
-      height: 32px;
-      width: calc(34px - 2px * sibling-index());
-      height: calc(34px - 2px * sibling-index());
+      width: calc(34px - 2px * var(--sib, sibling-index()));
+      height: calc(34px - 2px * var(--sib, sibling-index()));
       margin-inline-start: 0;
     }
 
     .rail .platforms > .platform-item + .platform-item {
-      margin-top: -28px;
-      margin-top: calc(2px * sibling-index() - 30px);
+      margin-top: calc(2px * var(--sib, sibling-index()) - 30px);
     }
 
     .rail-follow:has(.rail-stack:is(:hover, :focus-visible))
       .platforms
       > .platform-item
       + .platform-item {
-      margin-top: -22px;
-      margin-top: calc(2px * sibling-index() - 24px);
+      margin-top: calc(2px * var(--sib, sibling-index()) - 24px);
     }
 
     .rail .host-list {
@@ -1044,14 +1071,6 @@
     }
   }
 
-  .rail-fly {
-    position: fixed;
-    inset: 0;
-    width: fit-content;
-    height: fit-content;
-    margin: auto;
-  }
-
   /* WebKit has anchor positioning, only not typed attr(): the flyouts and
      the tooltip take plain anchor names, on the layout's own boxes, so they
      still open beside what they name, and a flyout near the bottom flips
@@ -1316,7 +1335,7 @@
 
 /* A host speaking on the episode playing: their ring lights (people.css),
    or under reduced motion a "Speaking" label follows their name. */
-:is(.rail-host-name, .rail-fly .host-row) .person-speaking {
+:is(.rail-host-name, :is(.rail-fly, .sheet) .host-row) .person-speaking {
   margin-left: 6px;
   vertical-align: middle;
 }
@@ -1490,6 +1509,50 @@
   font-weight: 500;
 }
 
+/* On a phone a title has two lines before it ends in an ellipsis. */
+@media (max-width: 639px) {
+  .sp-title {
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* Touch has no Escape key: a Cancel takes the key's place. (The field
+   gives way to it: an input's own minimum width would push it out of a
+   320px phone's palette.) */
+.sp-field input {
+  min-width: 0;
+}
+
+.sp-cancel {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .sp-field .sp-esc {
+    display: none;
+  }
+
+  .sp-cancel {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    min-height: 44px;
+    margin-inline-end: -8px;
+    padding-inline: 8px;
+    border: 0;
+    border-radius: var(--r-thumb);
+    background: none;
+    color: var(--accent-ink);
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
 /* What the visitor typed stays plain; the completion is bold. */
 :is(.sp-title, .sp-name) b {
   font-weight: 700;
@@ -1583,6 +1646,18 @@
     display: none;
   }
 
+  /* Without anchor positioning a stack's flyout can't open beside its
+     stack: it opens in one fixed place beside the icon rail, low, where the
+     stacks are, with no caret to point at one. */
+  .rail-fly {
+    inset: auto auto 16px calc(var(--rail-shut) + 8px);
+    margin: 0;
+  }
+
+  .rail-fly-box::before {
+    display: none;
+  }
+
   .sp-row[aria-selected='true'] {
     background: var(--raised);
   }
@@ -1662,6 +1737,14 @@
 
 .sheet {
   border-radius: var(--r-tray) var(--r-tray) 0 0;
+  overscroll-behavior: contain;
+}
+
+/* An open sheet holds the page still. A sheet rarely overflows, so a swipe
+   on it (or on its scrim) found nothing to scroll there and scrolled the
+   page behind instead. */
+:root:has(.sheet:popover-open) {
+  overflow: hidden;
 }
 
 .sheet-head {
@@ -1669,7 +1752,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin: -8px -8px 12px 0;
+  margin: -8px 0 12px;
 }
 
 .sheet-head .sheet-title {
@@ -1732,6 +1815,41 @@
   min-height: 44px;
 }
 
+/* The hosts, under the follow marks: titled like that group, their rows a
+   panel like the links above (48px, a 32px face). */
+.sheet .rail-fly-title {
+  margin: 0 0 0.6rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.sheet .host-list {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border-radius: var(--r-tray);
+  background: var(--raised);
+}
+
+.sheet .host-row {
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 48px;
+  margin: 0;
+  padding: 8px 12px 8px 8px;
+  border-radius: calc(var(--r-tray) - 4px);
+  text-decoration: none;
+  transition: background-color var(--quick);
+}
+
+.sheet .host-row:hover {
+  background: color-mix(in oklch, var(--surface) 70%, transparent);
+}
+
+.sheet .host-row .person-face {
+  --person-size: 32px;
+}
+
 /* The follow sheet's labelled pills: two to a row on a phone, three where
    there is room, each row filled edge to edge. Without sibling-count() the
    same grid without the balance. */
@@ -1744,6 +1862,24 @@
 @media (min-width: 560px) {
   .sheet .platforms {
     --balance-max: 3;
+  }
+}
+
+/* A name keeps to one line, so a row's pills stay one height: under
+   360px a pill's padding, gap and type tighten for "Apple Podcasts" to fit
+   half a 320px phone. */
+.sheet .platform-name {
+  white-space: nowrap;
+}
+
+@media (max-width: 359px) {
+  .sheet .platform {
+    gap: 6px;
+    padding-inline: 0.65rem;
+  }
+
+  .sheet .platform-name {
+    font-size: 0.8125rem;
   }
 }
 
