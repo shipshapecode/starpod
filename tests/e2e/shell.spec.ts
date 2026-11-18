@@ -192,6 +192,9 @@ test.describe('desktop rail', () => {
         return;
       }
       const edge = document.querySelector('.rail-edge')!;
+      // The mouse's own pointer id (0 in Firefox, 1 elsewhere): capturing
+      // any other pointer throws.
+      const pointerId = navigator.userAgent.includes('Firefox') ? 0 : 1;
       const fire = (type: string, x: number) =>
         edge.dispatchEvent(
           new PointerEvent(type, {
@@ -202,7 +205,7 @@ test.describe('desktop rail', () => {
             clientX: x,
             clientY: 450,
             isPrimary: true,
-            pointerId: 1,
+            pointerId,
             pointerType: 'mouse'
           })
         );

@@ -1999,6 +1999,22 @@ export function startExplorer() {
   );
   signal.addEventListener('abort', () => clearTimeout(settle));
 
+  // A card's controls carry a scroll margin that clears the sticky toolbar
+  // and the dock (explorer.css). Chromium honours it when focus scrolls a
+  // control into view; Firefox doesn't scroll a control that is only partly
+  // hidden, so it can sit under the toolbar. Bringing it in here honours the
+  // margin everywhere, and where the browser already did nothing moves.
+  list.addEventListener(
+    'focusin',
+    (event) => {
+      const target = event.target as HTMLElement;
+      if (target.matches('.xp-card :is(a, button)')) {
+        target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
+    },
+    { signal }
+  );
+
   list.addEventListener(
     'click',
     (event) => {

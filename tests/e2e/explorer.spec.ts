@@ -357,7 +357,8 @@ const rect = (page: Page, selector: string) =>
   });
 
 test('opens a card in the close-up, its parts in their slots', async ({
-  page
+  page,
+  browserName
 }) => {
   const card = cards(page).nth(2);
   const toggle = card.locator('.xp-art');
@@ -366,13 +367,22 @@ test('opens a card in the close-up, its parts in their slots', async ({
   await expect(explorer).toHaveAttribute('data-open', '');
   await expect(card).toHaveAttribute('data-on', '');
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  // The artwork, facts line and title land in the close-up's own slots.
-  await expect
-    .poll(() => rect(page, '.xp-card[data-on] .xp-art'))
-    .toEqual(await rect(page, '.xp-cu-art'));
-  await expect
-    .poll(() => rect(page, '.xp-card[data-on] .xp-title'))
-    .toEqual(await rect(page, '.xp-cu-title'));
+  // The artwork, facts line and title land in the close-up's own slots. Both
+  // sides are measured on every poll: the close-up may still be settling.
+  // Firefox resolves anchor(top) here about 2px above the slot it names, so
+  // it gets that much room.
+  const slack = browserName === 'firefox' ? 3 : 0;
+  const lands = (part: string, slot: string) =>
+    expect
+      .poll(async () => {
+        const [a, b] = await Promise.all([rect(page, part), rect(page, slot)]);
+        return a.every((value, i) => Math.abs(value - b[i]!) <= slack)
+          ? 'in its slot'
+          : `${a} vs ${b}`;
+      })
+      .toBe('in its slot');
+  await lands('.xp-card[data-on] .xp-art', '.xp-cu-art');
+  await lands('.xp-card[data-on] .xp-title', '.xp-cu-title');
   // The detail column: the episode link, play, and Up next.
   const detail = card.locator('.xp-detail');
   await expect(
