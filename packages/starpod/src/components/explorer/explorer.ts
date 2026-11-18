@@ -314,9 +314,13 @@ export function startExplorer() {
   );
   cards.forEach((card) => watcher.observe(card.li));
 
+  // How much of the stuck toolbar is cut away (on a phone on its side, all
+  // but its first row: explorer.css), read with its size.
+  let cut = 0;
+
   /** The line under the sticky toolbar: cards above it are out of sight. */
   function fold() {
-    return bar.getBoundingClientRect().bottom;
+    return bar.getBoundingClientRect().bottom - cut;
   }
 
   /** Shown cards whose box is in the viewport now, found by bisection. */
@@ -955,7 +959,7 @@ export function startExplorer() {
 
   /** Where the close-up's top edge sits: under the stuck toolbar. */
   function ceiling() {
-    return parseFloat(getComputedStyle(bar).top) + bar.offsetHeight;
+    return parseFloat(getComputedStyle(bar).top) + bar.offsetHeight - cut;
   }
 
   /** Where the dock and the phone's tab bar start covering the page. */
@@ -1798,9 +1802,13 @@ export function startExplorer() {
   // the cards'.)
   const heading = root.querySelector<HTMLElement>('.xp-heading')!;
   function size() {
-    // Both reads before any write, and only what changed is written (coming
-    // home, the archive arrived sized already).
-    const barHeight = `${bar.offsetHeight}px`;
+    // Every read before any write, and only what changed is written (coming
+    // home, the archive arrived sized already). Stuck on a phone on its side,
+    // the toolbar shows only its first row (explorer.css): what sits under
+    // it sits under that.
+    cut =
+      parseFloat(getComputedStyle(bar).getPropertyValue('--xp-bar-cut')) || 0;
+    const barHeight = `${bar.offsetHeight - cut}px`;
     const was = width;
     width = `${heading.clientWidth}px`;
     const set = (el: HTMLElement | undefined, name: string, value: string) => {
@@ -1941,13 +1949,27 @@ export function startExplorer() {
     .querySelector('[data-xp-clear]')!
     .addEventListener('click', clear, { signal });
 
-  // Opening a menu puts you on its current choice.
+  // Opening a menu puts you on its current choice, and points its caret at
+  // its chip, however far the menu was moved to fit (explorer.css).
   for (const menu of form.querySelectorAll<HTMLElement>('.xp-menu')) {
+    const chip = form.querySelector<HTMLElement>(
+      `[popovertarget="${menu.id}"]`
+    );
     menu.addEventListener(
       'toggle',
       (event) => {
-        if ((event as ToggleEvent).newState === 'open') {
-          menu.querySelector<HTMLInputElement>('input:checked')?.focus();
+        if ((event as ToggleEvent).newState !== 'open') {
+          return;
+        }
+        menu.querySelector<HTMLInputElement>('input:checked')?.focus();
+        if (chip) {
+          const at = chip.getBoundingClientRect();
+          const box = menu.getBoundingClientRect();
+          const x = at.left + at.width / 2 - box.left;
+          menu.style.setProperty(
+            '--xp-caret',
+            `${Math.min(Math.max(x, 24), box.width - 24)}px`
+          );
         }
       },
       { signal }

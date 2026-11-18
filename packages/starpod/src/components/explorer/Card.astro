@@ -100,15 +100,14 @@ const ids = (people: typeof card.people) =>
   <div class="xp-text PropFLIP">
     <p class="xp-facts PropFLIP">
       <span class="xp-number" data-number={number}>{short}</span>
-      <time datetime={date.toISOString()}>
-        {
+      <time datetime={date.toISOString()}
+        >{
           date.toLocaleDateString('en-us', {
             month: 'short',
-            day: 'numeric',
-            year: 'numeric'
+            day: 'numeric'
           })
-        }
-      </time>
+        }<span class="xp-year">, {date.getFullYear()}</span></time
+      >
       <span class="xp-facts-length">{length}</span>
       {episode.video && <span class="xp-facts-kind">Video</span>}
     </p>

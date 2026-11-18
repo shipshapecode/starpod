@@ -70,6 +70,38 @@
   grid-area: meta;
 }
 
+/* A phone on its side: the picture beside its words, as on a wide screen,
+   and no taller than the screen leaves it under the top bar and the tab
+   bar, so its play disc and Play are on the first screen. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .xp-hero {
+    --xp-hero-max: calc(
+      (100dvh - var(--topbar-h) - var(--tabbar-h) - 2 * var(--gutter)) * 16 / 9
+    );
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-areas: 'media meta';
+    align-items: start;
+    margin-bottom: 32px;
+  }
+
+  .xp-hero-media,
+  .xp-hero-glow {
+    max-width: var(--xp-hero-max);
+  }
+
+  .xp-hero .xp-hero-title {
+    font-size: clamp(1.4rem, 9dvh, 2.2rem);
+  }
+
+  .xp-hero .xp-hero-desc {
+    -webkit-line-clamp: 2;
+  }
+
+  .xp-hero .xp-hero-people {
+    display: none;
+  }
+}
+
 /* Light from the artwork itself (prop-for-that img-color), cast away from
    the pointer as if the cursor were the sun. Only a translate moves. */
 .xp-hero-glow {
@@ -487,6 +519,44 @@
         0 16px 32px -28px oklch(10% 0.03 280 / 0.6);
     }
   }
+
+  /* A phone upright has a little height to spare: while you scroll on down
+     the archive, the stuck toolbar keeps to its first row (the field, the
+     views) and its chips fade; they come back as soon as the page scrolls
+     up. Nothing moves in the page: the second row is only cut away (the
+     cards show through), never taken out of the flow. */
+  @media (max-width: 767px) {
+    :root:has(.xp-heading) {
+      container: xp-page / scroll-state;
+    }
+
+    .xp-bar-in {
+      clip-path: inset(0 0 0 0);
+      transition:
+        background-color 300ms var(--ease-out),
+        box-shadow 300ms var(--ease-out),
+        clip-path 300ms var(--ease-out);
+    }
+
+    .xp-chips {
+      transition:
+        opacity 300ms var(--ease-out),
+        visibility 300ms allow-discrete;
+    }
+
+    @container xp-page scroll-state(scrolled: bottom) {
+      @container xp-bar scroll-state(stuck: top) {
+        .xp-bar-in {
+          clip-path: inset(0 0 calc(100% - 64px) 0);
+        }
+
+        .xp-chips {
+          visibility: hidden;
+          opacity: 0;
+        }
+      }
+    }
+  }
 }
 
 .xp-bar-row {
@@ -494,6 +564,97 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 10px;
+  /* As wide as the toolbar, never its field's natural width: on a 320px
+     phone the field gives way to the views beside it. */
+  min-width: 0;
+}
+
+/* On a phone the toolbar takes the top bar's place: as it arrives at the
+   top it pushes the top bar up and away, and it sticks at the safe-area
+   top. The top bar moves with the scroll, pixel for pixel (a scroll-driven
+   animation on the heading's view timeline, which ends where the toolbar
+   sticks); where that is missing, the top bar stays put and the toolbar
+   sticks under it, as on a tablet. */
+@media (max-width: 767px), (orientation: landscape) and (max-height: 500px) {
+  @supports (animation-timeline: --a) and (timeline-scope: --a) {
+    :root:has(.xp-heading) {
+      --xp-stick: env(safe-area-inset-top);
+      timeline-scope: --xp-head;
+    }
+
+    .xp-heading {
+      view-timeline: --xp-head block;
+    }
+
+    /* From the toolbar meeting the top bar's lower edge (the heading's
+       bottom there) to the toolbar sticking; the bar's safe-area strip
+       stays. */
+    :root:has(.xp-heading) .topbar {
+      animation: xp-topbar-away linear both;
+      animation-timeline: --xp-head;
+      animation-range: exit-crossing
+        calc(100% - var(--topbar-h) - env(safe-area-inset-top) - 1px)
+        exit-crossing calc(100% - env(safe-area-inset-top));
+    }
+  }
+
+  /* The narrowest phones keep the toolbar to two rows, without its back
+     to the top button (a flick does the same). */
+  @media (max-width: 22rem) {
+    .xp-top {
+      display: none;
+    }
+  }
+}
+
+@keyframes xp-topbar-away {
+  to {
+    translate: 0 calc(env(safe-area-inset-top) - 100%);
+  }
+}
+
+/* A phone on its side has no height to spare: once the toolbar is stuck it
+   keeps to its first row (the field, the views), on the same timeline: over
+   the next 48px of scroll its chips fade and the row they leave is cut away
+   (the cards show through; nothing in the page moves). The script reads
+   the cut (--xp-bar-cut), so whatever sits under the toolbar sits under
+   its first row. */
+@media (orientation: landscape) and (max-height: 500px) {
+  @supports (animation-timeline: --a) and (timeline-scope: --a) {
+    .xp-bar {
+      --xp-bar-cut: 48px;
+    }
+
+    .xp-bar-in,
+    .xp-chips {
+      animation: xp-bar-cut linear both;
+      animation-timeline: --xp-head;
+      animation-range: exit-crossing calc(100% - env(safe-area-inset-top))
+        exit-crossing calc(100% - env(safe-area-inset-top) + 48px);
+    }
+
+    .xp-chips {
+      animation-name: xp-chips-away;
+    }
+  }
+}
+
+@keyframes xp-bar-cut {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+
+  to {
+    /* Its padding, the first row, and its padding again. */
+    clip-path: inset(0 0 calc(100% - 64px) 0);
+  }
+}
+
+@keyframes xp-chips-away {
+  to {
+    visibility: hidden;
+    opacity: 0;
+  }
 }
 
 .xp-search {
@@ -536,6 +697,14 @@
   color: var(--muted);
 }
 
+/* On a touch screen the field is 16px type at least: iOS zooms the page
+   into any smaller field it focuses. */
+@media (pointer: coarse) {
+  .xp-search input {
+    font-size: max(1rem, 16px);
+  }
+}
+
 .xp-count {
   flex: none;
   color: var(--muted);
@@ -543,9 +712,11 @@
   white-space: nowrap;
 }
 
-/* Narrow: the count is a number, the view switch is icons. */
+/* Narrow: the count is a number (filtered, only the number shown), the
+   view switch is icons. */
 @container xp (width < 30rem) {
   .xp-count-unit,
+  .xp-count [data-xp-of],
   .xp-views label span {
     position: absolute;
     width: 1px;
@@ -651,6 +822,21 @@
 
 .xp-unset[hidden] {
   display: none;
+}
+
+/* On a touch screen it keeps its 24px look but takes a 44px tap, and the
+   pill makes a little more room for it, so a near miss doesn't open the
+   menu instead. */
+@media (pointer: coarse) {
+  .xp-pick[data-on] {
+    padding-inline-end: 42px;
+  }
+
+  .xp-unset::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+  }
 }
 
 @media (hover: hover) {
@@ -854,6 +1040,8 @@
   gap: 8px;
   margin: -6px calc(var(--gutter) * -1);
   padding: 6px var(--gutter);
+  /* A chip scrolled into view (a filter just set) keeps the gutter. */
+  scroll-padding-inline: var(--gutter);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
@@ -1109,6 +1297,17 @@
       .xp-menu:popover-open .xp-menu-in {
         translate: 0 8px;
       }
+    }
+  }
+
+  /* On a phone a menu is often moved along to fit, away from its chip
+     (the chip row scrolled, the menu wider than what is left beside it):
+     its caret points at the chip wherever the menu landed (explorer.ts
+     measures it as the menu opens), above or below as it flipped. */
+  @media (max-width: 767px), (orientation: landscape) and (max-height: 500px) {
+    .xp-menu-in::before {
+      right: auto;
+      left: calc(var(--xp-caret, 35px) - 5px);
     }
   }
 }
@@ -2060,6 +2259,29 @@
 
 :is(.xp-list, .xp-fading-text)[data-view='list'] .xp-title a {
   -webkit-line-clamp: 2;
+}
+
+/* A phone's list row has no room for the whole facts line on one line:
+   it takes two (a fact starting the second drops its separator, as on any
+   wrap), and every row is that much taller. */
+@container xp (width < 40rem) {
+  .xp-list[data-view='list'] {
+    --xp-row-text: calc(
+      2 * var(--xp-facts-lh) + 0.15rem + 0.3rem + 2 * var(--xp-title-lh)
+    );
+  }
+
+  :is(.xp-list, .xp-fading-text)[data-view='list'] .xp-facts {
+    flex-wrap: wrap;
+  }
+}
+
+/* A card too narrow for the whole date (two columns on a 320px phone)
+   leaves out its year. */
+@container (width < 9rem) {
+  .xp-facts .xp-year {
+    display: none;
+  }
 }
 
 @container xp (width >= 40rem) {
