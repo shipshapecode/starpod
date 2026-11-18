@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  cueText,
   jsonSegments,
   mergeIntoLines,
   parseMarkdownCues
@@ -76,5 +77,18 @@ describe('jsonSegments', () => {
         ]
       })
     ).toEqual([{ start: 2, text: 'Hi', speaker: undefined }]);
+  });
+});
+
+describe('cueText', () => {
+  it('takes the speaker from a voice span and decodes references once', () => {
+    expect(cueText('<v Robbie Wagner>Ship it &amp; see &amp;lt;3</v>')).toEqual({
+      text: 'Ship it & see &lt;3',
+      speaker: 'Robbie Wagner'
+    });
+  });
+
+  it('strips styling tags from captions without a speaker', () => {
+    expect(cueText('<i>Hello</i> there')).toEqual({ text: 'Hello there', speaker: undefined });
   });
 });

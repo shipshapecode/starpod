@@ -12,13 +12,79 @@ export interface TranscriptParagraph {
   text: string;
 }
 
+/** A JSON transcript segment, in either field naming. */
+export interface JsonSegment {
+  body?: string;
+  speaker?: string;
+  start?: number;
+  startTime?: number;
+  text?: string;
+}
+
 interface JsonTranscript {
   text?: string;
-  segments?: Array<{ text?: string; start?: number }>;
+  segments?: Array<JsonSegment>;
+}
+
+/**
+ * A JSON segment's time, text, and speaker. The Podcast Namespace format names
+ * them `startTime`, `body`, and `speaker`; `start` and `text` are accepted too.
+ */
+export function readJsonSegment(segment: JsonSegment): {
+  start?: number;
+  text?: string;
+  speaker?: string;
+} {
+  const start = segment.startTime ?? segment.start;
+  return {
+    start: typeof start === 'number' ? start : undefined,
+    text: (segment.body ?? segment.text)?.trim() || undefined,
+    speaker: segment.speaker || undefined
+  };
+}
+
+const FETCH_TIMEOUT_MS = 10_000;
+const downloads = new Map<string, Promise<{ raw: string; type: string } | null>>();
+
+/**
+ * Download a transcript once per build, shared by the transcript on the page,
+ * its `.html.md` twin, and the live transcript's timed lines. The deadline
+ * covers the whole request, body included, so a stalled server can't hold up
+ * the build. Failures are not remembered, so a later request can retry.
+ */
+export function fetchTranscriptText(
+  url: string
+): Promise<{ raw: string; type: string } | null> {
+  let pending = downloads.get(url);
+  if (!pending) {
+    pending = (async () => {
+      try {
+        const response = await fetch(url, {
+          signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
+        });
+        if (!response.ok) {
+          return null;
+        }
+        return {
+          raw: await response.text(),
+          type: response.headers.get('content-type') ?? ''
+        };
+      } catch {
+        return null;
+      }
+    })();
+    downloads.set(url, pending);
+    void pending.then((result) => {
+      if (!result) {
+        downloads.delete(url);
+      }
+    });
+  }
+  return pending;
 }
 
 // Cache parsed transcripts by URL so the episode page and its `.html.md`
-// counterpart don't fetch the same transcript twice during a build.
+// counterpart don't parse the same transcript twice during a build.
 const cache = new Map<string, Array<TranscriptParagraph> | null>();
 
 /**
@@ -40,20 +106,15 @@ export async function getRssTranscriptParagraphs(
     return cached;
   }
 
-  let paragraphs: Array<TranscriptParagraph> | null = null;
-
-  try {
-    const response = await fetch(url);
-    if (response.ok) {
-      const raw = await response.text();
-      const type =
-        episode.transcriptType || response.headers.get('content-type') || '';
-      paragraphs = parseTranscript(raw, type);
-    }
-  } catch {
-    paragraphs = null;
+  const download = await fetchTranscriptText(url);
+  if (!download) {
+    // Not cached: the download may succeed on a later request.
+    return null;
   }
-
+  const paragraphs = parseTranscript(
+    download.raw,
+    episode.transcriptType || download.type
+  );
   cache.set(url, paragraphs);
   return paragraphs;
 }
@@ -89,9 +150,9 @@ function parseTranscript(
     if (Array.isArray(data.segments) && data.segments.length > 0) {
       const segments: Array<{ text: string; start?: number }> = [];
       for (const segment of data.segments) {
-        const text = segment.text?.trim();
+        const { start, text } = readJsonSegment(segment);
         if (text) {
-          segments.push({ text, start: segment.start });
+          segments.push({ text, start });
         }
       }
       if (segments.length > 0) {

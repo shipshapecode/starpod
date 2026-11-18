@@ -4,6 +4,7 @@ import {
   getRssTranscriptParagraphs,
   getRssTranscriptText
 } from 'starpod/src/lib/transcript';
+import { getRssCues } from 'starpod/src/lib/cues';
 import type { Episode } from 'starpod/src/lib/rss';
 
 // Each test uses a unique transcript URL because the module caches parsed
@@ -237,5 +238,41 @@ describe('getRssTranscriptText', () => {
     const episode = makeEpisode({ transcriptUrl: undefined });
 
     expect(await getRssTranscriptText(episode)).toBeNull();
+  });
+});
+
+describe('shared transcript download', () => {
+  it('reads the Podcast Namespace startTime/body fields', async () => {
+    mockFetch({
+      body: JSON.stringify({
+        segments: [{ startTime: 1.5, body: 'Hello from the spec.', speaker: 'Alice' }]
+      })
+    });
+
+    expect(await getRssTranscriptParagraphs(makeEpisode())).toEqual([
+      { start: 1.5, text: 'Hello from the spec.' }
+    ]);
+  });
+
+  it('downloads once for both the page transcript and the live lines', async () => {
+    const fetchMock = mockFetch({
+      body: JSON.stringify({ segments: [{ start: 0, text: 'Hi there.', speaker: 'Al' }] })
+    });
+    const episode = makeEpisode();
+
+    await getRssTranscriptParagraphs(episode);
+    expect(await getRssCues(episode)).toEqual([{ s: 0, t: 'Hi there.', v: 0, n: 'Al' }]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries a transcript whose download failed', async () => {
+    const episode = makeEpisode();
+    mockFetch({ ok: false });
+    expect(await getRssTranscriptParagraphs(episode)).toBeNull();
+
+    mockFetch({ body: JSON.stringify({ segments: [{ start: 2, text: 'Back again.' }] }) });
+    expect(await getRssTranscriptParagraphs(episode)).toEqual([
+      { start: 2, text: 'Back again.' }
+    ]);
   });
 });

@@ -7,6 +7,8 @@
  * HLS playlist; the `<podcast:source uri>` inside it is the stream URL.
  */
 
+import { decodeEntities } from './entities';
+
 export interface FeedVideo {
   src: string;
   type: string;
@@ -14,31 +16,6 @@ export interface FeedVideo {
 
 const HLS_TYPES = ['application/x-mpegurl', 'application/vnd.apple.mpegurl'];
 const FETCH_TIMEOUT_MS = 10_000;
-
-const NAMED_ENTITIES: Record<string, string> = {
-  amp: '&',
-  apos: "'",
-  gt: '>',
-  lt: '<',
-  quot: '"'
-};
-
-/**
- * Decode XML character references in one pass, so each reference in the
- * original text is decoded exactly once (`&amp;lt;` stays the literal `&lt;`).
- */
-function decodeEntities(value: string): string {
-  return value.replace(
-    /&(?:#(\d+)|#x([\da-f]+)|(amp|apos|gt|lt|quot));/gi,
-    (reference, decimal?: string, hex?: string, name?: string) => {
-      if (name) {
-        return NAMED_ENTITIES[name.toLowerCase()];
-      }
-      const codePoint = decimal ? Number(decimal) : parseInt(hex!, 16);
-      return codePoint <= 0x10ffff ? String.fromCodePoint(codePoint) : reference;
-    }
-  );
-}
 
 // Attribute names are fixed by this module, never taken from the feed.
 const ATTRIBUTE_PATTERNS: Record<'type' | 'uri', RegExp> = {

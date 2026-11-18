@@ -1,5 +1,11 @@
+import { decodeEntities } from './entities';
 import type { Episode } from './rss';
-import { parseCues } from './transcript';
+import {
+  fetchTranscriptText,
+  parseCues,
+  readJsonSegment,
+  type JsonSegment
+} from './transcript';
 
 /**
  * A short, timed line of speech for the live transcript performance. `v` is
@@ -144,26 +150,25 @@ export function parseMarkdownCues(markdown: string): Array<TranscriptCue> {
   return mergeIntoLines(segments);
 }
 
-type JsonSegment = {
-  body?: string;
-  speaker?: string;
-  start?: number;
-  startTime?: number;
-  text?: string;
-};
-
 /**
- * Segments from a JSON transcript. The Podcast Namespace format names its
- * fields `startTime` and `body`; `start` and `text` are accepted as well.
+ * Timed segments from a JSON transcript (either field naming; see
+ * `readJsonSegment`). Segments without a time or text are dropped.
  */
-export function jsonSegments(data: { segments?: Array<JsonSegment> }): Array<Segment> {
-  return (data.segments ?? []).flatMap((segment) => {
-    const start = segment.startTime ?? segment.start;
-    const text = (segment.body ?? segment.text)?.trim();
-    return typeof start === 'number' && text
-      ? [{ start, text, speaker: segment.speaker || undefined }]
-      : [];
+export function jsonSegments(data: { segments?: Array<JsonSegment> } | null): Array<Segment> {
+  return (data?.segments ?? []).flatMap((segment) => {
+    const { start, text, speaker } = readJsonSegment(segment);
+    return start !== undefined && text ? [{ start, text, speaker }] : [];
   });
+}
+
+/** A VTT/SRT cue's text: voice and styling tags removed, references decoded. */
+export function cueText(raw: string): { text: string; speaker?: string } {
+  // WebVTT voice spans: <v Speaker>text</v>
+  const voice = raw.match(/^<v(?:\.[^\s>]*)?\s+([^>]+)>/);
+  return {
+    text: decodeEntities(raw.replace(/<[^>]+>/g, '')).trim(),
+    speaker: voice ? decodeEntities(voice[1]).trim() : undefined
+  };
 }
 
 /**
@@ -183,6 +188,12 @@ export function getRssCues(
   if (!pending) {
     pending = fetchRssCues(episode, url);
     rssCueCache.set(url, pending);
+    // Forget misses so a failed download can be retried on a later request.
+    void pending.then((cues) => {
+      if (!cues) {
+        rssCueCache.delete(url);
+      }
+    });
   }
   return pending;
 }
@@ -191,34 +202,20 @@ async function fetchRssCues(
   episode: Episode,
   url: string
 ): Promise<Array<TranscriptCue> | null> {
+  const download = await fetchTranscriptText(url);
+  if (!download) {
+    return null;
+  }
+  const type = (episode.transcriptType || download.type).toLowerCase();
   try {
-    // A deadline on the whole request, body included, so a stalled
-    // transcript can't hold up the build.
-    const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
-    if (!response.ok) {
-      return null;
-    }
-    const raw = await response.text();
-    const type = (
-      episode.transcriptType ||
-      response.headers.get('content-type') ||
-      ''
-    ).toLowerCase();
-
     if (type.includes('json')) {
-      const segments = jsonSegments(JSON.parse(raw));
+      const segments = jsonSegments(JSON.parse(download.raw));
       return segments.length ? mergeIntoLines(segments) : null;
     }
-
-    const cues = parseCues(raw).map((cue) => {
-      // WebVTT voice spans: <v Speaker>text</v>
-      const voice = cue.text.match(/^<v(?:\.[^\s>]*)?\s+([^>]+)>/);
-      return {
-        start: cue.start,
-        text: cue.text.replace(/<[^>]+>/g, '').trim(),
-        speaker: voice?.[1]?.trim()
-      };
-    });
+    const cues = parseCues(download.raw).map((cue) => ({
+      start: cue.start,
+      ...cueText(cue.text)
+    }));
     return cues.length ? mergeIntoLines(cues) : null;
   } catch {
     return null;
