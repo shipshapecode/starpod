@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import rehypeTranscriptTimestamps from 'starpod/src/lib/rehype-transcript-timestamps.mjs';
+import { SEEK_CHIP_CLASS } from 'starpod/src/lib/seek-chip.mjs';
 
 type HastNode = {
   type: string;
@@ -40,9 +41,11 @@ describe('rehypeTranscriptTimestamps', () => {
 
     expect(button.tagName).toBe('button');
     expect(button.properties?.['data-seek']).toBe('83');
-    expect(button.properties?.['aria-label']).toBe('Play from [00:01:23]');
-    // The visible label keeps the original bracketed timestamp.
-    expect(button.children?.[0]?.value).toBe('[00:01:23]');
+    expect(button.properties?.['aria-label']).toBe('Play from 1:23');
+    // The shared seek chip: same class and clock label as show notes and
+    // feed transcripts.
+    expect(button.properties?.className).toEqual([SEEK_CHIP_CLASS]);
+    expect(button.children?.[0]?.value).toBe('00:01:23');
   });
 
   it('converts an [MM:SS] timestamp (no hours) into the right offset', () => {
@@ -50,7 +53,7 @@ describe('rehypeTranscriptTimestamps', () => {
     const [button] = buttonsIn(tree);
 
     expect(button.properties?.['data-seek']).toBe('252');
-    expect(button.children?.[0]?.value).toBe('[04:12]');
+    expect(button.children?.[0]?.value).toBe('00:04:12');
   });
 
   it('preserves surrounding text and sibling elements around the timestamp', () => {
@@ -94,5 +97,21 @@ describe('rehypeTranscriptTimestamps', () => {
 
     expect(buttonsIn(tree)).toHaveLength(0);
     expect(tree.children![0].children?.[0]?.value).toBe('no timestamps here');
+  });
+
+  it('labels every chip HH:MM:SS, so they line up', () => {
+    const tree = run({
+      type: 'root',
+      children: ['[00:00:04] start', '[00:14:12] middle', '[01:02:03] end'].map((line) => ({
+        type: 'element',
+        tagName: 'p',
+        children: [text(line)]
+      }))
+    });
+    expect(buttonsIn(tree).map((b) => b.children?.[0]?.value)).toEqual([
+      '00:00:04',
+      '00:14:12',
+      '01:02:03'
+    ]);
   });
 });

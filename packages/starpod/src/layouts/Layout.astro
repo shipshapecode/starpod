@@ -7,14 +7,14 @@ import SpeedInsights from '@vercel/speed-insights/astro';
 import { getPublicationAtUri } from '@bryanguffey/astro-standard-site';
 
 import Breadcrumbs from 'virtual:starpod/components/Breadcrumbs';
-import Dots from 'virtual:starpod/components/Dots';
 import Hosts from 'virtual:starpod/components/Hosts';
 import InfoCard from 'virtual:starpod/components/InfoCard';
 import Platforms from 'virtual:starpod/components/Platforms';
-import Player from '../components/Player';
+import ShowArtwork from 'virtual:starpod/components/ShowArtwork';
+import Dock from '../components/media/Dock';
 import SearchButton from '../components/SearchButton';
 import SearchDialog from '../components/SearchDialog';
-import ShowArtwork from 'virtual:starpod/components/ShowArtwork';
+import { FollowIcon, ListIcon, MoreIcon } from '../components/icons';
 
 import { getShowInfo } from '../lib/rss';
 import starpodConfig from 'virtual:starpod/config';
@@ -41,6 +41,8 @@ const { imageUrl, title } = Astro.props;
 const canonicalURL =
   Astro.props.canonicalURL ?? new URL(Astro.url.pathname, Astro.site);
 const description = Astro.props.description ?? starpodConfig.description;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isHome = path === '/';
 
 // standard.site publication discovery hint. Bluesky's AppView needs this
 // `<link rel="site.standard.publication">` tag on every page (home + episodes)
@@ -59,10 +61,13 @@ const publicationLinkTag =
 ---
 
 <!doctype html>
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" data-world="stage">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <meta name="generator" content={Astro.generator} />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
@@ -85,12 +90,12 @@ const publicationLinkTag =
     <link rel="manifest" href="/site.webmanifest" />
     <meta
       name="theme-color"
-      content="#ffffff"
+      content="oklch(97.65% 0.005 274.97)"
       media="(prefers-color-scheme: light)"
     />
     <meta
       name="theme-color"
-      content="#1a1a1a"
+      content="oklch(13.85% 0.025 273.24)"
       media="(prefers-color-scheme: dark)"
     />
 
@@ -112,8 +117,10 @@ const publicationLinkTag =
     <meta property="og:site_name" content={show.title} />
 
     <link rel="preload" as="image" href={show.image} />
+    <Font cssVariable="--astro-font-familjen" preload />
+    <Font cssVariable="--astro-font-archivo" />
+    <Font cssVariable="--astro-font-young-serif" />
 
-    <Font cssVariable="--astro-font-inter" preload />
 
     <Schema
       slot="head"
@@ -144,82 +151,115 @@ const publicationLinkTag =
     <slot name="head" />
     <ClientRouter />
   </head>
-  <body
-    class="font-inter text-light-text-body dark:bg-dark-background dark:text-dark-text-body antialiased"
-  >
-    <header
-      class="custom-scrollbar lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-112 lg:items-start lg:overflow-y-auto xl:w-120"
-      transition:persist="sidenav"
-    >
-      <div class="relative z-10 mx-auto lg:min-h-full lg:flex-auto">
-        <div
-          class="bg-light-card dark:bg-dark-card m-2 rounded-lg pt-10 pb-4 lg:pt-16 lg:pb-12"
-        >
-          <ShowArtwork image={show.image} />
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
 
-          <div class="px-4 sm:px-6 md:px-4 lg:px-16">
-            <p
-              class="text-light-text-heading mt-8 text-center text-2xl font-bold lg:text-left dark:text-white"
-            >
-              {show.title}
-            </p>
 
-            <p class="mt-2 text-center text-lg lg:text-left">
-              {starpodConfig.blurb}
-            </p>
-          </div>
+    <div class="app">
+      <aside class="rail" aria-label="Show">
+        <ShowArtwork image={show.image} />
+        <p class="rail-title">
+          <a href="/">{show.title}</a>
+        </p>
+        <p class="rail-blurb">{starpodConfig.blurb}</p>
 
-          <div class="px-4 sm:px-6 md:px-4 lg:px-16">
-            <Platforms />
-          </div>
-          <div class="hidden lg:block">
-            <Hosts />
-          </div>
+        <div class="rail-search">
+          <SearchButton client:load />
         </div>
 
-        <div class="hidden lg:block">
+        <nav aria-label="Main" class="rail-nav">
+          <a aria-current={isHome ? 'page' : undefined} href="/">
+            <ListIcon />
+            <span>Episodes</span>
+          </a>
           <InfoCard />
+        </nav>
+
+        <div class="rail-follow">
+          <p class="rail-label">Follow the show</p>
+          <Platforms />
         </div>
-      </div>
-    </header>
-    <main
-      class="bg-light-card dark:bg-dark-card mx-2 mb-2 rounded-lg lg:relative lg:ml-112 lg:min-h-screen xl:ml-120"
-    >
-      <div class="absolute top-4 right-4 z-30">
-        <SearchButton client:load />
-      </div>
-      <div class="relative mt-2 pt-16">
-        <div
-          class="bg-gradient-light dark:bg-gradient-dark absolute top-0 right-0 left-0 z-0 h-80 w-full opacity-30"
+
+        <Hosts />
+      </aside>
+
+      <header class="topbar">
+        <a class="topbar-show" href="/">
+          <img alt="" height="36" src={show.image} width="36" />
+          <span>{show.title}</span>
+        </a>
+        <button
+          class="topbar-follow"
+          popovertarget="follow-sheet"
+          type="button"
         >
-        </div>
+          <FollowIcon size={18} />
+          <span>Follow</span>
+        </button>
+      </header>
 
-        <Dots />
-
-        <div class="max-w-4xl">
-          <div
-            class:list={[
-              'dark:border-dark-border relative z-20 mb-12 border-b pb-6 lg:mb-16 lg:pb-10',
-              Astro.url.pathname === '/' && 'hidden'
-            ]}
-          >
-            <div class="ml-8 lg:ml-18">
+      <main id="main" class:list={['main relative', !isHome && 'main-page']}>
+        {
+          !isHome && (
+            <div class="crumbs">
               <Breadcrumbs title={title} />
             </div>
-          </div>
-
-          <slot />
-        </div>
-      </div>
-    </main>
-    <footer class="block lg:hidden">
-      <Hosts />
-      <InfoCard />
-    </footer>
-    <div id="audio-player">
-      <Player client:only="preact" transition:persist="player" />
+          )
+        }
+        <slot />
+      </main>
     </div>
+
+    <div class="dock" transition:persist="dock">
+      <div class="dock-media" data-media-dock></div>
+      <Dock client:only="preact" />
+    </div>
+
+    <nav aria-label="Main" class="tabbar">
+      <a aria-current={isHome ? 'page' : undefined} href="/">
+        <ListIcon />
+        <span>Episodes</span>
+      </a>
+      <SearchButton client:load variant="tab" />
+      <button popovertarget="more-sheet" type="button">
+        <MoreIcon />
+        <span>More</span>
+      </button>
+    </nav>
+
+    <div class="sheet" id="follow-sheet" popover>
+      <p class="sheet-title">Follow {show.title}</p>
+      <Platforms />
+    </div>
+    <div class="sheet" id="more-sheet" popover>
+      <p class="sheet-title">{show.title}</p>
+      <nav aria-label="More" class="sheet-nav">
+        <InfoCard />
+      </nav>
+      <p class="rail-label">Follow the show</p>
+      <Platforms />
+    </div>
+
     <SearchDialog client:load transition:persist="search-dialog" />
     <SpeedInsights />
+
+    <script>
+      // Foldables: when the viewport opens from the cover screen into the
+      // inner "spread" (two segments, or the near-square inner display), the
+      // page unfolds from the hinge once. Purely decorative and skipped under
+      // reduced motion.
+      const spread = window.matchMedia(
+        '(horizontal-viewport-segments: 2), (min-width: 700px) and (max-width: 1180px) and (min-aspect-ratio: 6/5) and (max-aspect-ratio: 8/5) and (max-height: 960px) and (pointer: coarse)'
+      );
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+      spread.addEventListener('change', (event) => {
+        if (!event.matches || calm.matches) {
+          return;
+        }
+        const root = document.documentElement;
+        root.dataset.unfolding = '';
+        window.setTimeout(() => delete root.dataset.unfolding, 1100);
+      });
+    </script>
   </body>
 </html>

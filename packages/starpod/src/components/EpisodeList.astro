@@ -1,9 +1,9 @@
 ---
-import FormattedDate from '../components/FormattedDate';
 import FullPlayButton from '../components/FullPlayButton';
 import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
 import type { Episode, Show } from '../lib/rss';
 import { dasherize } from '../utils/dasherize';
+import { formatDuration, toPlayable } from '../utils/playable';
 
 export interface Props {
   episodes: Array<Episode>;
@@ -15,71 +15,118 @@ const { episodes, show } = Astro.props;
 
 {
   episodes.length === 0 ? (
-    <div class="flex flex-col items-center">
-      <div class="h-auto w-full max-w-80">
+    <div class="empty">
+      <div class="empty-art">
         <UFOIllustration />
       </div>
-
-      <p class="text-light-text-heading py-10 text-lg font-bold dark:text-white">
-        No episodes yet. Check back soon!
-      </p>
+      <p>No episodes yet. The first one lands here the moment it’s in the feed.</p>
     </div>
   ) : (
-    <ul aria-label="EpisodeList">
+    <ol aria-label="EpisodeList" class="episode-list">
       {episodes.map((episode) => {
+        const date = new Date(episode.published);
         return (
-          <li class="dark:border-dark-border border-b">
-            <div class="flex w-full flex-col py-12 lg:flex-row">
-              <img
-                alt={`${episode.title} - episode art`}
-                aria-hidden="true"
-                class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
-                height={80}
-                loading="lazy"
-                src={episode.episodeThumbnail ?? show.image}
-                width={80}
-              />
-
-              <div class="flex flex-col">
-                <FormattedDate date={new Date(episode.published)} />
-
-                <h2 class="text-light-text-heading my-2 text-lg font-bold dark:text-white">
-                  <a
-                    href={`/${episode.episodeSlug}`}
-                    style={
-                      'view-transition-name: var(--should-vt); --vt-name: vt-' +
-                      dasherize(episode.title)
-                    }
-                  >
-                    {episode.episodeNumber}: {episode.title}
-                  </a>
-                </h2>
-
-                <p class="mb-5">{episode.description}</p>
-
-                <div class="flex items-center gap-6 text-sm">
-                  <FullPlayButton
-                    client:visible
-                    episode={{
-                      audio: episode.audio,
-                      episodeNumber: episode.episodeNumber,
-                      id: episode.id,
-                      title: episode.title
-                    }}
-                  />
-
-                  <a
-                    class="text-light-text-heading font-bold dark:text-white"
-                    href={`/${episode.episodeSlug}`}
-                  >
-                    Show notes
-                  </a>
-                </div>
-              </div>
+          <li
+            class="episode-row"
+            data-episode-row
+            data-vt={dasherize(episode.title)}
+          >
+            <img
+              alt={`${episode.title} - episode art`}
+              aria-hidden="true"
+              class="episode-row-art"
+              height={80}
+              loading="lazy"
+              src={episode.episodeThumbnail ?? show.image}
+              width={80}
+            />
+            <div class="episode-row-main">
+              <p class="episode-row-facts">
+                <span class="episode-row-number">
+                  {episode.episodeNumber === 'Bonus' ? 'Bonus' : episode.episodeNumber}
+                </span>
+                <time datetime={date.toISOString()}>
+                  {date.toLocaleDateString('en-us', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </time>
+                <span>{formatDuration(episode.duration)}</span>
+                {episode.video && <span class="episode-row-kind">Video</span>}
+              </p>
+              <h3 class="episode-row-title">
+                <a
+                  href={`/${episode.episodeSlug}`}
+                >
+                  {episode.title}
+                </a>
+              </h3>
+              <p class="episode-row-desc">{episode.description}</p>
+            </div>
+            <div class="episode-row-play">
+              <FullPlayButton client:visible episode={toPlayable(episode, show)} />
             </div>
           </li>
         );
       })}
-    </ul>
+    </ol>
   )
 }
+
+<script>
+  /*
+    The row you open morphs into the episode page: its artwork into the
+    cover, its title into the heading. Only that one row carries
+    view-transition names (hundreds of named elements would be costly), set
+    just before the navigation starts. Coming back, the row for the episode
+    you left is named so both fly home.
+  */
+  const NAMED = 'data-vt-named';
+
+  function name(row: HTMLElement | null) {
+    document.querySelectorAll<HTMLElement>(`[${NAMED}]`).forEach((el) => {
+      el.style.viewTransitionName = '';
+      el.style.contentVisibility = '';
+      el.removeAttribute(NAMED);
+    });
+    const slug = row?.dataset.vt;
+    if (!row || !slug) {
+      return;
+    }
+    // Rows skip rendering while off screen (content-visibility), and a row
+    // just swapped in hasn't been judged on screen yet; a skipped element
+    // can't be captured, so the named row always renders.
+    row.style.contentVisibility = 'visible';
+    row.setAttribute(NAMED, '');
+    const art = row.querySelector<HTMLElement>('.episode-row-art');
+    const title = row.querySelector<HTMLElement>('.episode-row-title a');
+    for (const [el, value] of [
+      [art, `vt-art-${slug}`],
+      [title, `vt-${slug}`]
+    ] as const) {
+      if (el) {
+        el.style.viewTransitionName = value;
+        el.setAttribute(NAMED, '');
+      }
+    }
+  }
+
+  let leaving = '';
+
+  document.addEventListener('astro:before-preparation', (event) => {
+    leaving = event.from.pathname;
+    const link = (event.sourceElement as HTMLElement | undefined)?.closest?.(
+      '[data-episode-row] a[href]'
+    );
+    name(link ? (link.closest('[data-episode-row]') as HTMLElement) : null);
+  });
+
+  document.addEventListener('astro:after-swap', () => {
+    const row = [...document.querySelectorAll<HTMLElement>('[data-episode-row]')].find(
+      (candidate) =>
+        candidate.querySelector('.episode-row-title a')?.getAttribute('href') === leaving
+    );
+    name(row ?? null);
+  });
+</script>
