@@ -69,6 +69,15 @@ describe('voiceFor', () => {
     expect(voiceFor('Adam Smith', adams)).toBe(0);
   });
 
+  it('matches non-Latin names exactly and never pairs two different ones', () => {
+    const names = [
+      { s: 0, t: '你好', v: 0, n: '李明' },
+      { s: 5, t: '你好', v: 1, n: '张强' }
+    ];
+    expect(voiceFor('张强', names)).toBe(1);
+    expect(voiceFor('王伟', names)).toBeUndefined();
+  });
+
   it('gives no voice to guests outside the two main voices, or without a transcript', () => {
     expect(voiceFor('Denver Cramer', cues)).toBeUndefined();
     expect(voiceFor('Robbie Wagner', null)).toBeUndefined();

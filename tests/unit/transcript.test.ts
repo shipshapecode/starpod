@@ -265,6 +265,11 @@ describe('shared transcript download', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it('treats a downloaded but unusable JSON body as no transcript', async () => {
+    mockFetch({ body: 'null' });
+    expect(await getRssTranscriptParagraphs(makeEpisode())).toBeNull();
+  });
+
   it('retries a transcript whose download failed', async () => {
     const episode = makeEpisode();
     mockFetch({ ok: false });

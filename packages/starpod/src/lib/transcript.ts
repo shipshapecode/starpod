@@ -111,10 +111,13 @@ export async function getRssTranscriptParagraphs(
     // Not cached: the download may succeed on a later request.
     return null;
   }
-  const paragraphs = parseTranscript(
-    download.raw,
-    episode.transcriptType || download.type
-  );
+  let paragraphs: Array<TranscriptParagraph> | null;
+  try {
+    paragraphs = parseTranscript(download.raw, episode.transcriptType || download.type);
+  } catch {
+    // Downloaded but unusable (e.g. a JSON body of `null`): no transcript.
+    paragraphs = null;
+  }
   cache.set(url, paragraphs);
   return paragraphs;
 }

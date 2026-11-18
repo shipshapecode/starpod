@@ -45,7 +45,8 @@ const tokens = (name: string) =>
   name
     .toLowerCase()
     .split(/[\s.]+/)
-    .map((token) => token.replace(/[^a-z0-9]/g, ''))
+    // Letters and digits in any script, so non-Latin names survive.
+    .map((token) => token.replace(/[^\p{L}\p{N}]/gu, ''))
     .filter(Boolean);
 
 /**
@@ -79,10 +80,12 @@ export function voiceFor(
     voice,
     speaker: cues.find((cue) => cue.v === voice && cue.n)?.n
   }));
-  // An exact name wins over a loose one, whichever voice comes first.
+  // An exact name wins over a loose one, whichever voice comes first. A name
+  // with nothing left after normalizing never matches.
   const exact = tokens(name).join(' ');
   const match =
-    speakers.find(({ speaker }) => speaker && tokens(speaker).join(' ') === exact) ??
-    speakers.find(({ speaker }) => speaker && sameName(name, speaker));
+    (exact
+      ? speakers.find(({ speaker }) => speaker && tokens(speaker).join(' ') === exact)
+      : undefined) ?? speakers.find(({ speaker }) => speaker && sameName(name, speaker));
   return match?.voice;
 }
