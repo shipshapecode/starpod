@@ -1059,7 +1059,8 @@ export function startExplorer() {
    * In the close-up the page itself scrolls the filmstrip, so nothing in
    * flight is ever clipped by a scroller, and the close-up sticks under the
    * toolbar. Bring `card`'s cell into view: centred when the close-up opens,
-   * the least distance when stepping.
+   * the least distance when stepping, and not at all when it is in view
+   * already (a cell clicked in the strip: nothing moves under the pointer).
    */
   function placeStrip(card: Card, centre: boolean, smooth = false) {
     if (metrics() && across) {
@@ -1067,20 +1068,20 @@ export function startExplorer() {
       return;
     }
     const top = ceiling();
-    const box = stage.getBoundingClientRect();
-    const view = closeup.getBoundingClientRect();
-    // On a phone the close-up sits above the strip; the strip shows below.
-    const band = view.left === box.left ? top + view.height : top;
     const bottom = floor();
     const cell = card.li.getBoundingClientRect();
     let shift = 0;
     if (centre) {
-      shift = cell.top + cell.height / 2 - (band + bottom) / 2;
-    } else if (cell.top < band + 8) {
-      shift = cell.top - band - 8;
+      shift = cell.top + cell.height / 2 - (top + bottom) / 2;
+    } else if (cell.top < top + 8) {
+      shift = cell.top - top - 8;
     } else if (cell.bottom > bottom - 8) {
       shift = cell.bottom - bottom + 8;
+    } else {
+      return;
     }
+    const box = stage.getBoundingClientRect();
+    const view = closeup.getBoundingClientRect();
     // The stage reaches the toolbar, so the close-up sticks at once, and
     // never scrolls past its end, so the close-up stays whole.
     const least = box.top - top;
@@ -1745,8 +1746,9 @@ export function startExplorer() {
   /**
    * Show a card in the close-up, swap it for another (mid-flight too: the
    * old parts turn for home as the new ones leave), or close it (`null`).
+   * `still`: a cell pressed in the strip, which stays where it is.
    */
-  function show(next: Card | null) {
+  function show(next: Card | null, still = false) {
     if (next === open) {
       return;
     }
@@ -1813,8 +1815,13 @@ export function startExplorer() {
         root.toggleAttribute('data-open', Boolean(next));
       },
       {
-        place: () =>
-          next ? placeStrip(next, !prev, glide) : prev && placeHome(prev),
+        place: () => {
+          if (next && !(prev && still)) {
+            placeStrip(next, !prev, glide);
+          } else if (!next && prev) {
+            placeHome(prev);
+          }
+        },
         anchor: next ?? prev
       }
     );
@@ -2123,11 +2130,13 @@ export function startExplorer() {
   // control into view; Firefox doesn't scroll a control that is only partly
   // hidden, so it can sit under the toolbar. Bringing it in here honours the
   // margin everywhere, and where the browser already did nothing moves.
+  // Only keyboard focus: a press focuses its button too, and scrolling then
+  // would move the button out from under the pointer before the click.
   list.addEventListener(
     'focusin',
     (event) => {
       const target = event.target as HTMLElement;
-      if (target.matches('.xp-card :is(a, button)')) {
+      if (target.matches('.xp-card :is(a, button):focus-visible')) {
         target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       }
     },
@@ -2158,10 +2167,10 @@ export function startExplorer() {
           status.textContent = 'Added to Up next.';
         }
       } else if (target.closest('.xp-art')) {
-        show(open === card ? null : card);
+        show(open === card ? null : card, (event as MouseEvent).detail > 0);
       } else if (!target.closest('a, button, .xp-detail') && open !== card) {
         // The rest of a card (a filmstrip cell) opens it too.
-        show(card);
+        show(card, (event as MouseEvent).detail > 0);
       }
     },
     { signal }

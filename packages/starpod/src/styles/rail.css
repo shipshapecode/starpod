@@ -756,6 +756,68 @@
   }
 }
 
+/* Without typed attr() the links stay in flow, but the nav's one highlight
+   still glides between them (as below, where it rides their slots): it
+   rides the hovered or focused link, or else the current page, and the
+   links keep only their ink. Without anchor positioning at all, each link
+   keeps its own hover and current fills (shell.css). */
+@supports (anchor-name: --a) and
+  (not (anchor-name: attr(data-a type(<custom-ident>)))) {
+  @media (min-width: 1024px) {
+    .rail-nav {
+      isolation: isolate;
+    }
+
+    .rail-nav a:is(:hover, :focus-visible),
+    .rail-nav:not(:has(a:is(:hover, :focus-visible))) a[aria-current='page'] {
+      anchor-name: --rail-hl;
+    }
+
+    /* (The link the collapsed rail's tooltip names keeps that anchor too.) */
+    .rail-nav a[data-tip-at]:is(:hover, :focus-visible),
+    .rail-nav:not(:has(a:is(:hover, :focus-visible)))
+      a[data-tip-at][aria-current='page'] {
+      anchor-name: --rail-hl, --rail-tip-at;
+    }
+
+    .rail-nav a,
+    .rail-nav a:hover,
+    .rail-nav a[aria-current='page'] {
+      background: none;
+    }
+
+    .rail-hl {
+      position: absolute;
+      position-anchor: --rail-hl;
+      position-visibility: anchors-valid;
+      top: anchor(top);
+      left: anchor(left);
+      z-index: -1;
+      width: anchor-size(width);
+      height: anchor-size(height);
+      border-radius: var(--radius);
+      background: var(--raised);
+      pointer-events: none;
+      transition:
+        top calc(0.3s * var(--slomo)) var(--ease-out),
+        left calc(0.3s * var(--slomo)) var(--ease-out),
+        width calc(0.3s * var(--slomo)) var(--ease-out),
+        height calc(0.3s * var(--slomo)) var(--ease-out),
+        background-color calc(0.2s * var(--slomo)) ease,
+        scale calc(0.35s * var(--slomo)) var(--ease-spring);
+    }
+
+    .rail-nav:not(:has(a:is(:hover, :focus-visible):not([aria-current])))
+      .rail-hl {
+      background: var(--accent-soft);
+    }
+
+    .rail-nav:has(a:active) .rail-hl {
+      scale: 0.97;
+    }
+  }
+}
+
 /* The travelling pieces need typed attr() for their anchors. Elsewhere the
    same slots hold the pieces in flow: the rail still collapses and lays out,
    it just doesn't travel. */

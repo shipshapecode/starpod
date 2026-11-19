@@ -1002,6 +1002,32 @@
   pointer-events: none;
 }
 
+/* In the close-up the archive is a strip, with no grid or list to pick: the
+   view switch steps out of the toolbar, the field taking its room (its row
+   keeps its height), and steps back in on closing. */
+.xp-views {
+  interpolate-size: allow-keywords;
+  transition:
+    opacity calc(200ms * var(--slomo)) var(--ease-out),
+    scale calc(300ms * var(--slomo)) var(--ease-out),
+    width calc(300ms * var(--slomo)) var(--ease-out),
+    margin calc(300ms * var(--slomo)) var(--ease-out),
+    padding calc(300ms * var(--slomo)) var(--ease-out),
+    border-width calc(300ms * var(--slomo)) var(--ease-out),
+    visibility calc(300ms * var(--slomo)) allow-discrete;
+}
+
+.xp[data-open] .xp-views {
+  width: 0;
+  margin-inline-start: -10px;
+  padding-inline: 0;
+  border-inline-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  scale: 0.6;
+  visibility: hidden;
+}
+
 .xp-seg label:has(:checked) {
   anchor-name: --xp-on;
   color: var(--on-ink);
@@ -1538,14 +1564,21 @@
   --xp-hover-grow: 1.06;
 }
 
-.xp-list[data-view='list'] {
+.xp-list[data-view='list'],
+.xp[data-open] .xp-list {
   --xp-hover-grow: 1.12;
 }
 
+/* It grows under the pointer and with keyboard focus anywhere in the card,
+   in the wall and in the strip alike. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .xp:not([data-open], [data-still])
-    .xp-card:not([data-on], [data-swap]):hover
-    .xp-art {
+  .xp:not([data-still]) .xp-card:not([data-on], [data-swap]):hover .xp-art {
+    --xp-grow: var(--xp-hover-grow);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .xp-card:not([data-on], [data-swap]):has(:focus-visible) .xp-art {
     --xp-grow: var(--xp-hover-grow);
   }
 }
@@ -1670,6 +1703,15 @@
   perspective-origin: 50% 50%;
 }
 
+/* A card stepped away from goes home to the strip: on the way it takes the
+   strip's perspective, so it lands as a strip cell, with nothing left to
+   change when it stops travelling. */
+.xp[data-open] .xp-card[data-swap]:not([data-on]) .xp-tilt {
+  perspective: var(--xp-depth, 1500px);
+  transition: perspective calc(var(--xp-turn-d) * var(--slomo)) var(--ease-out)
+    calc(var(--flip-delay, 0s) * var(--slomo));
+}
+
 .xp-face {
   background: var(--media-ground);
 }
@@ -1683,6 +1725,13 @@
 
 .xp-card:is([data-on], [data-swap]) .xp-face {
   backface-visibility: hidden;
+}
+
+/* Closing, the card goes home to the flat wall: its shadow fades on the
+   way, so it lands with none. */
+.xp:not([data-open]) .xp-card[data-swap] .xp-face {
+  box-shadow: 0 14px 22px -16px oklch(0% 0 0 / 0);
+  transition: box-shadow calc(var(--flip-ds) * var(--slomo)) var(--ease-out);
 }
 
 .xp-turn > * {
