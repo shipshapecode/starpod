@@ -88,10 +88,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run Playwright tests
-        run: |
-          pnpm exec playwright test --project=firefox tests/e2e/zz-firefox-probe.spec.ts --reporter=list --retries=0 --workers=1 || true
-          echo '=== CONTENDED (2 workers) ==='
-          pnpm exec playwright test --project=firefox tests/e2e/zz-firefox-probe.spec.ts --reporter=list --retries=0 --workers=2 --grep 'baseline|no-cv|no-ct' --repeat-each=2 || true
+        run: pnpm exec playwright test --project=firefox tests/e2e/zz-firefox-probe.spec.ts --reporter=list --retries=0 --workers=1 || true
         env:
           ASTRO_DB_REMOTE_URL: ${{ secrets.ASTRO_DB_REMOTE_URL }}
           ASTRO_DB_APP_TOKEN: ${{ secrets.ASTRO_DB_APP_TOKEN }}
