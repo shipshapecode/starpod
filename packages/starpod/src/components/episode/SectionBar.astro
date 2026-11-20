@@ -138,13 +138,11 @@ const { label, sections } = Astro.props;
     }
 
     // Groups above a landed section can still settle to their real height
-    // after the glide ends. Scroll anchoring keeps the section put where the
-    // browser has it; WebKit doesn't, so there the section is held under the
-    // bar for a moment, until you take over.
+    // after the glide ends. Chromium and Firefox keep the section put with
+    // scroll anchoring; WebKit doesn't (though it accepts overflow-anchor),
+    // so the section is held under the bar for a moment, until you take
+    // over. Where anchoring did its job there is nothing to correct.
     function hold(target: HTMLElement) {
-      if (CSS.supports('overflow-anchor', 'auto')) {
-        return;
-      }
       const yours = new AbortController();
       const done = () => yours.abort();
       for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown']) {
