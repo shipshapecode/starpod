@@ -530,9 +530,12 @@ test('comes home from an episode already sized', async ({ page }) => {
   const link = cards(page).nth(3).locator('.xp-title a');
   const href = (await link.getAttribute('href'))!;
   await link.click();
-  await page.waitForURL('**' + href);
+  // Client-side navigations take 5–9s in CI's Firefox under the suite's load.
+  await page.waitForURL('**' + href, { timeout: 15_000 });
   await page.goBack();
-  await expect(page.locator('[data-explorer][data-live]')).toBeAttached();
+  await expect(page.locator('[data-explorer][data-live]')).toBeAttached({
+    timeout: 15_000
+  });
   expect(
     await page.evaluate(() => (window as unknown as { sized?: boolean }).sized)
   ).toBe(true);
@@ -705,6 +708,8 @@ test('hides the In progress chip once it is off and nothing is started', async (
 test('comes back to the card it left, closing or returning', async ({
   page
 }) => {
+  // Two navigations, each up to 15s in CI's Firefox.
+  test.slow();
   const inView = (index: string) =>
     page.evaluate((index) => {
       const box = document

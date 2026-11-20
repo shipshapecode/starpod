@@ -501,7 +501,8 @@ test.describe('episode page navigation', () => {
 
     const href = await cards.first().getAttribute('href');
     await cards.first().click();
-    await expect(page).toHaveURL(new RegExp(`${href}$`));
+    // Client-side navigations take 5–9s in CI's Firefox under the suite's load.
+    await expect(page).toHaveURL(new RegExp(`${href}$`), { timeout: 15_000 });
     await expect(page.locator('h1.stage-title')).toHaveText(
       /Open-Source Ethics/
     );
