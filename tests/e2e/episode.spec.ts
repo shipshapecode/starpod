@@ -691,7 +691,8 @@ test.describe('episode page review fixes', () => {
       document.body.append(link);
     });
     await page.locator('#to-184').evaluate((link: HTMLElement) => link.click());
-    await expect(page).toHaveURL(/\/184$/);
+    // Client-side navigations take up to ~9s on CI's runners under load.
+    await expect(page).toHaveURL(/\/184$/, { timeout: 15_000 });
     // Play on from one of Robbie's lines.
     const robbie = await page.evaluate(async () => {
       const cues = await (
