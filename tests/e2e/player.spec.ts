@@ -38,6 +38,34 @@ async function expectPlaying(page: Page) {
   await expect.poll(() => playhead(page), { timeout: 15_000 }).toBeGreaterThan(from);
 }
 
+// A few seconds of quiet as a WAV, which every browser decodes. CI's
+// Firefox can't decode the feed's MP3s (MEDIA_ERR_DECODE, so they never
+// play or end), and the audio tests shouldn't hang on the podcast's CDN.
+function quietWav(seconds = 6, rate = 8000) {
+  const data = seconds * rate * 2;
+  const wav = Buffer.alloc(44 + data);
+  wav.write('RIFF', 0);
+  wav.writeUInt32LE(36 + data, 4);
+  wav.write('WAVEfmt ', 8);
+  wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20); // PCM
+  wav.writeUInt16LE(1, 22); // mono
+  wav.writeUInt32LE(rate, 24);
+  wav.writeUInt32LE(rate * 2, 28);
+  wav.writeUInt16LE(2, 32);
+  wav.writeUInt16LE(16, 34);
+  wav.write('data', 36);
+  wav.writeUInt32LE(data, 40);
+  return wav;
+}
+
+async function serveQuietAudio(page: Page) {
+  const body = quietWav();
+  await page.route(/\.mp3(\?|$)/, (route) =>
+    route.fulfill({ status: 200, contentType: 'audio/wav', body })
+  );
+}
+
 test('the picture leaves its stage for a corner, comes back, moves, expands and keeps playing across pages', async ({
   page
 }) => {
@@ -133,6 +161,7 @@ test('the picture leaves its stage for a corner, comes back, moves, expands and 
 test('an audio episode docks its artwork in the player and plays Up next when it ends', async ({
   page
 }) => {
+  await serveQuietAudio(page);
   // Queue an episode from its own page; the queue outlives the visit.
   await open(page, VIDEO_EPISODE);
   await page.getByRole('button', { name: 'Up next' }).click();
@@ -167,6 +196,9 @@ test('an episode that ends is not heard again while the next one loads its playe
   // Where HLS is not native (Firefox, for one) the next video waits for
   // hls.js. Stand in for such a browser and hold that import back.
   test.skip(browserName === 'webkit', 'WebKit plays HLS itself and never loads hls.js');
+  // It waits on a held-back hls.js and two episodes' players: ~23s locally.
+  test.slow();
+  await serveQuietAudio(page);
   await page.addInitScript(() => {
     const can = HTMLMediaElement.prototype.canPlayType;
     HTMLMediaElement.prototype.canPlayType = function (type: string) {
