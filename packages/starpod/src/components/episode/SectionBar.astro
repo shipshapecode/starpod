@@ -129,10 +129,44 @@ const { label, sections } = Astro.props;
           if (tries && Math.abs(off) > 2 && room > 1) {
             target.scrollIntoView({ behavior: 'smooth' });
             glideOn(target, tries - 1);
+          } else {
+            hold(target);
           }
         },
         { once: true, signal: yours.signal }
       );
+    }
+
+    // Groups above a landed section can still settle to their real height
+    // after the glide ends. Scroll anchoring keeps the section put where the
+    // browser has it; WebKit doesn't, so there the section is held under the
+    // bar for a moment, until you take over.
+    function hold(target: HTMLElement) {
+      if (CSS.supports('overflow-anchor', 'auto')) {
+        return;
+      }
+      const yours = new AbortController();
+      const done = () => yours.abort();
+      for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown']) {
+        addEventListener(type, done, { signal: yours.signal, passive: true });
+      }
+      signal.addEventListener('abort', done, { signal: yours.signal });
+      const until = performance.now() + 1500;
+      const tick = (now: number) => {
+        if (yours.signal.aborted) {
+          return;
+        }
+        const off = target.getBoundingClientRect().top - landing(target);
+        if (Math.abs(off) > 2) {
+          scrollBy({ top: off, behavior: 'instant' });
+        }
+        if (now < until) {
+          requestAnimationFrame(tick);
+        } else {
+          done();
+        }
+      };
+      requestAnimationFrame(tick);
     }
 
     if (CSS.supports('scroll-target-group', 'auto')) {
