@@ -198,7 +198,7 @@ test.describe('desktop rail', () => {
     if (browserName === 'webkit') {
       await page.mouse.move(232, y, { steps: 4 });
     } else {
-      await page.evaluate(async (y) => {
+      await page.evaluate((y) => {
         const edge = document.querySelector('.rail-edge')!;
         const pointerId = (window as unknown as { mouseId: number }).mouseId;
         const fire = (type: string, x: number) =>
@@ -215,10 +215,16 @@ test.describe('desktop rail', () => {
               pointerType: 'mouse'
             })
           );
-        const frame = () => new Promise((done) => setTimeout(done, 16));
-        await frame();
+        // A frame apart, waited for in place: under load a timer can fire
+        // far later, which reads as a hand that stopped.
+        const frame = () => {
+          const end = performance.now() + 16;
+          while (performance.now() < end) {
+            // Spin.
+          }
+        };
         fire('pointermove', 102);
-        await frame();
+        frame();
         fire('pointermove', 132);
         fire('pointerup', 132);
       }, y);
