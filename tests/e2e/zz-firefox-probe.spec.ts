@@ -1,104 +1,63 @@
-// Throwaway probe: why the audio episode tests fail in CI's Firefox.
-// Prints PROBE lines; not meant to be merged.
-import { expect, test, type Page } from '@playwright/test';
+// Throwaway probe: why the close-up's artwork lands 54px above its slot in
+// CI's Firefox. Prints PROBE lines; not meant to be merged.
+import { test, type Page } from '@playwright/test';
 
-test.setTimeout(120_000);
-
-const VIDEO_EPISODE = '/will-ai-kill-us-all-jev-says-87';
 const log = (...args: unknown[]) => console.log('PROBE', ...args);
-const media = (page: Page) => page.locator('video.starpod-media');
 
-async function open(page: Page, path: string) {
-  await page.goto(path);
-  await expect(
-    page.locator('astro-island:has(.stage-play)').first()
-  ).not.toHaveAttribute('ssr', { timeout: 30_000 });
-}
-
-const state = (page: Page) =>
+const snap = (page: Page) =>
   page.evaluate(() => {
-    const v = document.querySelector<HTMLVideoElement>('video.starpod-media');
-    const frame = document.querySelector('[data-stage-frame]');
-    const r = frame?.getBoundingClientRect();
-    const d = document.documentElement.dataset;
+    const r = (sel: string) => {
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      const b = el.getBoundingClientRect();
+      return [b.left, b.top, b.width, b.height].map(Math.round);
+    };
+    const art = document.querySelector('.xp-card[data-on] .xp-art');
+    const cs = art && getComputedStyle(art);
+    const scrollers = [...document.querySelectorAll('*')]
+      .filter((el) => el.scrollTop > 0)
+      .map((el) => `${el.tagName}.${String(el.className).slice(0, 20)}=${el.scrollTop}`);
     return {
       scrollY: Math.round(scrollY),
-      docH: document.documentElement.scrollHeight,
-      innerH: innerHeight,
-      frame: r ? [Math.round(r.top), Math.round(r.bottom)] : null,
-      home: v?.parentElement?.className,
-      t: v ? Math.round(v.currentTime * 10) / 10 : null,
-      dur: v?.duration,
-      paused: v?.paused,
-      ended: v?.ended,
-      ready: v?.readyState,
-      net: v?.networkState,
-      err: v?.error?.code,
-      src: v?.currentSrc?.slice(-40),
-      picture: d.picture,
-      medium: d.medium,
-      playing: d.playing,
-      host: d.host,
-      name: document.querySelector('.island-name b')?.textContent?.slice(0, 30),
-      hover: (() => {
-        const el = document.querySelectorAll(':hover');
-        return el[el.length - 1]?.className?.toString().slice(0, 40);
-      })()
+      scrollers,
+      art: r('.xp-card[data-on] .xp-art'),
+      slot: r('.xp-cu-art'),
+      stage: r('.xp-stage'),
+      bar: r('[data-xp-bar]'),
+      cu: r('.xp-cu'),
+      artPos: cs && [cs.position, cs.top, cs.left, cs.translate, cs.transform].join(' | '),
+      cb: (art as HTMLElement | null)?.offsetParent?.className?.toString().slice(0, 40)
     };
   });
 
-for (const variant of ['listen']) {
-  test(`audio ${variant}`, async ({ page }) => {
-    page.on('console', (m) => {
-      if (m.type() === 'error' || m.type() === 'warning') {
-        log(variant, 'console', m.type(), m.text().slice(0, 160));
-      }
-    });
-    page.on('pageerror', (e) => log(variant, 'pageerror', String(e).slice(0, 200)));
-    if (variant === 'watch') {
-      await page.addInitScript(() => localStorage.setItem('starpod:medium', 'watch'));
+for (const at of ['top', 'scrolled']) {
+  test(`close-up ${at}`, async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-explorer][data-live]').waitFor({ state: 'attached' });
+    if (at === 'scrolled') {
+      await page.evaluate(() => scrollTo(0, 600));
+      await page.waitForTimeout(500);
     }
-    await page.addInitScript(() => {
-      for (const type of ['play', 'playing', 'pause', 'seeking', 'seeked', 'ended', 'error', 'emptied', 'loadstart', 'waiting', 'stalled']) {
-        document.addEventListener(
-          type,
-          (e) => {
-            const v = e.target as HTMLVideoElement;
-            if (v instanceof HTMLMediaElement) {
-              console.info(`MEDIA ${type} t=${v.currentTime.toFixed(1)} d=${v.duration} src=${v.currentSrc.slice(-30)}`);
-            }
-          },
-          true
-        );
-      }
-    });
-    page.on('console', (m) => {
-      if (m.text().startsWith('MEDIA')) log(variant, m.text());
-    });
-
-    await open(page, VIDEO_EPISODE);
-    await page.getByRole('button', { name: 'Up next' }).click();
-    await open(page, '/120');
-    await page.getByRole('button', { name: /^Play episode 120/ }).first().click();
-    await page.waitForTimeout(3000);
-    log(variant, 'after play', JSON.stringify(await state(page)));
-
-    await page.mouse.wheel(0, 1500);
-    for (const ms of [300, 1000, 3000]) {
+    log(at, 'before', JSON.stringify(await snap(page)));
+    await page.locator('.xp-card:not([hidden])').nth(2).locator('.xp-art').click();
+    for (const ms of [100, 500, 1500, 4000]) {
       await page.waitForTimeout(ms);
-      log(variant, `wheel+${ms}`, JSON.stringify(await state(page)));
+      log(at, `+${ms}`, JSON.stringify(await snap(page)));
     }
-    await page.evaluate(() => scrollBy(0, 1500));
-    await page.waitForTimeout(1500);
-    log(variant, 'scrollBy', JSON.stringify(await state(page)));
-
-    await media(page).evaluate((v) => {
-      const el = v as HTMLVideoElement;
-      el.currentTime = el.duration - 1;
+    // Does a scroll nudge, or a style flush, bring it home?
+    await page.evaluate(() => {
+      scrollBy(0, 1);
+      scrollBy(0, -1);
     });
-    for (let i = 0; i < 8; i++) {
-      await page.waitForTimeout(2500);
-      log(variant, `end+${(i + 1) * 2.5}s`, JSON.stringify(await state(page)));
-    }
+    await page.waitForTimeout(300);
+    log(at, 'nudged', JSON.stringify(await snap(page)));
+    await page.evaluate(() => {
+      const art = document.querySelector<HTMLElement>('.xp-card[data-on] .xp-art')!;
+      art.style.positionAnchor = 'none';
+      void art.offsetTop;
+      art.style.positionAnchor = '';
+    });
+    await page.waitForTimeout(300);
+    log(at, 're-anchored', JSON.stringify(await snap(page)));
   });
 }
