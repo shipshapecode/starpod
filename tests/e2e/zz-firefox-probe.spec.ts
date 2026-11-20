@@ -14,7 +14,8 @@ const variants: Record<string, string> = {
     '*,*::before,*::after{position-anchor:none!important;anchor-name:none!important}',
   'no-containers':
     '*,*::before,*::after{container-type:normal!important;content-visibility:visible!important}',
-  'cards-hidden': '.xp-list{display:none!important}'
+  'no-cv': '*,*::before,*::after{content-visibility:visible!important}',
+  'no-ct': '*,*::before,*::after{container-type:normal!important}'
 };
 
 const log = (...args: unknown[]) => console.log('PROBE', ...args);
@@ -119,22 +120,21 @@ for (const [name, css] of Object.entries(variants)) {
     log(name, 'scroll-call', Date.now() - t);
     log(name, 'idle 40%', JSON.stringify(await roundTrips(page)), JSON.stringify(await frames(page)));
 
-    // The slow journey from the failing tests: out to an episode and back.
-    const link = page.locator('.xp-card:not([hidden]) .xp-title a').nth(3);
-    const ok = await link.count();
-    if (ok) {
+    // The slow journey from the failing tests: out to an episode and back,
+    // twice (the first visit also pays the dev server's compile).
+    await page.evaluate(() => scrollTo(0, 0));
+    for (const round of [1, 2]) {
+      const link = page.locator('.xp-card:not([hidden]) .xp-title a').nth(round);
       t = Date.now();
-      await link.click({ timeout: 30_000 });
-      await page.waitForURL((url) => url.pathname !== '/', { timeout: 60_000 });
-      log(name, 'to-episode', Date.now() - t);
-      log(name, 'idle episode', JSON.stringify(await roundTrips(page, 2000)));
+      await link.click({ timeout: 30_000 }).catch((e) => log(name, round, 'click failed', String(e).slice(0, 80)));
+      await page.waitForURL((url) => url.pathname !== '/', { timeout: 60_000 }).catch(() => log(name, round, 'never left'));
+      log(name, round, 'to-episode', Date.now() - t);
+      log(name, round, 'idle episode', JSON.stringify(await roundTrips(page, 2000)));
       t = Date.now();
       await page.goBack();
-      await live.waitFor({ state: 'attached', timeout: 60_000 }).catch(() => log(name, 'back: never live'));
-      log(name, 'back-to-live', Date.now() - t);
-      log(name, 'idle back', JSON.stringify(await roundTrips(page)), JSON.stringify(await frames(page)));
-    } else {
-      log(name, 'no card link');
+      await live.waitFor({ state: 'attached', timeout: 60_000 }).catch(() => log(name, round, 'back: never live'));
+      log(name, round, 'back-to-live', Date.now() - t);
+      log(name, round, 'idle back', JSON.stringify(await roundTrips(page, 2000)), JSON.stringify(await frames(page)));
     }
   });
 }
