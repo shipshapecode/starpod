@@ -1,9 +1,18 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
+import { eq } from 'drizzle-orm';
 
 import Layout from '../layouts/Layout.astro';
-import starpodConfig from 'virtual:starpod/config';
+import PageHeader from '../components/PageHeader.astro';
+import Tiles from '../components/episode/Tiles.astro';
+import { ArrowOutIcon, GithubIcon, LinkIcon, XIcon } from '../components/icons';
+import { createDb } from '../db';
+import { HostOrGuest, Person } from '../db/schema';
+import { matchNames } from '../lib/cast';
+import { optimizeImage } from '../lib/optimize-episode-image';
+import { getAllEpisodes, getShowInfo, type Episode } from '../lib/rss';
+import starpodConfig, { database } from 'virtual:starpod/config';
 import LargePlatforms from 'virtual:starpod/components/LargePlatforms';
 
 import avatarLight from '../assets/avatar-light.png';
@@ -15,78 +24,205 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 
 // Fall back to the packaged avatar when the site has not provided a photo in
 // src/img/people yet.
-const hostImage = (img: string) =>
-  images[`/src/img/people/${img}`]?.() ?? avatarLight;
+const hostImage = async (img: string) =>
+  (await images[`/src/img/people/${img}`]?.())?.default ?? avatarLight;
+
+const linksFor = (host: (typeof hosts)[number]) =>
+  [
+    host.twitter && { href: host.twitter, label: 'Twitter', Icon: XIcon },
+    host.github && { href: host.github, label: 'GitHub', Icon: GithubIcon },
+    host.website && { href: host.website, label: 'Website', Icon: LinkIcon }
+  ].filter(Boolean) as Array<{
+    href: string;
+    label: string;
+    Icon: typeof LinkIcon;
+  }>;
+
+// What each host has done on the show, from the guests database when the
+// site has one: how many episodes, since when, how many hours, and the two
+// latest.
+const db = database
+  ? createDb(
+      import.meta.env.ASTRO_DB_REMOTE_URL,
+      import.meta.env.ASTRO_DB_APP_TOKEN
+    )
+  : null;
+const everyone = db
+  ? await db.select({ id: Person.id, name: Person.name }).from(Person)
+  : [];
+const show = db ? await getShowInfo() : undefined;
+const bySlug = new Map(
+  (db ? await getAllEpisodes() : []).map((item) => [item.episodeSlug, item])
+);
+
+const tile = async (item: Episode) => ({
+  href: `/${item.episodeSlug}`,
+  number: item.episodeNumber === 'Bonus' ? 'Bonus' : `Ep ${item.episodeNumber}`,
+  title: item.title,
+  art:
+    (await optimizeImage(item.episodeImage ?? show!.image, {
+      width: 320,
+      height: 320
+    })) ?? show!.image
+});
+
+// Each configured host's database record: the same name, or surely the same
+// person, one each, whatever order the rows come in.
+const recordOf = matchNames(
+  hosts.map((host) => host.name),
+  everyone.map((candidate) => candidate.name)
+);
+
+const posters = await Promise.all(
+  hosts.map(async (host, index) => {
+    const person = everyone.find(
+      (candidate) => candidate.name === recordOf.get(host.name)
+    );
+    const theirs =
+      db && person
+        ? (
+            await db
+              .select({ slug: HostOrGuest.episodeSlug })
+              .from(HostOrGuest)
+              .where(eq(HostOrGuest.personId, person.id))
+          )
+            .map((row) => bySlug.get(row.slug))
+            .filter((item): item is Episode => Boolean(item))
+            .sort((a, b) => b.published - a.published)
+        : [];
+    const hours = Math.round(
+      theirs.reduce((sum, item) => sum + (item.duration || 0), 0) / 3600
+    );
+    return {
+      ...host,
+      id: person?.id,
+      photo: await hostImage(host.img),
+      voice: index < 2 ? index : undefined,
+      count: theirs.length,
+      stats: theirs.length
+        ? [
+            `${theirs.length} ${theirs.length === 1 ? 'episode' : 'episodes'}`,
+            `since ${new Date(theirs.at(-1)!.published).getFullYear()}`,
+            `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+          ].join(' · ')
+        : undefined,
+      theirs,
+      recent: await Promise.all(theirs.slice(0, 2).map(tile))
+    };
+  })
+);
+
+// When every host's latest two are the same episodes, each poster would
+// repeat one row: show it once beneath them instead, as the latest episodes
+// they made together, and keep each poster's way to all of theirs.
+const recentOf = (poster: (typeof posters)[number]) =>
+  poster.recent.map((item) => item.href).join(' ');
+const together =
+  posters.length > 1 &&
+  posters[0].recent.length > 0 &&
+  posters.every((poster) => recentOf(poster) === recentOf(posters[0]))
+    ? await Promise.all(
+        posters[0].theirs
+          .filter((item) =>
+            posters.every((poster) => poster.theirs.includes(item))
+          )
+          .slice(0, 4)
+          .map(tile)
+      )
+    : [];
 ---
 
 <Layout title="About">
-  <div class="relative z-10 px-8 lg:px-18">
-    <h1
-      class="text-light-text-heading mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl dark:text-white"
-    >
-      About the show
-    </h1>
+  <div class="relative z-10">
+    <PageHeader title="About the show">
+      <p class="m-0">{starpodConfig.description}</p>
+    </PageHeader>
 
-    <p class="mb-5">{starpodConfig.description}</p>
+    <section aria-labelledby="listen-heading" class="ep-reveal">
+      <h2 class="section-title" id="listen-heading">Listen on</h2>
+      <LargePlatforms />
+    </section>
 
-    <LargePlatforms />
+    <section aria-labelledby="hosts-heading" class="mt-16 lg:mt-20">
+      <h2 class="section-title" id="hosts-heading">Meet the hosts</h2>
 
-    <h2 class="section-heading-underlined mt-16 lg:mt-24">Meet the hosts</h2>
+      <ul class="ab-hosts">
+        {
+          posters.map((host) => (
+            <li class="ab-host ep-reveal" data-voice={host.voice}>
+              <div
+                class="ab-host-photo"
+                data-props-for="img-color"
+                data-props-to=".ab-host"
+              >
+                <Image alt="" src={host.photo} width={720} />
+              </div>
 
-    <div class="mt-9 pb-9 lg:mt-12">
-      {
-        hosts.map((host, index) => (
-          <div
-            class="flex flex-col lg:flex-row"
-            class:list={[index < hosts.length - 1 ? 'mb-4' : '']}
-          >
-            <Image
-              class="mr-6 mb-4 h-12 w-12 rounded-lg lg:h-20 lg:w-20"
-              height={80}
-              src={hostImage(host.img)}
-              width={80}
-              alt=""
-            />
+              <div class="ab-host-body">
+                <h3 class="ab-host-name">{host.name}</h3>
+                {host.stats && <p class="person-fact">{host.stats}</p>}
+                {host.bio && <p class="ab-host-bio">{host.bio}</p>}
 
-            <div>
-              <h3 class="text-light-text-heading text-lg font-bold lg:text-2xl dark:text-white">
-                {host.name}
-              </h3>
-
-              <p class="mt-2 lg:mt-3">{host.bio}</p>
-
-              <div class="mt-6 flex gap-4">
-                {host?.twitter && (
+                {together.length === 0 && host.recent.length > 0 && (
+                  <div class="ab-host-tray">
+                    <Tiles
+                      items={host.recent}
+                      label={`Latest episodes with ${host.name}`}
+                    />
+                    {host.id && (
+                      <a
+                        aria-label={`All ${host.count} episodes with ${host.name}`}
+                        class="ep-pill"
+                        href={`/?guest=${encodeURIComponent(host.id)}`}
+                      >
+                        All {host.count}
+                        <ArrowOutIcon size={14} />
+                      </a>
+                    )}
+                  </div>
+                )}
+                {together.length > 0 && host.id && (
                   <a
-                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
-                    href={host.twitter}
+                    aria-label={`All ${host.count} episodes with ${host.name}`}
+                    class="ep-pill"
+                    href={`/?guest=${encodeURIComponent(host.id)}`}
                   >
-                    Twitter
+                    All {host.count}
+                    <ArrowOutIcon size={14} />
                   </a>
                 )}
 
-                {host?.github && (
-                  <a
-                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
-                    href={host.github}
-                  >
-                    GitHub
-                  </a>
-                )}
-
-                {host?.website && (
-                  <a
-                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
-                    href={host.website}
-                  >
-                    Website
-                  </a>
+                {linksFor(host).length > 0 && (
+                  <ul class="ab-host-links">
+                    {linksFor(host).map(({ href, Icon, label }) => (
+                      <li>
+                        <a
+                          class="ep-pill"
+                          href={href}
+                          rel="noopener"
+                          target="_blank"
+                        >
+                          <Icon size={16} />
+                          {label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
-            </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      {
+        together.length > 0 && (
+          <div class="ab-latest ep-reveal">
+            <h3 class="ab-latest-title">Latest episodes</h3>
+            <Tiles items={together} label="Latest episodes with the hosts" />
           </div>
-        ))
+        )
       }
-    </div>
+    </section>
   </div>
 </Layout>
