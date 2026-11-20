@@ -2641,6 +2641,19 @@
 
 /* ---------- The open card's parts, in their close-up slots ---------- */
 
+/* Where the browser puts something anchored to the artwork's slot, kept
+   still so the explorer can measure it against the slot (mendAnchors). */
+.xp-anchor-marker {
+  position: absolute;
+  position-anchor: --xp-d-art;
+  top: anchor(top, 0px);
+  left: 0;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .xp-stage .xp-card[data-on] {
   /* Its parts are positioned against the stage, so the card may not be a
      containing block or clip them. */
@@ -2662,7 +2675,7 @@
   position: absolute;
   z-index: 4;
   position-anchor: --xp-d-art;
-  top: anchor(top);
+  top: calc(anchor(top) + var(--xp-cu-fix, 0px));
   left: anchor(left);
   width: anchor-size(width);
   height: anchor-size(height);
@@ -2677,7 +2690,7 @@
   z-index: 4;
   position-visibility: always;
   position-anchor: --xp-d-inf;
-  top: anchor(top);
+  top: calc(anchor(top) + var(--xp-cu-fix, 0px));
   left: anchor(left);
   margin: 0;
 }
@@ -2699,7 +2712,7 @@
   z-index: 5;
   position-visibility: always;
   position-anchor: --xp-d-ttl;
-  top: anchor(top);
+  top: calc(anchor(top) + var(--xp-cu-fix, 0px));
   left: anchor(left);
   width: anchor-size(width);
   transform-origin: 50% 50%;
@@ -2723,7 +2736,7 @@
   position: absolute;
   z-index: 4;
   position-anchor: --xp-d-col;
-  top: anchor(top);
+  top: calc(anchor(top) + var(--xp-cu-fix, 0px));
   left: anchor(left);
   display: block;
   width: anchor-size(width);
@@ -2770,7 +2783,7 @@
   position: absolute;
   z-index: 5;
   position-anchor: --xp-d-play;
-  top: anchor(top);
+  top: calc(anchor(top) + var(--xp-cu-fix, 0px));
   left: anchor(left);
   margin: 0;
   position-visibility: anchors-visible;

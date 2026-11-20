@@ -1813,6 +1813,7 @@ export function startExplorer() {
         }
         open = next;
         root.toggleAttribute('data-open', Boolean(next));
+        requestAnimationFrame(mendAnchors);
       },
       {
         place: () => {
@@ -2124,6 +2125,40 @@ export function startExplorer() {
   addEventListener('scroll', onScroll, { passive: true, signal });
   list.addEventListener('scroll', onScroll, { passive: true, signal });
   signal.addEventListener('abort', () => clearTimeout(settle));
+
+  // Firefox resolves the open card's anchors as if the close-up weren't
+  // stuck: once the page has scrolled, its artwork, facts and title sit off
+  // their slots by the close-up's sticky offset. A still, invisible marker
+  // anchored like the artwork shows where the browser puts it; the parts
+  // make up any gap from the slot (--xp-cu-fix, explorer.css). Where anchors
+  // follow a stuck box the gap is 0.
+  const cuArt = closeup.querySelector<HTMLElement>('.xp-cu-art');
+  const marker = document.createElement('i');
+  marker.className = 'xp-anchor-marker';
+  marker.setAttribute('aria-hidden', 'true');
+  stage.append(marker);
+  let anchorFix = 0;
+  function mendAnchors() {
+    const gap =
+      open && cuArt
+        ? Math.round(
+            cuArt.getBoundingClientRect().top -
+              marker.getBoundingClientRect().top
+          )
+        : 0;
+    // A pixel either way is a sticky offset's rounding, not a gap.
+    const fix = Math.abs(gap) > 1 ? gap : 0;
+    if (fix !== anchorFix) {
+      anchorFix = fix;
+      if (fix) {
+        stage.style.setProperty('--xp-cu-fix', `${fix}px`);
+      } else {
+        stage.style.removeProperty('--xp-cu-fix');
+      }
+    }
+  }
+  addEventListener('scroll', mendAnchors, { passive: true, signal });
+  addEventListener('resize', mendAnchors, { passive: true, signal });
 
   // A card's controls carry a scroll margin that clears the sticky toolbar
   // and the dock (explorer.css). Chromium honours it when focus scrolls a
