@@ -723,19 +723,25 @@ test('comes back to the card it left, closing or returning', async ({
     scrollTo(0, document.documentElement.scrollHeight * 0.4)
   );
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
-  // A card in the middle of the view, once the window has followed there.
+  // The whole card nearest the middle of the view, once the window has
+  // followed there. Cards run tall, so pick by distance rather than a band.
   const middle = () =>
-    page.evaluate(
-      () =>
-        [...document.querySelectorAll<HTMLElement>('.xp-list > .xp-card')].find(
-          (li) => {
-            const box = li.getBoundingClientRect();
-            return (
-              box.top > innerHeight * 0.3 && box.bottom < innerHeight * 0.9
-            );
-          }
-        )?.dataset.index
-    );
+    page.evaluate(() => {
+      const bar = document
+        .querySelector('[data-xp-bar]')!
+        .getBoundingClientRect().bottom;
+      const whole = [
+        ...document.querySelectorAll<HTMLElement>('.xp-list > .xp-card')
+      ].filter((li) => {
+        const box = li.getBoundingClientRect();
+        return box.top >= bar && box.bottom <= innerHeight;
+      });
+      const off = (li: HTMLElement) => {
+        const box = li.getBoundingClientRect();
+        return Math.abs((box.top + box.bottom) / 2 - innerHeight / 2);
+      };
+      return whole.sort((a, b) => off(a) - off(b))[0]?.dataset.index;
+    });
   await expect.poll(middle).toBeTruthy();
   const index = (await middle())!;
   const card = page.locator(`.xp-card[data-index="${index}"]`);

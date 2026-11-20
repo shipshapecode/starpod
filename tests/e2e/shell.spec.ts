@@ -181,42 +181,49 @@ test.describe('desktop rail', () => {
     // own round trips can space them past the 80ms that reads as a stop.
     // Headless WebKit handles each move here in 50–150ms, which reads as a
     // hand that stopped, so there the divider is carried past the middle.
+    // Elsewhere the real mouse presses the divider, so its pointer is active
+    // and can be captured, and the moves and the release are fired in the
+    // page under the id that press came with.
+    await page.evaluate(() =>
+      addEventListener(
+        'pointerdown',
+        (event) =>
+          ((window as unknown as { mouseId?: number }).mouseId =
+            event.pointerId),
+        { capture: true, once: true }
+      )
+    );
+    await page.mouse.move(72, y);
+    await page.mouse.down();
     if (browserName === 'webkit') {
-      await page.mouse.move(72, y);
-      await page.mouse.down();
       await page.mouse.move(232, y, { steps: 4 });
-      await page.mouse.up();
+    } else {
+      await page.evaluate(async (y) => {
+        const edge = document.querySelector('.rail-edge')!;
+        const pointerId = (window as unknown as { mouseId: number }).mouseId;
+        const fire = (type: string, x: number) =>
+          edge.dispatchEvent(
+            new PointerEvent(type, {
+              bubbles: true,
+              button: 0,
+              buttons: type === 'pointerup' ? 0 : 1,
+              cancelable: true,
+              clientX: x,
+              clientY: y,
+              isPrimary: true,
+              pointerId,
+              pointerType: 'mouse'
+            })
+          );
+        const frame = () => new Promise((done) => setTimeout(done, 16));
+        await frame();
+        fire('pointermove', 102);
+        await frame();
+        fire('pointermove', 132);
+        fire('pointerup', 132);
+      }, y);
     }
-    await page.evaluate(async (skip) => {
-      if (skip) {
-        return;
-      }
-      const edge = document.querySelector('.rail-edge')!;
-      // The mouse's own pointer id (0 in Firefox, 1 elsewhere): capturing
-      // any other pointer throws.
-      const pointerId = navigator.userAgent.includes('Firefox') ? 0 : 1;
-      const fire = (type: string, x: number) =>
-        edge.dispatchEvent(
-          new PointerEvent(type, {
-            bubbles: true,
-            button: 0,
-            buttons: type === 'pointerup' ? 0 : 1,
-            cancelable: true,
-            clientX: x,
-            clientY: 450,
-            isPrimary: true,
-            pointerId,
-            pointerType: 'mouse'
-          })
-        );
-      const frame = () => new Promise((done) => setTimeout(done, 16));
-      fire('pointerdown', 72);
-      await frame();
-      fire('pointermove', 102);
-      await frame();
-      fire('pointermove', 132);
-      fire('pointerup', 132);
-    }, browserName === 'webkit');
+    await page.mouse.up();
     await expect.poll(() => state(page)).toBe('expanded');
     await expect
       .poll(async () => (await rail(page).boundingBox())?.width)

@@ -41,6 +41,8 @@ async function expectPlaying(page: Page) {
 test('the picture leaves its stage for a corner, comes back, moves, expands and keeps playing across pages', async ({
   page
 }) => {
+  // A long journey: on CI's runners it takes 15–40s.
+  test.slow();
   await open(page, VIDEO_EPISODE);
   await page.getByRole('button', { name: /^Play episode 260/ }).first().click();
   await expectPlaying(page);

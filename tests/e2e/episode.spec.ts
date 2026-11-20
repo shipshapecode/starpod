@@ -377,6 +377,8 @@ test.describe('episode page navigation', () => {
     test(`on a ${form} phone, every section link lands its section just under the bar`, async ({
       page
     }) => {
+      // Fifteen landings, each held 400ms: on CI's runners near 30s.
+      test.slow();
       await page.setViewportSize(viewport);
       const nav = page.getByRole('navigation', { name: 'Episode sections' });
       const underBar = (href: string) =>
