@@ -56,9 +56,19 @@ jobs:
         run: pnpm test:unit run
 
   e2e:
-    timeout-minutes: 60
-    # Playwright 1.60 can't install browsers on ubuntu-latest (26.04) yet.
+    name: e2e (${{ matrix.project }})
+    timeout-minutes: 30
     runs-on: ubuntu-24.04
+    # The browsers and their system libraries come with the image, so nothing
+    # is installed from apt on each run. Keep the tag on the exact
+    # @playwright/test version in pnpm-lock.yaml.
+    container:
+      image: mcr.microsoft.com/playwright:v1.60.0-noble
+      options: --user 1001
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -77,17 +87,15 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: pnpm exec playwright test --project=${{ matrix.project }}
         env:
           ASTRO_DB_REMOTE_URL: ${{ secrets.ASTRO_DB_REMOTE_URL }}
           ASTRO_DB_APP_TOKEN: ${{ secrets.ASTRO_DB_APP_TOKEN }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}
           path: playwright-report/
           retention-days: 30
 

@@ -7,6 +7,7 @@ import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 
 import AdPackageCard from 'starpod/components/AdPackageCard';
+import PageHeader from 'starpod/components/PageHeader';
 import Layout from 'starpod/layout';
 import { getShowInfo } from 'starpod/rss';
 
@@ -27,35 +28,35 @@ const countries = [
 ---
 
 <Layout title="Sponsor">
-  <div class="relative z-10 px-8 lg:px-18">
-    <h1
-      class="mb-4 text-2xl font-bold text-light-text-heading lg:mb-6 lg:text-5xl dark:text-white"
-    >
-      Sponsor {title}
-    </h1>
-
-    <p class="mb-5">
-      Want to dazzle a crowd of tech nerds and whiskey connoisseurs? Throw your
-      brand into the mix! Our listeners love innovation, good banter, and a
-      stiff drink—so get in on the fun and make some magic happen. Stay classy,
-      sponsor.
-    </p>
+  <div class="relative z-10">
+    <PageHeader title={`Sponsor ${title}`}>
+      <p class="m-0">
+        Want to dazzle a crowd of tech nerds and whiskey connoisseurs? Throw
+        your brand into the mix! Our listeners love innovation, good banter,
+        and a stiff drink—so get in on the fun and make some magic happen. Stay
+        classy, sponsor.
+      </p>
+    </PageHeader>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <AdPackageCard
-        bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
-        heading="30 second ad"
-        price="$500"
-      />
-      <AdPackageCard
-        bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
-        heading="60 second ad"
-        price="$1,000"
-      />
+      <div class="ep-reveal">
+        <AdPackageCard
+          bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
+          heading="30 second ad"
+          price="$500"
+        />
+      </div>
+      <div class="ep-reveal">
+        <AdPackageCard
+          bullets={['Host read ad', '10% off for 3+', '20% off for 6+']}
+          heading="60 second ad"
+          price="$1,000"
+        />
+      </div>
     </div>
 
     <h2
-      class="mb-4 mt-16 text-2xl font-bold text-light-text-heading lg:mb-6 lg:mt-20 lg:text-5xl dark:text-white"
+      class="mb-4 mt-16 text-2xl font-bold text-ink lg:mb-6 lg:mt-20 lg:text-5xl"
     >
       Your overall ad reach
     </h2>
@@ -63,9 +64,9 @@ const countries = [
     <h3 class="section-heading mb-8 mt-8 lg:mt-12">Listener Metrics</h3>
 
     <div class="grid grid-cols-1 lg:grid-cols-2">
-      <figure>
+      <figure class="ep-reveal">
         <span
-          class="text-6xl font-bold tabular-nums text-light-text-heading dark:text-white"
+          class="text-6xl font-bold tabular-nums text-ink"
         >
           1,000
         </span>
@@ -73,9 +74,9 @@ const countries = [
         <figcaption class="mt-2 font-bold">listeners per episode</figcaption>
       </figure>
 
-      <figure>
+      <figure class="ep-reveal">
         <span
-          class="text-6xl font-bold tabular-nums text-light-text-heading dark:text-white"
+          class="text-6xl font-bold tabular-nums text-ink"
         >
           15,000
         </span>
@@ -88,7 +89,7 @@ const countries = [
       Top Listeners By Location
     </h3>
 
-    <div class="grid grid-cols-[minmax(0,max-content)_1fr_minmax(0,max-content)] gap-x-4 gap-y-12 border-b py-6 text-light-text-heading dark:border-dark-border dark:text-white">
+    <div class="grid grid-cols-[minmax(0,max-content)_1fr_minmax(0,max-content)] gap-x-4 gap-y-12 border-b py-6 text-ink border-line">
     {
       countries.map((country) => {
         return (
@@ -106,7 +107,7 @@ const countries = [
             <div class="relative flex items-center">
               <div class="absolute z-0 h-1 w-full rounded-lg bg-gray-200 outline-hidden dark:bg-gray-700" />
               <div
-                class="absolute z-10 h-1 rounded-lg bg-linear-to-r from-[#D8CCFF] to-[#8A63FF] dark:from-[#42C8F3] dark:to-[#B6EDFF]"
+                class="ep-grow absolute z-10 h-1 rounded-lg bg-linear-to-r from-[#D8CCFF] to-[#8A63FF] dark:from-[#42C8F3] dark:to-[#B6EDFF]"
                 style={`width:${country.percentage}%`}
               />
             </div>
