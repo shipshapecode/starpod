@@ -40,7 +40,12 @@ export default defineConfig({
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] }
+      use: {
+        ...devices['Desktop Firefox'],
+        launchOptions: {
+          firefoxUserPrefs: { 'media.cubeb.force_null_context': true }
+        }
+      }
     },
 
     {
