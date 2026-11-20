@@ -43,7 +43,10 @@ export default defineConfig({
       use: {
         ...devices['Desktop Firefox'],
         launchOptions: {
-          firefoxUserPrefs: { 'media.cubeb.force_null_context': true }
+          firefoxUserPrefs: {
+            'media.cubeb.force_null_context': true,
+            'media.cubeb.backend': 'null'
+          }
         }
       }
     },

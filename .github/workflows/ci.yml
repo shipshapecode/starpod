@@ -87,8 +87,14 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install
+      - name: Audio in the image
+        run: |
+          id; which pulseaudio pactl pipewire || true
+          ls /usr/lib/x86_64-linux-gnu | grep -iE 'pulse|asound|pipewire' | head -20 || true
+          (pulseaudio --start --exit-idle-time=-1 && pactl load-module module-null-sink sink_name=quiet && pactl info | head -5) || echo 'NO PULSE'
+        continue-on-error: true
       - name: Run Playwright tests
-        run: pnpm exec playwright test --project=firefox tests/e2e/zz-firefox-probe.spec.ts tests/e2e/player.spec.ts --reporter=list --retries=0 --workers=2 || true
+        run: pnpm exec playwright test --project=firefox tests/e2e/player.spec.ts -g 'audio episode docks|ends is not heard' --reporter=list --retries=0 --workers=2 || true
         env:
           ASTRO_DB_REMOTE_URL: ${{ secrets.ASTRO_DB_REMOTE_URL }}
           ASTRO_DB_APP_TOKEN: ${{ secrets.ASTRO_DB_APP_TOKEN }}
