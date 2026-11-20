@@ -22,6 +22,10 @@ export default defineConfig({
       // module, so tests resolve it straight to the site's config file.
       'virtual:starpod/config': fileURLToPath(
         new URL('./starpod.config.ts', import.meta.url)
+      ),
+      // The dock navigates with Astro's client router; tests stub it.
+      'astro:transitions/client': fileURLToPath(
+        new URL('./tests/unit/stubs/astro-transitions-client.ts', import.meta.url)
       )
     }
   }
