@@ -1,4 +1,3 @@
-import { decodeEntities } from './entities';
 import type { Episode } from './rss';
 import {
   fetchTranscriptText,
@@ -161,16 +160,6 @@ export function jsonSegments(data: { segments?: Array<JsonSegment> } | null): Ar
   });
 }
 
-/** A VTT/SRT cue's text: voice and styling tags removed, references decoded. */
-export function cueText(raw: string): { text: string; speaker?: string } {
-  // WebVTT voice spans: <v Speaker>text</v>
-  const voice = raw.match(/^<v(?:\.[^\s>]*)?\s+([^>]+)>/);
-  return {
-    text: decodeEntities(raw.replace(/<[^>]+>/g, '')).trim(),
-    speaker: voice ? decodeEntities(voice[1]).trim() : undefined
-  };
-}
-
 /**
  * Timed lines from the feed's `<podcast:transcript>` (VTT/SRT cues or JSON
  * segments). Returns `null` when none is available.
@@ -212,10 +201,8 @@ async function fetchRssCues(
       const segments = jsonSegments(JSON.parse(download.raw));
       return segments.length ? mergeIntoLines(segments) : null;
     }
-    const cues = parseCues(download.raw).map((cue) => ({
-      start: cue.start,
-      ...cueText(cue.text)
-    }));
+    // Plain text, with the speaker from any WebVTT voice span.
+    const cues = parseCues(download.raw);
     return cues.length ? mergeIntoLines(cues) : null;
   } catch {
     return null;
