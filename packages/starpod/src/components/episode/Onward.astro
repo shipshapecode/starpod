@@ -1,0 +1,152 @@
+---
+import { dasherize } from '../../utils/dasherize';
+import { formatDuration } from '../../utils/playable';
+import PersonFace from '../PersonFace.astro';
+
+interface Card {
+  href: string;
+  number: string;
+  title: string;
+  art: string;
+  duration: number;
+  /** Why it is here, when it is more than nearness in time. */
+  reason?: string;
+  /** The face of the person who is the reason. */
+  face?: string;
+}
+
+export interface Props {
+  older?: Card;
+  newer?: Card;
+  related: Array<Card>;
+}
+
+const { older, newer, related } = Astro.props;
+const pager = [
+  older && { ...older, label: 'Previous' },
+  newer && { ...newer, label: 'Next' }
+].filter((card) => !!card);
+---
+
+{
+  pager.length > 0 && (
+    <nav aria-label="Previous and next episode" class="ep-pager">
+      {pager.map((card) => (
+        <a
+          class="ep-pager-link ep-reveal halo"
+          data-ep-card={dasherize(card.title)}
+          data-props-for="pointer-local"
+          href={card.href}
+          rel={card.label === 'Next' ? 'next' : 'prev'}
+        >
+          <img
+            alt=""
+            class="ep-card-art"
+            height="72"
+            loading="lazy"
+            src={card.art}
+            width="72"
+          />
+          <span class="ep-pager-text">
+            <span class="ep-pager-label">
+              {card.label} · {card.number}
+            </span>
+            <span class="ep-card-title">{card.title}</span>
+          </span>
+        </a>
+      ))}
+    </nav>
+  )
+}
+
+{
+  related.length > 0 && (
+    <div class="ep-shelf-wrap">
+      <h3 class="ep-shelf-title ep-reveal">Related episodes</h3>
+      <ul aria-label="Related episodes" class="ep-shelf">
+        {related.map((card) => (
+          <li class="ep-shelf-item">
+            <a
+              class="ep-card"
+              data-ep-card={dasherize(card.title)}
+              data-props-for="pointer-local"
+              href={card.href}
+            >
+              <img
+                alt=""
+                class="ep-card-art"
+                height="320"
+                loading="lazy"
+                src={card.art}
+                width="320"
+              />
+              <span class="ep-card-facts">
+                {card.number} · {formatDuration(card.duration)}
+              </span>
+              <span class="ep-card-title">{card.title}</span>
+              {card.reason && (
+                <span class="ep-card-reason">
+                  {card.face && <PersonFace size={20} src={card.face} />}
+                  {card.reason}
+                </span>
+              )}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+<script>
+  /*
+    The card you open morphs into the next episode's stage: its art into the
+    cover, its title into the heading (the stage's own view-transition
+    names). Only that card is named, just before the navigation starts, so
+    names never collide. Going back, the card for the episode you left is
+    named so the stage flies home into it.
+  */
+  const NAMED = 'data-ep-named';
+
+  function name(card: HTMLElement | null | undefined) {
+    document.querySelectorAll<HTMLElement>(`[${NAMED}]`).forEach((el) => {
+      el.style.viewTransitionName = '';
+      el.removeAttribute(NAMED);
+    });
+    const slug = card?.dataset.epCard;
+    if (!card || !slug) {
+      return;
+    }
+    for (const [el, value] of [
+      [card.querySelector<HTMLElement>('.ep-card-art'), `vt-art-${slug}`],
+      [card.querySelector<HTMLElement>('.ep-card-title'), `vt-${slug}`]
+    ] as const) {
+      if (el) {
+        el.style.viewTransitionName = value;
+        el.setAttribute(NAMED, '');
+      }
+    }
+  }
+
+  let leaving = '';
+
+  document.addEventListener('astro:before-preparation', (event) => {
+    leaving = event.from.pathname;
+    name(
+      (event.sourceElement as HTMLElement | undefined)?.closest?.<HTMLElement>(
+        '[data-ep-card]'
+      )
+    );
+  });
+
+  document.addEventListener('astro:after-swap', () => {
+    if (document.documentElement.dataset.astroTransition !== 'back') {
+      return;
+    }
+    name(
+      document.querySelector<HTMLElement>(
+        `[data-ep-card][href="${CSS.escape(leaving)}"]`
+      )
+    );
+  });
+</script>

@@ -1,0 +1,118 @@
+/* ---------- People: one identity wherever a person appears ----------
+
+   The episode page, the stage's cast, About, the transcript's speaker card,
+   the rail, the palette and the explorer all draw a person the same way.
+
+   Portrait: a circle in a 2px ring, 2px clear of the photo (the gap shows
+   whatever is behind it), with the hairline over the photo.
+
+     <span class="person-face" style="--person-size: 32px">
+       <img alt="" src="…" width="32" height="32" />
+     </span>
+
+   (`PersonFace.astro` renders exactly that.) The ring is the person's voice:
+   `data-voice="0"` or `"1"` on the face or any ancestor wears that voice's
+   colour, everyone else Line Strong. While they are speaking, `data-speaking`
+   on the face or an ancestor brightens the ring to the accent, by opacity
+   on a pseudo-element; under reduced motion a `.person-speaking` label
+   shows instead.
+
+   Compact row: `a.person-chip` holding a 32px face and the name (14/18 600).
+   Fact line: `.person-fact` (13/18 500, Muted, tabular), its text from
+   `personFact()` in lib/cast.ts. */
+
+:where([data-voice='0']) {
+  --person-ring: var(--voice-0);
+}
+
+:where([data-voice='1']) {
+  --person-ring: var(--voice-1);
+}
+
+.person-face {
+  --person-size: 64px;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--person-size);
+  height: var(--person-size);
+  padding: 2px;
+  border: 2px solid var(--person-ring, var(--line-strong));
+  border-radius: 50%;
+}
+
+.person-face > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--raised);
+  object-fit: cover;
+}
+
+.person-face::before,
+.person-face::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.person-face::before {
+  inset: 2px;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+
+.person-face::after {
+  inset: -2px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent) 28%, transparent);
+  opacity: 0;
+  transition: opacity var(--quick);
+}
+
+.person-speaking {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :is([data-speaking] .person-face, .person-face[data-speaking])::after {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-speaking] .person-speaking {
+    display: inline-flex;
+  }
+}
+
+.person-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.125rem;
+  text-decoration: none;
+}
+
+.person-chip .person-face {
+  --person-size: 32px;
+}
+
+.person-fact {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  line-height: 1.125rem;
+}
