@@ -1,0 +1,53 @@
+---
+import { ArrowOutIcon } from '../icons';
+
+export interface Props {
+  sponsors: Array<{
+    id: string;
+    img: string | null;
+    name: string;
+    url: string;
+    count: number;
+  }>;
+}
+
+const { sponsors } = Astro.props;
+const svgs = import.meta.glob('/src/img/sponsors/*.svg', {
+  query: '?raw',
+  import: 'default'
+});
+---
+
+<ul class="ep-sponsors">
+  {
+    sponsors.map((sponsor) => (
+      <li class="ep-reveal">
+        <a
+          class="ep-sponsor halo"
+          data-props-for="pointer-local"
+          href={sponsor.url}
+          rel="noopener"
+          target="_blank"
+        >
+          <span class="ep-logo">
+            <Fragment
+              set:html={svgs[`/src/img/sponsors/${sponsor.img}`]?.() ?? ''}
+            />
+          </span>
+          <span class="ep-sponsor-text">
+            <span class="ep-sponsor-name">{sponsor.name}</span>
+            <span class="person-fact">
+              {sponsor.count > 1
+                ? `Presented ${sponsor.count} episodes`
+                : 'Presenting this episode'}
+            </span>
+          </span>
+          <span aria-hidden="true" class="ep-pill">
+            Visit
+            <ArrowOutIcon size={14} />
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>

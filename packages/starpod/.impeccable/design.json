@@ -1,0 +1,820 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-14T02:36:56.672077+00:00",
+  "title": "Design System: Starpod",
+  "extensions": {
+    "colorMeta": {
+      "iris-100": {
+        "role": "primary",
+        "displayName": "Iris Wash",
+        "canonical": "oklch(95% 0.022 293)",
+        "tonalRamp": [
+          "oklch(45.5% 0.2 291)",
+          "oklch(59.6% 0.22 292)",
+          "oklch(77.32% 0.129 294.81)",
+          "oklch(86.9% 0.07 293.5)",
+          "oklch(95% 0.022 293)"
+        ]
+      },
+      "iris-200": {
+        "role": "primary",
+        "displayName": "Pale Iris",
+        "canonical": "oklch(86.9% 0.07 293.5)",
+        "tonalRamp": [
+          "oklch(45.5% 0.2 291)",
+          "oklch(59.6% 0.22 292)",
+          "oklch(77.32% 0.129 294.81)",
+          "oklch(86.9% 0.07 293.5)",
+          "oklch(95% 0.022 293)"
+        ]
+      },
+      "iris-300": {
+        "role": "primary",
+        "displayName": "Lilac",
+        "canonical": "oklch(77.32% 0.129 294.81)",
+        "tonalRamp": [
+          "oklch(45.5% 0.2 291)",
+          "oklch(59.6% 0.22 292)",
+          "oklch(77.32% 0.129 294.81)",
+          "oklch(86.9% 0.07 293.5)",
+          "oklch(95% 0.022 293)"
+        ]
+      },
+      "iris-500": {
+        "role": "primary",
+        "displayName": "Iris",
+        "canonical": "oklch(59.6% 0.22 292)",
+        "tonalRamp": [
+          "oklch(45.5% 0.2 291)",
+          "oklch(59.6% 0.22 292)",
+          "oklch(77.32% 0.129 294.81)",
+          "oklch(86.9% 0.07 293.5)",
+          "oklch(95% 0.022 293)"
+        ]
+      },
+      "iris-700": {
+        "role": "primary",
+        "displayName": "Deep Iris",
+        "canonical": "oklch(45.5% 0.2 291)",
+        "tonalRamp": [
+          "oklch(45.5% 0.2 291)",
+          "oklch(59.6% 0.22 292)",
+          "oklch(77.32% 0.129 294.81)",
+          "oklch(86.9% 0.07 293.5)",
+          "oklch(95% 0.022 293)"
+        ]
+      },
+      "aqua-100": {
+        "role": "secondary",
+        "displayName": "Aqua Mist",
+        "canonical": "oklch(95.5% 0.03 215)",
+        "tonalRamp": [
+          "oklch(48% 0.105 226)",
+          "oklch(77.5% 0.13 222)",
+          "oklch(91% 0.06 215)",
+          "oklch(95.5% 0.03 215)"
+        ]
+      },
+      "aqua-200": {
+        "role": "secondary",
+        "displayName": "Pale Aqua",
+        "canonical": "oklch(91% 0.06 215)",
+        "tonalRamp": [
+          "oklch(15% 0.06 215)",
+          "oklch(26% 0.06 215)",
+          "oklch(37% 0.06 215)",
+          "oklch(48% 0.06 215)",
+          "oklch(60% 0.06 215)",
+          "oklch(72% 0.06 215)",
+          "oklch(84% 0.06 215)",
+          "oklch(95% 0.06 215)"
+        ]
+      },
+      "aqua-400": {
+        "role": "secondary",
+        "displayName": "Aqua",
+        "canonical": "oklch(77.5% 0.13 222)",
+        "tonalRamp": [
+          "oklch(15% 0.13 222)",
+          "oklch(26% 0.13 222)",
+          "oklch(37% 0.13 222)",
+          "oklch(48% 0.13 222)",
+          "oklch(60% 0.13 222)",
+          "oklch(72% 0.13 222)",
+          "oklch(84% 0.13 222)",
+          "oklch(95% 0.13 222)"
+        ]
+      },
+      "aqua-700": {
+        "role": "secondary",
+        "displayName": "Deep Aqua",
+        "canonical": "oklch(48% 0.105 226)",
+        "tonalRamp": [
+          "oklch(15% 0.105 226)",
+          "oklch(26% 0.105 226)",
+          "oklch(37% 0.105 226)",
+          "oklch(48% 0.105 226)",
+          "oklch(60% 0.105 226)",
+          "oklch(72% 0.105 226)",
+          "oklch(84% 0.105 226)",
+          "oklch(95% 0.105 226)"
+        ]
+      },
+      "ground-day": {
+        "role": "neutral",
+        "displayName": "Ground (day)",
+        "canonical": "oklch(97.65% 0.005 274.97)",
+        "tonalRamp": [
+          "oklch(15% 0.005 274.97)",
+          "oklch(26% 0.005 274.97)",
+          "oklch(37% 0.005 274.97)",
+          "oklch(48% 0.005 274.97)",
+          "oklch(60% 0.005 274.97)",
+          "oklch(72% 0.005 274.97)",
+          "oklch(84% 0.005 274.97)",
+          "oklch(95% 0.005 274.97)"
+        ]
+      },
+      "surface-day": {
+        "role": "neutral",
+        "displayName": "Surface (day)",
+        "canonical": "oklch(99.6% 0.002 280)",
+        "tonalRamp": [
+          "oklch(15% 0.002 280)",
+          "oklch(26% 0.002 280)",
+          "oklch(37% 0.002 280)",
+          "oklch(48% 0.002 280)",
+          "oklch(60% 0.002 280)",
+          "oklch(72% 0.002 280)",
+          "oklch(84% 0.002 280)",
+          "oklch(95% 0.002 280)"
+        ]
+      },
+      "raised-day": {
+        "role": "neutral",
+        "displayName": "Raised (day)",
+        "canonical": "oklch(95.2% 0.01 280)",
+        "tonalRamp": [
+          "oklch(15% 0.01 280)",
+          "oklch(26% 0.01 280)",
+          "oklch(37% 0.01 280)",
+          "oklch(48% 0.01 280)",
+          "oklch(60% 0.01 280)",
+          "oklch(72% 0.01 280)",
+          "oklch(84% 0.01 280)",
+          "oklch(95% 0.01 280)"
+        ]
+      },
+      "line-day": {
+        "role": "neutral",
+        "displayName": "Line (day)",
+        "canonical": "oklch(90.5% 0.014 280)",
+        "tonalRamp": [
+          "oklch(15% 0.014 280)",
+          "oklch(26% 0.014 280)",
+          "oklch(37% 0.014 280)",
+          "oklch(48% 0.014 280)",
+          "oklch(60% 0.014 280)",
+          "oklch(72% 0.014 280)",
+          "oklch(84% 0.014 280)",
+          "oklch(95% 0.014 280)"
+        ]
+      },
+      "line-strong-day": {
+        "role": "neutral",
+        "displayName": "Line Strong (day)",
+        "canonical": "oklch(83% 0.02 280)",
+        "tonalRamp": [
+          "oklch(15% 0.02 280)",
+          "oklch(26% 0.02 280)",
+          "oklch(37% 0.02 280)",
+          "oklch(48% 0.02 280)",
+          "oklch(60% 0.02 280)",
+          "oklch(72% 0.02 280)",
+          "oklch(84% 0.02 280)",
+          "oklch(95% 0.02 280)"
+        ]
+      },
+      "ink-day": {
+        "role": "neutral",
+        "displayName": "Ink (day)",
+        "canonical": "oklch(24% 0.05 292)",
+        "tonalRamp": [
+          "oklch(15% 0.05 292)",
+          "oklch(26% 0.05 292)",
+          "oklch(37% 0.05 292)",
+          "oklch(48% 0.05 292)",
+          "oklch(60% 0.05 292)",
+          "oklch(72% 0.05 292)",
+          "oklch(84% 0.05 292)",
+          "oklch(95% 0.05 292)"
+        ]
+      },
+      "text-day": {
+        "role": "neutral",
+        "displayName": "Text (day)",
+        "canonical": "oklch(37% 0.034 288)",
+        "tonalRamp": [
+          "oklch(15% 0.034 288)",
+          "oklch(26% 0.034 288)",
+          "oklch(37% 0.034 288)",
+          "oklch(48% 0.034 288)",
+          "oklch(60% 0.034 288)",
+          "oklch(72% 0.034 288)",
+          "oklch(84% 0.034 288)",
+          "oklch(95% 0.034 288)"
+        ]
+      },
+      "muted-day": {
+        "role": "neutral",
+        "displayName": "Muted (day)",
+        "canonical": "oklch(49% 0.026 286)",
+        "tonalRamp": [
+          "oklch(15% 0.026 286)",
+          "oklch(26% 0.026 286)",
+          "oklch(37% 0.026 286)",
+          "oklch(48% 0.026 286)",
+          "oklch(60% 0.026 286)",
+          "oklch(72% 0.026 286)",
+          "oklch(84% 0.026 286)",
+          "oklch(95% 0.026 286)"
+        ]
+      },
+      "on-ink-day": {
+        "role": "neutral",
+        "displayName": "On Ink (day)",
+        "canonical": "oklch(98.5% 0.006 290)",
+        "tonalRamp": [
+          "oklch(15% 0.006 290)",
+          "oklch(26% 0.006 290)",
+          "oklch(37% 0.006 290)",
+          "oklch(48% 0.006 290)",
+          "oklch(60% 0.006 290)",
+          "oklch(72% 0.006 290)",
+          "oklch(84% 0.006 290)",
+          "oklch(95% 0.006 290)"
+        ]
+      },
+      "accent-soft-night": {
+        "role": "secondary",
+        "displayName": "Night Accent Wash",
+        "canonical": "oklch(26% 0.05 225)",
+        "tonalRamp": [
+          "oklch(15% 0.05 225)",
+          "oklch(26% 0.05 225)",
+          "oklch(37% 0.05 225)",
+          "oklch(48% 0.05 225)",
+          "oklch(60% 0.05 225)",
+          "oklch(72% 0.05 225)",
+          "oklch(84% 0.05 225)",
+          "oklch(95% 0.05 225)"
+        ]
+      },
+      "ground-night": {
+        "role": "neutral",
+        "displayName": "Ground (night)",
+        "canonical": "oklch(13.85% 0.025 273.24)",
+        "tonalRamp": [
+          "oklch(15% 0.025 273.24)",
+          "oklch(26% 0.025 273.24)",
+          "oklch(37% 0.025 273.24)",
+          "oklch(48% 0.025 273.24)",
+          "oklch(60% 0.025 273.24)",
+          "oklch(72% 0.025 273.24)",
+          "oklch(84% 0.025 273.24)",
+          "oklch(95% 0.025 273.24)"
+        ]
+      },
+      "surface-night": {
+        "role": "neutral",
+        "displayName": "Surface (night)",
+        "canonical": "oklch(17.4% 0.025 277)",
+        "tonalRamp": [
+          "oklch(15% 0.025 277)",
+          "oklch(26% 0.025 277)",
+          "oklch(37% 0.025 277)",
+          "oklch(48% 0.025 277)",
+          "oklch(60% 0.025 277)",
+          "oklch(72% 0.025 277)",
+          "oklch(84% 0.025 277)",
+          "oklch(95% 0.025 277)"
+        ]
+      },
+      "raised-night": {
+        "role": "neutral",
+        "displayName": "Raised (night)",
+        "canonical": "oklch(21.57% 0.029 280.68)",
+        "tonalRamp": [
+          "oklch(15% 0.029 280.68)",
+          "oklch(26% 0.029 280.68)",
+          "oklch(37% 0.029 280.68)",
+          "oklch(48% 0.029 280.68)",
+          "oklch(60% 0.029 280.68)",
+          "oklch(72% 0.029 280.68)",
+          "oklch(84% 0.029 280.68)",
+          "oklch(95% 0.029 280.68)"
+        ]
+      },
+      "line-night": {
+        "role": "neutral",
+        "displayName": "Line (night)",
+        "canonical": "oklch(25.5% 0.035 272)",
+        "tonalRamp": [
+          "oklch(15% 0.035 272)",
+          "oklch(26% 0.035 272)",
+          "oklch(37% 0.035 272)",
+          "oklch(48% 0.035 272)",
+          "oklch(60% 0.035 272)",
+          "oklch(72% 0.035 272)",
+          "oklch(84% 0.035 272)",
+          "oklch(95% 0.035 272)"
+        ]
+      },
+      "line-strong-night": {
+        "role": "neutral",
+        "displayName": "Line Strong (night)",
+        "canonical": "oklch(33% 0.045 274)",
+        "tonalRamp": [
+          "oklch(15% 0.045 274)",
+          "oklch(26% 0.045 274)",
+          "oklch(37% 0.045 274)",
+          "oklch(48% 0.045 274)",
+          "oklch(60% 0.045 274)",
+          "oklch(72% 0.045 274)",
+          "oklch(84% 0.045 274)",
+          "oklch(95% 0.045 274)"
+        ]
+      },
+      "ink-night": {
+        "role": "neutral",
+        "displayName": "Ink (night)",
+        "canonical": "oklch(97.65% 0.005 274.97)",
+        "tonalRamp": [
+          "oklch(15% 0.005 274.97)",
+          "oklch(26% 0.005 274.97)",
+          "oklch(37% 0.005 274.97)",
+          "oklch(48% 0.005 274.97)",
+          "oklch(60% 0.005 274.97)",
+          "oklch(72% 0.005 274.97)",
+          "oklch(84% 0.005 274.97)",
+          "oklch(95% 0.005 274.97)"
+        ]
+      },
+      "text-night": {
+        "role": "neutral",
+        "displayName": "Text (night)",
+        "canonical": "oklch(83% 0.016 266)",
+        "tonalRamp": [
+          "oklch(15% 0.016 266)",
+          "oklch(26% 0.016 266)",
+          "oklch(37% 0.016 266)",
+          "oklch(48% 0.016 266)",
+          "oklch(60% 0.016 266)",
+          "oklch(72% 0.016 266)",
+          "oklch(84% 0.016 266)",
+          "oklch(95% 0.016 266)"
+        ]
+      },
+      "muted-night": {
+        "role": "neutral",
+        "displayName": "Muted (night)",
+        "canonical": "oklch(71% 0.02 264)",
+        "tonalRamp": [
+          "oklch(15% 0.02 264)",
+          "oklch(26% 0.02 264)",
+          "oklch(37% 0.02 264)",
+          "oklch(48% 0.02 264)",
+          "oklch(60% 0.02 264)",
+          "oklch(72% 0.02 264)",
+          "oklch(84% 0.02 264)",
+          "oklch(95% 0.02 264)"
+        ]
+      },
+      "on-ink-night": {
+        "role": "neutral",
+        "displayName": "On Ink (night)",
+        "canonical": "oklch(16% 0.03 270)",
+        "tonalRamp": [
+          "oklch(15% 0.03 270)",
+          "oklch(26% 0.03 270)",
+          "oklch(37% 0.03 270)",
+          "oklch(48% 0.03 270)",
+          "oklch(60% 0.03 270)",
+          "oklch(72% 0.03 270)",
+          "oklch(84% 0.03 270)",
+          "oklch(95% 0.03 270)"
+        ]
+      },
+      "media-ground-day": {
+        "role": "neutral",
+        "displayName": "Media Ground (day)",
+        "canonical": "oklch(19% 0.03 280)",
+        "tonalRamp": [
+          "oklch(15% 0.03 280)",
+          "oklch(26% 0.03 280)",
+          "oklch(37% 0.03 280)",
+          "oklch(48% 0.03 280)",
+          "oklch(60% 0.03 280)",
+          "oklch(72% 0.03 280)",
+          "oklch(84% 0.03 280)",
+          "oklch(95% 0.03 280)"
+        ]
+      },
+      "media-ground-night": {
+        "role": "neutral",
+        "displayName": "Media Ground (night)",
+        "canonical": "oklch(9% 0.02 273)",
+        "tonalRamp": [
+          "oklch(15% 0.02 273)",
+          "oklch(26% 0.02 273)",
+          "oklch(37% 0.02 273)",
+          "oklch(48% 0.02 273)",
+          "oklch(60% 0.02 273)",
+          "oklch(72% 0.02 273)",
+          "oklch(84% 0.02 273)",
+          "oklch(95% 0.02 273)"
+        ]
+      },
+      "on-media-chip": {
+        "role": "neutral",
+        "displayName": "On-Media Chip",
+        "canonical": "oklch(98% 0.005 285)",
+        "tonalRamp": [
+          "oklch(15% 0.005 285)",
+          "oklch(26% 0.005 285)",
+          "oklch(37% 0.005 285)",
+          "oklch(48% 0.005 285)",
+          "oklch(60% 0.005 285)",
+          "oklch(72% 0.005 285)",
+          "oklch(84% 0.005 285)",
+          "oklch(95% 0.005 285)"
+        ]
+      },
+      "on-media-ink": {
+        "role": "neutral",
+        "displayName": "On-Media Ink",
+        "canonical": "oklch(20% 0.04 285)",
+        "tonalRamp": [
+          "oklch(15% 0.04 285)",
+          "oklch(26% 0.04 285)",
+          "oklch(37% 0.04 285)",
+          "oklch(48% 0.04 285)",
+          "oklch(60% 0.04 285)",
+          "oklch(72% 0.04 285)",
+          "oklch(84% 0.04 285)",
+          "oklch(95% 0.04 285)"
+        ]
+      },
+      "media-glass": {
+        "role": "neutral",
+        "displayName": "Media Glass",
+        "canonical": "oklch(15% 0.02 280 / 0.72)",
+        "tonalRamp": [
+          "oklch(15% 0.02 280 / 0.72)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Episode title on the stage; condensed uppercase Archivo, max 18ch."
+      },
+      "page-title": {
+        "displayName": "Page Title",
+        "purpose": "PageHeader on About, Contact, and other standalone pages."
+      },
+      "rail-title": {
+        "displayName": "Rail Title",
+        "purpose": "Show name in the desktop rail."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles: Show notes, Listen on, Meet the hosts."
+      },
+      "row-title": {
+        "displayName": "Row Title",
+        "purpose": "Episode titles in the list; current episode takes voice-0."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "UI text, tabular numerals."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Paragraph under a page title, max 62ch."
+      },
+      "body-prose": {
+        "displayName": "Prose",
+        "purpose": "Show notes and transcripts (Tailwind prose)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Rail group labels, Presented by, Host/Guest tags."
+      },
+      "script-live-voice-0": {
+        "displayName": "Live Line, Voice 0",
+        "purpose": "The line being heard, first speaker."
+      },
+      "script-live-voice-1": {
+        "displayName": "Live Line, Voice 1",
+        "purpose": "The line being heard, second speaker, right-aligned."
+      },
+      "script-live-caption": {
+        "displayName": "Live Line, Caption",
+        "purpose": "The line being heard with no attributed speaker."
+      },
+      "script-rest": {
+        "displayName": "Script, Resting",
+        "purpose": "Lines away from the live one; size set by data-d."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-soft",
+        "value": "0 1px 2px oklch(28% 0.05 290 / 0.06), 0 10px 30px -12px oklch(28% 0.06 290 / 0.22)",
+        "purpose": "Stage frame, show art, mini-player chrome. Night: 0 1px 2px oklch(0% 0 0 / 0.3), 0 12px 32px -12px oklch(0% 0 0 / 0.6)."
+      },
+      {
+        "name": "shadow-float",
+        "value": "0 2px 6px oklch(20% 0.05 290 / 0.12), 0 24px 60px -18px oklch(20% 0.07 290 / 0.45)",
+        "purpose": "Artwork in the frame, stage play disc, bottom sheet, floating mini video. Night: 0 2px 8px oklch(0% 0 0 / 0.35), 0 28px 70px -18px oklch(0% 0 0 / 0.75)."
+      },
+      {
+        "name": "dock-lip",
+        "value": "0 -12px 32px -24px oklch(10% 0.03 280 / 0.5)",
+        "purpose": "Separates the fixed dock from content scrolling beneath."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "State changes, reveals, sheets, page transitions, unfold."
+      },
+      {
+        "name": "ease-halo",
+        "value": "linear(0 0%, 0.0027 3.64%, 0.0106 7.29%, 0.0425 14.58%, 0.0957 21.87%, 0.1701 29.16%, 0.2477 35.19%, 0.3401 41.23%, 0.5982 55.18%, 0.7044 61.56%, 0.7987 68.28%, 0.875 75%, 0.9297 81.25%, 0.9687 87.5%, 0.9922 93.75%, 1 100%)",
+        "purpose": "The ring sweeping on over 500ms (animated @property --halo)."
+      },
+      {
+        "name": "ease-spring",
+        "value": "linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.4%, 1.067, 1.089 24.6%, 1.085 27.1%, 1.04 33.4%, 1.007 41.2%, 0.995 50.6%, 1.001 70.4%, 1)",
+        "purpose": "Press feedback, switch thumb, scrubber thumb, play glyph, mini-player scale."
+      },
+      {
+        "name": "fill",
+        "value": "300ms ease-out",
+        "purpose": "Solid controls fade into the gradient (--fill-a/--fill-b); icon gradient stops."
+      },
+      {
+        "name": "script-flip",
+        "value": "720ms cubic-bezier(0.25, 1, 0.5, 1)",
+        "purpose": "Live script lines FLIP to their new boxes; jumps over 3 lines crossfade."
+      },
+      {
+        "name": "page-curtain",
+        "value": "out 240ms cubic-bezier(0.4, 0, 1, 1); in 640ms ease-out",
+        "purpose": "View-transition curtain between pages; shell parts crossfade 180ms; dock never animates."
+      },
+      {
+        "name": "morph",
+        "value": "480ms ease-out",
+        "purpose": "List row art and title morph into the stage."
+      },
+      {
+        "name": "dock-in",
+        "value": "600ms ease-out",
+        "purpose": "Dock slides up once per visit."
+      },
+      {
+        "name": "unfold",
+        "value": "1000ms ease-out",
+        "purpose": "Foldable pages swing from rotateY(62deg) once on unfold."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "1ms",
+        "purpose": "All animation and transition durations collapse under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1100px"
+      },
+      {
+        "name": "foldable",
+        "value": "(horizontal-viewport-segments: 2), or coarse pointer 700-1180px wide at 6/5-8/5 aspect, max-height 960px"
+      }
+    ],
+    "glow": {
+      "day": [
+        "oklch(86.9% 0.07 293.5)",
+        "oklch(59.6% 0.22 292)"
+      ],
+      "night": [
+        "oklch(77.5% 0.13 222)",
+        "oklch(91% 0.06 215)"
+      ]
+    },
+    "engineState": [
+      "html: data-world=\"stage\" (fixed), data-medium (watch|listen), data-host (dock), data-has-video, data-episode, data-unfolding, data-arriving",
+      "stage: data-current, data-playing, data-watching, data-buffering",
+      "controls: data-buffering on .play-toggle, data-flash (keyboard acts as hover)",
+      "script lines: data-v (voice), data-d (distance), data-long, data-index",
+      "--playback-progress (0 to 1)"
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid ink pill (Play episode, Send message); hover fades the fill into the Iris/Aqua gradient.",
+      "html": "<button class=\"ds-btn-primary\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M7.5 4.8v14.4a.8.8 0 0 0 1.2.7l11.6-7.2a.8.8 0 0 0 0-1.4L8.7 4.1a.8.8 0 0 0-1.2.7Z\" fill=\"currentColor\"/></svg> Play episode</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 0.55rem; padding: 0.75rem 1.25rem; border: 0; border-radius: 999px; background: var(--ink, oklch(24% 0.05 292)); color: var(--on-ink, oklch(98.5% 0.006 290)); font: 700 0.9375rem/1 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: background 300ms cubic-bezier(0.16, 1, 0.3, 1), color 300ms cubic-bezier(0.16, 1, 0.3, 1), transform 300ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover, .ds-btn-primary:focus-visible { background: linear-gradient(to right, var(--glow-a, oklch(86.9% 0.07 293.5)), var(--glow-b, oklch(59.6% 0.22 292))); color: var(--on-glow, oklch(24% 0.05 292)); outline: none; } .ds-btn-primary:active { transform: scale(0.97); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined pill (Read the full transcript, Go back); wears the ring.",
+      "html": "<button class=\"ds-btn-secondary ds-ring\">Read the full transcript</button>",
+      "css": ".ds-ring { position: relative; isolation: isolate; } .ds-ring::after { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(to bottom right, var(--glow-a, oklch(86.9% 0.07 293.5)), var(--glow-b, oklch(59.6% 0.22 292))); mask: linear-gradient(oklch(0% 0 0) 0 0) content-box, linear-gradient(oklch(0% 0 0) 0 0); mask-composite: exclude; -webkit-mask-composite: xor; opacity: 0; transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; } .ds-ring:hover::after, .ds-ring:focus-visible::after { opacity: 1; } .ds-btn-secondary { display: inline-flex; align-items: center; padding: 0.75rem 1.25rem; border: 1px solid var(--line-strong, oklch(83% 0.02 280)); border-radius: 999px; background: var(--surface, oklch(99.6% 0.002 280)); color: var(--ink, oklch(24% 0.05 292)); font: 700 0.9375rem/1 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif; cursor: pointer; } .ds-btn-secondary:focus-visible { outline: none; }"
+    },
+    {
+      "name": "Platform Pill",
+      "kind": "chip",
+      "refersTo": "platform-pill",
+      "description": "Labelled listen-on link with a muted platform glyph; wears the ring.",
+      "html": "<a class=\"ds-platform ds-ring\" href=\"#\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M4 10.5a9.5 9.5 0 0 1 9.5 9.5H11a7 7 0 0 0-7-7zM4 4a16 16 0 0 1 16 16h-2.5A13.5 13.5 0 0 0 4 6.5z\"/><circle fill=\"currentColor\" cx=\"5.6\" cy=\"18.4\" r=\"2\"/></svg>RSS feed</a>",
+      "css": ".ds-ring { position: relative; isolation: isolate; } .ds-ring::after { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(to bottom right, var(--glow-a, oklch(86.9% 0.07 293.5)), var(--glow-b, oklch(59.6% 0.22 292))); mask: linear-gradient(oklch(0% 0 0) 0 0) content-box, linear-gradient(oklch(0% 0 0) 0 0); mask-composite: exclude; -webkit-mask-composite: xor; opacity: 0; transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; } .ds-ring:hover::after, .ds-ring:focus-visible::after { opacity: 1; } .ds-platform { display: inline-flex; align-items: center; gap: 0.625rem; padding: 0.625rem 1.25rem 0.625rem 1rem; border: 1px solid var(--line, oklch(90.5% 0.014 280)); border-radius: 999px; color: var(--ink, oklch(24% 0.05 292)); font: 600 0.9375rem/1 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif; text-decoration: none; } .ds-platform svg { color: var(--muted, oklch(49% 0.026 286)); } .ds-platform:focus-visible { outline: none; }"
+    },
+    {
+      "name": "Medium Switch",
+      "kind": "custom",
+      "refersTo": "medium-switch",
+      "description": "Watch / Listen pill track with a sliding ink thumb.",
+      "html": "<div class=\"ds-switch\" role=\"radiogroup\"><span class=\"ds-switch-thumb\"></span><button role=\"radio\" aria-checked=\"true\" class=\"ds-switch-opt\">Watch</button><button role=\"radio\" aria-checked=\"false\" class=\"ds-switch-opt\">Listen</button></div>",
+      "css": ".ds-switch { position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; padding: 3px; border: 1px solid oklch(83% 0.02 280); border-radius: 999px; background: oklch(97.65% 0.005 274.97); } .ds-switch-thumb { position: absolute; inset: 3px auto 3px 3px; width: calc(50% - 3px); border-radius: 999px; background: oklch(24% 0.05 292); transition: translate 520ms linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.4%, 1.067, 1.089 24.6%, 1.085 27.1%, 1.04 33.4%, 1.007 41.2%, 0.995 50.6%, 1.001 70.4%, 1); } .ds-switch:has(.ds-switch-opt:last-of-type[aria-checked='true']) .ds-switch-thumb { translate: 100% 0; } .ds-switch-opt { position: relative; z-index: 1; padding: 0.45rem 0.9rem; border: 0; border-radius: 999px; background: none; color: oklch(49% 0.026 286); font: 650 0.875rem/1 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: color 300ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-switch-opt[aria-checked='true'] { color: oklch(98.5% 0.006 290); } .ds-switch-opt:focus-visible { outline: 2px solid oklch(59.6% 0.22 292); outline-offset: 3px; }"
+    },
+    {
+      "name": "Rail Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Rail and sheet links; current page in Accent Wash; config links pick their own icon.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Now playing</a><a href=\"#\">Episodes</a><a href=\"#\">About</a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 2px; width: 220px; } .ds-nav a { padding: 0.55rem 0.7rem; border-radius: 3px; color: oklch(37% 0.034 288); font: 600 1rem/1.3 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif; text-decoration: none; transition: background 200ms cubic-bezier(0.16, 1, 0.3, 1), color 200ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-nav a:hover { background: oklch(95.2% 0.01 280); color: oklch(24% 0.05 292); } .ds-nav a[aria-current='page'] { background: oklch(95% 0.022 293); color: oklch(45.5% 0.2 291); } .ds-nav a:focus-visible { outline: 2px solid oklch(59.6% 0.22 292); outline-offset: 3px; }"
+    },
+    {
+      "name": "Row Play Disc",
+      "kind": "button",
+      "refersTo": "row-play",
+      "description": "Episode row play circle; wears the ring at rest, becomes a solid ink disc with on-air bars when current.",
+      "html": "<button class=\"ds-row-play ds-ring\" aria-label=\"Play\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M7.5 4.8v14.4a.8.8 0 0 0 1.2.7l11.6-7.2a.8.8 0 0 0 0-1.4L8.7 4.1a.8.8 0 0 0-1.2.7Z\" fill=\"currentColor\"/></svg></button>",
+      "css": ".ds-ring { position: relative; isolation: isolate; } .ds-ring::after { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; background: linear-gradient(to bottom right, var(--glow-a, oklch(86.9% 0.07 293.5)), var(--glow-b, oklch(59.6% 0.22 292))); mask: linear-gradient(oklch(0% 0 0) 0 0) content-box, linear-gradient(oklch(0% 0 0) 0 0); mask-composite: exclude; -webkit-mask-composite: xor; opacity: 0; transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; } .ds-ring:hover::after, .ds-ring:focus-visible::after { opacity: 1; } .ds-row-play { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line-strong, oklch(83% 0.02 280)); border-radius: 999px; background: var(--surface, oklch(99.6% 0.002 280)); color: var(--ink, oklch(24% 0.05 292)); cursor: pointer; } .ds-row-play:focus-visible { outline: none; }"
+    },
+    {
+      "name": "Seek Chip",
+      "kind": "chip",
+      "refersTo": "seek-chip",
+      "description": "HH:MM:SS timestamp in show notes and transcripts; fills with the gradient on hover; seeks on click.",
+      "html": "<button class=\"ds-seek-chip\">00:12:34</button>",
+      "css": ".ds-seek-chip { display: inline-block; padding: 1px 0.375rem; border: 0; border-radius: 6px; background: var(--accent-soft, oklch(95% 0.022 293)); color: var(--accent-ink, oklch(45.5% 0.2 291)); font: 600 0.8125rem/1.4 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif; font-variant-numeric: tabular-nums; cursor: pointer; transition: background 300ms cubic-bezier(0.16, 1, 0.3, 1), color 300ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-seek-chip:hover, .ds-seek-chip:focus-visible { background: linear-gradient(to right, var(--glow-a, oklch(86.9% 0.07 293.5)), var(--glow-b, oklch(59.6% 0.22 292))); color: var(--on-glow, oklch(24% 0.05 292)); outline: none; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Labelled field (Contact); accent border plus Accent Wash ring on focus, never an outline.",
+      "html": "<label class=\"ds-field\"><span>Email</span><input type=\"email\" placeholder=\"you@example.com\"></label>",
+      "css": ".ds-field { display: block; font: 400 1rem/1.5 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif; } .ds-field span { display: block; margin-bottom: 0.5rem; color: var(--ink, oklch(24% 0.05 292)); font-size: 0.875rem; font-weight: 600; } .ds-field input { display: block; width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--line, oklch(90.5% 0.014 280)); border-radius: 12px; background: var(--surface, oklch(99.6% 0.002 280)); color: var(--ink, oklch(24% 0.05 292)); font: inherit; outline: none; transition: border-color 200ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.16, 1, 0.3, 1); } .ds-field input::placeholder { color: var(--muted, oklch(49% 0.026 286)); } .ds-field input:focus { border-color: var(--accent, oklch(59.6% 0.22 292)); box-shadow: 0 0 0 4px var(--accent-soft, oklch(95% 0.022 293)); }"
+    },
+    {
+      "name": "Page Header",
+      "kind": "custom",
+      "refersTo": "page-title",
+      "description": "Condensed uppercase page title with a lede; opens About, Contact, and custom pages.",
+      "html": "<header class=\"ds-page-header\"><h1>About the show</h1><p>A short description of the show, kept to a readable measure.</p></header>",
+      "css": ".ds-page-header h1 { margin: 0; max-width: 18ch; color: var(--ink, oklch(24% 0.05 292)); font: 800 clamp(2.25rem, 1.4rem + 3vw, 4rem)/0.95 Archivo, 'Familjen Grotesk', ui-sans-serif, sans-serif; font-stretch: 72%; letter-spacing: -0.01em; text-transform: uppercase; text-wrap: balance; } .ds-page-header p { margin: 1.25rem 0 0; max-width: 62ch; color: var(--text, oklch(37% 0.034 288)); font: 400 1.125rem/1.625 'Familjen Grotesk', ui-sans-serif, system-ui, sans-serif; }"
+    },
+    {
+      "name": "Stage Live Script",
+      "kind": "custom",
+      "refersTo": "script-live-voice-0",
+      "description": "The conversation typeset by voice and distance: one face per speaker, live line at display size (night scheme shown).",
+      "html": "<ol class=\"ds-script\"><li class=\"ds-l v1 d2\">Right, and the first one was better.</li><li class=\"ds-l v0 d0\">That is the whole point of the test</li><li class=\"ds-l v1 d1\">Fair enough.</li></ol>",
+      "css": ".ds-script { display: flex; flex-direction: column; gap: 14px; width: 460px; margin: 0; padding: 16px; list-style: none; background: oklch(13.85% 0.025 273.24); } .ds-l { line-height: 1.12; } .ds-l.v0 { color: oklch(77.32% 0.129 294.81); font-family: Archivo, 'Familjen Grotesk', sans-serif; font-stretch: 78%; font-weight: 750; max-width: 92%; } .ds-l.v1 { color: oklch(91% 0.06 215); font-family: 'Young Serif', Georgia, serif; margin-left: auto; text-align: right; max-width: 88%; } .ds-l.d0 { font-size: clamp(2.25rem, 1.2rem + 2.8vw, 3.5rem); font-stretch: 68%; font-weight: 900; text-transform: uppercase; line-height: 0.98; } .ds-l.d1 { font-size: 0.95rem; opacity: 0.38; } .ds-l.d2 { font-size: 1.15rem; opacity: 0.62; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Typeset Conversation",
+    "overview": "**Creative North Star: \"The Typeset Conversation\"**\n\nA podcast is people talking, so Starpod typesets the conversation. The episode stage puts the video (or the show's artwork) beside a live script in which each voice has its own face, the line being heard swells to display size, and spoken lines shrink and soften back into the page. Everything else (the list of episodes, the shell, the pages) speaks in the same condensed, uppercase display voice and a calm grotesque for UI.\n\nOne engine runs the whole visit. A single persistent `<video>` element plays the episode's HLS video or MP3, moves physically between the episode stage and the dock, and writes playback state onto `<html data-*>` and a live `--playback-progress` number so CSS can react without islands. Light and dark are both first-class: day uses Iris, night uses Aqua. The styles are still scoped under `<html data-world=\"stage\">`, which is hardcoded; there is one world.\n\nThe system is generic by construction. Show artwork and cast photos supply the only imagery colour, shown in full colour, and every surface has to look deliberate for any show's art.",
+    "keyCharacteristics": [
+      "One OKLCH palette, one shell, one Stage world.",
+      "Light is computed, not painted: the scrubber, the dock edge, and the stage light all take their position or colour from real playback.",
+      "Iris by day, Aqua by night. The accent marks interaction, current state, and playback, nothing else.",
+      "Three hover behaviours, never mixed: a gradient ring on outlined controls, a gradient fill on solid ones, a gradient icon on bare icons.",
+      "Condensed uppercase Archivo for every title; Familjen Grotesk for everything you read or operate.",
+      "Fixed navigation keeps play, follow, and navigation on screen at every size."
+    ],
+    "rules": [
+      {
+        "name": "The Two Lamps Rule",
+        "body": "Iris is the only accent by day and Aqua the only accent by night. Accent fills are limited to interaction, the current item, and playback, and never decorate resting content.",
+        "section": "colors"
+      },
+      {
+        "name": "The Computed Light Rule",
+        "body": "Every moving gradient or glow takes its position from `--playback-progress`, from sampled video, or from a hover/focus state. A gradient that no state drives does not belong in the system.",
+        "section": "colors"
+      },
+      {
+        "name": "The OKLCH Only Rule",
+        "body": "Every colour is authored in OKLCH, including shadows, masks, and backdrops. Hex and rgb are never used.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Palette Rule",
+        "body": "Tailwind's theme holds only the token colours above. There are no parallel light/dark colour pairs; a single token class follows both schemes.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Face Per Voice Rule",
+        "body": "In the script and the cast, voice 0 is condensed Archivo in the voice-0 colour, voice 1 is Young Serif in the voice-1 colour and right-aligned, and further voices or unattributed captions are Familjen in ink. A voice face always identifies a speaker.",
+        "section": "typography"
+      },
+      {
+        "name": "The Volume Rule",
+        "body": "Size, width, and opacity carry distance from the live line. They are set by the engine's `data-d` attribute and never by hand.",
+        "section": "typography"
+      },
+      {
+        "name": "The Upright Time Rule",
+        "body": "Every timestamp is upright, tabular, and in `HH:MM:SS` on seek chips.",
+        "section": "typography"
+      },
+      {
+        "name": "The Never-Hidden CTA Rule",
+        "body": "Play, follow, and navigation are fixed chrome at every size: the rail on desktop, the top bar plus tab bar plus dock below that. Page content pads for every fixed layer it could sit under.",
+        "section": "layout"
+      },
+      {
+        "name": "The Stage Light Rule",
+        "body": "The glow behind the stage frame is sampled from the playing video into a 32×18 canvas (artwork glow when nothing plays). It is the only ambient colour on the page and it is always computed.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Two Shadows Rule",
+        "body": "Soft and Float are the only elevation shadows. A hover is shown by the ring, the gradient fill, or a Raised fill, never by a deeper shadow or a lift.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Pill Controls Rule",
+        "body": "If it can be pressed, it is round. Corner radius on containers is near-square; corner radius on controls is full.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Shape-Keeping Focus Rule",
+        "body": "Focus never changes an element's shape. The global ring is a 2px accent outline at 3px offset that follows the element's own radius; fields replace it with an accent border and a 4px Accent Wash ring.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Three Hovers Rule",
+        "body": "Outlined controls draw the ring; solid controls fill with the gradient; bare icons turn the icon to the gradient. A control gets exactly one, and every one transitions.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "**Do** read state from the engine: style `[data-current]`, `[data-playing]`, `[data-watching]`, `[data-buffering]`, `html[data-medium]`, `html[data-host]`, and `--playback-progress` instead of adding new JS-driven classes.",
+      "**Do** style new work with Tailwind utilities on the token colours; keep custom CSS for what Tailwind cannot express (`@property` animations, the ring, view transitions, voice typography).",
+      "**Do** choose the hover by the control's shape: ring for outlined, gradient fill for solid, gradient icon for bare icons, always with a transition.",
+      "**Do** use the easings: expo-out (`cubic-bezier(0.16, 1, 0.3, 1)`) for state and reveal, the `--ease-halo` curve for the ring, and the overshooting `linear()` spring for press, thumb, and glyph motion. Everything collapses to 1ms under `prefers-reduced-motion`.",
+      "**Do** open standalone pages with `PageHeader` and align them to the breadcrumbs.",
+      "**Do** give fields visible labels and the accent border plus Accent Wash ring on focus."
+    ],
+    "donts": [
+      "**Don't** author colour in hex, rgb, or hsl anywhere, including docs, shadows, and masks.",
+      "**Don't** reintroduce parallel light/dark Tailwind colours (`bg-light-*`, `dark:bg-dark-*`). Use the single token class.",
+      "**Don't** let an accent fill decorate resting content.",
+      "**Don't** reshape an element on focus or put a ring on a control that already fills or has no outline.",
+      "**Don't** add a third elevation shadow or a hover lift.",
+      "**Don't** desaturate or duotone show art or cast photos; show imagery in full colour.",
+      "**Don't** use a voice face (Archivo condensed as a speaker, Young Serif) for anything other than a speaker or their name; Archivo as a title face is fine.",
+      "**Don't** hide play, follow, or navigation behind scroll.",
+      "**Don't** add show-specific copy, colour, or imagery to the package. Show artwork and the site's own data are the only imagery and content sources."
+    ]
+  }
+}

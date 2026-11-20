@@ -1,0 +1,147 @@
+---
+import type { Show } from '../../lib/rss';
+import { dasherize } from '../../utils/dasherize';
+import { formatDuration, toPlayable } from '../../utils/playable';
+import type { ArchiveCard } from './archive';
+
+export interface Props {
+  card: ArchiveCard;
+  show: Show;
+}
+
+const { card, show } = Astro.props;
+const { episode } = card;
+const date = new Date(episode.published);
+const number =
+  episode.episodeNumber === 'Bonus' ? 'Bonus' : episode.episodeNumber;
+// Sentence case under the title: "Ep 254 · Sep 24, 2026 · 1 hr 21 min".
+const short = episode.episodeNumber === 'Bonus' ? 'Bonus' : `Ep ${number}`;
+const detailId = `xp-detail-${episode.id.replace(/[^a-z0-9]/gi, '')}`;
+const length = formatDuration(episode.duration);
+const playable = toPlayable(episode, show);
+// The episode's playable slice, once, on the card itself: the play disc, Up
+// next and the close-up all read it from here (explorer.ts, playableOf).
+// Media types are only written when they aren't the usual ones.
+const media = {
+  'data-audio': playable.audio.src,
+  'data-audio-type':
+    playable.audio.type === 'audio/mpeg' ? undefined : playable.audio.type,
+  'data-video': playable.video ? playable.video.src : undefined,
+  'data-video-type':
+    playable.video && playable.video.type !== 'application/x-mpegURL'
+      ? playable.video.type
+      : undefined,
+  'data-thumb': playable.image
+};
+const ids = (people: typeof card.people) =>
+  people.map((person) => encodeURIComponent(person.id)).join(' ');
+---
+
+{
+  /*
+  A card is loose parts, as in the Close-Up: the artwork, the facts line
+  and the title each travel on their own, and the detail (description,
+  cast, Up next, the episode link) is laid out wherever the card is shown:
+  a list row's text, or the close-up's column.
+*/
+}
+<li
+  class="xp-card"
+  data-duration={episode.duration}
+  data-episode-row
+  data-id={episode.id}
+  data-index={card.index}
+  data-hosts={ids(card.people.filter((person) => person.isHost)) || undefined}
+  data-people={ids(card.people)}
+  {...media}
+  data-vt={dasherize(episode.title)}
+  data-year={card.year}
+>
+  <div class="xp-art-box">
+    <button
+      aria-controls={detailId}
+      aria-expanded="false"
+      class="xp-art PropFLIP"
+      data-props-for="img"
+      type="button"
+    >
+      {
+        /* Depth lives one level below the box that travels, so its rect
+          stays honest: the tilt leans to the pointer, the turn turns over. */
+      }
+      <span class="xp-tilt">
+        <span class="xp-turn">
+          <span class="xp-face">
+            <span aria-hidden="true" class="xp-skeleton"></span>
+            <img
+              alt=""
+              data-vt-art
+              decoding="async"
+              height="320"
+              loading="lazy"
+              sizes="(min-width: 1024px) 280px, 48vw"
+              src={card.art.src}
+              srcset={card.art.srcset}
+              width="320"
+            />
+            <span aria-hidden="true" class="xp-chip xp-chip-kind"
+              >{episode.video ? 'Video' : 'Audio'}</span
+            >
+            <span aria-hidden="true" class="xp-chip xp-chip-length"
+              >{length}</span
+            >
+            <span aria-hidden="true" class="xp-progress"></span>
+          </span>
+        </span>
+      </span>
+      <span class="sr-only">Details for episode {number}: {episode.title}</span>
+    </button>
+  </div>
+  <div class="xp-text PropFLIP">
+    <p class="xp-facts PropFLIP">
+      <span class="xp-number" data-number={number}>{short}</span>
+      <time datetime={date.toISOString()}
+        >{
+          date.toLocaleDateString('en-us', {
+            month: 'short',
+            day: 'numeric'
+          })
+        }<span class="xp-year">, {date.getFullYear()}</span></time
+      >
+      <span class="xp-facts-length">{length}</span>
+      {episode.video && <span class="xp-facts-kind">Video</span>}
+    </p>
+    <h3 class="xp-title PropFLIP">
+      <a data-vt-title href={`/${episode.episodeSlug}`}>{episode.title}</a>
+    </h3>
+  </div>
+  <div class="xp-detail" id={detailId}>
+    <p class="xp-desc" data-props-for="truncated" data-props-to=".xp-detail">
+      {episode.description}
+    </p>
+    <span aria-hidden="true" class="xp-more">More</span>
+    {
+      /* The cast, where to resume and the actions are made when the card
+        opens (explorer.ts): only the open card shows them. */
+    }
+  </div>
+  <div class="xp-play PropFLIP">
+    {
+      /* At rest the disc is plain markup; the card that is playing gets the
+        live control (explorer.ts). */
+    }
+    <button
+      aria-label={`Play episode ${episode.episodeNumber}: ${episode.title}`}
+      class="play-toggle row-play halo"
+      data-static
+      type="button"
+      ><span class="glyph"
+        ><svg aria-hidden="true" height="18" viewBox="0 0 24 24" width="18"
+          ><path
+            d="M7.5 4.8v14.4a.8.8 0 0 0 1.2.7l11.6-7.2a.8.8 0 0 0 0-1.4L8.7 4.1a.8.8 0 0 0-1.2.7Z"
+            fill="currentColor"></path></svg
+        ></span
+      ></button
+    >
+  </div>
+</li>

@@ -6,6 +6,17 @@ import starpodConfig from 'virtual:starpod/config';
 
 import avatarLight from '../assets/avatar-light.png';
 
+export interface Props {
+  /**
+   * In the desktop rail: each host is a slot, and the face (the shared
+   * people identity, styles/people.css) and name are pieces anchored to it,
+   * so the faces can gather into a stack: a co-author credit at rest in the
+   * open rail, a column of marks in the icon rail.
+   */
+  anchored?: boolean;
+}
+
+const { anchored } = Astro.props;
 const { hosts } = starpodConfig;
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/people/*.{jpeg,jpg,png}'
@@ -15,26 +26,102 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 // src/img/people yet.
 const hostImage = (img: string) =>
   images[`/src/img/people/${img}`]?.() ?? avatarLight;
+
+const slot = anchored ? '--slot' : undefined;
+const on = anchored ? '' : undefined;
+// Each host links to their own site, else a profile.
+const linkFor = (host: (typeof hosts)[number]) =>
+  host.website ?? host.twitter ?? host.github;
+// The stack's credit line, the way a co-authored post is signed.
+const first = (name: string) => name.split(/\s+/)[0];
+const credit =
+  hosts.length === 2
+    ? `${hosts[0]!.name} & ${hosts[1]!.name}`
+    : hosts.length > 2
+      ? `${first(hosts[0]!.name)}, ${first(hosts[1]!.name)} and ${hosts.length - 2} more`
+      : '';
 ---
 
 <div
-  class="bg-light-card dark:bg-dark-card mx-2 mt-2 rounded-lg px-4 pt-12 pb-12 sm:px-6 md:px-4 lg:mx-0 lg:mt-0 lg:px-16 lg:pb-0"
+  class:list={[anchored && 'rail-hosts-in', hosts.length === 1 && 'is-solo']}
+  style={anchored ? `--hosts: ${hosts.length}` : undefined}
 >
-  <h3 class="section-heading pb-6">Hosted By</h3>
+  <h3
+    class:list={[anchored ? 'rail-label' : 'rail-fly-title']}
+    {...{
+      'data-⚓️-to': anchored ? '--rail-hosts' : undefined,
+      'data-⚓️-above': on,
+      'data-⚓️-align-leading': on
+    }}
+  >
+    Hosted by
+  </h3>
+
+  <div
+    class="host-list"
+    {...{ 'data-⚓️-name': anchored ? '--rail-hosts' : undefined }}
+  >
+    {
+      hosts.map((host, index) => {
+        const href = linkFor(host);
+        const Row = href ? 'a' : 'div';
+        return (
+          <Row
+            class:list={[
+              'host-row text-ink mb-3 flex items-center font-semibold',
+              anchored && 'rail-host'
+            ]}
+            data-speaks-as={host.name}
+            data-voice={index < 2 ? index : undefined}
+            href={href}
+            {...{ 'data-⚓️-name': slot, 'data-⚓️-scope-name': slot }}
+          >
+            <span
+              class="person-face"
+              {...{
+                'data-⚓️-to': slot,
+                'data-⚓️-align-top': on,
+                'data-⚓️-align-leading': on
+              }}
+            >
+              <Image
+                alt=""
+                height={40}
+                loading="lazy"
+                src={hostImage(host.img)}
+                width={40}
+              />
+            </span>
+            <span
+              class={slot && 'rail-host-name'}
+              {...{
+                'data-⚓️-to': slot,
+                'data-⚓️-align-top': on,
+                'data-⚓️-align-leading': on
+              }}
+            >
+              {host.name}
+              <span class="person-speaking">Speaking</span>
+            </span>
+          </Row>
+        );
+      })
+    }
+  </div>
 
   {
-    hosts.map((host) => (
-      <div class="mb-4 flex items-center">
-        <Image
-          class="mr-4 h-12 w-12 rounded-lg"
-          height={48}
-          src={hostImage(host.img)}
-          width={48}
-          alt=""
-          loading="lazy"
-        />
-        {host.name}
-      </div>
-    ))
+    anchored && credit && (
+      <p
+        aria-hidden="true"
+        class="host-credit"
+        {...{
+          'data-⚓️-to': '--rail-hosts',
+          'data-⚓️-align-top': '',
+          'data-⚓️-align-leading': ''
+        }}
+      >
+        {credit}
+      </p>
+    )
   }
 </div>

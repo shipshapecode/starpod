@@ -23,7 +23,6 @@ import {
  */
 const OVERRIDABLE_COMPONENTS = {
   Breadcrumbs: './components/Breadcrumbs.astro',
-  Dots: './components/Dots.astro',
   EpisodeList: './components/EpisodeList.astro',
   Hosts: './components/Hosts.astro',
   InfoCard: './components/InfoCard.astro',
@@ -210,21 +209,38 @@ export default function starpod(
             clientPrerender: true
           },
           fonts: [
+            // UI and display.
             {
               provider: fontProviders.google(),
-              name: 'Inter',
-              cssVariable: '--astro-font-inter',
+              name: 'Familjen Grotesk',
+              cssVariable: '--astro-font-familjen',
               formats: ['woff2'],
               styles: ['normal'],
               subsets: ['latin'],
-              weights: ['300 900'],
+              weights: ['400 700']
+            },
+            // One face per voice in the live transcript. Archivo's width axis
+            // lets the live line swell; Young Serif is the second voice.
+            {
+              provider: fontProviders.google(),
+              name: 'Archivo',
+              cssVariable: '--astro-font-archivo',
+              formats: ['woff2'],
+              styles: ['normal'],
+              subsets: ['latin'],
+              weights: ['400 900'],
               options: {
-                experimental: {
-                  variableAxis: {
-                    opsz: ['14..32']
-                  }
-                }
+                experimental: { variableAxis: { wdth: ['62..125'] } }
               }
+            },
+            {
+              provider: fontProviders.google(),
+              name: 'Young Serif',
+              cssVariable: '--astro-font-young-serif',
+              formats: ['woff2'],
+              styles: ['normal'],
+              subsets: ['latin'],
+              weights: ['400']
             }
           ],
           image: {

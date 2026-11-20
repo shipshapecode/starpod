@@ -2,7 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
   getRssTranscriptParagraphs,
-  getRssTranscriptText
+  getRssTranscriptText,
+  parseCues
 } from 'starpod/src/lib/transcript';
 import { getRssCues } from 'starpod/src/lib/cues';
 import type { Episode } from 'starpod/src/lib/rss';
@@ -125,6 +126,33 @@ describe('getRssTranscriptParagraphs', () => {
     // Short cues group into one paragraph tagged with the first cue's start.
     expect(paragraphs).toEqual([
       { start: 4.5, text: 'Hello there. Welcome to the show.' }
+    ]);
+  });
+
+  it('decodes the character references in cue text exactly once', async () => {
+    // WebVTT escapes &, < and > in cue text; the page escapes its text again
+    // when it renders, so leaving them encoded showed "Web &amp; Whatnot".
+    mockFetch({
+      body: [
+        'WEBVTT',
+        '',
+        '1',
+        '00:00:01.000 --> 00:00:03.000',
+        'Whiskey, Web &amp; Whatnot: &lt;b&gt; isn&#39;t &quot;bold&quot; &gt; 1',
+        '',
+        '2',
+        '00:00:03.000 --> 00:00:05.000',
+        'Written &amp;lt; once &#x26; done'
+      ].join('\n')
+    });
+    const paragraphs = await getRssTranscriptParagraphs(
+      makeEpisode({ transcriptType: 'text/vtt' })
+    );
+    expect(paragraphs).toEqual([
+      {
+        start: 1,
+        text: 'Whiskey, Web & Whatnot: <b> isn\'t "bold" > 1 Written &lt; once & done'
+      }
     ]);
   });
 
@@ -279,5 +307,42 @@ describe('shared transcript download', () => {
     expect(await getRssTranscriptParagraphs(episode)).toEqual([
       { start: 2, text: 'Back again.' }
     ]);
+  });
+});
+
+describe('parseCues', () => {
+  it('takes the speaker from a WebVTT voice span and drops every tag', () => {
+    expect(
+      parseCues(
+        'WEBVTT\n\n00:00:02.500 --> 00:00:04.000\n<v.loud Jev>It&#39;s <i>87%</i> &amp; rising</v>'
+      )
+    ).toEqual([{ start: 2.5, text: "It's 87% & rising", speaker: 'Jev' }]);
+  });
+
+  it('decodes the voice name too', () => {
+    expect(
+      parseCues('WEBVTT\n\n00:00:01.000 --> 00:00:02.000\n<v Tom &amp; Jerry>Hi</v>')
+    ).toEqual([{ start: 1, text: 'Hi', speaker: 'Tom & Jerry' }]);
+  });
+
+  it("strips only cue markup, keeping SRT's bare < and > as text", () => {
+    expect(
+      parseCues('1\n00:00:01,000 --> 00:00:02,000\nIf x < 5 and y > 3, then <i>stop</i>.')
+    ).toEqual([{ start: 1, text: 'If x < 5 and y > 3, then stop.' }]);
+    expect(
+      parseCues('WEBVTT\n\n00:00:01.000 --> 00:00:03.000\nWord<00:00:01.500> by <c.yellow>word</c>')
+    ).toEqual([{ start: 1, text: 'Word by word' }]);
+  });
+
+  it('decodes each reference once', () => {
+    expect(
+      parseCues('WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nShip it &amp; see &amp;lt;3')
+    ).toEqual([{ start: 1, text: 'Ship it & see &lt;3' }]);
+  });
+
+  it('never turns escaped text into a tag', () => {
+    expect(
+      parseCues('WEBVTT\n\n00:00:01.000 --> 00:00:02.000\n&lt;v Mallory&gt; hi')
+    ).toEqual([{ start: 1, text: '<v Mallory> hi' }]);
   });
 });
