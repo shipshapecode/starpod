@@ -1,0 +1,32 @@
+---
+/**
+ * A person's portrait: a circle in their voice's ring with the hairline over
+ * the photo. See styles/people.css for the markup contract other components
+ * (Preact islands included) can copy.
+ */
+export interface Props {
+  src: string;
+  /** Rendered size in px (the ring and gap included); leave it out to size
+   * it from CSS (`--person-size`, 64px by default). */
+  size?: number;
+  /** Transcript voice 0 or 1 wears that voice's ring colour. */
+  voice?: number;
+  loading?: 'eager' | 'lazy';
+}
+
+const { loading = 'lazy', size, src, voice } = Astro.props;
+---
+
+<span
+  class="person-face"
+  data-voice={voice}
+  style={size ? `--person-size: ${size}px` : undefined}
+  ><img
+    alt=""
+    decoding="async"
+    height={size ?? 64}
+    loading={loading}
+    src={src}
+    width={size ?? 64}
+  /></span
+>
