@@ -45,7 +45,7 @@ const STAGGER = 22;
 const known = new Map<string, PlayableEpisode>();
 /** The shelf's own order: more episodes, the ones played most recently last. */
 let shelf: Array<string> = [];
-let loading: Promise<void> | null = null;
+let loading: Promise<boolean> | null = null;
 /** Bumped whenever the shelf changes, so what reads it (nextEpisode()) re-renders. */
 const shelfChanged = signal(0);
 
@@ -69,10 +69,19 @@ function showImage() {
   return document.querySelector<HTMLImageElement>('.rail-art img, .topbar-show img')?.src;
 }
 
-/** The shelf comes from the JSON API (see mountBoard() for when). */
-function loadShelf(): Promise<void> {
+/**
+ * The shelf comes from the JSON API (see mountBoard() for when). Resolves
+ * whether it loaded: only a shelf that did is kept for later boards, so a
+ * failed request can be made again.
+ */
+function loadShelf(): Promise<boolean> {
   loading ??= fetch('/api/episodes/1.json')
-    .then((response) => (response.ok ? response.json() : null))
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Shelf: ${response.status}`);
+      }
+      return response.json();
+    })
     .then((body) => {
       const fallback = showImage();
       for (const episode of body?.episodes?.data ?? []) {
@@ -92,9 +101,11 @@ function loadShelf(): Promise<void> {
         }
       }
       shelfChanged.value++;
+      return true;
     })
     .catch(() => {
       loading = null;
+      return false;
     });
   return loading;
 }
@@ -151,7 +162,9 @@ export function mountBoard(host: HTMLElement): Board {
   function ring() {
     const now = currentEpisode.value;
     const next = queue.value.slice(0, MAX_NEXT);
-    const taken = new Set([now?.id, ...next.map((episode) => episode.id)]);
+    // All of Up next, though only its first few show: a queued episode on the
+    // shelf would offer to queue what is already queued.
+    const taken = new Set([now?.id, ...queue.value.map((episode) => episode.id)]);
     const rest = shelf.filter((id) => !taken.has(id) && known.has(id)).slice(0, SHELF);
     const places = new Map<string, Place>();
     let order = 0;
@@ -183,6 +196,11 @@ export function mountBoard(host: HTMLElement): Board {
   function tileFor(episode: PlayableEpisode) {
     let tile = tiles.get(episode.id);
     if (tile) {
+      // Its artwork may have come with the shelf after the cover was made.
+      const img = tile.querySelector('img')!;
+      if (episode.image && img.getAttribute('src') !== episode.image) {
+        img.src = episode.image;
+      }
       return tile;
     }
     // A cover: the art (the button you tap or drag), a glass chip with its
@@ -452,7 +470,15 @@ export function mountBoard(host: HTMLElement): Board {
         const others = shelf.filter((id) => id !== episode.id);
         const shown = ring().rest.filter((id) => id !== episode.id);
         const before = shown[at];
-        others.splice(before ? others.indexOf(before) : others.length, 0, episode.id);
+        // Past the last cover shown (its slot was the last one): right after
+        // that cover, not behind episodes the shelf has no room to show.
+        const last = shown.at(-1);
+        const index = before
+          ? others.indexOf(before)
+          : last
+            ? others.indexOf(last) + 1
+            : others.length;
+        others.splice(index, 0, episode.id);
         shelf = others;
         lastNow = currentEpisode.value?.id;
       }
@@ -480,6 +506,7 @@ export function mountBoard(host: HTMLElement): Board {
 
   let drag: {
     tile: HTMLElement;
+    pointerId: number;
     x: number;
     y: number;
     p: FlipProps | null;
@@ -501,10 +528,10 @@ export function mountBoard(host: HTMLElement): Board {
     nudge(face(tile), { tx: 0, ty: 0, sx: 1, sy: 1 });
   }
 
-  /** End a drag without dropping (the card closed under it): the cover goes home. */
-  function letGo() {
+  /** Nothing held any more: the drag's marks and listeners go. */
+  function release() {
     if (!drag) {
-      return;
+      return null;
     }
     const { tile, over } = drag;
     drag = null;
@@ -513,19 +540,36 @@ export function mountBoard(host: HTMLElement): Board {
     forget();
     removeEventListener('scroll', forget, { capture: true });
     removeEventListener('resize', forget);
-    settle(tile);
+    return tile;
+  }
+
+  /** End a drag without dropping (the card closed under it): the cover goes home. */
+  function letGo() {
+    const tile = release();
+    if (tile) {
+      settle(tile);
+    }
   }
 
   function wire(tile: HTMLElement) {
     tile.addEventListener('pointerdown', (event) => {
-      if (event.button || (event.target as Element).closest('.tile-remove')) {
+      // One cover at a time, held by one pointer.
+      if (drag || event.button || (event.target as Element).closest('.tile-remove')) {
         return;
       }
       tile.setPointerCapture(event.pointerId);
-      drag = { tile, x: event.clientX, y: event.clientY, p: null, moved: false, over: null };
+      drag = {
+        tile,
+        pointerId: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        p: null,
+        moved: false,
+        over: null
+      };
     });
     tile.addEventListener('pointermove', (event) => {
-      if (drag?.tile !== tile) {
+      if (drag?.tile !== tile || event.pointerId !== drag.pointerId) {
         return;
       }
       const dx = event.clientX - drag.x;
@@ -552,27 +596,39 @@ export function mountBoard(host: HTMLElement): Board {
         drag.over = over;
       }
     });
-    const end = () => {
-      if (drag?.tile !== tile) {
+    const end = (event: PointerEvent) => {
+      if (drag?.tile !== tile || event.pointerId !== drag.pointerId) {
         return;
       }
-      const { moved, over } = drag;
-      drag = null;
-      over?.removeAttribute('data-hot');
-      delete tile.dataset.held;
-      forget();
-      removeEventListener('scroll', forget, { capture: true });
-      removeEventListener('resize', forget);
+      const { moved } = drag;
+      // The slot under the pointer as it lets go: the card may have scrolled
+      // since the last move.
+      const at = [...host.querySelectorAll<HTMLElement>('.slot')].find((slot) => {
+        const r = slot.getBoundingClientRect();
+        return (
+          event.clientX >= r.left &&
+          event.clientX <= r.right &&
+          event.clientY >= r.top &&
+          event.clientY <= r.bottom
+        );
+      });
+      release();
       if (moved) {
+        // Its click is a drag's, not a tap; it flies on from where it is.
         tile.dataset.dragged = '';
-        drop(tile, over?.dataset.slot ?? null);
+        drop(tile, at?.dataset.slot ?? null);
       }
     };
     tile.addEventListener('pointerup', end);
-    tile.addEventListener('pointercancel', end);
-    // Capture can be lost without a pointerup (the tile hidden, the window
-    // blurred); the drop then happens where the cover is.
-    tile.addEventListener('lostpointercapture', end);
+    // Cancelled, or capture lost without a pointerup (the tile hidden, the
+    // window blurred): the cover goes home and nothing is dropped.
+    const cancel = (event: PointerEvent) => {
+      if (drag?.tile === tile && event.pointerId === drag.pointerId) {
+        letGo();
+      }
+    };
+    tile.addEventListener('pointercancel', cancel);
+    tile.addEventListener('lostpointercapture', cancel);
     // The click lands on the cover itself (it holds the pointer while pressed).
     tile.addEventListener('click', (event) => {
       if ((event.target as Element).closest('.tile-remove')) {
@@ -663,19 +719,40 @@ export function mountBoard(host: HTMLElement): Board {
   }
   const idle = window.requestIdleCallback ?? ((fn: () => void) => window.setTimeout(fn, 200));
   const lean = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+  // A shelf that failed to load is asked for again when the card is open
+  // (at once if it is), then each time it opens: never in a loop.
   let asked = false;
+  const failed = signal(false);
   const stopAsking = effect(() => {
-    if (asked || !(lean ? open() : currentTime.value > 0)) {
+    const due = failed.value || lean ? open() : currentTime.value > 0;
+    if (asked || !due) {
       return;
     }
     asked = true;
-    idle(() => !stopped && void loadShelf().then(arrive));
-    queueMicrotask(() => stopAsking());
+    idle(() => {
+      if (stopped) {
+        return;
+      }
+      void loadShelf().then((ok) => {
+        if (stopped) {
+          return;
+        }
+        if (ok) {
+          arrive();
+          stopAsking();
+        } else {
+          asked = false;
+          // Asked again once the card next opens (not while it is open now).
+          failed.value = true;
+        }
+      });
+    });
   });
 
   return {
     stop: () => {
       stopped = true;
+      letGo();
       cancelAnimationFrame(roving);
       stopClosing();
       stopState();

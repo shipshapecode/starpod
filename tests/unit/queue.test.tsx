@@ -33,6 +33,16 @@ describe('Up next queue', () => {
     isPlaying.value = false;
   });
 
+  it('moves on past an episode that ends while it is still in Up next', () => {
+    enqueue(episode(2));
+    enqueue(episode(3));
+    // Chosen another way (a transcript line), it stayed queued.
+    currentEpisode.value = episode(2);
+    playNext();
+    expect(currentEpisode.value?.id).toBe('ep-3');
+    expect(ids()).toEqual([]);
+  });
+
   it('queues each episode once, in order, and remembers it', () => {
     enqueue(episode(1));
     enqueue(episode(2));
@@ -161,14 +171,19 @@ describe('the Up next board', () => {
     document.body.replaceChildren();
     const fetched = vi.mocked(fetch);
     fetched.mockClear();
-    currentTime.value = 0;
+    // Fresh modules: another test's board may already have loaded the shelf,
+    // which every later board shares.
+    vi.resetModules();
+    const fresh = await import('starpod/src/components/media/board');
+    const state = await import('starpod/src/components/state');
+    state.currentTime.value = 0;
     const host = document.createElement('div');
     document.body.append(host);
-    stop = mountBoard(host).stop;
+    stop = fresh.mountBoard(host).stop;
     await new Promise((done) => setTimeout(done, 300));
     expect(fetched).not.toHaveBeenCalled();
     act(() => {
-      currentTime.value = 2;
+      state.currentTime.value = 2;
     });
     await waitFor(() => expect(fetched).toHaveBeenCalledTimes(1));
   });
@@ -187,7 +202,8 @@ describe('the Up next board', () => {
     expect(fill('ep-5')).toBe('--slot-s0');
     expect(fill('ep-7')).toBe('--slot-s1');
     // The same elements, in the same order: only the attribute changed.
-    expect([...document.querySelectorAll('.tile')].slice(0, covers.length)).toEqual(covers);
+    const after = [...document.querySelectorAll('.tile')];
+    covers.forEach((cover, i) => expect(after[i]).toBe(cover));
   });
 
   it('says how to queue another under Up next: a tap on a cover below', async () => {

@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { startEngine } from './media/engine';
 import PlayGlyph from './media/PlayGlyph';
 import PlayToggle from './media/PlayToggle';
-import { readPosition } from './media/position';
+import { resumePoint } from './media/position';
 import { formatClock } from '../utils/playable';
 import {
   currentEpisode,
@@ -31,15 +31,17 @@ export default function FullPlayButton({ episode, look = 'row' }: Props) {
   const button = useRef<HTMLButtonElement>(null);
   const [resumeAt, setResumeAt] = useState(0);
 
+  const isCurrent =
+    Boolean(episode) && episode!.id === currentEpisode.value?.id;
+
+  // Read again when it stops being current: it has just been played.
   useLayoutEffect(() => {
     startEngine();
     if (episode && look === 'pill') {
-      setResumeAt(readPosition(episode.id));
+      setResumeAt(resumePoint(episode.id));
     }
-  }, [episode, look]);
+  }, [episode, look, isCurrent]);
 
-  const isCurrent =
-    Boolean(episode) && episode!.id === currentEpisode.value?.id;
   const playing = isCurrent && isPlaying.value;
 
   useLayoutEffect(() => {
@@ -53,7 +55,7 @@ export default function FullPlayButton({ episode, look = 'row' }: Props) {
   }
 
   if (look === 'pill') {
-    const resume = !isCurrent && resumeAt >= 30;
+    const resume = !isCurrent && resumeAt > 0;
     return (
       <button
         class="button-primary"

@@ -41,13 +41,15 @@ import {
   type Medium,
   type PlayableEpisode
 } from '../state';
-import { POSITION_PREFIX, readPosition } from './position';
+import { POSITION_PREFIX, readPosition, resumePoint } from './position';
 import { startPip } from './pip';
 import { publish } from './publish';
 import { installShortcuts } from './shortcuts';
 import { startStageLight } from './stage-light';
 
 let element: HTMLVideoElement | null = null;
+/** The playhead last saved, for the episode that owns it. */
+let lastSaved = 0;
 
 /**
  * True while the current episode's stage is scrolled mostly out of view. A
@@ -77,6 +79,12 @@ const RETRY_WINDOW_MS = 10_000;
 let recovered: { id: string; at: number } | null = null;
 /** Counts sources loaded, so a failure is handled once for the source it hit. */
 let generation = 0;
+/** Where a source that ran out of retries stopped, for the next Play. */
+let stoppedAt = 0;
+/** The episode whose playhead the element holds, once its source is ready. */
+let playhead: string | null = null;
+/** Fired on the element when a source is ready and its playhead placed. */
+const READY = 'starpod:ready';
 
 /**
  * The source failed (the element's error, or a fatal hls.js error): reload
@@ -95,7 +103,11 @@ function recover(source = generation) {
   }
   const now = Date.now();
   if (recovered?.id === episode.id && now - recovered.at < RETRY_WINDOW_MS) {
+    // Stopped, and the failed source forgotten: the next Play loads it
+    // again (a failed element refuses play() until a new load).
     swapping = false;
+    loaded = null;
+    stoppedAt = video.currentTime > 0 ? video.currentTime : readPosition(episode.id);
     isPlaying.value = false;
     return;
   }
@@ -106,8 +118,6 @@ function recover(source = generation) {
   loaded = null;
   void loadSource(episode, activeMedium.value, { at, resume });
 }
-
-const RESUME_MIN_SECONDS = 30;
 
 function savePosition(id: string, seconds: number) {
   try {
@@ -138,17 +148,17 @@ function createElement(): HTMLVideoElement {
   video.className = 'starpod-media';
   video.playsInline = true;
   video.preload = 'metadata';
-  video.crossOrigin = 'anonymous';
   video.setAttribute('playsinline', '');
   video.setAttribute('aria-label', 'Episode video');
   // Playback as --live-* custom properties, for CSS to follow (publish.ts).
   publish(video);
 
-  let lastSaved = 0;
   video.addEventListener('timeupdate', () => {
     currentTime.value = video.currentTime;
+    // Only the episode whose source is ready owns the playhead: a source
+    // being reset reads 0, which is no one's progress.
     const id = currentEpisode.value?.id;
-    if (id && Math.abs(video.currentTime - lastSaved) > 5) {
+    if (id && id === playhead && Math.abs(video.currentTime - lastSaved) > 5) {
       lastSaved = video.currentTime;
       savePosition(id, video.currentTime);
     }
@@ -233,17 +243,20 @@ async function loadSource(
   // resumes where they left it last time; a retry, where it stopped.
   const startAt =
     retry?.at ??
-    (sameEpisode
-      ? video.currentTime
-      : readPosition(episode.id) > RESUME_MIN_SECONDS
-        ? readPosition(episode.id)
-        : 0);
-  const wasPlaying = retry?.resume ?? isPlaying.value;
+    (sameEpisode ? video.currentTime : resumePoint(episode.id));
+  if (retry) {
+    isPlaying.value = retry.resume;
+  }
 
   hls?.destroy();
   hls = null;
   loaded = { id: episode.id, medium };
+  playhead = null;
   delete video.dataset.ready;
+  if (video.currentSrc) {
+    // The old source's pause on the way out is not the visitor's.
+    swapping = true;
+  }
   if (!sameEpisode && video.currentSrc) {
     // Let go of the last episode before anything waits (hls.js is imported
     // on first use): left attached, a play asked for meanwhile would replay
@@ -256,37 +269,56 @@ async function loadSource(
   video.poster = episode.image ?? '';
   video.dataset.medium = medium;
 
+  // Audio as the feed serves it: an enclosure needn't send CORS headers.
+  const playAudio = () => {
+    video.removeAttribute('crossorigin');
+    video.src = episode.audio.src;
+  };
   if (medium === 'watch' && episode.video) {
+    // Video frames are sampled for the stage's light (publish.ts), which
+    // needs a CORS-clean picture.
+    video.crossOrigin = 'anonymous';
     const isHls = /mpegurl/i.test(episode.video.type);
     if (!isHls || canPlayHlsNatively(video)) {
       video.src = episode.video.src;
     } else {
-      const { default: HlsClass } = await import('hls.js');
-      // Another episode (or medium) may have been chosen while it loaded.
-      if (loaded?.id !== episode.id || loaded.medium !== medium) {
+      const HlsClass = await import('hls.js').then(
+        (module) => module.default,
+        () => null
+      );
+      // Another source may have been chosen while it loaded.
+      if (source !== generation) {
         return;
       }
-      if (HlsClass.isSupported()) {
+      if (HlsClass?.isSupported()) {
         hls = new HlsClass({ startPosition: startAt });
         hls.on(HlsClass.Events.ERROR, (_event, data) => data.fatal && recover(source));
         hls.loadSource(episode.video.src);
         hls.attachMedia(video);
       } else {
-        // No MSE: fall back to audio rather than a black frame.
-        video.src = episode.audio.src;
+        // No MSE, or hls.js failed to load: audio rather than a black frame.
+        playAudio();
         video.dataset.medium = 'listen';
       }
     }
   } else {
-    video.src = episode.audio.src;
+    playAudio();
   }
 
   const begin = () => {
+    if (source !== generation) {
+      return;
+    }
     swapping = false;
     if (startAt > 0 && Math.abs(video.currentTime - startAt) > 1) {
       video.currentTime = startAt;
     }
-    if (wasPlaying || isPlaying.value) {
+    playhead = episode.id;
+    lastSaved = video.currentTime;
+    // For a seek waiting on this source (seekTo's effect).
+    video.dispatchEvent(new Event(READY));
+    // What the visitor wants now: a Pause while it loaded holds.
+    if (isPlaying.value) {
       safePlay(video);
     }
   };
@@ -689,8 +721,12 @@ export function startEngine() {
       return;
     }
     if (isPlaying.value) {
-      // Mid-swap, begin() plays the new source once it is ready.
-      if (!swapping) {
+      const episode = currentEpisode.value;
+      if (!loaded) {
+        // Its source ran out of retries: Play loads it again.
+        void loadSource(episode, activeMedium.peek(), { at: stoppedAt, resume: true });
+      } else if (!swapping) {
+        // Mid-swap, begin() plays the new source once it is ready.
         safePlay(element);
       }
     } else {
@@ -718,16 +754,30 @@ export function startEngine() {
       return;
     }
     const video = element;
+    // The seek is for the episode chosen with it; another episode's source
+    // getting ready first must not take it.
+    const id = currentEpisode.peek()?.id;
+    const ready = () => playhead === id && video.readyState >= 1;
     const apply = () => {
+      if (currentEpisode.peek()?.id !== id) {
+        seekTo.value = null;
+        return;
+      }
+      if (!ready()) {
+        return;
+      }
+      video.removeEventListener(READY, apply);
       video.currentTime = target;
       seekTo.value = null;
       isPlaying.value = true;
     };
-    if (video.readyState >= 1) {
+    if (ready()) {
       apply();
-    } else {
-      video.addEventListener('loadedmetadata', apply, { once: true });
+      return;
     }
+    video.addEventListener(READY, apply);
+    // A newer seek, or a new episode, replaces this one.
+    return () => video.removeEventListener(READY, apply);
   });
 
   // Client-side navigation. The box persists, and its view transition group

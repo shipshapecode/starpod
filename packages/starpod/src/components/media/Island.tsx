@@ -346,12 +346,21 @@ export function go(home: IslandHome) {
 function keepFocus(island: HTMLElement, to: IslandHome) {
   const focused = document.activeElement;
   if (!(focused instanceof HTMLElement) || !island.contains(focused)) {
-    // The card is a dialog: opened from anywhere, focus goes into it.
+    // The card is a dialog: opened from anywhere, focus goes into it, and
+    // goes back to what opened it when it closes.
     if (to === 'card') {
+      opener = focused instanceof HTMLElement && focused !== document.body ? focused : null;
       cardStart(island)?.focus({ preventScroll: true });
     }
     return;
   }
+  if (to !== 'card' && opener?.isConnected) {
+    const back = opener;
+    opener = null;
+    back.focus({ preventScroll: true });
+    return;
+  }
+  opener = to === 'card' ? opener : null;
   const part = focused.closest<HTMLElement>('#player > *');
   const target =
     to === 'card' && !focused.closest('.island-queue')
@@ -361,6 +370,9 @@ function keepFocus(island: HTMLElement, to: IslandHome) {
         : null;
   target?.focus({ preventScroll: true });
 }
+
+/** What had focus outside the player when the card opened, for its close. */
+let opener: HTMLElement | null = null;
 
 /** The island's body toggles the card and the home it came from. */
 export function toggleCard() {
@@ -648,6 +660,16 @@ function swipeToClose(strip: HTMLElement) {
     strip.removeEventListener('pointermove', move);
     strip.removeEventListener('pointerup', up);
     strip.removeEventListener('pointercancel', up);
+    // Closed mid-swipe (Escape under the finger): the card lets go of it.
+    if (from) {
+      if (strip.hasPointerCapture(from.id)) {
+        strip.releasePointerCapture(from.id);
+      }
+      from = null;
+      const el = island();
+      el?.style.removeProperty('transition');
+      el?.style.removeProperty('translate');
+    }
   };
 }
 
