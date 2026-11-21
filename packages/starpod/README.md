@@ -89,7 +89,18 @@ validates your config and lists every problem with its field path.
   and YouTube
 - `rssFeed` — the feed your episodes are read from at build time
 - `links` (optional) — extra navigation links after About and Contact, e.g.
-  `[{ label: 'Store', href: 'https://example.com/store' }]`
+  `[{ label: 'Store', href: 'https://example.com/store', icon: 'store' }]`.
+  `icon` is one of `external`, `heart`, `link`, `sponsor`, or `store`; it
+  defaults to `external` for URLs and `link` for local pages.
+
+## Video
+
+Starpod is video-first with no setup. When an episode's feed item carries a
+`<podcast:alternateEnclosure>` with a video or HLS type, its page leads with
+the video and offers a Watch / Listen switch; the visitor's choice is
+remembered. Episodes without video lead with their artwork and play the
+audio enclosure. Playback continues across pages: the video floats into a
+mini player when its stage scrolls away or the visitor navigates.
 
 ## Integration options
 
@@ -105,8 +116,40 @@ starpod(starpodConfig, {
 });
 ```
 
-Overridable components: `Breadcrumbs`, `Dots`, `EpisodeList`, `Hosts`,
+Overridable components: `Breadcrumbs`, `EpisodeList`, `Hosts`,
 `InfoCard`, `LargePlatforms`, `NotFoundContent`, `Platforms`, `ShowArtwork`.
+
+### Overrides in the sidebar
+
+`InfoCard` (the sidebar's links after Episodes), `Platforms` and `Hosts`
+also render in the desktop sidebar, where the layout passes them an
+optional `anchored` prop. An override can ignore it and render plain
+content. The layout keeps everything the sidebar needs on its own
+wrappers:
+
+- the "Follow the show" label;
+- the anchors that the collapsed sidebar's stacks and flyouts open from;
+- making a group unfocusable while it's collapsed.
+
+Without `anchored`, your markup simply lays out in place. When the sidebar
+collapses:
+
+- each group keeps to the icon column;
+- its stack opens a flyout with your component rendered in full (that
+  copy gets no `anchored` prop).
+
+What `anchored` buys: the built-in components use it to make each link,
+mark and face a piece on its own anchored slot (anchored-auto-layout's
+`data-⚓️-*` attributes). The pieces then glide between the open and
+icon sidebar, the follow marks gather into a deck, and the host faces
+gather into a co-author stack. The nav links get a sliding highlight and
+tooltips in the icon sidebar. See the built-in `Platforms.astro`,
+`Hosts.astro` and `InfoCard.astro` for the markup this takes.
+
+For an overriding `InfoCard`, give each link an icon `<svg>` and its label
+in a `<span>`, as the built-in does. The icon sidebar then shows the icon
+alone and names the link in a tooltip. A link with bare text keeps its
+text, cut to the icon column, and is still named by the tooltip.
 
 ## Custom pages
 
@@ -146,7 +189,9 @@ export const collections = {
 
 `[HH:MM:SS]` timestamps become clickable and seek the player. Without a
 file, Starpod falls back to the transcript referenced by the feed's
-`<podcast:transcript>` tag.
+`<podcast:transcript>` tag. Write speakers as `[00:01:23] **Name:** text` and
+the two most frequent speakers each get their own typeface in the live
+transcript beside the player.
 
 ## Database (guests & sponsors)
 
