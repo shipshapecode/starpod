@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import SectionBar from '../components/episode/SectionBar.astro';
 import { getAllEpisodes, getShowInfo } from '../lib/rss';
 import { formatDate, formatDuration } from '../lib/llms';
 import starpodConfig from 'virtual:starpod/config';
@@ -23,6 +24,17 @@ if (episodes.length > 0) {
     episodesPerWeek = (episodes.length / daysBetween) * 7;
   }
 }
+
+const sections = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'hosts', label: 'Hosts' },
+  { id: 'episodes', label: 'Episodes' },
+  { id: 'recent', label: 'Recent' },
+  { id: 'transcripts', label: 'Transcripts' },
+  { id: 'listen', label: 'Listen' },
+  { id: 'rss', label: 'RSS' },
+  { id: 'all', label: 'All episodes' }
+];
 ---
 
 <Layout
@@ -31,13 +43,18 @@ if (episodes.length > 0) {
 >
   <div class="relative z-10 px-8 lg:px-18">
     <h1
-      class="text-light-text-heading mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl dark:text-white"
+      class="text-ink mb-4 text-2xl font-bold lg:mb-6 lg:text-5xl"
     >
       {show.title} - Guide for AI Assistants
     </h1>
+  </div>
 
-    <section class="mb-8">
-      <h2 class="section-heading-underlined">Podcast Overview</h2>
+  <div class="ep-body">
+    <SectionBar label="Guide sections" sections={sections} />
+    <div class="relative z-10 px-8 lg:px-18">
+
+    <section class="mb-8" id="overview">
+      <h2 class="section-heading-underlined ep-reveal">Podcast Overview</h2>
       <p class="mb-2">
         <strong>Tagline:</strong>
         {starpodConfig.blurb}
@@ -45,12 +62,12 @@ if (episodes.length > 0) {
       <p>{starpodConfig.description}</p>
     </section>
 
-    <section class="mb-8">
-      <h2 class="section-heading-underlined">Hosts</h2>
+    <section class="mb-8" id="hosts">
+      <h2 class="section-heading-underlined ep-reveal">Hosts</h2>
       {
         starpodConfig.hosts.map((host) => (
           <div class="mb-4">
-            <h3 class="text-light-text-heading text-xl font-bold dark:text-white">
+            <h3 class="text-ink text-xl font-bold">
               {host.name}
             </h3>
             <p class="mt-2">{host.bio}</p>
@@ -61,7 +78,7 @@ if (episodes.length > 0) {
                   <>
                     <a
                       href={host.website}
-                      class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                      class="animated-bottom-border text-ink font-bold after:mt-1"
                     >
                       Website
                     </a>
@@ -72,7 +89,7 @@ if (episodes.length > 0) {
                   <>
                     <a
                       href={host.github}
-                      class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                      class="animated-bottom-border text-ink font-bold after:mt-1"
                     >
                       GitHub
                     </a>
@@ -82,7 +99,7 @@ if (episodes.length > 0) {
                 {host.twitter && (
                   <a
                     href={host.twitter}
-                    class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                    class="animated-bottom-border text-ink font-bold after:mt-1"
                   >
                     Twitter
                   </a>
@@ -94,8 +111,8 @@ if (episodes.length > 0) {
       }
     </section>
 
-    <section class="mb-8">
-      <h2 class="section-heading-underlined">Episode Information</h2>
+    <section class="mb-8" id="episodes">
+      <h2 class="section-heading-underlined ep-reveal">Episode Information</h2>
       <ul class="list-disc pl-6">
         <li>
           <strong>Total Episodes:</strong>
@@ -120,8 +137,8 @@ if (episodes.length > 0) {
       </ul>
     </section>
 
-    <section class="mb-8">
-      <h2 class="section-heading-underlined">Recent Episodes</h2>
+    <section class="mb-8" id="recent">
+      <h2 class="section-heading-underlined ep-reveal">Recent Episodes</h2>
       <ul class="list-disc pl-6">
         {
           recentEpisodes.map((episode) => (
@@ -129,7 +146,7 @@ if (episodes.length > 0) {
               <strong>Episode {episode.episodeNumber}:</strong>{' '}
               <a
                 href={`/${episode.episodeSlug}.html.md`}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 {episode.title}
               </a>{' '}
@@ -140,8 +157,8 @@ if (episodes.length > 0) {
       </ul>
     </section>
 
-    <section class="mb-8">
-      <h2 class="section-heading-underlined">Transcript Availability</h2>
+    <section class="mb-8" id="transcripts">
+      <h2 class="section-heading-underlined ep-reveal">Transcript Availability</h2>
       <p>
         Transcripts are available for many episodes and are included in the
         individual episode markdown files. Access any episode at
@@ -150,15 +167,15 @@ if (episodes.length > 0) {
       </p>
     </section>
 
-    <section class="mb-8">
-      <h2 class="section-heading-underlined">How to Listen</h2>
+    <section class="mb-8" id="listen">
+      <h2 class="section-heading-underlined ep-reveal">How to Listen</h2>
       <ul class="list-disc pl-6">
         {
           starpodConfig.platforms.apple && (
             <li>
               <a
                 href={starpodConfig.platforms.apple}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 Apple Podcasts
               </a>
@@ -170,7 +187,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.spotify}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 Spotify
               </a>
@@ -182,7 +199,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.youtube}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 YouTube
               </a>
@@ -194,7 +211,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.overcast}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 Overcast
               </a>
@@ -206,7 +223,7 @@ if (episodes.length > 0) {
             <li>
               <a
                 href={starpodConfig.platforms.pocketCasts}
-                class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+                class="animated-bottom-border text-ink font-bold after:mt-1"
               >
                 Pocket Casts
               </a>
@@ -216,33 +233,34 @@ if (episodes.length > 0) {
       </ul>
     </section>
 
-    <section class="mb-8">
-      <h2 class="section-heading-underlined">RSS Feed</h2>
+    <section class="mb-8" id="rss">
+      <h2 class="section-heading-underlined ep-reveal">RSS Feed</h2>
       <p>
         Direct RSS feed access: <a
           href={starpodConfig.rssFeed}
-          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          class="animated-bottom-border text-ink font-bold after:mt-1"
           >{starpodConfig.rssFeed}</a
         >
       </p>
     </section>
 
-    <section class="mb-8">
-      <h2 class="section-heading-underlined">Complete Episode List</h2>
+    <section class="mb-8" id="all">
+      <h2 class="section-heading-underlined ep-reveal">Complete Episode List</h2>
       <p>
         For a complete list of all episodes with descriptions, see <a
           href="/episodes-index.html.md"
-          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          class="animated-bottom-border text-ink font-bold after:mt-1"
           >Episodes Index</a
         >.
       </p>
       <p class="mt-2">
         Markdown version of this page: <a
           href="/for-llms.html.md"
-          class="animated-bottom-border text-light-text-heading font-bold after:mt-1 dark:text-white"
+          class="animated-bottom-border text-ink font-bold after:mt-1"
           >for-llms.html.md</a
         >
       </p>
     </section>
+    </div>
   </div>
 </Layout>

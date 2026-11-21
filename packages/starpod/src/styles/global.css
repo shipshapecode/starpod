@@ -1,78 +1,76 @@
 @import './tailwind.css';
-@import './gradient-icon.css';
-@import './buttons.css';
+@import 'anchored-auto-layout';
+@import '../motion/propflip.css';
+@import './tilt.css';
 @import './search-icon.css';
-
-@import 'atropos/css';
+@import './tokens.css';
+@import './people.css';
+@import './shell.css';
+@import './stage.css';
+@import './worlds.css';
+@import './interactions.css';
+@import './rail.css';
+@import './explorer.css';
+@import './player.css';
+@import './episode.css';
 
 @view-transition {
   navigation: auto;
 }
 
-main:has(+ * + #audio-player .player) {
-  @media (min-width: 1024px) {
-    @apply mb-28;
-  }
-}
 
-html {
-  color-scheme: light dark;
-}
-
-html,
-.custom-scrollbar {
-  scrollbar-color: var(--color-light-input-border) transparent;
-
-  @media (prefers-color-scheme: dark) {
-    scrollbar-color: var(--color-dark-input-border) transparent;
-  }
-}
-
-footer:has(+ #audio-player .player) {
-  @media (max-width: 1024px) {
-    @apply mb-40;
-  }
-}
-
-[aria-label='EpisodeList'] li {
-  > div {
-    content-visibility: auto;
-    contain-intrinsic-block-size: auto 400px;
-  }
-
-  @media (width >= 1024px) {
-    & h2 > a {
-      animation: toggle-vt-names linear both;
-      animation-timeline: view();
-    }
-  }
-}
-
-@keyframes toggle-vt-names {
-  entry 0% {
-    --should-vt: none;
-  }
-  entry 1%,
-  exit 99% {
-    --should-vt: var(--vt-name);
-  }
-  exit 100% {
-    --should-vt: none;
-  }
-}
+/* ---------- Shared utilities for pages and overrides ---------- */
 
 .animated-bottom-border {
-  @apply dark:border-dark-border border-b after:block after:h-[1px] after:w-0 after:bg-gradient-to-r after:from-[#C6B2FF] after:to-[#8D67FF] after:transition-all after:duration-500 after:ease-in-out hover:after:w-full dark:after:from-[#43C9F5] dark:after:to-[#B4EDFF];
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.animated-bottom-border::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 1px;
+  width: 0;
+  background: linear-gradient(90deg, var(--glow-a), var(--glow-b));
+  transition: width 500ms var(--ease-out);
+}
+
+.animated-bottom-border:hover::after {
+  width: 100%;
 }
 
 .input {
-  @apply border-light-input-border bg-light-input-bg focus:border-light-input-border-focused dark:border-dark-input-border dark:bg-dark-input-bg dark:focus:border-dark-input-border-focused rounded border p-4 !ring-0 transition-colors !outline-none;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0.9rem 1rem;
+  font: inherit;
+  outline: none;
+  transition: border-color 200ms var(--ease-out);
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.input:focus {
+  border-color: var(--accent);
 }
 
 @utility section-heading {
-  @apply text-xs font-bold tracking-wide uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 @utility section-heading-underlined {
-  @apply section-heading dark:border-dark-border border-b pb-4;
+  @apply section-heading;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1rem;
 }

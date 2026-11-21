@@ -3,26 +3,14 @@ import UFODark from '../../svgs/ufo-dark.svg?raw';
 import UFOLight from '../../svgs/ufo-light.svg?raw';
 ---
 
-<div class="atropos ufo">
-  <div class="atropos-scale">
-    <div class="atropos-rotate">
-      <div class="atropos-inner">
-        <div class="block h-auto w-full dark:hidden">
-          <Fragment set:html={UFOLight} />
-        </div>
-        <div class="hidden h-auto w-full dark:block">
-          <Fragment set:html={UFODark} />
-        </div>
-      </div>
+<!-- Leans toward the pointer and its layers part (styles/tilt.css). -->
+<div class="tilt ufo" data-props-hover="pointer-local">
+  <div class="tilt-body">
+    <div class="block h-auto w-full dark:hidden">
+      <Fragment set:html={UFOLight} />
+    </div>
+    <div class="hidden h-auto w-full dark:block">
+      <Fragment set:html={UFODark} />
     </div>
   </div>
 </div>
-
-<script>
-  import Atropos from 'atropos';
-  Atropos({
-    el: '.ufo',
-    highlight: false,
-    shadow: false
-  });
-</script>

@@ -1,0 +1,77 @@
+/*
+  Tilt: art that leans toward the pointer while its layers part, from
+  prop-for-that's pointer-local ratios (data-props-for="pointer-local").
+  Transforms and opacity only. Nothing runs at rest, and the source pauses
+  off screen. The lean eases through a registered copy of the ratios, so it
+  settles rather than snaps, and it levels when the pointer leaves.
+
+  <div class="tilt" data-props-for="pointer-local">
+    <div class="tilt-body">… <g data-depth="3">…</g> …</div>
+  </div>
+
+  Layers marked data-depth="n" shift n% of their box toward the pointer
+  (read with typed attr(); flat where that is missing).
+*/
+
+@property --tilt-x {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --tilt-y {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --tilt-in {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.tilt {
+  /* -1…1 from the centre while the pointer is over the art, else 0. */
+  --tilt-in: var(--live-local-pointer-inside, 0);
+  --tilt-x: calc(
+    (var(--live-local-pointer-x-ratio, 0.5) * 2 - 1) * var(--tilt-in)
+  );
+  --tilt-y: calc(
+    (var(--live-local-pointer-y-ratio, 0.5) * 2 - 1) * var(--tilt-in)
+  );
+  display: block;
+  perspective: 1200px;
+  transition:
+    --tilt-x 0.3s var(--ease-out),
+    --tilt-y 0.3s var(--ease-out),
+    --tilt-in 0.3s var(--ease-out);
+}
+
+.tilt-body {
+  position: relative;
+  display: block;
+  /* The hovered side presses in, as much as 15deg at the edges, and the
+     art lifts a little toward the viewer. */
+  transform: rotateX(calc(var(--tilt-y) * -15deg))
+    rotateY(calc(var(--tilt-x) * 15deg));
+  scale: calc(1 + 0.04 * var(--tilt-in));
+  /* Its own layer always: the lean is a 3D transform driven from the main
+     thread, so without this the art would be promoted as a lean starts and
+     dropped as it levels, re-rastering what it sits on each time. */
+  will-change: transform;
+}
+
+.tilt [data-depth] {
+  translate: calc(var(--tilt-x) * attr(data-depth type(<number>), 0) * 1%)
+    calc(var(--tilt-y) * attr(data-depth type(<number>), 0) * 1%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tilt-body,
+  .tilt [data-depth] {
+    transform: none;
+    translate: none;
+    scale: none;
+  }
+}

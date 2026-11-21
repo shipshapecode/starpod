@@ -1,20 +1,36 @@
+import { SearchIcon } from './icons';
 import { isSearchOpen } from './state';
 
-export default function SearchButton() {
+type Props = { variant?: 'rail' | 'tab' };
+
+// Every trigger is marked so the palette can grow out of whichever is on
+// screen, and return to it.
+export default function SearchButton({ variant = 'rail' }: Props) {
+  if (variant === 'tab') {
+    return (
+      <button
+        aria-label="Search episodes"
+        data-search-trigger
+        onClick={() => (isSearchOpen.value = true)}
+        type="button"
+      >
+        <SearchIcon />
+        <span>Search</span>
+      </button>
+    );
+  }
+
   return (
     <button
-      type="button"
-      class="btn"
-      onClick={() => (isSearchOpen.value = true)}
       aria-label="Search episodes (⌘K)"
+      class="search-trigger halo"
+      data-search-trigger
+      onClick={() => (isSearchOpen.value = true)}
+      type="button"
     >
-      <span class="text-light-text-heading flex items-center gap-2 rounded-full px-3 py-2 text-sm dark:text-white">
-        <span class="search-icon h-4 w-4" aria-hidden="true" />
-        <span class="hidden sm:inline">Search</span>
-        <kbd class="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 text-xs bg-light-card dark:bg-dark-card rounded border border-light-input-border dark:border-dark-input-border">
-          <span class="text-xs">⌘</span>K
-        </kbd>
-      </span>
+      <SearchIcon size={18} />
+      <span>Search episodes</span>
+      <kbd>⌘K</kbd>
     </button>
   );
 }
