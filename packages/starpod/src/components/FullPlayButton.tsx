@@ -1,82 +1,90 @@
-import type { JSX } from 'preact/jsx-runtime';
+import { useLayoutEffect, useRef, useState } from 'preact/hooks';
 
-import { currentEpisode, isPlaying } from './state';
+import { startEngine } from './media/engine';
+import PlayGlyph from './media/PlayGlyph';
+import PlayToggle from './media/PlayToggle';
+import { resumePoint } from './media/position';
+import { formatClock } from '../utils/playable';
+import {
+  currentEpisode,
+  isPlaying,
+  playEpisode,
+  type PlayableEpisode
+} from './state';
 
 type Props = {
-  episode: (typeof currentEpisode)['value'];
+  episode: PlayableEpisode | null;
+  /**
+   * `row`: the round play disc on an episode card. `disc`: the large disc
+   * over featured media. `pill`: a labelled primary button that offers to
+   * resume where the visitor left off.
+   */
+  look?: 'row' | 'disc' | 'pill';
 };
 
-const PlayIcon = (
-  <svg
-    class="h-2 w-2"
-    fill="none"
-    height="14"
-    viewBox="0 0 11 14"
-    width="13"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      clip-rule="evenodd"
-      d="m.367882.443158c0-.065142.07026-.106046.126866-.073861l11.541952 6.562623c.0573.03256.0573.11515 0 .14772l-11.541949 6.56266c-.056606.0321-.126865-.0088-.126865-.0739z"
-      fill="currentColor"
-      fill-rule="evenodd"
-    />
-  </svg>
-);
+/**
+ * A play control for one episode. Marks its card (`[data-episode-row]`) as
+ * current (the lit room / the speaking line) while that episode is loaded,
+ * and as playing while it plays.
+ */
+export default function FullPlayButton({ episode, look = 'row' }: Props) {
+  const button = useRef<HTMLButtonElement>(null);
+  const [resumeAt, setResumeAt] = useState(0);
 
-const PauseIcon = (
-  <svg
-    class="h-2 w-2"
-    fill="none"
-    height="18"
-    viewBox="0 0 14 18"
-    width="14"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g fill="currentColor">
-      <rect height="16.8" rx="1.07692" width="5.6" y=".799805" />
-      <rect height="16.8" rx="1.07692" width="5.6" x="8.40039" y=".799805" />
-    </g>
-  </svg>
-);
+  const isCurrent =
+    Boolean(episode) && episode!.id === currentEpisode.value?.id;
 
-function renderIcon(icon: JSX.Element, key?: string) {
-  return <span key={key}>{icon}</span>;
-}
+  // Read again when it stops being current: it has just been played.
+  useLayoutEffect(() => {
+    startEngine();
+    if (episode && look === 'pill') {
+      setResumeAt(resumePoint(episode.id));
+    }
+  }, [episode, look, isCurrent]);
 
-export default function FullPlayButton({ episode }: Props) {
+  const playing = isCurrent && isPlaying.value;
+
+  useLayoutEffect(() => {
+    const row = button.current?.closest<HTMLElement>('[data-episode-row]');
+    row?.toggleAttribute('data-current', isCurrent);
+    row?.toggleAttribute('data-playing', playing);
+  });
+
   if (!episode) {
     return null;
   }
 
-  const isCurrentEpisode = episode.id === currentEpisode.value?.id;
-  const showPauseIcon = isCurrentEpisode && isPlaying.value;
+  if (look === 'pill') {
+    const resume = !isCurrent && resumeAt > 0;
+    return (
+      <button
+        class="button-primary"
+        onClick={() => playEpisode(episode)}
+        ref={button}
+        type="button"
+      >
+        <PlayGlyph playing={playing} size={18} />
+        <span>
+          {playing
+            ? 'Pause episode'
+            : resume
+              ? `Resume at ${formatClock(resumeAt)}`
+              : 'Play episode'}
+        </span>
+      </button>
+    );
+  }
 
   return (
-    <button
-      class="btn"
-      onClick={() => {
-        currentEpisode.value = {
-          audio: episode.audio,
-          episodeNumber: episode.episodeNumber,
-          id: episode.id,
-          title: episode.title
-        };
-
-        isPlaying.value = isCurrentEpisode ? !isPlaying.value : true;
-      }}
-    >
-      <span class="text-light-text-heading flex w-full items-center rounded-full p-2 pr-4 dark:text-white">
-        <span class="bg-light-text-heading dark:text-dark-button mr-3 flex h-7 w-7 items-center justify-center rounded-full text-white dark:bg-white">
-          {showPauseIcon
-            ? renderIcon(PauseIcon, 'pause')
-            : renderIcon(PlayIcon, 'play')}
-        </span>
-        {showPauseIcon ? 'Pause' : 'Play'} Episode
-        <span class="sr-only">
-          (press to {showPauseIcon ? 'pause' : 'play'})
-        </span>
-      </span>
-    </button>
+    <PlayToggle
+      buttonRef={button}
+      class={look === 'disc' ? 'stage-play' : 'row-play halo'}
+      episode={episode}
+      labelFor={(on) =>
+        `${on ? 'Pause' : 'Play'} episode ${episode.episodeNumber}: ${episode.title}`
+      }
+      onAir={look === 'row'}
+      size={look === 'disc' ? 30 : 18}
+    />
   );
 }

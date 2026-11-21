@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/preact';
+import { fireEvent, render, screen } from '@testing-library/preact';
 import { beforeEach, describe, expect, it } from 'vitest';
 import FullPlayButton from 'starpod/src/components/FullPlayButton';
 import { currentEpisode, isPlaying } from 'starpod/src/components/state';
@@ -28,126 +28,61 @@ describe('FullPlayButton', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders play button when not playing', () => {
+  it('names the episode it plays', () => {
     render(<FullPlayButton episode={mockEpisode} />);
-
-    const button = screen.getByRole('button');
-    expect(button).toBeInTheDocument();
-    expect(screen.getByText('Play Episode')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Play episode 1: Test Episode' })
+    ).toBeInTheDocument();
   });
 
-  it('renders pause button when playing current episode', () => {
-    currentEpisode.value = mockEpisode;
-    isPlaying.value = true;
-
+  it('starts the episode when clicked', () => {
     render(<FullPlayButton episode={mockEpisode} />);
+    fireEvent.click(screen.getByRole('button'));
 
-    expect(screen.getByText('Pause Episode')).toBeInTheDocument();
-  });
-
-  it('starts playing when clicked on a new episode', () => {
-    render(<FullPlayButton episode={mockEpisode} />);
-
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
-
-    expect(currentEpisode.value).toEqual({
-      id: mockEpisode.id,
-      title: mockEpisode.title,
-      audio: mockEpisode.audio,
-      episodeNumber: mockEpisode.episodeNumber
-    });
+    expect(currentEpisode.value?.id).toBe('test-episode-1');
     expect(isPlaying.value).toBe(true);
   });
 
-  it('toggles play/pause when clicked on current episode', () => {
-    currentEpisode.value = {
-      id: mockEpisode.id,
-      title: mockEpisode.title,
-      audio: mockEpisode.audio,
-      episodeNumber: mockEpisode.episodeNumber
-    };
+  it('pauses when the current episode is playing', () => {
+    currentEpisode.value = mockEpisode;
     isPlaying.value = true;
-
     render(<FullPlayButton episode={mockEpisode} />);
 
-    const button = screen.getByRole('button');
+    const button = screen.getByRole('button', { name: /^Pause episode 1/ });
     fireEvent.click(button);
-
     expect(isPlaying.value).toBe(false);
   });
 
-  it('switches to new episode when clicked while another episode is playing', () => {
-    currentEpisode.value = {
-      id: mockEpisode.id,
-      title: mockEpisode.title,
-      audio: mockEpisode.audio,
-      episodeNumber: mockEpisode.episodeNumber
-    };
+  it('switches to a different episode and plays it', () => {
+    currentEpisode.value = mockEpisode;
     isPlaying.value = true;
-
     render(<FullPlayButton episode={mockEpisode2} />);
 
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
-
-    expect(currentEpisode.value).toEqual({
-      id: mockEpisode2.id,
-      title: mockEpisode2.title,
-      audio: mockEpisode2.audio,
-      episodeNumber: mockEpisode2.episodeNumber
-    });
+    fireEvent.click(screen.getByRole('button'));
+    expect(currentEpisode.value?.id).toBe('test-episode-2');
     expect(isPlaying.value).toBe(true);
   });
 
-  it('has proper accessibility attributes', () => {
-    render(<FullPlayButton episode={mockEpisode} />);
-
-    const button = screen.getByRole('button');
-    expect(button).toBeInTheDocument();
-
-    const srOnly = screen.getByText('(press to play)');
-    expect(srOnly).toBeInTheDocument();
-    expect(srOnly).toHaveClass('sr-only');
+  it('offers a labelled play, and to resume where the visitor stopped', () => {
+    localStorage.setItem('starpod:pos:test-episode-2', '754');
+    render(<FullPlayButton episode={mockEpisode} look="pill" />);
+    render(<FullPlayButton episode={mockEpisode2} look="pill" />);
+    expect(
+      screen.getByRole('button', { name: 'Play episode' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Resume at 12:34' })
+    ).toBeInTheDocument();
+    localStorage.removeItem('starpod:pos:test-episode-2');
   });
 
-  it('updates accessibility text for pause state', () => {
-    currentEpisode.value = {
-      id: mockEpisode.id,
-      title: mockEpisode.title,
-      audio: mockEpisode.audio,
-      episodeNumber: mockEpisode.episodeNumber
-    };
-    isPlaying.value = true;
-
-    render(<FullPlayButton episode={mockEpisode} />);
-
-    const srOnly = screen.getByText('(press to pause)');
-    expect(srOnly).toBeInTheDocument();
-    expect(srOnly).toHaveClass('sr-only');
-  });
-
-  it('sets currentEpisode with only required fields', () => {
-    const episodeWithExtraFields = {
-      ...mockEpisode,
-      extraField: 'should not be included',
-      published: 1234567890,
-      description: 'Episode description'
-    };
-
-    render(<FullPlayButton episode={episodeWithExtraFields} />);
-
-    const button = screen.getByRole('button');
-    fireEvent.click(button);
-
-    expect(currentEpisode.value).toEqual({
-      id: mockEpisode.id,
-      title: mockEpisode.title,
-      audio: mockEpisode.audio,
-      episodeNumber: mockEpisode.episodeNumber
-    });
-    expect(currentEpisode.value).not.toHaveProperty('extraField');
-    expect(currentEpisode.value).not.toHaveProperty('published');
-    expect(currentEpisode.value).not.toHaveProperty('description');
+  it('marks its row as current while its episode is loaded', () => {
+    currentEpisode.value = mockEpisode;
+    const { container } = render(
+      <li data-episode-row>
+        <FullPlayButton episode={mockEpisode} />
+      </li>
+    );
+    expect(container.querySelector('li')).toHaveAttribute('data-current');
   });
 });
