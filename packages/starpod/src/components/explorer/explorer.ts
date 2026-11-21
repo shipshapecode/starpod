@@ -1814,7 +1814,7 @@ export function startExplorer() {
         }
         open = next;
         root.toggleAttribute('data-open', Boolean(next));
-        requestAnimationFrame(mendAnchors);
+        mendAnchors();
       },
       {
         place: () => {
@@ -2139,7 +2139,18 @@ export function startExplorer() {
   marker.setAttribute('aria-hidden', 'true');
   stage.append(marker);
   let anchorFix = 0;
+  // Measured in a frame, never in the scroll event itself: Chromium moves
+  // anchored boxes for a scroll a frame later, and read early the marker
+  // shows a gap that isn't there. A new fix is taken only once two frames
+  // in a row agree on it.
+  let mendFrame = 0;
+  let pendingFix: number | null = null;
   function mendAnchors() {
+    cancelAnimationFrame(mendFrame);
+    mendFrame = requestAnimationFrame(measureAnchors);
+  }
+  function measureAnchors() {
+    mendFrame = 0;
     const gap =
       open && cuArt
         ? Math.round(
@@ -2149,17 +2160,27 @@ export function startExplorer() {
         : 0;
     // A pixel either way is a sticky offset's rounding, not a gap.
     const fix = Math.abs(gap) > 1 ? gap : 0;
-    if (fix !== anchorFix) {
-      anchorFix = fix;
-      if (fix) {
-        stage.style.setProperty('--xp-cu-fix', `${fix}px`);
-      } else {
-        stage.style.removeProperty('--xp-cu-fix');
-      }
+    if (fix === anchorFix) {
+      pendingFix = null;
+      return;
+    }
+    if (pendingFix !== fix) {
+      pendingFix = fix;
+      mendAnchors();
+      return;
+    }
+    pendingFix = null;
+    anchorFix = fix;
+    if (fix) {
+      stage.style.setProperty('--xp-cu-fix', `${fix}px`);
+    } else {
+      stage.style.removeProperty('--xp-cu-fix');
     }
   }
-  addEventListener('scroll', mendAnchors, { passive: true, signal });
-  addEventListener('resize', mendAnchors, { passive: true, signal });
+  for (const type of ['scroll', 'scrollend', 'resize']) {
+    addEventListener(type, mendAnchors, { passive: true, signal });
+  }
+  signal.addEventListener('abort', () => cancelAnimationFrame(mendFrame));
 
   // A card's controls carry a scroll margin that clears the sticky toolbar
   // and the dock (explorer.css). Chromium honours it when focus scrolls a
