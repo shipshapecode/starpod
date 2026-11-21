@@ -109,6 +109,12 @@ export function moveInQueue(id: string, index: number) {
 
 /** Play the first queued episode. False when the queue is empty. */
 export function playNext() {
+  // The episode that just ended may still be waiting in Up next (chosen from
+  // a transcript line, say): it is done, so it leaves rather than replays.
+  const ended = currentEpisode.value?.id;
+  if (ended) {
+    dequeue(ended);
+  }
   const next = queue.value[0];
   if (next) {
     playEpisode(next);

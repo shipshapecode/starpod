@@ -105,12 +105,20 @@ function useFlip(
 export default function LiveScript({ episode }: Props) {
   const [cues, setCues] = useState<Array<TranscriptCue> | null>(null);
 
-  // Fetched as hydration completes, not after the next frame.
+  // Fetched as hydration completes, not after the next frame; again for a
+  // new episode, whose lines replace the last one's (a reply for the old one
+  // arriving late is dropped).
   useLayoutEffect(() => {
-    if (cues || !episode.slug) {
+    if (!episode.slug) {
+      setCues([]);
       return;
     }
-    void loadCues(episode.slug).then(setCues);
+    let current = true;
+    setCues(null);
+    void loadCues(episode.slug).then((next) => current && setCues(next));
+    return () => {
+      current = false;
+    };
   }, [episode.slug]);
 
   const list = useRef<HTMLOListElement>(null);

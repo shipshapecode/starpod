@@ -16,7 +16,7 @@ import {
 } from '../state';
 import { formatClock } from '../../utils/playable';
 import { startEngine, watchStage } from './engine';
-import { readPosition } from './position';
+import { resumePoint } from './position';
 import MediumSwitch from './MediumSwitch';
 
 type Props = {
@@ -38,10 +38,11 @@ export default function StageControls({ episode, part }: Props) {
   const watching = isCurrent && activeMedium.value === 'watch';
   const buffering = playing && isBuffering.value;
 
+  // Read again when it stops being current: it has just been played.
   useLayoutEffect(() => {
     startEngine();
-    setResumeAt(readPosition(episode.id));
-  }, [episode.id]);
+    setResumeAt(resumePoint(episode.id));
+  }, [episode.id, isCurrent]);
 
   // Reflect state on the stage so CSS can stage the light, swap artwork for
   // video, and pin the frame while watching.
@@ -66,7 +67,7 @@ export default function StageControls({ episode, part }: Props) {
     return part === 'overlay' && isCurrent && room ? watchStage(room) : undefined;
   }, [isCurrent, part]);
 
-  const label = playing ? 'Pause' : resumeAt > 30 && !isCurrent ? 'Resume' : 'Play';
+  const label = playing ? 'Pause' : resumeAt > 0 && !isCurrent ? 'Resume' : 'Play';
 
   if (part === 'overlay') {
     return (
@@ -75,11 +76,11 @@ export default function StageControls({ episode, part }: Props) {
           class="stage-play"
           episode={episode}
           labelFor={(playing) =>
-            `${playing ? 'Pause' : resumeAt > 30 && !isCurrent ? 'Resume' : 'Play'} episode ${episode.episodeNumber}: ${episode.title}`
+            `${playing ? 'Pause' : resumeAt > 0 && !isCurrent ? 'Resume' : 'Play'} episode ${episode.episodeNumber}: ${episode.title}`
           }
           size={30}
         />
-        {!isCurrent && resumeAt > 30 && (
+        {!isCurrent && resumeAt > 0 && (
           <span class="stage-resume">Resume at {formatClock(resumeAt)}</span>
         )}
       </span>

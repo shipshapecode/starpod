@@ -37,9 +37,12 @@ export function startStageLight(getVideo: () => HTMLVideoElement | null) {
       return;
     }
     if (video.readyState >= 2) {
-      context.globalAlpha = canvas.dataset.lit ? BLEND : 1;
+      // The first frame lands whole; each after blends in (data-lit is a
+      // flag, so it is its presence that counts: its value is '').
+      const lit = 'lit' in canvas.dataset;
+      context.globalAlpha = lit ? BLEND : 1;
       context.drawImage(video, 0, 0, WIDTH, HEIGHT);
-      if (!canvas.dataset.lit) {
+      if (!lit) {
         canvas.dataset.lit = '';
       }
     }
