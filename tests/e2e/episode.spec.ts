@@ -390,14 +390,19 @@ test.describe('episode page navigation', () => {
           return Math.round(top - bar.bottom);
         }, href);
       // Where it settles: the same for 400ms, so a late re-aim can't pass.
+      // Within a pixel of 16: WebKit scrolls by whole pixels and the bar's
+      // edge can fall between two, so it lands a rounding either side.
       const settled = (href: string) =>
         expect
           .poll(async () => {
             const before = await underBar(href);
             await page.waitForTimeout(400);
-            return (await underBar(href)) === before ? before : NaN;
+            const after = await underBar(href);
+            return after === before && Math.abs(after - 16) <= 1
+              ? 'under the bar'
+              : `${after}px`;
           })
-          .toBe(16);
+          .toBe('under the bar');
 
       await page.goto(page239);
       const hrefs = await nav
