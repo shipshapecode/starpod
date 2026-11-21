@@ -32,7 +32,7 @@ import {
   reducedMotion,
   type FlipRect
 } from '../../motion/propflip';
-import { readPosition } from '../media/position';
+import { readPosition, resumePoint } from '../media/position';
 import {
   currentEpisode,
   dequeue,
@@ -1572,8 +1572,9 @@ export function startExplorer() {
   }
 
   function fillResume(card: Card) {
-    const seconds = readPosition(card.li.dataset.id!);
-    resume.hidden = seconds < 30;
+    // Shown only where Play would pick up (the engine's rule).
+    const seconds = resumePoint(card.li.dataset.id!);
+    resume.hidden = !seconds;
     // (A phone's close-up leaves out the long part: explorer.css.)
     const rest = document.createElement('span');
     rest.className = 'xp-long';
