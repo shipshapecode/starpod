@@ -61,10 +61,6 @@
     var(--also, visibility 0s);
 }
 
-/* "turn the transition off": only the 4 props, layout transitions keep running */
-.PropFLIP.flip-hold {
-  transition: var(--also, visibility 0s);
-}
 
 /* UnSquish: opted-in direct children undo the parent's scale, read through
    the relay (above). Set --ox/--oy to the child's offset from the corner it

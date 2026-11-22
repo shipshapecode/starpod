@@ -262,6 +262,17 @@ describe('getRssTranscriptText', () => {
     expect(text).toBe('First paragraph.\n\nSecond paragraph.');
   });
 
+  it('escapes decoded cue text, so the markdown carries no HTML', async () => {
+    mockFetch({
+      body: 'WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nUse &lt;img src=x onerror=alert(1)&gt; &amp; see',
+      contentType: 'text/vtt'
+    });
+
+    expect(await getRssTranscriptText(makeEpisode({ transcriptType: 'text/vtt' }))).toBe(
+      'Use &lt;img src=x onerror=alert(1)&gt; &amp; see'
+    );
+  });
+
   it('returns null when there is no usable transcript', async () => {
     const episode = makeEpisode({ transcriptUrl: undefined });
 
@@ -335,6 +346,9 @@ describe('parseCues', () => {
     expect(
       parseCues('1\n00:00:01,000 --> 00:00:02,000\n<font color="yellow">Hello</font>, <font face="serif">you</font>')
     ).toEqual([{ start: 1, text: 'Hello, you' }]);
+    expect(
+      parseCues('1\n00:00:01,000 --> 00:00:02,000\n<I>Hello</I> <SPAN>there</SPAN><br>my<BR />friend')
+    ).toEqual([{ start: 1, text: 'Hello there my friend' }]);
   });
 
   it('decodes each reference once', () => {

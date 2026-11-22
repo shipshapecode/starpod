@@ -59,46 +59,6 @@ function setProps(el: HTMLElement, { tx, ty, sx, sy }: FlipProps) {
   el.style.setProperty('--sy', String(sy));
 }
 
-/**
- * The batch from the article: measure First, hold the transition, change the
- * DOM, measure, invert, release.
- *
- * Targets must not nest: each is inverted on its own, so a child flipped with
- * its parent would carry the parent's invert twice. "First" is the visual rect, so calling this
- * mid-flight just works. The invert is measured against the layout as it is
- * right after the change, so anything Anchored Auto Layout is already
- * transitioning (width, height, left, top) reads as "no difference" and
- * PropFLIP only animates what's left over.
- */
-export function propFlip(targets: Iterable<HTMLElement>, mutate: () => void) {
-  const els = [...targets];
-  const first = els.map((el) => el.getBoundingClientRect());
-
-  els.forEach((el) => el.classList.add('flip-hold'));
-  mutate();
-
-  els.forEach((el, i) => {
-    const f = first[i]!;
-    const now = el.getBoundingClientRect();
-    if (!f.width || !now.width) {
-      return; // entering or leaving, nothing to flip
-    }
-    setProps(el, {
-      tx: f.left - now.left,
-      ty: f.top - now.top,
-      sx: f.width / now.width,
-      sy: f.height / now.height
-    });
-  });
-
-  void document.body.offsetHeight; // commit the lie
-
-  els.forEach((el) => {
-    el.classList.remove('flip-hold');
-    setProps(el, IDENTITY);
-  });
-}
-
 const IDENTITY: FlipProps = { tx: 0, ty: 0, sx: 1, sy: 1 };
 
 /** True when the visitor (or `<html data-motion="reduce">`) asks for less motion. */
@@ -175,14 +135,14 @@ function commit(moves: FlipMove[]) {
     return;
   }
   // Hold only the flip's own four: whatever its `--also` lists (a layout
-  // transition the update just started) keeps running, as .flip-hold does.
+  // transition the update just started) keeps running.
   for (const { el, first, last } of moves) {
     el.style.transition = 'var(--also, visibility 0s)';
     setProps(el, {
       tx: first.left - last.left,
       ty: first.top - last.top,
-      sx: first.width / last.width || 1,
-      sy: first.height / last.height || 1
+      sx: last.width ? first.width / last.width : 1,
+      sy: last.height ? first.height / last.height : 1
     });
   }
   void document.body.offsetHeight; // commit the lie
@@ -196,11 +156,12 @@ function commit(moves: FlipMove[]) {
 }
 
 /**
- * Where propFlip() cancels a running transition to measure, flip() never
- * does: it reads each element's live --tx/--ty/--sx/--sy, strips that
+ * A flip never cancels a running transition to measure: it reads each element's live --tx/--ty/--sx/--sy, strips that
  * transform from its rect to find the layout box, then inverts from the exact
  * pixels on screen. Elements already in flight never get a stagger re-applied.
- * As with propFlip(), targets must not nest.
+ *
+ * Targets must not nest: each is inverted on its own, so a child flipped with
+ * its parent would carry the parent's invert twice.
  */
 export function flip(
   targets: Iterable<HTMLElement | null | undefined>,
@@ -261,6 +222,10 @@ export function flipFrom(el: HTMLElement, first: FlipRect, frame?: Element | nul
     return;
   }
   const last = strip(rect(el, frame), props(el));
+  // Nothing to scale from or to: a box with no size isn't on screen.
+  if (!first.width || !first.height || !last.width || !last.height) {
+    return;
+  }
   commit([{ el, first, last }]);
 }
 

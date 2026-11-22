@@ -177,6 +177,13 @@ describe('speakerFor', () => {
     expect(speakerFor('Rob Wagner', ['Robbie James Wagner Jr'])).toBe('Robbie James Wagner Jr');
   });
 
+  it('takes a short surname or an initial once the first names agree', () => {
+    expect(speakerFor('Jen Lee', ['Jennifer Lee'])).toBe('Jennifer Lee');
+    expect(speakerFor('Adam Argyle', ['Adam A.', 'Adam R.'])).toBe('Adam A.');
+    // Not without them: a short surname alone pairs no strangers.
+    expect(matchNames(['Jen Lee'], ['Bruce Lee'], { surnames: true }).size).toBe(0);
+  });
+
   it('leaves someone who never speaks unmatched', () => {
     expect(speakerFor('Dave Rupert', speakers)).toBeUndefined();
   });

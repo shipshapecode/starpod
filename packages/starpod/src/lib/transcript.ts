@@ -1,4 +1,4 @@
-import { decodeEntities } from './entities';
+import { decodeEntities, escapeHtml } from './entities';
 import type { Episode } from './rss';
 
 // Roughly how many characters to accumulate before starting a new paragraph
@@ -132,8 +132,10 @@ export async function getRssTranscriptText(
   episode: Episode
 ): Promise<string | null> {
   const paragraphs = await getRssTranscriptParagraphs(episode);
+  // Cue text comes back decoded, so a transcript's escaped `&lt;img …&gt;` is
+  // a real `<` by now: escape it again so the markdown can't carry HTML.
   return paragraphs?.length
-    ? paragraphs.map((paragraph) => paragraph.text).join('\n\n')
+    ? paragraphs.map((paragraph) => escapeHtml(paragraph.text)).join('\n\n')
     : null;
 }
 
@@ -184,12 +186,13 @@ function parseTranscript(
   return stripped ? splitParagraphs(stripped) : null;
 }
 
-// What a cue's markup looks like: a WebVTT class, italic, bold, underline,
-// ruby, voice or language span (`<v Speaker>`, `<c.loud>`, `</i>`…), SRT's
-// `<font color="…">`, or a timestamp (`<00:01:02.500>`). Anything else in
-// angle brackets, like SRT's unescaped "x < 5 and y > 3", is text.
+// What a cue's markup looks like, in any case: a WebVTT class, italic, bold,
+// underline, ruby, voice or language span (`<v Speaker>`, `<c.loud>`,
+// `</i>`…), SRT's `<font color="…">`, a `<span>` or `<br>` some captioners
+// write, or a timestamp (`<00:01:02.500>`). Anything else in angle brackets,
+// like SRT's unescaped "x < 5 and y > 3", is text.
 const CUE_TAG =
-  /<\/?(?:[cibuv]|ruby|rt|lang|font)(?:\.[^\s<>]*)?(?:\s[^<>]*)?>|<(?:\d+:)?\d{2}:\d{2}\.\d{3}>/g;
+  /<\/?(?:[cibuv]|ruby|rt|lang|font|span|br)(?:\.[^\s<>]*)?(?:\s[^<>]*)?\/?>|<(?:\d+:)?\d{2}:\d{2}\.\d{3}>/gi;
 
 /**
  * Parse WebVTT/SRT cue blocks into `{ start, text, speaker }` entries,
@@ -222,7 +225,10 @@ export function parseCues(
     const markup = lines.slice(timingIndex + 1).join(' ').trim();
     const voice = markup.match(/^<v(?:\.[^\s>]*)?\s+([^>]+)>/)?.[1];
     const speaker = voice && decodeEntities(voice).trim();
-    const text = decodeEntities(markup.replace(CUE_TAG, ''))
+    const text = decodeEntities(
+      // A line break becomes a space; any other tag just goes.
+      markup.replace(CUE_TAG, (tag) => (/^<br\b/i.test(tag) ? ' ' : ''))
+    )
       .replace(/\s+/g, ' ')
       .trim();
     if (start !== undefined && text) {

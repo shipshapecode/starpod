@@ -26,3 +26,8 @@ export function decodeEntities(value: string): string {
     }
   );
 }
+
+/** Escape `&`, `<` and `>` so text reads as text in HTML or markdown. */
+export function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}

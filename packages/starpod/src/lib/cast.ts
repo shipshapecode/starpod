@@ -55,13 +55,25 @@ const SUFFIXES = new Set(['jr', 'sr', 'ii', 'iii', 'iv']);
  * Whether two names' tokens after the first share a surname: one name's last
  * (suffixes like "III" aside) appears in the other's. A middle name the two
  * happen to share ("Adam Michael Rackis", "Adam Michael Argyle") is not one.
+ *
+ * Alone, a surname has to be 4 letters or more to count, so short common ones
+ * don't pair strangers. Backing first names that already agree (`firsts`),
+ * any length counts ("Jen Lee" ~ "Jennifer Lee"), and so does an initial
+ * ("Adam A." ~ "Adam Argyle").
  */
-function shareSurname(aRest: Array<string>, bRest: Array<string>) {
+function shareSurname(aRest: Array<string>, bRest: Array<string>, firsts = false) {
   const last = (rest: Array<string>) =>
     rest.filter((token) => !SUFFIXES.has(token)).at(-1) ?? '';
   const a = last(aRest);
   const b = last(bRest);
-  return (a.length >= 4 && bRest.includes(a)) || (b.length >= 4 && aRest.includes(b));
+  if (!a || !b) {
+    return false;
+  }
+  const min = firsts ? 1 : 4;
+  if ((a.length >= min && bRest.includes(a)) || (b.length >= min && aRest.includes(b))) {
+    return true;
+  }
+  return firsts && (a.length === 1 ? b.startsWith(a) : b.length === 1 && a.startsWith(b));
 }
 
 /**
@@ -104,10 +116,10 @@ function likeness(a: string, b: string, surnames: boolean) {
     aFirst.length >= 3 &&
     bFirst.length >= 3 &&
     (aFirst.startsWith(bFirst) || bFirst.startsWith(aFirst));
-  const surname = shareSurname(aRest, bRest);
-  if (firsts && surname) {
+  if (firsts && shareSurname(aRest, bRest, true)) {
     return 3;
   }
+  const surname = shareSurname(aRest, bRest);
   if (firsts && (!aRest.length || !bRest.length)) {
     return 2;
   }
