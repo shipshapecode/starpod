@@ -1,0 +1,99 @@
+/*
+  PropFLIP: FLIP where the invert is four typed custom properties and the
+  play is a CSS transition. Vendored from Adam Argyle's PropFLIP kit
+  (https://nerdy.dev/prop-flip). The script half is ./propflip.ts.
+*/
+@property --tx { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --ty { syntax: "<number>"; inherits: false; initial-value: 0; }
+/* The scale does not inherit: a tween would otherwise restyle the whole
+   subtree every frame. Children that un-squish read it through the relay
+   pair below (see UnSquish). */
+@property --sx { syntax: "<number>"; inherits: false; initial-value: 1; }
+@property --sy { syntax: "<number>"; inherits: false; initial-value: 1; }
+
+/* Starpod departs from the author's kit here. The kit's un-squished
+   children read the parent's scale with `--sx: inherit`, but WebKit does
+   not restyle a child that reads a non-inheriting registered property
+   through `inherit` while the parent's value tweens: the child keeps the
+   counter-scale it was first given (the search palette's text stayed about
+   ten times tall, and its rows missed their clicks). Minimal repro: a
+   parent transitions a registered, non-inheriting --sx from 4 to 1, and its
+   child sets `--sx: inherit; transform: scale(calc(1 / var(--sx)))`. Chrome
+   follows the tween; WebKit stays at the child's first value.
+
+   So the parent relays its scale into this inheriting pair, which its
+   children read, and their children reset it: a flip restyles the box, its
+   children and grandchildren (a handful more elements per frame than the
+   kit in Chrome, measured), never the whole subtree. */
+@property --kid-sx { syntax: "<number>"; inherits: true; initial-value: 1; }
+@property --kid-sy { syntax: "<number>"; inherits: true; initial-value: 1; }
+
+/* Typed so they can tween alongside the flip: --r is the corner radius,
+   --ox/--oy are an unsquished child's offset from its parent's corner. */
+@property --r  { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --ox { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --oy { syntax: "<length>"; inherits: false; initial-value: 0px; }
+
+:root {
+  --flip-dx: 0.6s;
+  --flip-dy: 0.6s;
+  --flip-ds: 0.6s;
+  --flip-ex: ease;
+  --flip-ey: ease;
+  --flip-es: ease;
+  --slomo: 1;
+}
+
+.PropFLIP {
+  transform:
+    translate(calc(var(--tx) * 1px), calc(var(--ty) * 1px))
+    scale(var(--sx), var(--sy));
+  transform-origin: top left;
+  border-radius: calc(var(--r) / var(--sx)) / calc(var(--r) / var(--sy));
+  /* --also is where layout transitions join the list (width/height for the
+     hybrid, left/top too for a pure anchored glide). They must live in this
+     one list so holding the flip doesn't cancel them. */
+  transition:
+    --tx calc(var(--flip-dx) * var(--slomo)) var(--flip-ex) calc(var(--flip-delay, 0s) * var(--slomo)),
+    --ty calc(var(--flip-dy) * var(--slomo)) var(--flip-ey) calc(var(--flip-delay, 0s) * var(--slomo)),
+    --sx calc(var(--flip-ds) * var(--slomo)) var(--flip-es) calc(var(--flip-delay, 0s) * var(--slomo)),
+    --sy calc(var(--flip-ds) * var(--slomo)) var(--flip-es) calc(var(--flip-delay, 0s) * var(--slomo)),
+    var(--also, visibility 0s);
+}
+
+
+/* UnSquish: opted-in direct children undo the parent's scale, read through
+   the relay (above). Set --ox/--oy to the child's offset from the corner it
+   hangs off. */
+.PropFLIP:has(> [data-unsquish]) { --kid-sx: var(--sx); --kid-sy: var(--sy); }
+.PropFLIP > [data-unsquish] {
+  transform-origin: top left;
+  transform:
+    translate(calc(var(--ox) / var(--kid-sx) - var(--ox)), calc(var(--oy) / var(--kid-sy) - var(--oy)))
+    scale(calc(1 / var(--kid-sx)), calc(1 / var(--kid-sy)));
+}
+.PropFLIP > [data-unsquish="br"] {
+  transform-origin: bottom right;
+  transform:
+    translate(calc(var(--ox) - var(--ox) / var(--kid-sx)), calc(var(--oy) - var(--oy) / var(--kid-sy)))
+    scale(calc(1 / var(--kid-sx)), calc(1 / var(--kid-sy)));
+}
+/* Zero specificity, so a nested box's own relay wins. */
+:where(.PropFLIP > [data-unsquish] > *) { --kid-sx: 1; --kid-sy: 1; }
+
+/* The post's own spelling of the two fixes, as opt-in classes:
+   .fix-radius keeps corners round (set --r), .fix-kids un-squishes every
+   direct child (set --p to the padding they sit at, 0 for a full-bleed wrapper). */
+.fix-radius { --r: 12px; }
+.fix-kids { --kid-sx: var(--sx); --kid-sy: var(--sy); }
+.fix-kids > * {
+  transform-origin: top left;
+  transform:
+    translate(calc(var(--p, 0px) / var(--kid-sx) - var(--p, 0px)), calc(var(--p, 0px) / var(--kid-sy) - var(--p, 0px)))
+    scale(calc(1 / var(--kid-sx)), calc(1 / var(--kid-sy)));
+}
+:where(.fix-kids > * > *) { --kid-sx: 1; --kid-sy: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --slomo: 0; }
+}

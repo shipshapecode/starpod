@@ -1,3 +1,4 @@
+import { decodeEntities, escapeHtml } from './entities';
 import type { Episode } from './rss';
 
 // Roughly how many characters to accumulate before starting a new paragraph
@@ -131,8 +132,10 @@ export async function getRssTranscriptText(
   episode: Episode
 ): Promise<string | null> {
   const paragraphs = await getRssTranscriptParagraphs(episode);
+  // Cue text comes back decoded, so a transcript's escaped `&lt;img …&gt;` is
+  // a real `<` by now: escape it again so the markdown can't carry HTML.
   return paragraphs?.length
-    ? paragraphs.map((paragraph) => paragraph.text).join('\n\n')
+    ? paragraphs.map((paragraph) => escapeHtml(paragraph.text)).join('\n\n')
     : null;
 }
 
@@ -183,15 +186,28 @@ function parseTranscript(
   return stripped ? splitParagraphs(stripped) : null;
 }
 
+// What a cue's markup looks like, in any case: a WebVTT class, italic, bold,
+// underline, ruby, voice or language span (`<v Speaker>`, `<c.loud>`,
+// `</i>`…), SRT's `<font color="…">`, a `<span>` or `<br>` some captioners
+// write, or a timestamp (`<00:01:02.500>`). Anything else in angle brackets,
+// like SRT's unescaped "x < 5 and y > 3", is text.
+const CUE_TAG =
+  /<\/?(?:[cibuv]|ruby|rt|lang|font|span|br)(?:\.[^\s<>]*)?(?:\s[^<>]*)?\/?>|<(?:\d+:)?\d{2}:\d{2}\.\d{3}>/gi;
+
 /**
- * Parse WebVTT/SRT cue blocks into `{ start, text }` entries, preserving the
- * start time (in seconds) of each cue. Blocks without a `-->` timing line
- * (e.g. the `WEBVTT` header) are skipped.
+ * Parse WebVTT/SRT cue blocks into `{ start, text, speaker }` entries,
+ * preserving the start time (in seconds) of each cue. Blocks without a `-->`
+ * timing line (e.g. the `WEBVTT` header) are skipped.
+ *
+ * The text comes back plain, ready to render once: a WebVTT voice span
+ * (`<v Speaker>…`) gives the speaker, every tag is dropped, and only then are
+ * character references (`&amp;`, `&lt;`…) decoded, so escaped text can never
+ * turn into a tag.
  */
 export function parseCues(
   raw: string
-): Array<{ text: string; start: number }> {
-  const cues: Array<{ text: string; start: number }> = [];
+): Array<{ text: string; start: number; speaker?: string }> {
+  const cues: Array<{ text: string; start: number; speaker?: string }> = [];
 
   for (const block of raw.replace(/\r\n/g, '\n').split(/\n{2,}/)) {
     const lines = block
@@ -206,9 +222,17 @@ export function parseCues(
     const start = parseCueStart(lines[timingIndex]);
     // Cue text is everything after the timing line (the numeric index and any
     // cue identifier come before it).
-    const text = lines.slice(timingIndex + 1).join(' ').trim();
+    const markup = lines.slice(timingIndex + 1).join(' ').trim();
+    const voice = markup.match(/^<v(?:\.[^\s>]*)?\s+([^>]+)>/)?.[1];
+    const speaker = voice && decodeEntities(voice).trim();
+    const text = decodeEntities(
+      // A line break becomes a space; any other tag just goes.
+      markup.replace(CUE_TAG, (tag) => (/^<br\b/i.test(tag) ? ' ' : ''))
+    )
+      .replace(/\s+/g, ' ')
+      .trim();
     if (start !== undefined && text) {
-      cues.push({ text, start });
+      cues.push(speaker ? { text, start, speaker } : { text, start });
     }
   }
 
