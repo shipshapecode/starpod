@@ -10,14 +10,28 @@ const cache = new Map<string, Promise<Array<TranscriptCue>>>();
 export function loadCues(slug: string): Promise<Array<TranscriptCue>> {
   let request = cache.get(slug);
   if (!request) {
-    request = fetch(`/api/cues/${slug}.json`)
-      .then((response) => (response.ok ? response.json() : []))
+    // The endpoint answers every episode, with [] when it has no transcript,
+    // so a failure is the network's or the server's: forget it, and the next
+    // reader asks again.
+    const attempt: Promise<Array<TranscriptCue>> = fetch(`/api/cues/${slug}.json`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`cues: ${response.status}`);
+        }
+        return response.json();
+      })
       // cueIndexAt() searches by start time: not every transcript source
       // lists its lines in order.
       .then((cues: Array<TranscriptCue>) =>
         Array.isArray(cues) ? [...cues].sort((a, b) => a.s - b.s) : []
       )
-      .catch(() => []);
+      .catch(() => {
+        if (cache.get(slug) === attempt) {
+          cache.delete(slug);
+        }
+        return [];
+      });
+    request = attempt;
     cache.set(slug, request);
   }
   return request;

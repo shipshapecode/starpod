@@ -15,17 +15,24 @@ vi.mock('../../packages/starpod/node_modules/hls.js', () => {
   return { default: FakeHls };
 });
 
-import { startEngine } from 'starpod/src/components/media/engine';
+import { setRate, startEngine } from 'starpod/src/components/media/engine';
 import { POSITION_PREFIX } from 'starpod/src/components/media/position';
 import { currentEpisode, isPlaying, seekTo, setMedium } from 'starpod/src/components/state';
 
-const episode = (id: string, video = false) => ({
+const episode = (id: string, video: false | 'hls' | 'mp4' | true = false) => ({
   id,
   title: id,
   audio: { src: `https://cdn.example/${id}.mp3`, type: 'audio/mpeg' },
-  ...(video ? { video: { src: `https://cdn.example/${id}.m3u8`, type: 'application/x-mpegURL' } } : {}),
+  ...(video === 'mp4'
+    ? { video: { src: `https://cdn.example/${id}.mp4`, type: 'video/mp4' } }
+    : video
+      ? { video: { src: `https://cdn.example/${id}.m3u8`, type: 'application/x-mpegURL' } }
+      : {}),
   episodeNumber: '1'
 });
+
+// The OS media controls (lock screen, Control Center), as the engine registers them.
+const sessionActions = new Map<string, (details: { seekTime?: number }) => void>();
 
 // jsdom has no media pipeline: the element below plays along by hand.
 let video: HTMLVideoElement;
@@ -39,6 +46,23 @@ const load = vi.fn(() => {
 const play = vi.fn(() => Promise.resolve());
 
 beforeAll(() => {
+  Object.defineProperty(navigator, 'mediaSession', {
+    configurable: true,
+    value: {
+      metadata: null,
+      setActionHandler: (action: string, handler: (details: { seekTime?: number }) => void) =>
+        sessionActions.set(action, handler),
+      setPositionState: () => {}
+    }
+  });
+  vi.stubGlobal(
+    'MediaMetadata',
+    class {
+      constructor(init: object) {
+        Object.assign(this, init);
+      }
+    }
+  );
   vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(load);
   vi.spyOn(HTMLMediaElement.prototype, 'play').mockImplementation(play);
   vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => {});
@@ -155,5 +179,58 @@ describe('the engine', () => {
     arrive();
     expect(time).toBe(95);
     expect(isPlaying.value).toBe(true);
+  });
+
+  it('plays a video from a host without CORS by asking again without it', () => {
+    setMedium('watch');
+    currentEpisode.value = episode('no-cors', 'mp4');
+    isPlaying.value = true;
+    expect(video.crossOrigin).toBe('anonymous');
+    fail();
+    expect(video.getAttribute('src')).toBe('https://cdn.example/no-cors.mp4');
+    expect(video.hasAttribute('crossorigin')).toBe(false);
+    expect(isPlaying.value).toBe(true);
+    // The retry is still there for a real failure after that.
+    arrive();
+    fail();
+    expect(video.getAttribute('src')).toBe('https://cdn.example/no-cors.mp4');
+    expect(isPlaying.value).toBe(true);
+  });
+
+  it('keeps the chosen speed through a new source', () => {
+    setRate(1.5);
+    expect(video.defaultPlaybackRate).toBe(1.5);
+    expect(video.playbackRate).toBe(1.5);
+    setRate(1);
+  });
+
+  it('seeks from the lock screen without pressing Play', () => {
+    currentEpisode.value = episode('lock-seek');
+    arrive();
+    sessionActions.get('seekto')!({ seekTime: 42 });
+    expect(time).toBe(42);
+    expect(isPlaying.value).toBe(false);
+  });
+
+  it('holds a retry through the reload, after earlier episode switches', () => {
+    currentEpisode.value = episode('swap-a');
+    isPlaying.value = true;
+    arrive();
+    currentEpisode.value = episode('swap-b');
+    arrive();
+    fail();
+    // A new source clears the error; the reload's pause is not the visitor's.
+    failure = null;
+    video.dispatchEvent(new Event('pause'));
+    expect(isPlaying.value).toBe(true);
+  });
+
+  it('saves the place at once on pause', () => {
+    currentEpisode.value = episode('pause-save');
+    isPlaying.value = true;
+    arrive();
+    time = 103;
+    video.dispatchEvent(new Event('pause'));
+    expect(localStorage.getItem(POSITION_PREFIX + 'pause-save')).toBe('103');
   });
 });

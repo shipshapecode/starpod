@@ -85,6 +85,11 @@ let stoppedAt = 0;
 let playhead: string | null = null;
 /** Fired on the element when a source is ready and its playhead placed. */
 const READY = 'starpod:ready';
+/**
+ * Episodes whose video host refused a CORS request: their video plays
+ * without one (the stage light can't sample it, which costs only its tone).
+ */
+const withoutCors = new Set<string>();
 
 /**
  * The source failed (the element's error, or a fatal hls.js error): reload
@@ -111,11 +116,17 @@ function recover(source = generation) {
     isPlaying.value = false;
     return;
   }
-  recovered = { id: episode.id, at: now };
   const at = video.currentTime > 0 ? video.currentTime : readPosition(episode.id);
   // The failure's own pause or refused play is not the visitor's choice.
   const resume = isPlaying.value;
   loaded = null;
+  // A video asked for with CORS from a host that sends no CORS headers fails
+  // as unsupported. Before spending the retry, ask again without CORS.
+  if (!hls && video.crossOrigin && video.error?.code === 4 && !withoutCors.has(episode.id)) {
+    withoutCors.add(episode.id);
+  } else {
+    recovered = { id: episode.id, at: now };
+  }
   void loadSource(episode, activeMedium.value, { at, resume });
 }
 
@@ -158,12 +169,14 @@ function createElement(): HTMLVideoElement {
     // Only the episode whose source is ready owns the playhead: a source
     // being reset reads 0, which is no one's progress.
     const id = currentEpisode.value?.id;
-    if (id && id === playhead && Math.abs(video.currentTime - lastSaved) > 5) {
-      lastSaved = video.currentTime;
-      savePosition(id, video.currentTime);
+    if (Math.abs(video.currentTime - lastSaved) > 5) {
+      saveProgress();
     }
     updatePositionState();
   });
+  // Playing, the place is saved every few seconds; stopping anywhere, at once.
+  video.addEventListener('seeked', saveProgress);
+  window.addEventListener('pagehide', saveProgress);
   // A seek (skip, scrubber, transcript line) can take a moment to land on a
   // far-off HLS segment, and browsers hold timeupdate until it does. Publish
   // the destination at once so the live transcript and the scrubber follow
@@ -179,6 +192,7 @@ function createElement(): HTMLVideoElement {
   });
   video.addEventListener('play', () => (isPlaying.value = true));
   video.addEventListener('pause', () => {
+    saveProgress();
     // A pause from a failed source is not the visitor's (recover() decides).
     if (!swapping && !video.error) {
       isPlaying.value = false;
@@ -206,6 +220,19 @@ function createElement(): HTMLVideoElement {
   });
 
   return video;
+}
+
+/**
+ * Save the playhead as the current episode's resume point. Only the episode
+ * whose source is ready owns the playhead: a source being reset reads 0,
+ * which is no one's progress.
+ */
+function saveProgress() {
+  const id = currentEpisode.value?.id;
+  if (element && id && id === playhead) {
+    lastSaved = element.currentTime;
+    savePosition(id, element.currentTime);
+  }
 }
 
 function updatePositionState() {
@@ -264,7 +291,6 @@ async function loadSource(
     swapping = true;
     video.removeAttribute('src');
     video.load();
-    video.addEventListener('error', () => (swapping = false), { once: true });
   }
   video.poster = episode.image ?? '';
   video.dataset.medium = medium;
@@ -276,8 +302,12 @@ async function loadSource(
   };
   if (medium === 'watch' && episode.video) {
     // Video frames are sampled for the stage's light (publish.ts), which
-    // needs a CORS-clean picture.
-    video.crossOrigin = 'anonymous';
+    // needs a CORS-clean picture, unless the host has refused CORS (recover).
+    if (withoutCors.has(episode.id)) {
+      video.removeAttribute('crossorigin');
+    } else {
+      video.crossOrigin = 'anonymous';
+    }
     const isHls = /mpegurl/i.test(episode.video.type);
     if (!isHls || canPlayHlsNatively(video)) {
       video.src = episode.video.src;
@@ -347,7 +377,8 @@ function setMediaSession(episode: PlayableEpisode) {
     ['pause', () => (isPlaying.value = false)],
     ['seekbackward', (d) => skip(-(d.seekOffset ?? 15))],
     ['seekforward', (d) => skip(d.seekOffset ?? 30)],
-    ['seekto', (d) => d.seekTime !== undefined && (seekTo.value = d.seekTime)]
+    // A scrub on the lock screen keeps play or pause as it is.
+    ['seekto', (d) => d.seekTime !== undefined && seek(d.seekTime)]
   ];
   for (const [action, handler] of handlers) {
     try {
@@ -405,6 +436,9 @@ export function enterFullscreen() {
 
 export function setRate(rate: number) {
   if (element) {
+    // The default too: loading a new source (Watch/Listen, the next episode,
+    // a retry) resets the rate to it.
+    element.defaultPlaybackRate = rate;
     element.playbackRate = rate;
   }
 }
