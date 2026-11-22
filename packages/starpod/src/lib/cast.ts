@@ -49,6 +49,21 @@ const tokens = (name: string) =>
     .map((token) => token.replace(/[^\p{L}\p{N}]/gu, ''))
     .filter(Boolean);
 
+const SUFFIXES = new Set(['jr', 'sr', 'ii', 'iii', 'iv']);
+
+/**
+ * Whether two names' tokens after the first share a surname: one name's last
+ * (suffixes like "III" aside) appears in the other's. A middle name the two
+ * happen to share ("Adam Michael Rackis", "Adam Michael Argyle") is not one.
+ */
+function shareSurname(aRest: Array<string>, bRest: Array<string>) {
+  const last = (rest: Array<string>) =>
+    rest.filter((token) => !SUFFIXES.has(token)).at(-1) ?? '';
+  const a = last(aRest);
+  const b = last(bRest);
+  return (a.length >= 4 && bRest.includes(a)) || (b.length >= 4 && aRest.includes(b));
+}
+
 /**
  * Do these two names refer to the same person? Loosely: their first names
  * start the same way ("Robbie" ~ "RobbieTheWagner"), or they share a surname
@@ -60,7 +75,7 @@ export function sameName(a: string, b: string) {
   if (aFirst.length >= 3 && bFirst.length >= 3 && (aFirst.startsWith(bFirst) || bFirst.startsWith(aFirst))) {
     return true;
   }
-  return aRest.some((token) => token.length >= 4 && bRest.includes(token));
+  return shareSurname(aRest, bRest);
 }
 
 /**
@@ -89,9 +104,7 @@ function likeness(a: string, b: string, surnames: boolean) {
     aFirst.length >= 3 &&
     bFirst.length >= 3 &&
     (aFirst.startsWith(bFirst) || bFirst.startsWith(aFirst));
-  const surname = aRest.some(
-    (token) => token.length >= 4 && bRest.includes(token)
-  );
+  const surname = shareSurname(aRest, bRest);
   if (firsts && surname) {
     return 3;
   }
@@ -175,7 +188,12 @@ export function matchNames(
  */
 export function matchPageNames(names: Array<string>, speakers: Array<string>) {
   const people: Array<Array<string>> = [];
-  for (const name of new Set(names)) {
+  // Full names first, so each person is grouped before a short alias
+  // ("Adam") that could be either of two of them tries to join one.
+  const longestFirst = [...new Set(names)].sort(
+    (a, b) => tokens(b).length - tokens(a).length
+  );
+  for (const name of longestFirst) {
     const same = people.filter((person) =>
       person.some((other) => likeness(name, other, false) >= 2)
     );

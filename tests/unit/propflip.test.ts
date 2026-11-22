@@ -108,4 +108,25 @@ describe('flip commit', () => {
       ['0', '']
     ]);
   });
+
+  it('resets a held box with transitions off under data-motion="reduce"', () => {
+    const card = box({ left: 0, top: 0 });
+    card.el.style.setProperty('--tx', '-40');
+    const seen: Array<[string, string]> = [];
+    const setProperty = card.el.style.setProperty.bind(card.el.style);
+    card.el.style.setProperty = (name: string, value: string | null) => {
+      if (name === '--tx') {
+        seen.push([value ?? '', card.el.style.transition]);
+      }
+      setProperty(name, value);
+    };
+    document.documentElement.dataset.motion = 'reduce';
+    try {
+      expect(flip([card.el])).toEqual([]);
+    } finally {
+      delete document.documentElement.dataset.motion;
+    }
+    expect(seen).toEqual([['0', 'none']]);
+    expect(card.el.style.transition).toBe('');
+  });
 });

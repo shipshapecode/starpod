@@ -63,7 +63,8 @@ function setProps(el: HTMLElement, { tx, ty, sx, sy }: FlipProps) {
  * The batch from the article: measure First, hold the transition, change the
  * DOM, measure, invert, release.
  *
- * Pass elements parents-first. "First" is the visual rect, so calling this
+ * Targets must not nest: each is inverted on its own, so a child flipped with
+ * its parent would carry the parent's invert twice. "First" is the visual rect, so calling this
  * mid-flight just works. The invert is measured against the layout as it is
  * right after the change, so anything Anchored Auto Layout is already
  * transitioning (width, height, left, top) reads as "no difference" and
@@ -199,6 +200,7 @@ function commit(moves: FlipMove[]) {
  * does: it reads each element's live --tx/--ty/--sx/--sy, strips that
  * transform from its rect to find the layout box, then inverts from the exact
  * pixels on screen. Elements already in flight never get a stagger re-applied.
+ * As with propFlip(), targets must not nest.
  */
 export function flip(
   targets: Iterable<HTMLElement | null | undefined>,
@@ -208,10 +210,16 @@ export function flip(
   const els = [...targets].filter((el): el is HTMLElement => Boolean(el));
   if (reducedMotion()) {
     update();
+    // Reset with transitions off: `data-motion="reduce"` alone doesn't stop
+    // the stylesheet's, so a held box would otherwise glide home.
     els.forEach((el) => {
-      el.style.transition = '';
+      el.style.transition = 'none';
       setProps(el, IDENTITY);
     });
+    if (els.length) {
+      void document.body.offsetHeight;
+    }
+    els.forEach((el) => (el.style.transition = ''));
     return [];
   }
   const before = els.map((el) => {

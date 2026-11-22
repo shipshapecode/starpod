@@ -184,12 +184,12 @@ function parseTranscript(
   return stripped ? splitParagraphs(stripped) : null;
 }
 
-// What a WebVTT cue's markup looks like: a class, italic, bold, underline,
-// ruby, voice or language span (`<v Speaker>`, `<c.loud>`, `</i>`…) or a
-// timestamp (`<00:01:02.500>`). Anything else in angle brackets, like SRT's
-// unescaped "x < 5 and y > 3", is text.
+// What a cue's markup looks like: a WebVTT class, italic, bold, underline,
+// ruby, voice or language span (`<v Speaker>`, `<c.loud>`, `</i>`…), SRT's
+// `<font color="…">`, or a timestamp (`<00:01:02.500>`). Anything else in
+// angle brackets, like SRT's unescaped "x < 5 and y > 3", is text.
 const CUE_TAG =
-  /<\/?(?:[cibuv]|ruby|rt|lang)(?:\.[^\s<>]*)?(?:\s[^<>]*)?>|<(?:\d+:)?\d{2}:\d{2}\.\d{3}>/g;
+  /<\/?(?:[cibuv]|ruby|rt|lang|font)(?:\.[^\s<>]*)?(?:\s[^<>]*)?>|<(?:\d+:)?\d{2}:\d{2}\.\d{3}>/g;
 
 /**
  * Parse WebVTT/SRT cue blocks into `{ start, text, speaker }` entries,

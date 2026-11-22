@@ -332,6 +332,9 @@ describe('parseCues', () => {
     expect(
       parseCues('WEBVTT\n\n00:00:01.000 --> 00:00:03.000\nWord<00:00:01.500> by <c.yellow>word</c>')
     ).toEqual([{ start: 1, text: 'Word by word' }]);
+    expect(
+      parseCues('1\n00:00:01,000 --> 00:00:02,000\n<font color="yellow">Hello</font>, <font face="serif">you</font>')
+    ).toEqual([{ start: 1, text: 'Hello, you' }]);
   });
 
   it('decodes each reference once', () => {

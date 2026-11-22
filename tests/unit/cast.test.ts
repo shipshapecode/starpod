@@ -172,6 +172,11 @@ describe('speakerFor', () => {
     expect(speakerFor('Chuck Carpenter', ['Charles William Carpenter III', 'Robbie Wagner'])).toBeUndefined();
   });
 
+  it("doesn't take a shared middle name for a shared surname", () => {
+    expect(speakerFor('Adam Michael Rackis', ['Adam Michael Argyle'])).toBeUndefined();
+    expect(speakerFor('Rob Wagner', ['Robbie James Wagner Jr'])).toBe('Robbie James Wagner Jr');
+  });
+
   it('leaves someone who never speaks unmatched', () => {
     expect(speakerFor('Dave Rupert', speakers)).toBeUndefined();
   });
@@ -245,8 +250,16 @@ describe('matchPageNames', () => {
     });
   });
 
-  it('keeps a first name that could be either of two people to itself', () => {
-    const matched = matchPageNames(['Adam Argyle', 'Adam Rackis', 'Adam'], ['Adam Argyle']);
-    expect(Object.fromEntries(matched)).toEqual({ 'Adam Argyle': 'Adam Argyle' });
+  it('keeps a first name that could be either of two people to itself, in any order', () => {
+    const names = ['Adam Argyle', 'Adam Rackis', 'Adam'];
+    const orders = [0, 1, 2].flatMap((a) =>
+      [0, 1, 2].flatMap((b) =>
+        [0, 1, 2].filter((c) => new Set([a, b, c]).size === 3).map((c) => [a, b, c])
+      )
+    );
+    for (const order of orders) {
+      const matched = matchPageNames(order.map((i) => names[i]), ['Adam Argyle']);
+      expect(Object.fromEntries(matched)).toEqual({ 'Adam Argyle': 'Adam Argyle' });
+    }
   });
 });
