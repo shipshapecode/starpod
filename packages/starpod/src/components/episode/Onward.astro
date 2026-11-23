@@ -47,7 +47,7 @@ const pager = [
             src={card.art}
             width="72"
           />
-          <span class="ep-pager-text">
+          <span class="flex min-w-0 flex-1 flex-col gap-1 px-1">
             <span class="ep-pager-label">
               {card.label} · {card.number}
             </span>
@@ -62,7 +62,7 @@ const pager = [
 {
   related.length > 0 && (
     <div class="ep-shelf-wrap">
-      <h3 class="ep-shelf-title ep-reveal">Related episodes</h3>
+      <h3 class="ep-reveal mb-1 text-[0.9375rem] leading-[40px] font-[650]">Related episodes</h3>
       <ul aria-label="Related episodes" class="ep-shelf">
         {related.map((card) => (
           <li class="ep-shelf-item">

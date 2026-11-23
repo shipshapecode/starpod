@@ -313,34 +313,9 @@
   }
 }
 
+/* Colours on links stay here: the global `a { color: inherit }` beats a utility. */
 .ep-bar-title {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
   color: var(--ink);
-  line-height: 1.2;
-  text-decoration: none;
-}
-
-.ep-bar-number {
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-
-.ep-bar-name {
-  overflow: hidden;
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@media (max-width: 639px) {
-  .ep-bar-title {
-    display: none;
-  }
 }
 
 /* Reading progress along the bar's lower edge: how far through the page
@@ -760,33 +735,9 @@ button.ep-person-who:focus-visible::after {
   outline-offset: -2px;
 }
 
-.ep-person-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.ep-person-name {
-  overflow: hidden;
-  color: var(--ink);
-  font-size: 1.0625rem;
-  font-weight: 650;
-  line-height: 1.375rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* Phones: the name may take two lines, and the trailing stat drops under
    the text so it never squeezes them. */
 @media (max-width: 639px) {
-  .ep-person-name {
-    display: -webkit-box;
-    white-space: normal;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
   .ep-person-head {
     grid-template-columns: minmax(0, 1fr) auto;
     row-gap: 8px;
@@ -814,19 +765,6 @@ button.ep-person-who:focus-visible::after {
     grid-row: 1;
     grid-column: 2;
   }
-}
-
-.ep-person-stat {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1rem;
 }
 
 /* A trailing stat: a seek chip to someone's first line, or their tally. */
@@ -912,11 +850,7 @@ button.ep-chip {
 }
 
 .ep-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
   color: var(--ink);
-  text-decoration: none;
 }
 
 /* Focus rings the art, on its own corners. */
@@ -979,17 +913,6 @@ button.ep-chip {
   line-height: 1rem;
 }
 
-.ep-tile-title {
-  display: -webkit-box;
-  overflow: hidden;
-  padding-inline: 4px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
 .ep-pill {
   display: inline-flex;
   align-items: center;
@@ -1014,20 +937,6 @@ button.ep-chip {
 }
 
 /* With guests, the hosts in one line under them. */
-.ep-hosted {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 20px;
-  margin: 16px 0 0;
-}
-
-.ep-hosted-label {
-  color: var(--muted);
-  font-size: 0.8125rem;
-  font-weight: 600;
-}
-
 .ep-hosted .person-chip {
   transition: color var(--quick);
 }
@@ -1122,21 +1031,6 @@ button.ep-chip {
   height: 100%;
 }
 
-.ep-sponsor-text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.ep-sponsor-name {
-  color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 650;
-  line-height: 1.25rem;
-}
-
 .ep-sponsor .ep-pill {
   flex: none;
   margin: 0;
@@ -1158,10 +1052,6 @@ button.ep-chip {
    in the flow would then leave it, moving everything below by its height
    (a section link that had just landed included). When nothing is cut off
    the button hides, which takes nothing out of the flow either. */
-.ep-clamp-box {
-  position: relative;
-}
-
 .ep-clamp[data-clamped] {
   max-height: 34rem;
   overflow: clip;
@@ -1172,10 +1062,6 @@ button.ep-chip {
     oklch(0% 0 0) calc(24rem + (1 - var(--live-truncated, 1)) * 100rem),
     transparent 34rem
   );
-}
-
-.ep-more {
-  margin-top: 1.25rem;
 }
 
 .ep-more {
@@ -1450,12 +1336,6 @@ button.ep-chip {
   }
 }
 
-.ep-who-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .ep-who-text strong {
   color: var(--ink);
   font-size: 0.9375rem;
@@ -1617,15 +1497,6 @@ button.ep-chip {
   outline-offset: -1px;
 }
 
-.ep-pager-text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  padding-inline: 4px;
-}
-
 .ep-pager-label,
 .ep-card-facts {
   color: var(--muted);
@@ -1651,14 +1522,6 @@ button.ep-chip {
 .ep-shelf-wrap {
   position: relative;
   container: ep-shelf / inline-size;
-}
-
-.ep-shelf-title {
-  margin: 0 0 4px;
-  color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 650;
-  line-height: 40px;
 }
 
 /* The next card always peeks: so many whole cards and four tenths of one,
@@ -1837,21 +1700,6 @@ button.ep-chip {
    the host's voice, what they have done on the show, the bio, their two
    latest episodes and the way to all of them, and their links. Until the
    colour arrives the poster is plain Surface. */
-.ab-hosts {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 24px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 1024px) {
-  .ab-hosts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 .ab-host {
   --ab-ground: color-mix(
     in oklch,
@@ -1893,16 +1741,6 @@ button.ep-chip {
   pointer-events: none;
 }
 
-.ab-host-body {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  margin-top: -28px;
-  padding: 0 24px 24px;
-}
-
 .ab-host-name {
   margin: 0;
   color: var(--person-ring, var(--ink));
@@ -1921,12 +1759,6 @@ button.ep-chip {
 [data-voice='1'] > .ab-host-body > .ab-host-name {
   font-family: var(--font-voice-1);
   font-weight: 400;
-}
-
-.ab-host-bio {
-  max-width: 48ch;
-  margin: 0;
-  color: var(--text);
 }
 
 /* Their two latest episodes, in a tray (24px, 4px in: 20px tiles). */
@@ -1949,27 +1781,6 @@ button.ep-chip {
 
 /* The hosts' latest episodes together, once, when every poster's tray
    would have shown the same ones. */
-.ab-latest {
-  margin-top: 32px;
-}
-
-.ab-latest-title {
-  margin: 0 0 12px;
-  color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 650;
-  line-height: 1.25rem;
-}
-
-.ab-host-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 4px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
 .ab-host-links .ep-pill {
   margin: 0;
 }

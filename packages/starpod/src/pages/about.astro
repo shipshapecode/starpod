@@ -139,7 +139,7 @@ const together =
     <section aria-labelledby="hosts-heading" class="mt-16 lg:mt-20">
       <h2 class="section-title" id="hosts-heading">Meet the hosts</h2>
 
-      <ul class="ab-hosts">
+      <ul class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {
           posters.map((host) => (
             <li class="ab-host ep-reveal" data-voice={host.voice}>
@@ -155,10 +155,10 @@ const together =
                 )}
               </div>
 
-              <div class="ab-host-body">
+              <div class="ab-host-body relative -mt-7 flex flex-col items-start gap-3 px-6 pb-6">
                 <h3 class="ab-host-name">{host.name}</h3>
                 {host.stats && <p class="person-fact">{host.stats}</p>}
-                {host.bio && <p class="ab-host-bio">{host.bio}</p>}
+                {host.bio && <p class="max-w-[48ch] text-text">{host.bio}</p>}
 
                 {together.length === 0 && host.recent.length > 0 && (
                   <div class="ab-host-tray">
@@ -190,7 +190,7 @@ const together =
                 )}
 
                 {linksFor(host).length > 0 && (
-                  <ul class="ab-host-links">
+                  <ul class="ab-host-links mt-1 flex flex-wrap gap-2">
                     {linksFor(host).map(({ href, Icon, label }) => (
                       <li>
                         <a
@@ -214,8 +214,8 @@ const together =
 
       {
         together.length > 0 && (
-          <div class="ab-latest ep-reveal">
-            <h3 class="ab-latest-title">Latest episodes</h3>
+          <div class="ep-reveal mt-8">
+            <h3 class="mb-3 text-[0.9375rem] leading-5 font-[650]">Latest episodes</h3>
             <Tiles items={together} label="Latest episodes with the hosts" />
           </div>
         )

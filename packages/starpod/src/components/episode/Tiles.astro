@@ -16,7 +16,7 @@ const { items, label } = Astro.props;
   {
     items.map((item) => (
       <li>
-        <a class="ep-tile" href={item.href}>
+        <a class="ep-tile flex flex-col gap-2 no-underline" href={item.href}>
           <span class="ep-tile-art">
             <img
               alt=""
@@ -27,7 +27,7 @@ const { items, label } = Astro.props;
             />
             <span class="ep-tile-chip">{item.number}</span>
           </span>
-          <span class="ep-tile-title">{item.title}</span>
+          <span class="line-clamp-2 px-1 text-[0.875rem] leading-5 font-semibold">{item.title}</span>
         </a>
       </li>
     ))

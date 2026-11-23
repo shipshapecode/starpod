@@ -134,7 +134,7 @@ export default function SpeakerCard({ root, speakers }: Props) {
         <span class="person-face" style="--person-size: 48px">
           <img alt="" height="48" ref={photo} width="48" />
         </span>
-        <span class="ep-who-text">
+        <span class="ep-who-text flex flex-col gap-0.5">
           <strong ref={name} />
           <span class="person-fact" ref={fact} />
         </span>

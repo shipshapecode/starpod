@@ -382,9 +382,9 @@ const documentLinkTag =
   <div class="ep-body">
     <SectionBar label="Episode sections" sections={sections}>
       <BarPlay client:load episode={playerEpisode} />
-      <a class="ep-bar-title" href="#main">
-        <span class="ep-bar-number">{numberOf(episode)}</span>
-        <span class="ep-bar-name">{episode.title}</span>
+      <a class="ep-bar-title flex min-w-0 flex-col leading-[1.2] no-underline max-sm:hidden" href="#main">
+        <span class="text-[0.75rem] font-semibold tabular-nums text-muted">{numberOf(episode)}</span>
+        <span class="ep-bar-name truncate text-[0.875rem] font-bold">{episode.title}</span>
       </a>
     </SectionBar>
 
@@ -394,7 +394,7 @@ const documentLinkTag =
       id="notes"
     >
       <h2 class="section-title ep-reveal" id="notes-heading">Show notes</h2>
-      <div class="ep-clamp-box">
+      <div class="ep-clamp-box relative">
         <div
           class="ep-clamp"
           data-clamped
@@ -460,7 +460,7 @@ const documentLinkTag =
       </h2>
       {
         hasTranscript ? (
-          <div class="ep-clamp-box">
+          <div class="ep-clamp-box relative">
             <Schema
               item={{
                 '@context': 'https://schema.org',
