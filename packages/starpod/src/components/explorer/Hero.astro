@@ -74,7 +74,7 @@ const number =
   </div>
 
   <div class="xp-hero-meta">
-    <p class="xp-hero-eyebrow">
+    <p class="mb-[0.6rem] text-[0.8125rem] font-[650] text-accent-ink">
       <span aria-hidden="true" class="xp-onair"
         ><span></span><span></span><span></span></span
       >
@@ -83,7 +83,9 @@ const number =
     <h2 class="xp-hero-title" id="xp-hero-title">
       <a data-vt-title href={`/${episode.episodeSlug}`}>{episode.title}</a>
     </h2>
-    <p class="xp-hero-facts">
+    <p
+      class="xp-hero-facts mb-4 flex flex-wrap gap-x-4 gap-y-[0.2rem] overflow-hidden text-[0.875rem] font-medium tabular-nums text-muted"
+    >
       <span>{number}</span>
       <time datetime={date.toISOString()}>
         {
@@ -120,10 +122,10 @@ const number =
         </ul>
       )
     }
-    <p class="xp-hero-desc">{episode.description}</p>
-    <div class="xp-hero-actions">
+    <p class="xp-hero-desc mb-5 line-clamp-4 max-w-[58ch] text-[1rem] text-text">{episode.description}</p>
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
       <FullPlayButton client:load episode={playable} look="pill" />
-      <a class="xp-hero-link" href={`/${episode.episodeSlug}`}>
+      <a class="xp-hero-link inline-flex items-center gap-[0.35rem] font-[650] no-underline" href={`/${episode.episodeSlug}`}>
         Show notes and transcript
         <ArrowOutIcon size={16} />
       </a>

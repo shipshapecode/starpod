@@ -285,13 +285,6 @@
   z-index: 2;
 }
 
-.xp-hero-eyebrow {
-  margin: 0 0 0.6rem;
-  color: var(--accent-ink);
-  font-size: 0.8125rem;
-  font-weight: 650;
-}
-
 .xp-hero-title {
   margin: 0 0 0.85rem;
   max-width: 18ch;
@@ -319,18 +312,6 @@
   color: var(--voice-0);
 }
 
-.xp-hero-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem 1rem;
-  margin: 0 0 1rem;
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-}
-
 /* One unit, in sentence case: "Ep 260 · Nov 12, 2026 · 1 hr 13 min".
    Every fact carries its separator in the gap before it (a negative start
    margin), and the line clips, so whichever fact starts a line, wrapped or
@@ -346,31 +327,9 @@
   text-align: center;
 }
 
-.xp-hero-desc {
-  max-width: 58ch;
-  margin: 0 0 1.25rem;
-  color: var(--text);
-  font-size: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.xp-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 20px;
-}
-
+/* The colour stays here: the global `a { color: inherit }` beats a utility. */
 .xp-hero-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
   color: var(--accent-ink);
-  font-weight: 650;
-  text-decoration: none;
 }
 
 .xp-hero-link svg {
@@ -706,13 +665,6 @@
   }
 }
 
-.xp-count {
-  flex: none;
-  color: var(--muted);
-  font-size: 0.8125rem;
-  white-space: nowrap;
-}
-
 /* Narrow: the count is a number (filtered, only the number shown), the
    view switch is icons. */
 @container xp (width < 30rem) {
@@ -879,10 +831,6 @@
   [popovertarget='xp-people']
   .xp-chevron {
   rotate: 180deg;
-}
-
-.xp-sort {
-  margin-left: auto;
 }
 
 .xp-reset {

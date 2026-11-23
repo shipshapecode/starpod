@@ -42,7 +42,7 @@ const segThumb = {
           placeholder="Filter episodes"
           type="search"
         />
-        <span aria-hidden="true" class="xp-count">
+        <span aria-hidden="true" class="xp-count flex-none text-[0.8125rem] whitespace-nowrap text-muted">
           <b data-xp-shown>{total}</b>
           <span data-xp-of hidden>of {total}</span>
           <span class="xp-count-unit">episodes</span>
@@ -140,7 +140,7 @@ const segThumb = {
       }
       <button class="xp-reset" data-xp-reset hidden type="reset">Reset</button>
       <button
-        class="xp-pick xp-sort halo"
+        class="xp-pick xp-sort halo ml-auto"
         popovertarget="xp-sort"
         style="anchor-name: --xp-sort"
         type="button"
