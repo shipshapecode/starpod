@@ -236,44 +236,12 @@
 }
 
 .topbar-show {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
   color: var(--ink);
-  font-weight: 700;
 }
 
-.topbar-art {
-  flex: none;
-  width: 36px;
-}
-
+/* A site's own artwork, kept to the bar's corner radius. */
 .topbar-show :is(.tilt-body, img) {
   border-radius: 8px;
-}
-
-.topbar-title {
-  overflow: hidden;
-  text-decoration: none;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.topbar-follow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-  padding: 0.5rem 0.9rem;
-  border: 0;
-  border-radius: 999px;
-  background: var(--ink);
-  color: var(--on-ink);
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 650;
-  cursor: pointer;
 }
 
 /* Main column. */
@@ -291,17 +259,8 @@
   }
 }
 
-.main-page {
-  max-width: 1280px;
-}
-
 .main:has(.stage[data-variant='page']) .crumbs {
   display: none;
-}
-
-.crumbs {
-  margin-bottom: 1.25rem;
-  font-size: 0.8125rem;
 }
 
 /* On touch a crumb's link is 44px tall, its line where it was. */
@@ -323,12 +282,6 @@
   font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.15;
-}
-
-.section-count {
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-weight: 500;
 }
 
 /* Tab bar (phones, tablets). */
@@ -487,13 +440,6 @@
 
 .sheet::backdrop {
   background: oklch(10% 0.02 280 / 0.45);
-}
-
-.sheet-title {
-  margin: 0 0 1rem;
-  color: var(--ink);
-  font-size: 1.05rem;
-  font-weight: 700;
 }
 
 .sheet .platforms {

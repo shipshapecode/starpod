@@ -365,14 +365,14 @@ const publicationLinkTag =
              the home link. The title goes home too, for a pointer; to the
              keyboard and assistive tech it's the same link, so it stays out
              of their way. -->
-        <div class="topbar-show">
-          <span class="topbar-art"><ShowArtwork image={show.image} /></span>
-          <a aria-hidden="true" class="topbar-title" href="/" tabindex="-1"
+        <div class="topbar-show flex min-w-0 items-center gap-2.5 font-bold">
+          <span class="w-9 flex-none"><ShowArtwork image={show.image} /></span>
+          <a aria-hidden="true" class="truncate no-underline" href="/" tabindex="-1"
             >{show.title}</a
           >
         </div>
         <button
-          class="topbar-follow"
+          class="topbar-follow ml-auto flex cursor-pointer items-center gap-1.5 rounded-full border-0 bg-ink px-[0.9rem] py-2 text-[0.875rem] font-[650] text-on-ink"
           popovertarget="follow-sheet"
           type="button"
         >
@@ -381,10 +381,10 @@ const publicationLinkTag =
         </button>
       </header>
 
-      <main id="main" class:list={['main relative', !isHome && 'main-page']}>
+      <main id="main" class:list={['main relative', !isHome && 'max-w-[1280px]']}>
         {
           !isHome && (
-            <div class="crumbs">
+            <div class="crumbs mb-5 text-[0.8125rem]">
               <Breadcrumbs title={title} />
             </div>
           )
@@ -451,7 +451,7 @@ const publicationLinkTag =
 
     <div class="sheet" id="follow-sheet" popover>
       <div class="sheet-head">
-        <p class="sheet-title">Follow {show.title}</p>
+        <p class="sheet-title text-[1.05rem] font-bold text-ink">Follow {show.title}</p>
         <button
           aria-label="Close"
           class="sheet-close"
@@ -466,7 +466,7 @@ const publicationLinkTag =
     </div>
     <div class="sheet" id="more-sheet" popover>
       <div class="sheet-head">
-        <p class="sheet-title">{show.title}</p>
+        <p class="sheet-title text-[1.05rem] font-bold text-ink">{show.title}</p>
         <button
           aria-label="Close"
           class="sheet-close"
