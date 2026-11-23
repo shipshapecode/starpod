@@ -1729,14 +1729,6 @@
   font: 650 14px/1.2 var(--font-ui);
 }
 
-.board-hint {
-  max-width: 62ch;
-  margin: -4px 0 12px 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  line-height: 1.4;
-}
-
 /* Read out, not shown. */
 .board-quiet {
   position: absolute;
@@ -1798,14 +1790,6 @@
   border-radius: var(--r-thumb);
 }
 
-.board-next-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
 .board-row {
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr);
@@ -1829,15 +1813,6 @@
   }
 }
 
-.board-row-name {
-  overflow: hidden;
-  color: var(--text);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .board-row-remove {
   display: none;
 }
@@ -1854,12 +1829,6 @@
 }
 
 /* Imagery leads; its title and one unit of proof sit 8px under it, 4px in. */
-.shelf-cell {
-  display: grid;
-  align-content: start;
-  min-width: 0;
-}
-
 .shelf-cell-title {
   display: -webkit-box;
   overflow: hidden;
@@ -1879,12 +1848,6 @@
 
 .shelf-cell-meta {
   margin: 2px 4px 0;
-}
-
-.board-row-text {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
 }
 
 .board-shelf-grid {

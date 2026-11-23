@@ -131,11 +131,11 @@ export function mountBoard(host: HTMLElement): Board {
     <i aria-hidden="true" class="slot slot-now" ${A}name="--slot-now"></i>
     <section class="board-next" aria-labelledby="board-next-title">
       <h3 class="board-title" id="board-next-title">Up next</h3>
-      <ol class="board-next-list"></ol>
+      <ol class="board-next-list grid gap-2"></ol>
     </section>
     <section class="board-shelf" aria-labelledby="board-shelf-title">
       <h3 class="board-title" id="board-shelf-title">More episodes</h3>
-      <p class="board-hint">Tap a cover to queue it · drag any cover onto any slot</p>
+      <p class="-mt-1 mb-3 ml-1 max-w-[62ch] text-[0.75rem] leading-[1.4] text-muted">Tap a cover to queue it · drag any cover onto any slot</p>
       <p class="board-quiet" id="board-hint">Enter queues a cover, or plays a queued one. Arrows move between covers, Alt with an arrow reorders Up next, Delete takes one out.</p>
       <div class="board-shelf-grid"></div>
     </section>
@@ -271,7 +271,7 @@ export function mountBoard(host: HTMLElement): Board {
       row.className = 'board-row';
       // On phones a queued row's remove sits at its end (player.css), off
       // the cover, so a tap on the cover still plays it.
-      row.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="board-row-text"><span class="board-row-name"></span><span class="board-row-meta"></span></span><button class="board-row-remove" hidden type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
+      row.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="grid min-w-0 gap-0.5"><span class="board-row-name truncate text-[0.8125rem] font-semibold text-text"></span><span class="board-row-meta"></span></span><button class="board-row-remove" hidden type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
       return row;
     });
     // The row after Up next says how to add one: the shelf is under it in
@@ -295,7 +295,7 @@ export function mountBoard(host: HTMLElement): Board {
     // Each shelf slot carries its occupant's title and caption beneath it.
     slots(shelfGrid, rest.length, () => {
       const cell = document.createElement('div');
-      cell.className = 'shelf-cell';
+      cell.className = 'grid min-w-0 content-start';
       cell.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="shelf-cell-title"></span><span class="shelf-cell-meta"></span>`;
       return cell;
     });
