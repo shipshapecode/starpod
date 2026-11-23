@@ -936,13 +936,13 @@ export default function Island() {
         </div>
 
         <div class="island-scrub PropFLIP" data-props-for="media-clock">
-          <span class="dock-time">
+          <span class="dock-time block w-[6.5ch] flex-none text-center text-[0.75rem] tabular-nums text-muted">
             <span>{elapsed}</span>
           </span>
           <span class="island-track">
             <LiveScrubber episode={episode} />
           </span>
-          <span class="dock-time">
+          <span class="dock-time block w-[6.5ch] flex-none text-center text-[0.75rem] tabular-nums text-muted">
             <span>{remaining}</span>
           </span>
         </div>

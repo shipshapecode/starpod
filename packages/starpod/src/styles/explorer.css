@@ -519,16 +519,6 @@
   }
 }
 
-.xp-bar-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 10px;
-  /* As wide as the toolbar, never its field's natural width: on a 320px
-     phone the field gives way to the views beside it. */
-  min-width: 0;
-}
-
 /* On a phone the toolbar takes the top bar's place: as it arrives at the
    top it pushes the top bar up and away, and it sticks at the safe-area
    top. The top bar moves with the scroll, pixel for pixel (a scroll-driven
@@ -1778,12 +1768,6 @@
   }
 }
 
-.xp-chip-kind {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-}
-
 /* The kind's glyph and the "More" chevron are painted from a mask in this
    sheet, once, rather than an inline icon in each of the 261 cards. */
 .xp-chip-kind::before,
@@ -1806,12 +1790,6 @@
 
 .xp-more::after {
   --xp-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
-}
-
-.xp-chip-length {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
 }
 
 /* How far the visitor got: their saved place, or live for the episode

@@ -676,17 +676,6 @@
   }
 }
 
-.dock-time {
-  display: block;
-  flex: none;
-  /* Fits "-9:59:59" in tabular figures. */
-  inline-size: 6.5ch;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-
 .dock-time > span {
   display: block;
   contain: strict;
