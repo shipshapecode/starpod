@@ -91,7 +91,14 @@ const { label, sections } = Astro.props;
         const target =
           link &&
           document.getElementById(decodeURIComponent(link.hash.slice(1)));
-        if (!link || !target || reducedMotion()) {
+        // A modified click (a new tab or window) is the browser's.
+        const modified =
+          event.button !== 0 ||
+          event.ctrlKey ||
+          event.metaKey ||
+          event.shiftKey ||
+          event.altKey;
+        if (!link || !target || modified || reducedMotion()) {
           return;
         }
         event.preventDefault();

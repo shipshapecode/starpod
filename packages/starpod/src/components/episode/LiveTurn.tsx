@@ -93,9 +93,14 @@ export default function LiveTurn({ episode, root }: Props) {
         }
         liveGroup = group;
         if (group) {
-          seen ??= new IntersectionObserver(([entry]) => {
-            groupInView = entry.isIntersecting;
-            expose();
+          // One observer follows the live group as it changes, so a batch can
+          // still carry an entry for the group it just left: read the live one.
+          seen ??= new IntersectionObserver((entries) => {
+            const latest = entries.filter((entry) => entry.target === liveGroup).pop();
+            if (latest) {
+              groupInView = latest.isIntersecting;
+              expose();
+            }
           });
           seen.observe(group);
         }

@@ -267,6 +267,7 @@ function split(
   }
 
   let drag: {
+    pointer: number;
     x0: number;
     from: number;
     samples: Array<[number, number]>;
@@ -275,13 +276,15 @@ function split(
   divider.addEventListener(
     'pointerdown',
     (event) => {
-      if (event.button) {
+      // One pointer drags: a second finger on the divider changes nothing.
+      if (event.button || drag) {
         return;
       }
       divider.setPointerCapture(event.pointerId);
       freeze();
       divider.dataset.held = '';
       drag = {
+        pointer: event.pointerId,
         x0: event.clientX,
         from: share * width(),
         samples: [[event.timeStamp, event.clientX]]
@@ -292,7 +295,7 @@ function split(
   divider.addEventListener(
     'pointermove',
     (event) => {
-      if (!drag) {
+      if (drag?.pointer !== event.pointerId) {
         return;
       }
       drag.samples.push([event.timeStamp, event.clientX]);
@@ -309,7 +312,7 @@ function split(
     { signal }
   );
   const release = (event: PointerEvent) => {
-    if (!drag) {
+    if (drag?.pointer !== event.pointerId) {
       return;
     }
     const [[t0, x0], [t1, x1]] = [drag.samples[0], drag.samples.at(-1)!];

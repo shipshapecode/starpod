@@ -586,8 +586,10 @@ const documentLinkTag =
     }
     const fold = clamp.getBoundingClientRect().bottom;
     clamp.removeAttribute('data-clamped');
+    // Only the preview's own groups: other things in it (the transcript's
+    // jump markers) keep the hidden they were given.
     clamp
-      .querySelectorAll<HTMLElement>('[hidden]')
+      .querySelectorAll<HTMLElement>('[hidden="until-found"]')
       .forEach((group) => group.removeAttribute('hidden'));
     box.querySelector<HTMLElement>('[data-ep-expand]')?.setAttribute('hidden', '');
     if (moveFocus) {

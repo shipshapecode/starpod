@@ -65,11 +65,12 @@
   }
 
   :root[data-world='stage'] .script {
-    min-height: 0;
-    max-height: 34vh;
+    min-height: 220px;
+    max-height: 46vh;
   }
 
   :root[data-world='stage'] .script[data-state='preview'] {
+    min-height: 0;
     max-height: 30vh;
   }
 }
@@ -335,14 +336,6 @@
   line-height: 1.02;
 }
 
-
-
-@media (max-width: 1023px) {
-  :root[data-world='stage'] .script {
-    min-height: 220px;
-    max-height: 46vh;
-  }
-}
 
 /* =====================================================================
    Foldables (iPhone Duo inner screen, two-segment viewports)

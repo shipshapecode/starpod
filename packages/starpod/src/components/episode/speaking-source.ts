@@ -120,10 +120,11 @@ effect(() => {
 
 effect(() => {
   const all = lines.value;
+  // A quarter second early, so the highlight lands with the voice; but no
+  // one before the first line starts.
+  const at = currentTime.value + 0.25;
   const speaker =
-    all && isPlaying.value
-      ? all[lineAt(all, currentTime.value + 0.25)]?.n
-      : undefined;
+    all && isPlaying.value && at >= all[0].s ? all[lineAt(all, at)]?.n : undefined;
   if (speaker !== speakingNow.peek()) {
     speakingNow.value = speaker;
     mark();

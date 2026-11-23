@@ -1151,7 +1151,7 @@ button.ep-chip {
 /* ---------- Previews ---------- */
 
 /* Long notes and transcripts start as a preview. The fade is set in fixed
-   lengths, so anything shorter than the preview is never faded. prop-for-
+   lengths, and drops away when the preview clips nothing. prop-for-
    that's `truncated` says whether the preview really clips its content: only
    then does its "more" button show, laid over the fade; when nothing is cut
    off it stays hidden. Browsers without style queries keep the button below. */
@@ -1163,7 +1163,12 @@ button.ep-chip {
   max-height: 34rem;
   overflow: clip;
   overflow-clip-margin: 8px;
-  mask-image: linear-gradient(oklch(0% 0 0) 24rem, transparent 34rem);
+  /* Faded only when the preview clips something: content that fits (not
+     truncated) pushes the fade's start past the end. */
+  mask-image: linear-gradient(
+    oklch(0% 0 0) calc(24rem + (1 - var(--live-truncated, 1)) * 100rem),
+    transparent 34rem
+  );
 }
 
 .ep-more {
@@ -1193,7 +1198,10 @@ button.ep-chip {
   /* clip, not hidden: no scroll container, so heads stay sticky to the page. */
   overflow: clip;
   overflow-clip-margin: 8px;
-  mask-image: linear-gradient(oklch(0% 0 0) 14rem, transparent 26rem);
+  mask-image: linear-gradient(
+    oklch(0% 0 0) calc(14rem + (1 - var(--live-truncated, 1)) * 100rem),
+    transparent 26rem
+  );
 }
 
 /* A turn: who spoke and when, in a gutter, then the words. */
@@ -1221,10 +1229,14 @@ button.ep-chip {
 .ep-turns {
   margin-inline: -8px;
   padding-inline: 8px;
-  content-visibility: auto;
   /* Until it has rendered, a group is as tall as the first one (measured
      by the page), and after that as tall as it last was. */
   contain-intrinsic-block-size: auto calc(var(--ep-group-h, 1800) * 1px);
+}
+/* Not a group still hidden="until-found": the browser hides it with
+   content-visibility, which auto would undo (and find in page with it). */
+.ep-turns:not([hidden]) {
+  content-visibility: auto;
 }
 
 /* A paragraph that continues a turn lines up with the words, not the gutter. */
