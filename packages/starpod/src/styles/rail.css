@@ -1593,49 +1593,6 @@
   }
 }
 
-.sp-text {
-  display: grid;
-  flex: 1;
-  gap: 2px;
-  min-width: 0;
-}
-
-.sp-head {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-}
-
-.sp-num {
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.sp-title,
-.sp-desc {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sp-title {
-  color: var(--ink);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-/* On a phone a title has two lines before it ends in an ellipsis. */
-@media (max-width: 639px) {
-  .sp-title {
-    display: -webkit-box;
-    white-space: normal;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-}
-
 /* Touch has no Escape key: a Cancel takes the key's place. (The field
    gives way to it: an input's own minimum width would push it out of a
    320px phone's palette.) */
@@ -1676,13 +1633,6 @@
 }
 
 /* "People" and "Episodes": sentence case captions over their rows. */
-.sp-group {
-  margin: 6px 8px 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
 .sp-group:not(:nth-child(2)) {
   margin-top: 12px;
 }
@@ -1693,22 +1643,6 @@
   min-height: 44px;
   box-sizing: border-box;
   padding-block: 4px;
-}
-
-.sp-name {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--ink);
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.125rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sp-desc {
-  color: var(--text);
-  font-size: 0.75rem;
 }
 
 /* A light follows the pointer across the panel, under the field and rows. */

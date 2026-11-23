@@ -398,7 +398,7 @@ export default function SearchDialog({
                   return (
                     <Fragment key={item.key}>
                       {caption && (
-                        <p aria-hidden="true" class="sp-group">
+                        <p aria-hidden="true" class="sp-group mx-2 mt-1.5 mb-1 text-[0.75rem] font-semibold text-muted">
                           {caption}
                         </p>
                       )}
@@ -439,8 +439,8 @@ export default function SearchDialog({
                                 width="32"
                               />
                             </span>
-                            <span class="sp-text">
-                              <span class="sp-name">
+                            <span class="grid min-w-0 flex-1 gap-0.5">
+                              <span class="sp-name min-w-0 truncate text-[0.875rem] leading-[1.125rem] font-medium text-ink">
                                 <Completion
                                   query={query}
                                   text={item.person.label}
@@ -464,19 +464,19 @@ export default function SearchDialog({
                               src={item.episode.episodeThumbnail}
                               width="40"
                             />
-                            <span class="sp-text">
-                              <span class="sp-head">
-                                <span class="sp-num">
+                            <span class="grid min-w-0 flex-1 gap-0.5">
+                              <span class="flex min-w-0 items-baseline gap-2">
+                                <span class="text-[0.75rem] font-medium text-muted">
                                   #{item.episode.episodeNumber}
                                 </span>
-                                <span class="sp-title">
+                                <span class="sp-title truncate text-[0.875rem] font-medium text-ink max-sm:line-clamp-2 max-sm:whitespace-normal">
                                   <Completion
                                     query={query}
                                     text={item.episode.title}
                                   />
                                 </span>
                               </span>
-                              <span class="sp-desc">
+                              <span class="truncate text-[0.75rem] text-text">
                                 {item.episode.description}
                               </span>
                             </span>
