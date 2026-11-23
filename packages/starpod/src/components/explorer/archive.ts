@@ -10,7 +10,8 @@ import { getImage } from 'astro:assets';
 import { eq } from 'drizzle-orm';
 import starpodConfig, { database } from 'virtual:starpod/config';
 
-import avatarLight from '../../assets/avatar-light.png';
+// The face for someone without a photo, light or dark with the page.
+import avatar from '../../assets/avatar.svg?url';
 import { createDb } from '../../db';
 import { HostOrGuest, Person } from '../../db/schema';
 import { sortCast, type CastPerson } from '../../lib/cast';
@@ -53,11 +54,12 @@ function avatarFor(img: string | null): Promise<string> {
     avatars.set(
       key,
       (async () => {
-        const source =
-          (img && (await photos[`/src/img/people/${img}`]?.())?.default) ||
-          avatarLight;
+        const photo = img && (await photos[`/src/img/people/${img}`]?.())?.default;
+        if (!photo) {
+          return avatar;
+        }
         const image = await getImage({
-          src: source,
+          src: photo,
           width: 64,
           height: 64,
           format: 'webp'
