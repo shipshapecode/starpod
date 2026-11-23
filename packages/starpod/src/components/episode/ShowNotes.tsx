@@ -32,7 +32,8 @@ export default function ShowNotes({ episode, children }: Props) {
     const nodes: Array<Text> = [];
     while (walker.nextNode()) {
       const node = walker.currentNode as Text;
-      if (TIMESTAMP.test(node.data) && !node.parentElement?.closest('a, button')) {
+      // Not in a link or button, nor in code, where 10:30 is code.
+      if (TIMESTAMP.test(node.data) && !node.parentElement?.closest('a, button, code, pre')) {
         nodes.push(node);
       }
       TIMESTAMP.lastIndex = 0;

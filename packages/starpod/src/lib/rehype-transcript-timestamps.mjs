@@ -11,7 +11,7 @@ import { seekChipAttributes } from './seek-chip.mjs';
 
 const TIMESTAMP = /\[(\d{1,2}):(\d{2})(?::(\d{2}))?\]/g;
 
-/** A turn with more words than this is long enough for its head to stick. */
+/** A turn with more characters than this is long enough for its head to stick. */
 export const LONG_TURN = 280;
 
 function toSeconds(hours, minutes, seconds) {
@@ -174,9 +174,22 @@ function group(tree) {
   tree.children = groups;
 }
 
+/**
+ * Is this file a transcript (under a `transcripts` directory, as
+ * `transcriptsLoader` keeps them)? Only a transcript is grouped: its later
+ * groups are hidden until the episode page opens them, and no other page
+ * has the script that does.
+ */
+function isTranscript(file) {
+  const path = file?.path ?? file?.history?.[0];
+  return !path || /[\\/]transcripts[\\/]/.test(path);
+}
+
 export default function rehypeTranscriptTimestamps() {
-  return (tree) => {
+  return (tree, file) => {
     transform(tree);
-    group(tree);
+    if (isTranscript(file)) {
+      group(tree);
+    }
   };
 }

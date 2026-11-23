@@ -8,6 +8,10 @@ import { currentEpisode, currentTime, type PlayableEpisode } from '../state';
 
 /** The last turn that starts at or before `time` (0 when none does). */
 function turnAt(starts: Array<number>, time: number) {
+  // Before the first turn starts, none is live.
+  if (!starts.length || time < starts[0]) {
+    return -1;
+  }
   let low = 0;
   let high = starts.length - 1;
   let found = 0;

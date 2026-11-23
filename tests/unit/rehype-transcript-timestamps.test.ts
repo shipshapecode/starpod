@@ -14,8 +14,8 @@ type HastNode = {
   children?: Array<HastNode>;
 };
 
-function run(tree: HastNode) {
-  rehypeTranscriptTimestamps()(tree);
+function run(tree: HastNode, file?: { path: string }) {
+  (rehypeTranscriptTimestamps() as (tree: HastNode, file?: { path: string }) => void)(tree, file);
   return tree;
 }
 
@@ -111,6 +111,21 @@ describe('rehypeTranscriptTimestamps', () => {
     expect(tree.children!.map((group) => group.children!.length)).toEqual([TURNS_PER_GROUP, 2]);
     // A short transcript is left as it is.
     expect(run(paragraph(text('[00:00:01] hi'))).children![0].tagName).toBe('p');
+  });
+
+  it('groups only transcripts, since only the episode page opens the groups', () => {
+    const lines = () =>
+      Array.from({ length: TURNS_PER_GROUP + 2 }, (_, index) => ({
+        type: 'element',
+        tagName: 'p',
+        children: [text(`[00:00:${String(index % 60).padStart(2, '0')}] line ${index}`)]
+      }));
+    const transcript = run({ type: 'root', children: lines() }, { path: '/site/src/content/transcripts/12.md' });
+    expect(transcript.children![1].properties?.hidden).toBe('until-found');
+
+    const post = run({ type: 'root', children: lines() }, { path: '/site/src/content/blog/chapters.md' });
+    expect(post.children).toHaveLength(TURNS_PER_GROUP + 2);
+    expect(post.children!.every((child) => child.tagName === 'p')).toBe(true);
   });
 
   it('leaves a timestamp in the middle of a paragraph inline', () => {

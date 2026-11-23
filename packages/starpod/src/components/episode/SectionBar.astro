@@ -157,15 +157,25 @@ const { label, sections } = Astro.props;
       }
       signal.addEventListener('abort', done, { signal: yours.signal });
       const until = performance.now() + 1500;
+      let lastY = scrollY;
       const tick = (now: number) => {
         if (yours.signal.aborted) {
           return;
         }
         const off = target.getBoundingClientRect().top - landing(target);
+        // You scrolled (a scrollbar drag fires none of the events above):
+        // the page moved, and not to keep the section put. Scroll anchoring
+        // moves the page but keeps the section put; a group settling moves
+        // the section but not the page.
+        if (Math.abs(scrollY - lastY) > 1 && Math.abs(off) > 2) {
+          done();
+          return;
+        }
         // To the pixel: the glide already got it within a couple.
         if (Math.abs(off) > 0.5) {
           scrollBy({ top: off, behavior: 'instant' });
         }
+        lastY = scrollY;
         if (now < until) {
           requestAnimationFrame(tick);
         } else {

@@ -101,5 +101,20 @@ describe('seek chips', () => {
       'Mismatched (<chip>] stays as written'
     ]);
   });
-});
 
+  it('leaves times in code alone', async () => {
+    const { container } = render(
+      <ShowNotes episode={episode}>
+        <p>12:34 Chapter</p>
+        <pre>
+          <code>setTimeout(run, '1:30')</code>
+        </pre>
+        <p>
+          Run <code>at 10:30</code> daily
+        </p>
+      </ShowNotes>
+    );
+    await screen.findAllByRole('button', { name: /^Play from/ });
+    expect(container.querySelectorAll('button')).toHaveLength(1);
+  });
+});
