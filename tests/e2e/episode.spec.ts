@@ -615,7 +615,7 @@ test.describe('episode page review fixes', () => {
     expect(await reachable()).toBeGreaterThan(600);
   });
 
-  test('keyboard focus and find in page open a clamped transcript', async ({
+  test('keyboard focus on what it cuts off, and find in page, open a clamped transcript', async ({
     page,
     browserName
   }) => {
@@ -627,10 +627,17 @@ test.describe('episode page review fixes', () => {
         heading.tabIndex = -1;
         heading.focus();
       });
+    // Tabbing through what the preview shows leaves it a preview...
     await page.keyboard.press(tabKey(browserName));
-    await expect(page.locator('.transcript')).not.toHaveAttribute(
-      'data-clamped'
-    );
+    await expect(page.locator('.transcript')).toHaveAttribute('data-clamped');
+    // ...and reaching something it cuts off opens it.
+    await expect(async () => {
+      await page.keyboard.press(tabKey(browserName));
+      await expect(page.locator('.transcript')).not.toHaveAttribute(
+        'data-clamped',
+        { timeout: 100 }
+      );
+    }).toPass({ timeout: 10_000 });
 
     await page.goto('/184');
     await page
