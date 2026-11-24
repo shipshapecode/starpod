@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 
 import starpodConfig from 'virtual:starpod/config';
 
-import avatarLight from '../assets/avatar-light.png';
+import avatar from '../assets/avatar.svg?url';
 
 export interface Props {
   /**
@@ -22,10 +22,10 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/people/*.{jpeg,jpg,png}'
 );
 
-// Fall back to the packaged avatar when the site has not provided a photo in
-// src/img/people yet.
+// Fall back to the packaged avatar, which follows light and dark, when the
+// site has not provided a photo in src/img/people yet.
 const hostImage = (img: string) =>
-  images[`/src/img/people/${img}`]?.() ?? avatarLight;
+  images[`/src/img/people/${img}`] as (typeof images)[string] | undefined;
 
 const slot = anchored ? '--slot' : undefined;
 const on = anchored ? '' : undefined;
@@ -64,6 +64,7 @@ const credit =
     {
       hosts.map((host, index) => {
         const href = linkFor(host);
+        const photo = hostImage(host.img);
         const Row = href ? 'a' : 'div';
         return (
           <Row
@@ -84,13 +85,23 @@ const credit =
                 'data-⚓️-align-leading': on
               }}
             >
-              <Image
-                alt=""
-                height={40}
-                loading="lazy"
-                src={hostImage(host.img)}
-                width={40}
-              />
+              {photo ? (
+                <Image
+                  alt=""
+                  height={40}
+                  loading="lazy"
+                  src={photo()}
+                  width={40}
+                />
+              ) : (
+                <img
+                  alt=""
+                  height={40}
+                  loading="lazy"
+                  src={avatar}
+                  width={40}
+                />
+              )}
             </span>
             <span
               class={slot && 'rail-host-name'}

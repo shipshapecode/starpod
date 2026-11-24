@@ -15,17 +15,17 @@ import { getAllEpisodes, getShowInfo, type Episode } from '../lib/rss';
 import starpodConfig, { database } from 'virtual:starpod/config';
 import LargePlatforms from 'virtual:starpod/components/LargePlatforms';
 
-import avatarLight from '../assets/avatar-light.png';
+import avatar from '../assets/avatar.svg?url';
 
 const { hosts } = starpodConfig;
 const images = import.meta.glob<{ default: ImageMetadata }>(
   '/src/img/people/*.{jpeg,jpg,png}'
 );
 
-// Fall back to the packaged avatar when the site has not provided a photo in
-// src/img/people yet.
+// Fall back to the packaged avatar, which follows light and dark, when the
+// site has not provided a photo in src/img/people yet.
 const hostImage = async (img: string) =>
-  (await images[`/src/img/people/${img}`]?.())?.default ?? avatarLight;
+  (await images[`/src/img/people/${img}`]?.())?.default;
 
 const linksFor = (host: (typeof hosts)[number]) =>
   [
@@ -155,7 +155,11 @@ const together =
                 data-props-for="img-color"
                 data-props-to=".ab-host"
               >
-                <Image alt="" src={host.photo} width={720} />
+                {host.photo ? (
+                  <Image alt="" src={host.photo} width={720} />
+                ) : (
+                  <img alt="" height={540} src={avatar} width={720} />
+                )}
               </div>
 
               <div class="ab-host-body">
