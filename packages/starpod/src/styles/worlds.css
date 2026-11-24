@@ -63,16 +63,6 @@
       'script'
       'meta';
   }
-
-  :root[data-world='stage'] .script {
-    min-height: 220px;
-    max-height: 46vh;
-  }
-
-  :root[data-world='stage'] .script[data-state='preview'] {
-    min-height: 0;
-    max-height: 30vh;
-  }
 }
 
 /* Landscape phones (the query the whole site uses for that form): the
@@ -336,6 +326,20 @@
   line-height: 1.02;
 }
 
+/* Phones: the script's height limits. They come after the base script
+   rules above, which they override at the same specificity, and before the
+   foldables below, which override them in turn. */
+@media (max-width: 1023px) {
+  :root[data-world='stage'] .script {
+    min-height: 220px;
+    max-height: 46vh;
+  }
+
+  :root[data-world='stage'] .script[data-state='preview'] {
+    min-height: 0;
+    max-height: 30vh;
+  }
+}
 
 /* =====================================================================
    Foldables (iPhone Duo inner screen, two-segment viewports)
