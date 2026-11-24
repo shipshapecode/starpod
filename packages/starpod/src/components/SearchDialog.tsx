@@ -262,8 +262,13 @@ export default function SearchDialog({
       return;
     }
 
-    // Navigation and selection when dialog is open
-    if (isSearchOpen.value && items.length > 0) {
+    // Moving through and choosing results belong to the field (the
+    // combobox): Enter on Cancel cancels.
+    if (
+      isSearchOpen.value &&
+      items.length > 0 &&
+      e.target === inputRef.current
+    ) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setSelectedIndex((prev) => (prev < items.length - 1 ? prev + 1 : prev));

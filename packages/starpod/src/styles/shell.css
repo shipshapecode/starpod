@@ -241,21 +241,32 @@
 }
 
 .topbar-show {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
   color: var(--ink);
   font-weight: 700;
-  text-decoration: none;
 }
 
-.topbar-show img {
+.topbar-art {
   flex: none;
+  width: 36px;
+}
+
+.topbar-show :is(.tilt-body, img) {
   border-radius: 8px;
 }
 
-.topbar-show span {
+/* The artwork's link covers the row: a tap on the title goes home too. */
+.topbar-show a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.topbar-title {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

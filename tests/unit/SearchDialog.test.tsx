@@ -176,7 +176,7 @@ describe('SearchDialog', () => {
     const input = screen.getByRole('combobox', { name: 'Search episodes' });
     expect(new Set(options.map((option) => option.id)).size).toBe(3);
     expect(input).toHaveAttribute('aria-activedescendant', options[0]!.id);
-    fireEvent.keyDown(document, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
     await waitFor(() =>
       expect(input).toHaveAttribute('aria-activedescendant', options[1]!.id)
     );
@@ -208,7 +208,7 @@ describe('SearchDialog', () => {
     expect(options[0]).toHaveTextContent('Ada Lovelace');
     expect(options[0]).toHaveAttribute('href', '/#guest=ada');
 
-    fireEvent.keyDown(document, { key: 'Enter' });
+    fireEvent.keyDown(input, { key: 'Enter' });
     expect(navigate).toHaveBeenCalledWith('/#guest=ada');
   });
 
@@ -294,7 +294,7 @@ describe('SearchDialog', () => {
     expect(options[0]!.id).not.toBe('');
     expect(input).toHaveAttribute('aria-activedescendant', options[0]!.id);
 
-    fireEvent.keyDown(document, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
     await waitFor(() =>
       expect(screen.getAllByRole('option')[1]).toHaveAttribute(
         'aria-selected',
@@ -306,7 +306,7 @@ describe('SearchDialog', () => {
       screen.getAllByRole('option')[1]!.id
     );
 
-    fireEvent.keyDown(document, { key: 'ArrowUp' });
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
     await waitFor(() =>
       expect(screen.getAllByRole('option')[0]).toHaveAttribute(
         'aria-selected',
@@ -314,9 +314,25 @@ describe('SearchDialog', () => {
       )
     );
 
-    fireEvent.keyDown(document, { key: 'Enter' });
+    fireEvent.keyDown(input, { key: 'Enter' });
     // Client-side navigation, so playback survives.
     expect(navigate).toHaveBeenCalledWith('/episode-one');
+    expect(isSearchOpen.value).toBe(false);
+  });
+
+  it('cancels with Enter on Cancel, rather than opening the selection', async () => {
+    isSearchOpen.value = true;
+    render(<SearchDialog />);
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('option')[0]).toHaveTextContent('Episode One')
+    );
+    const cancel = screen.getByRole('button', { name: 'Cancel' });
+    cancel.focus();
+    // The browser activates a focused button on Enter; jsdom doesn't.
+    fireEvent.keyDown(cancel, { key: 'Enter' });
+    fireEvent.click(cancel);
+    expect(navigate).not.toHaveBeenCalled();
     expect(isSearchOpen.value).toBe(false);
   });
 });

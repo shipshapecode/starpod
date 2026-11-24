@@ -22,6 +22,11 @@ export interface Props {
 const links = starpodConfig.links ?? [];
 const path = Astro.url.pathname.replace(/\/$/, '');
 const isExternal = (href: string) => /^https?:\/\//.test(href);
+// The page a local link opens, whatever query or hash it carries.
+const opens = (href: string) =>
+  isExternal(href)
+    ? null
+    : new URL(href, Astro.url).pathname.replace(/\/$/, '');
 const ICONS: Record<NavLinkIcon, typeof LinkIcon> = {
   external: ArrowOutIcon,
   heart: HeartIcon,
@@ -58,7 +63,7 @@ const on = Astro.props.anchored ? '' : undefined;
       {...{ 'data-⚓️-name': slot, 'data-⚓️-scope-name': slot }}
     >
       <a
-        aria-current={path === href ? 'page' : undefined}
+        aria-current={opens(href) === path ? 'page' : undefined}
         data-tip={on}
         {...{ 'data-⚓️-to': slot, 'data-⚓️-fill': on }}
         href={href}

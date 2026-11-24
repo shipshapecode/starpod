@@ -361,10 +361,12 @@ const publicationLinkTag =
       </aside>
 
       <header class="topbar">
-        <a class="topbar-show" href="/">
-          <img alt="" height="36" src={show.image} width="36" />
-          <span>{show.title}</span>
-        </a>
+        <!-- The show's artwork, a site's own ShowArtwork as in the rail, is
+             the home link, and reaches over the title too (shell.css). -->
+        <div class="topbar-show">
+          <span class="topbar-art"><ShowArtwork image={show.image} /></span>
+          <span class="topbar-title">{show.title}</span>
+        </div>
         <button
           class="topbar-follow"
           popovertarget="follow-sheet"
@@ -567,6 +569,19 @@ const publicationLinkTag =
         el.dataset.tip || el.textContent?.trim() || '';
       let tipTimer = 0;
 
+      // Stacked (the icon rail), the platform and host links sit under the
+      // stack's button.
+      function stack(shut: boolean) {
+        document
+          .querySelectorAll<HTMLElement>('.rail-follow-body, .rail-hosts-body')
+          .forEach((list) => (list.inert = shut));
+      }
+
+      // The divider's value stays within its stops; the hand's overshoot
+      // past the open stop is only drawn.
+      const valueAt = (x: number) =>
+        String(Math.round(Math.min(stops()[1]!, x)));
+
       function sync() {
         const shut = collapsed();
         const toggle = document.querySelector<HTMLElement>('.rail-toggle');
@@ -574,10 +589,7 @@ const publicationLinkTag =
           toggle.setAttribute('aria-expanded', String(!shut));
           toggle.dataset.tip = shut ? 'Expand sidebar' : 'Collapse sidebar';
         }
-        // Stacked, the platform and host links sit under the stack's button.
-        document
-          .querySelectorAll<HTMLElement>('.rail-follow-body, .rail-hosts-body')
-          .forEach((list) => (list.inert = shut));
+        stack(shut);
         $('.rail-edge')?.setAttribute(
           'aria-valuenow',
           String(stops()[shut ? 0 : 1])
@@ -597,7 +609,7 @@ const publicationLinkTag =
       function apply(x: number) {
         $('.rail-edge')!.style.left = `${x}px`;
         $('.app')!.style.gridTemplateColumns = `${x}px minmax(0, 1fr)`;
-        $('.rail-edge')!.setAttribute('aria-valuenow', String(Math.round(x)));
+        $('.rail-edge')!.setAttribute('aria-valuenow', valueAt(x));
       }
 
       // The rail's form while held: the icon rail below the middle. At a
@@ -610,6 +622,9 @@ const publicationLinkTag =
           reform();
         }
         root.dataset.railForm = next;
+        // The stacks take the form the hold is in (sync() would read the
+        // settled one, which the hold hasn't changed yet).
+        stack(narrow);
       }
 
       // The pieces sit in their slots in flow at rest (rail.css). A re-form
@@ -688,6 +703,7 @@ const publicationLinkTag =
         if (!wide.matches || !anchors || reducedMotion() || !main) {
           rest();
           main?.style.removeProperty('translate');
+          delete main?.dataset.gliding;
           sync();
           return;
         }
@@ -695,7 +711,7 @@ const publicationLinkTag =
         // or ride in progress) and where it will start: known numbers, so
         // nothing here forces a layout of the page.
         const shift =
-          main.dataset.gliding || main.style.translate
+          'gliding' in main.dataset || main.style.translate
             ? parseFloat(getComputedStyle(main).translate) || 0
             : 0;
         const column = parseFloat($('.app')!.style.gridTemplateColumns);
@@ -728,11 +744,16 @@ const publicationLinkTag =
         }
         main.style.transition = '';
         main.style.translate = '';
-        main.ontransitionend = (event) => {
+        // Over when it lands or is cut short, and never started when the
+        // column didn't move.
+        main.ontransitionend = main.ontransitioncancel = (event) => {
           if (event.target === main) {
             delete main.dataset.gliding;
           }
         };
+        if (from === width) {
+          delete main.dataset.gliding;
+        }
         sync();
       }
 
@@ -744,7 +765,7 @@ const publicationLinkTag =
         const main = $('.main')!;
         const x = edge.getBoundingClientRect().left;
         // At rest there is nothing in flight to catch, and nothing to measure.
-        if (!main.dataset.gliding && !edge.getAnimations().length) {
+        if (!('gliding' in main.dataset) && !edge.getAnimations().length) {
           apply(x);
           return { x, caught: false };
         }
@@ -766,6 +787,8 @@ const publicationLinkTag =
       }
 
       type Drag = {
+        // The pointer that took hold; another finger can't move or end it.
+        pointerId: number;
         x0: number;
         w0: number;
         // Where the hand wants the divider, and the frame that will put it
@@ -785,7 +808,7 @@ const publicationLinkTag =
         const edge = (event.target as Element).closest<HTMLElement>(
           '.rail-edge'
         );
-        if (!edge || event.button) {
+        if (!edge || event.button || drag) {
           return;
         }
         // No text selection, no native drag: on a long page either costs more
@@ -808,6 +831,7 @@ const publicationLinkTag =
         // (an attribute on the root restyles only what selects on it).
         root.dataset.railHeld = '';
         drag = {
+          pointerId: event.pointerId,
           x0: event.clientX,
           w0,
           x: w0,
@@ -826,7 +850,7 @@ const publicationLinkTag =
       // same event (prop-for-that's pointer-local does, for whatever is
       // hovered), forcing a layout of the page on every move.
       document.addEventListener('pointermove', (event) => {
-        if (!drag) {
+        if (drag?.pointerId !== event.pointerId) {
           return;
         }
         const dx = event.clientX - drag.x0;
@@ -856,7 +880,7 @@ const publicationLinkTag =
           // follow the hand, the page rides on a translate and re-lays once
           // when it is let go.
           $('.rail-edge')!.style.left = `${x}px`;
-          $('.rail-edge')!.setAttribute('aria-valuenow', String(Math.round(x)));
+          $('.rail-edge')!.setAttribute('aria-valuenow', valueAt(x));
           main.style.translate = `${x - drag.w0}px 0`;
         } else {
           // The page re-lays under the hand while that fits in a frame: the
@@ -900,7 +924,7 @@ const publicationLinkTag =
       // about 220ms, and the stop nearest where it would come to rest wins. A
       // hand that stopped before lifting threw nothing.
       function release(event: PointerEvent) {
-        if (!drag) {
+        if (!drag || drag.pointerId !== event.pointerId) {
           return;
         }
         const [[t0, x0], [t1, x1]] = [drag.samples[0]!, drag.samples.at(-1)!];
@@ -914,12 +938,25 @@ const publicationLinkTag =
         const target = drag.moved
           ? nearest(x + v * 220, stops())
           : stops()[collapsed() ? 0 : 1]!;
+        letGo();
+        settleSoon(target);
+      }
+      function letGo() {
         drag = null;
         delete $('.rail-edge')!.dataset.held;
         delete $('.rail')!.dataset.held;
         delete root.dataset.railHeld;
-        settleSoon(target);
       }
+      // Narrowed to the phone layout mid-hold, the rail is gone: the hold
+      // ends at the stop nearest where it was, the page back in its grid.
+      wide.addEventListener('change', () => {
+        if (!wide.matches && drag) {
+          cancelAnimationFrame(drag.frame);
+          const target = nearest(drag.x, stops());
+          letGo();
+          settle(target);
+        }
+      });
       document.addEventListener('pointerup', release);
       document.addEventListener('pointercancel', release);
       // Capture can go without an up or a cancel (the pointer's page lost

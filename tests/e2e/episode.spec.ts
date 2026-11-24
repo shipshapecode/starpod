@@ -123,7 +123,9 @@ test.describe('transcripts', () => {
     await expect(timestampButtons(page).first()).toHaveText(/^\d{1,2}:\d{2}/);
     // Speaker names (bold in the markdown) prove the markdown transcript
     // rendered; feed transcripts carry no speakers.
-    await expect(page.locator('article.transcript strong').first()).toBeVisible();
+    await expect(
+      page.locator('article.transcript strong').first()
+    ).toBeVisible();
     await expect(
       page.getByText('No transcript for this one yet.', { exact: false })
     ).toHaveCount(0);
@@ -137,25 +139,39 @@ test.describe('transcripts', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/230');
     await page.evaluate(() => {
-      const clicks: Array<string> = ((window as any).__clicks = []);
+      const clicks: Array<Element> = ((window as any).__clicks = []);
       document.addEventListener(
         'click',
-        (event) => clicks.push(String((event.target as Element).className)),
+        (event) => clicks.push(event.target as Element),
         true
       );
     });
     const heads = page
       .locator('article.transcript .ep-turn-head')
       .filter({ has: page.locator('strong') });
+    // What a new click landed on: this head's own timestamp, or what took
+    // it instead (or that no click came at all).
     const clickOn = async (head: number) => {
-      const box = (await heads.nth(head).locator('[data-seek]').boundingBox())!;
+      const chip = heads.nth(head).locator('[data-seek]');
+      const before = await page.evaluate(
+        () => (window as any).__clicks.length as number
+      );
+      const box = (await chip.boundingBox())!;
       await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, {
         steps: 5
       });
       await page.waitForTimeout(500);
       await page.mouse.down();
       await page.mouse.up();
-      return page.evaluate(() => (window as any).__clicks.at(-1) as string);
+      return chip.evaluate((el, before) => {
+        const clicks = (window as any).__clicks as Array<Element>;
+        const hit = clicks.length > before ? clicks.at(-1)! : null;
+        return !hit
+          ? 'no click'
+          : el.contains(hit)
+            ? String(el.className)
+            : `elsewhere: ${String(hit.className)}`;
+      }, before);
     };
     // Once the card's island is up, the turns in the middle of the screen.
     await expect(page.locator('.ep-who')).toBeAttached();
@@ -330,18 +346,29 @@ test.describe('episode page navigation', () => {
     // The bar's script is up once it marks the first section.
     await expect(nav.locator('a[aria-current]')).toHaveCount(1);
     const names = await nav.getByRole('link').allTextContents();
+    const anchored = await page.evaluate(() =>
+      CSS.supports('position-anchor', '--a')
+    );
     for (const name of [...names, ...names.slice(0, -1).reverse()]) {
       const link = nav.getByRole('link', { name, exact: true });
       await link.click();
       await expect(link).toHaveAttribute('aria-current', 'true');
       await expect(nav.locator('a[aria-current]')).toHaveCount(1);
-      await expect
-        .poll(async () => {
-          const here = await nav.locator('.ep-nav-here').boundingBox();
-          const box = await link.boundingBox();
-          return here && here.width ? Math.abs(here.x - box!.x) : 0;
-        })
-        .toBeLessThan(2);
+      // Where anchors place it, the indicator is drawn, on the link.
+      if (anchored) {
+        await expect
+          .poll(async () => {
+            const here = await nav.locator('.ep-nav-here').boundingBox();
+            const box = (await link.boundingBox())!;
+            return here && here.width > 0
+              ? Math.max(
+                  Math.abs(here.x - box.x),
+                  Math.abs(here.width - box.width)
+                )
+              : Infinity;
+          })
+          .toBeLessThan(2);
+      }
     }
   });
 
@@ -482,8 +509,8 @@ test.describe('episode page navigation', () => {
     await expect(page.locator('.dock-controls')).toContainText(
       'Why Open Source'
     );
-    // Whoever is speaking lights up wherever their portrait is.
-    await expect(page.locator('[data-speaking]').first()).toBeAttached({
+    // Her first line is hers: her own row lights up.
+    await expect(guest).toHaveAttribute('data-speaking', '', {
       timeout: 15000
     });
   });

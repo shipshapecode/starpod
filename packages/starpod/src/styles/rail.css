@@ -354,10 +354,28 @@
     margin-left: -12px;
   }
 
+  /* The resting stack shows three faces at most, so the credit beside it
+     fits the open rail whatever the cast (the config allows eight): the
+     rest wait unseen under the third, and fan out with the others. */
+  .rail-hosts-in {
+    --stacked: min(var(--hosts), 3);
+  }
+
+  :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form])) {
+    .rail-hosts:not(:hover, :focus-within, [data-open], :has(.is-fanned))
+      .rail-host:nth-child(n + 4) {
+      margin-left: -40px;
+
+      .person-face {
+        opacity: 0;
+      }
+    }
+  }
+
   :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form])) {
     :is(
       .rail-hosts:is(:hover, :focus-within, [data-open]),
-      .rail-hosts:has(.is-solo)
+      .rail-hosts:has(.is-fanned)
     ) {
       .host-list {
         flex-direction: column;
@@ -597,7 +615,7 @@
 
   .host-credit {
     --fade: calc(0.25s * var(--slomo)) ease calc(0.3s * var(--slomo));
-    --stack-w: calc(40px + (var(--hosts) - 1) * 28px);
+    --stack-w: calc(40px + (var(--stacked) - 1) * 28px);
     display: flex;
     align-items: center;
     box-sizing: border-box;
@@ -623,7 +641,7 @@
   :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form])) {
     :is(
       .rail-hosts:is(:hover, :focus-within, [data-open]),
-      .rail-hosts:has(.is-solo)
+      .rail-hosts:has(.is-fanned)
     ) {
       .rail-host-name {
         --fade: calc(0.25s * var(--slomo)) ease
@@ -1076,7 +1094,7 @@
     :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form])) {
       .rail-hosts-in {
         display: grid;
-        grid-template-columns: calc(40px + (var(--hosts) - 1) * 28px) 1fr;
+        grid-template-columns: calc(40px + (var(--stacked) - 1) * 28px) 1fr;
         column-gap: 10px;
       }
 
@@ -1099,7 +1117,7 @@
 
       :is(
         .rail-hosts:is(:hover, :focus-within, [data-open]),
-        .rail-hosts:has(.is-solo)
+        .rail-hosts:has(.is-fanned)
       ) {
         .rail-host-name {
           position: static;
@@ -1158,7 +1176,7 @@
       inset: auto;
       top: anchor(top);
       left: anchor(right);
-      position-try-fallbacks: flip-block;
+      position-try-fallbacks: flip-block, --rail-fly-fit;
     }
 
     .rail-tip {
@@ -1267,9 +1285,29 @@
     overlay calc(0.2s * var(--slomo)) allow-discrete;
 }
 
+/* A screen too short for the flyout either way up: it keeps inside it, and
+   its list scrolls (the box itself can't, or it would clip the caret). */
+.rail-fly[popover] {
+  position-try-fallbacks: flip-block, --rail-fly-fit;
+}
+
+@position-try --rail-fly-fit {
+  top: 8px;
+  bottom: auto;
+}
+
+.rail-fly-box > :last-child {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 .rail-fly-box {
   --caret: 10px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 16px);
   width: 15rem;
   padding: 8px;
   border: 1px solid var(--line);
@@ -1393,6 +1431,15 @@
 .rail-fly .host-row .person-face {
   --person-size: 32px;
   margin: 0;
+}
+
+/* Stacked, the hosts' names are hidden, so under reduced motion (which
+   otherwise shows a label by the name) the speaker's ring lights, at once. */
+@media (prefers-reduced-motion: reduce) {
+  .rail-host[data-speaking] .person-face::after {
+    opacity: 1;
+    transition: none;
+  }
 }
 
 /* A host speaking on the episode playing: their ring lights (people.css),

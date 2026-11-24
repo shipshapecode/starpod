@@ -34,6 +34,10 @@ const linkFor = (host: (typeof hosts)[number]) =>
   host.website ?? host.twitter ?? host.github;
 // The stack's credit line, the way a co-authored post is signed.
 const first = (name: string) => name.split(/\s+/)[0];
+// Fanned out for good with one host, or with more than two and nothing to
+// focus: the credit names only two, and a keyboard (with no link to land
+// on) could never fan the stack to read the rest.
+const fanned = hosts.length === 1 || (hosts.length > 2 && !hosts.some(linkFor));
 const credit =
   hosts.length === 2
     ? `${hosts[0]!.name} & ${hosts[1]!.name}`
@@ -43,7 +47,7 @@ const credit =
 ---
 
 <div
-  class:list={[anchored && 'rail-hosts-in', hosts.length === 1 && 'is-solo']}
+  class:list={[anchored && 'rail-hosts-in', fanned && 'is-fanned']}
   style={anchored ? `--hosts: ${hosts.length}` : undefined}
 >
   <h3
