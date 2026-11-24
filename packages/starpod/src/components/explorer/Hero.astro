@@ -1,0 +1,132 @@
+---
+import FullPlayButton from '../FullPlayButton';
+import { ArrowOutIcon, HeadphonesIcon, VideoIcon } from '../icons';
+import { optimizeImage } from '../../lib/optimize-episode-image';
+import type { Show } from '../../lib/rss';
+import { dasherize } from '../../utils/dasherize';
+import { formatDuration, toPlayable } from '../../utils/playable';
+import type { ArchiveCard } from './archive';
+import PersonFace from '../PersonFace.astro';
+import { voiceFor } from '../../lib/cast';
+import { getEpisodeCues } from '../../lib/episode-cues';
+
+export interface Props {
+  card: ArchiveCard;
+  show: Show;
+}
+
+const { card, show } = Astro.props;
+const { episode } = card;
+const playable = toPlayable(episode, show);
+// The same rendition the episode stage shows, so the two morph into each
+// other on navigation without a change of resolution.
+const art =
+  (await optimizeImage(episode.episodeImage ?? show.image, {
+    width: 960,
+    height: 960
+  })) ?? show.image;
+const date = new Date(episode.published);
+// The artwork's address as a CSS string (the feed's own, when it couldn't be
+// optimised, may hold anything).
+const artUrl = `url("${art.replace(/["\\\n\r]/g, (c) => (c === '\n' ? '\\a ' : c === '\r' ? '\\d ' : `\\${c}`))}")`;
+// Who speaks in the transcript wears that voice's ring.
+const cues = card.people.length ? await getEpisodeCues(episode) : null;
+const number =
+  episode.episodeNumber === 'Bonus'
+    ? 'Bonus'
+    : `Episode ${episode.episodeNumber}`;
+---
+
+<section
+  aria-labelledby="xp-hero-title"
+  class="xp-hero"
+  data-episode-row
+  data-id={episode.id}
+  data-video={episode.video ? '' : undefined}
+  data-vt={dasherize(episode.title)}
+>
+  <div aria-hidden="true" class="xp-hero-glow"></div>
+  <div
+    class="xp-hero-media"
+    data-props-for="img img-color pointer-local"
+    data-props-to=".xp-hero"
+  >
+    <div aria-hidden="true" class="xp-hero-ambient" style={`--art: ${artUrl}`}>
+    </div>
+    <img
+      alt=""
+      class="xp-hero-art"
+      data-vt-art
+      decoding="async"
+      fetchpriority="high"
+      height="960"
+      src={art}
+      width="960"
+    />
+    <span class="xp-chip xp-hero-kind">
+      {episode.video ? <VideoIcon size={14} /> : <HeadphonesIcon size={14} />}
+      {episode.video ? 'Video' : 'Audio'}
+    </span>
+    <span class="xp-hero-play">
+      <FullPlayButton client:load episode={playable} look="disc" />
+    </span>
+    <span aria-hidden="true" class="xp-hero-progress"></span>
+  </div>
+
+  <div class="xp-hero-meta">
+    <p class="xp-hero-eyebrow">
+      <span aria-hidden="true" class="xp-onair"
+        ><span></span><span></span><span></span></span
+      >
+      Latest episode
+    </p>
+    <h2 class="xp-hero-title" id="xp-hero-title">
+      <a data-vt-title href={`/${episode.episodeSlug}`}>{episode.title}</a>
+    </h2>
+    <p class="xp-hero-facts">
+      <span>{number}</span>
+      <time datetime={date.toISOString()}>
+        {
+          date.toLocaleDateString('en-us', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          })
+        }
+      </time>
+      <span>{formatDuration(episode.duration)}</span>
+    </p>
+    {
+      card.people.length > 0 && (
+        <ul aria-label="Hosts and guests" class="xp-hero-people">
+          {card.people.map((person) => (
+            <li
+              data-speaks-as={person.name}
+              data-voice={voiceFor(
+                person.name,
+                cues,
+                card.people.map((other) => other.name)
+              )}
+            >
+              <a
+                class="person-chip"
+                href={`/#guest=${encodeURIComponent(person.id)}`}
+              >
+                <PersonFace size={32} src={person.avatar} />
+                {person.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <p class="xp-hero-desc">{episode.description}</p>
+    <div class="xp-hero-actions">
+      <FullPlayButton client:load episode={playable} look="pill" />
+      <a class="xp-hero-link" href={`/${episode.episodeSlug}`}>
+        Show notes and transcript
+        <ArrowOutIcon size={16} />
+      </a>
+    </div>
+  </div>
+</section>

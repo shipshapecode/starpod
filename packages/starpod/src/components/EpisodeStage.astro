@@ -1,6 +1,7 @@
 ---
 import { matchNames, sortCast, voiceFor, type CastPerson } from '../lib/cast';
 import { getEpisodeCues } from '../lib/episode-cues';
+import { faceOf } from '../lib/people';
 import { optimizeImage } from '../lib/optimize-episode-image';
 import type { Episode, Show } from '../lib/rss';
 import { dasherize } from '../utils/dasherize';
@@ -11,11 +12,7 @@ import LiveScript from './media/LiveScript';
 import PersonFace from './PersonFace.astro';
 import StageControls from './media/StageControls';
 
-import type { ImageMetadata } from 'astro';
-import { getImage } from 'astro:assets';
 import starpodConfig from 'virtual:starpod/config';
-// The face for someone without a photo, light or dark with the page.
-import avatar from '../assets/avatar.svg?url';
 
 export interface Props {
   episode: Episode;
@@ -54,9 +51,6 @@ const presets = [
 
 // The cast: this episode's own hosts and guests, in credit order. Anyone who
 // speaks as one of the transcript's two main voices wears that voice's face.
-const photos = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/img/people/*.{jpeg,jpg,png}'
-);
 const cues = people.length ? await getEpisodeCues(episode) : null;
 const names = people.map((person) => person.name);
 const speakerOf = matchNames(names, [...new Set(cues?.flatMap((cue) => (cue.n ? [cue.n] : [])))], {
@@ -64,16 +58,11 @@ const speakerOf = matchNames(names, [...new Set(cues?.flatMap((cue) => (cue.n ? 
 });
 const cast = await Promise.all(
   sortCast(people, starpodConfig.hosts.map((host) => host.name)).map(async (person) => {
-    const photo =
-      person.img && (await photos[`/src/img/people/${person.img}`]?.())?.default;
-    const image = photo
-      ? await getImage({ src: photo, width: 112, height: 112, format: 'webp' })
-      : { src: avatar };
     return {
       guest: !person.isHost,
       name: person.name,
       speaksAs: speakerOf.get(person.name),
-      src: image.src,
+      src: await faceOf(person.img, 112),
       voice: voiceFor(person.name, cues, names)
     };
   })

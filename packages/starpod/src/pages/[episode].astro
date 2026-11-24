@@ -1,16 +1,9 @@
 ---
-import { getImage } from 'astro:assets';
 import { getEntry, render } from 'astro:content';
 import { count, eq, inArray } from 'drizzle-orm';
 
 import { createDb } from '../db';
-import {
-  Episode as DbEpisode,
-  HostOrGuest,
-  Person,
-  Sponsor,
-  SponsorForEpisode
-} from '../db/schema';
+import { Episode as DbEpisode, Sponsor, SponsorForEpisode } from '../db/schema';
 
 import { Schema } from 'astro-seo-schema';
 
@@ -27,14 +20,12 @@ import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
 import { generateDocumentLinkTag } from '@bryanguffey/astro-standard-site';
 
 import starpodConfig, { database } from 'virtual:starpod/config';
-import type { ImageMetadata } from 'astro';
-// The face for someone without a photo, light or dark with the page.
-import avatar from '../assets/avatar.svg?url';
 
 import Layout from '../layouts/Layout.astro';
 import { factGivesCount, matchNames, personFact, sortCast } from '../lib/cast';
 import { getEpisodeCues } from '../lib/episode-cues';
 import { optimizeImage } from '../lib/optimize-episode-image';
+import { faceOf, peopleBySlug } from '../lib/people';
 import { getAllEpisodes, getShowInfo, type Episode } from '../lib/rss';
 import {
   getRssTranscriptParagraphs,
@@ -130,19 +121,9 @@ const db = database
     )
   : null;
 
-const hostsAndGuests = !db
-  ? []
-  : await db
-      .select({
-        id: Person.id,
-        img: Person.img,
-        isHost: HostOrGuest.isHost,
-        name: Person.name
-      })
-      .from(HostOrGuest)
-      .innerJoin(DbEpisode, eq(HostOrGuest.episodeSlug, DbEpisode.episodeSlug))
-      .innerJoin(Person, eq(HostOrGuest.personId, Person.id))
-      .where(eq(DbEpisode.episodeSlug, episode.episodeSlug));
+// Its hosts and guests: the database's, else the feed's (src/lib/people.ts).
+const castBySlug = await peopleBySlug();
+const hostsAndGuests = castBySlug.get(episode.episodeSlug) ?? [];
 
 const sponsors = !db
   ? []
@@ -171,25 +152,10 @@ const newer = allEpisodes[position - 1];
 const older = allEpisodes[position + 1];
 const bySlug = new Map(allEpisodes.map((item) => [item.episodeSlug, item]));
 
-const appearances =
-  !db || !hostsAndGuests.length
-    ? []
-    : await db
-        .select({
-          personId: HostOrGuest.personId,
-          episodeSlug: HostOrGuest.episodeSlug
-        })
-        .from(HostOrGuest)
-        .where(
-          inArray(
-            HostOrGuest.personId,
-            hostsAndGuests.map((person) => person.id)
-          )
-        );
 const episodesOf = (personId: string) =>
-  appearances
-    .filter((row) => row.personId === personId)
-    .map((row) => bySlug.get(row.episodeSlug))
+  [...castBySlug]
+    .filter(([, people]) => people.some((person) => person.id === personId))
+    .map(([slug]) => bySlug.get(slug))
     .filter((item): item is Episode => Boolean(item))
     .sort((a, b) => b.published - a.published);
 
@@ -226,9 +192,6 @@ const card = async (item: Episode, reason?: string, face?: string) => ({
   face
 });
 
-const photos = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/img/people/*.{jpeg,jpg,png}'
-);
 const cast = sortCast(
   hostsAndGuests,
   starpodConfig.hosts.map((host) => host.name)
@@ -249,16 +212,11 @@ const people = await Promise.all(
     const earliest = theirs.at(-1);
     const speaker = speakerOf.get(person.name);
     const said = speaker ? talk.get(speaker) : undefined;
-    const photo =
-      person.img &&
-      (await photos[`/src/img/people/${person.img}`]?.())?.default;
     return {
       id: person.id,
       name: person.name,
       guest: !person.isHost,
-      src: photo
-        ? (await getImage({ src: photo, width: 128, height: 128, format: 'webp' })).src
-        : avatar,
+      src: await faceOf(person.img, 128),
       count: theirs.length,
       fact: personFact({
         appearance,

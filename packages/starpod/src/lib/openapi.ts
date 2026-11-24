@@ -252,6 +252,20 @@ export function generateOpenApiSpec(
                 src: { type: 'string', format: 'uri' },
                 type: { type: 'string' }
               }
+            },
+            people: {
+              type: 'array',
+              description:
+                "The episode's hosts and guests, from its <podcast:person> tags",
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string' },
+                  role: { type: 'string', description: 'host, guest, …' },
+                  img: { type: 'string', format: 'uri' },
+                  href: { type: 'string', format: 'uri' }
+                }
+              }
             }
           }
         },

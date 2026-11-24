@@ -1,0 +1,246 @@
+---
+import { CloseIcon, ListIcon, SearchIcon } from '../icons';
+import PersonFace from '../PersonFace.astro';
+import type { ArchiveChoice } from './archive';
+import { ChevronIcon, GridIcon, ResumeIcon, SortIcon, UpIcon } from './icons';
+
+export interface Props {
+  people: Array<ArchiveChoice>;
+  total: number;
+  years: Array<ArchiveChoice>;
+}
+
+const { people, total, years } = Astro.props;
+
+const sorts = [
+  { value: 'newest', label: 'Newest first' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'longest', label: 'Longest first' },
+  { value: 'shortest', label: 'Shortest first' }
+];
+
+// Anchored auto layout attributes have an emoji in their name, which JSX
+// can't spell; spread them in.
+const segRoot = { 'data-⚓️-root': '', 'data-⚓️-scope-name': '--xp-on' };
+const segThumb = {
+  'data-⚓️-to': '--xp-on',
+  'data-⚓️-fill': '',
+  'data-⚓️-transition': 'glide'
+};
+---
+
+<div class="xp-bar" data-xp-bar>
+  <form aria-label="Filter episodes" class="xp-bar-in" role="search">
+    <div class="xp-bar-row">
+      <label class="xp-search">
+        <SearchIcon size={18} />
+        <span class="sr-only">Search episodes</span>
+        <input
+          autocomplete="off"
+          enterkeyhint="search"
+          name="q"
+          placeholder="Filter episodes"
+          type="search"
+        />
+        <span aria-hidden="true" class="xp-count">
+          <b data-xp-shown>{total}</b>
+          <span data-xp-of hidden>of {total}</span>
+          <span class="xp-count-unit">episodes</span>
+        </span>
+      </label>
+      <fieldset class="xp-seg xp-views" {...segRoot}>
+        <legend class="sr-only">View</legend>
+        <span aria-hidden="true" class="xp-seg-thumb" {...segThumb}></span>
+        <label>
+          <input checked name="view" type="radio" value="grid" />
+          <GridIcon size={18} />
+          <span>Grid</span>
+        </label>
+        <label>
+          <input name="view" type="radio" value="list" />
+          <ListIcon size={18} />
+          <span>List</span>
+        </label>
+      </fieldset>
+      <button class="icon-button xp-top" data-xp-top type="button">
+        <UpIcon />
+        <span class="sr-only">Back to the top</span>
+      </button>
+    </div>
+
+    <div class="xp-chips">
+      <fieldset class="xp-seg" {...segRoot}>
+        <legend class="sr-only">Kind</legend>
+        <span aria-hidden="true" class="xp-seg-thumb" {...segThumb}></span>
+        <label
+          ><input checked name="kind" type="radio" value="" /><span>All</span
+          ></label
+        >
+        <label
+          ><input name="kind" type="radio" value="video" /><span>Video</span
+          ></label
+        >
+        <label
+          ><input name="kind" type="radio" value="audio" /><span>Audio</span
+          ></label
+        >
+      </fieldset>
+      <button
+        aria-pressed="false"
+        class="xp-pick halo"
+        data-xp-progress
+        hidden
+        type="button"
+      >
+        <ResumeIcon size={18} />
+        <span>In progress</span>
+        <b data-xp-progress-count></b>
+      </button>
+      {
+        /* A filter with a value set turns solid and gains a × that clears it. */
+      }
+      <span class="xp-filter">
+        <button
+          class="xp-pick halo"
+          popovertarget="xp-year"
+          style="anchor-name: --xp-year"
+          type="button"
+        >
+          <span>Year</span>
+          <b data-xp-label="year">Any</b>
+          <ChevronIcon class="xp-chevron" size={16} />
+        </button>
+        <button class="xp-unset" data-xp-unset="year" hidden type="button">
+          <CloseIcon size={14} />
+          <span class="sr-only">Any year</span>
+        </button>
+      </span>
+      {
+        people.length > 0 && (
+          <span class="xp-filter">
+            <button
+              class="xp-pick halo"
+              popovertarget="xp-people"
+              style="anchor-name: --xp-people"
+              type="button"
+            >
+              <span class="person-face xp-pick-face" data-xp-face hidden>
+                <img alt="" height="20" src="data:," width="20" />
+              </span>
+              <span>With</span>
+              <b data-xp-label="guest">Anyone</b>
+              <ChevronIcon class="xp-chevron" size={16} />
+            </button>
+            <button class="xp-unset" data-xp-unset="guest" hidden type="button">
+              <CloseIcon size={14} />
+              <span class="sr-only">Anyone</span>
+            </button>
+          </span>
+        )
+      }
+      <button class="xp-reset" data-xp-reset hidden type="reset">Reset</button>
+      <button
+        class="xp-pick xp-sort halo"
+        popovertarget="xp-sort"
+        style="anchor-name: --xp-sort"
+        type="button"
+      >
+        <SortIcon size={18} />
+        <span class="sr-only">Sort:</span>
+        <b data-xp-label="sort">Newest first</b>
+        <ChevronIcon class="xp-chevron" size={16} />
+      </button>
+    </div>
+
+    <div
+      class="xp-menu"
+      id="xp-sort"
+      popover
+      style="position-anchor: --xp-sort"
+    >
+      <div class="xp-menu-in">
+        <fieldset class="xp-menu-list">
+          <legend class="xp-menu-title">Sort episodes</legend>
+          {
+            sorts.map((sort, i) => (
+              <label class="xp-option">
+                <input
+                  checked={i === 0}
+                  name="sort"
+                  type="radio"
+                  value={sort.value}
+                />
+                <span>{sort.label}</span>
+                <span aria-hidden="true" class="xp-radio" />
+              </label>
+            ))
+          }
+        </fieldset>
+      </div>
+    </div>
+
+    <div
+      class="xp-menu"
+      id="xp-year"
+      popover
+      style="position-anchor: --xp-year"
+    >
+      <div class="xp-menu-in">
+        <fieldset class="xp-menu-list">
+          <legend class="xp-menu-title">Released in</legend>
+          <label class="xp-option">
+            <input checked name="year" type="radio" value="" />
+            <span>Any year</span>
+            <small>{total}</small>
+            <span aria-hidden="true" class="xp-radio"></span>
+          </label>
+          {
+            years.map((year) => (
+              <label class="xp-option">
+                <input name="year" type="radio" value={year.value} />
+                <span>{year.label}</span>
+                <small>{year.count}</small>
+                <span aria-hidden="true" class="xp-radio" />
+              </label>
+            ))
+          }
+        </fieldset>
+      </div>
+    </div>
+
+    {
+      people.length > 0 && (
+        <div
+          class="xp-menu"
+          id="xp-people"
+          popover
+          style="position-anchor: --xp-people"
+        >
+          <div class="xp-menu-in">
+            <fieldset class="xp-menu-list">
+              <legend class="xp-menu-title">Hosts and guests</legend>
+              <label class="xp-option">
+                <input checked name="guest" type="radio" value="" />
+                <span>Anyone</span>
+                <small>{total}</small>
+                <span aria-hidden="true" class="xp-radio" />
+              </label>
+              {people.map((person) => (
+                <label class="xp-option">
+                  <input name="guest" type="radio" value={person.value} />
+                  {person.avatar && (
+                    <PersonFace size={32} src={person.avatar} />
+                  )}
+                  <span>{person.label}</span>
+                  <small>{person.count}</small>
+                  <span aria-hidden="true" class="xp-radio" />
+                </label>
+              ))}
+            </fieldset>
+          </div>
+        </div>
+      )
+    }
+  </form>
+</div>
+<p class="sr-only" data-xp-status role="status"></p>

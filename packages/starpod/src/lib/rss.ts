@@ -1,16 +1,8 @@
 import { htmlToText } from 'html-to-text';
 import parseFeed from 'rss-to-json';
-import {
-  array,
-  number,
-  object,
-  optional,
-  parse,
-  string,
-  union
-} from 'valibot';
+import { array, number, object, optional, parse, string, union } from 'valibot';
 
-import { fetchFeedVideos, type FeedVideo } from './feed-media';
+import { fetchFeedExtras, type FeedPerson, type FeedVideo } from './feed-media';
 import { optimizeImage } from './optimize-episode-image';
 import type { StarpodConfig } from '../utils/config';
 import { dasherize } from '../utils/dasherize';
@@ -65,6 +57,9 @@ export interface Episode {
   // video or HLS type. When present the site leads with video and offers a
   // switch to audio.
   video?: FeedVideo;
+  // The episode's hosts and guests from its `<podcast:person>` tags, when the
+  // feed names them (src/lib/people.ts prefers the guests database).
+  people?: Array<FeedPerson>;
   // A transcript referenced by the feed's `<podcast:transcript>` tag, if any.
   // Used as a fallback when no explicit markdown transcript is provided for the
   // episode.
@@ -152,9 +147,9 @@ export async function getAllEpisodes(config?: StarpodConfig) {
   });
 
   const feedUrl = await resolveRssFeed(config);
-  const [feed, videos] = await Promise.all([
+  const [feed, { videos, people }] = await Promise.all([
     parseRssFeed(feedUrl) as Promise<Show>,
-    fetchFeedVideos(feedUrl)
+    fetchFeedExtras(feedUrl)
   ]);
   let items = parse(FeedSchema, feed).items;
 
@@ -202,7 +197,8 @@ export async function getAllEpisodes(config?: StarpodConfig) {
               src: audioEnclosure.url,
               type: audioEnclosure.type ?? 'audio/mpeg'
             },
-            video: videos.get(id)
+            video: videos.get(id),
+            people: people.get(id)
           };
         }
       )

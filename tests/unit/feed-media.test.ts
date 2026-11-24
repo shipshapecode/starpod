@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { extractVideosByGuid, isVideoType } from 'starpod/src/lib/feed-media';
+import {
+  extractPeopleByGuid,
+  extractVideosByGuid,
+  isVideoType
+} from 'starpod/src/lib/feed-media';
 
 const feed = `<?xml version="1.0"?>
 <rss><channel>
@@ -53,5 +57,43 @@ describe('isVideoType', () => {
     expect(isVideoType('video/mp4')).toBe(true);
     expect(isVideoType('application/vnd.apple.mpegurl')).toBe(true);
     expect(isVideoType('audio/mpeg')).toBe(false);
+  });
+});
+
+describe('extractPeopleByGuid', () => {
+  const people = extractPeopleByGuid(`<rss><channel>
+<podcast:person role="Host" img="https://example.com/show-host.jpg">Show Host</podcast:person>
+<item><title>Two people</title><guid>flightcast:AAA</guid>
+<podcast:person role="Host" img="https://example.com/r.jpg?a=1&amp;b=2" href="https://r.example/">Robbie Wagner</podcast:person>
+<podcast:person role='Guest' href="https://g.example/"><![CDATA[Guest & Co]]></podcast:person>
+<podcast:person>No Role</podcast:person>
+<podcast:person role="guest"> </podcast:person>
+</item>
+<item><title>Nobody</title><guid>flightcast:BBB</guid></item>
+</channel></rss>`);
+
+  it("reads each item's people: name, role, photo and link", () => {
+    expect(people.get('flightcast:AAA')).toEqual([
+      {
+        name: 'Robbie Wagner',
+        role: 'host',
+        img: 'https://example.com/r.jpg?a=1&b=2',
+        href: 'https://r.example/'
+      },
+      {
+        name: 'Guest & Co',
+        role: 'guest',
+        img: undefined,
+        href: 'https://g.example/'
+      },
+      { name: 'No Role', role: 'host', img: undefined, href: undefined }
+    ]);
+  });
+
+  it("leaves out items that name nobody, and the channel's own people", () => {
+    expect(people.has('flightcast:BBB')).toBe(false);
+    expect([...people.values()].flat().map((p) => p.name)).not.toContain(
+      'Show Host'
+    );
   });
 });

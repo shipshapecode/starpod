@@ -1,85 +1,211 @@
 ---
-import FormattedDate from '../components/FormattedDate';
-import FullPlayButton from '../components/FullPlayButton';
 import UFOIllustration from '../components/illustrations/UFOIllustration.astro';
+import { ArrowOutIcon, CloseIcon, QueueIcon } from './icons';
 import type { Episode, Show } from '../lib/rss';
-import { dasherize } from '../utils/dasherize';
+import type { ArchiveCard, ArchiveChoice } from './explorer/archive';
+import Card from './explorer/Card.astro';
+import Toolbar from './explorer/Toolbar.astro';
 
 export interface Props {
+  /** The archive, newest first, as `loadArchive()` prepares it. */
+  cards: Array<ArchiveCard>;
   episodes: Array<Episode>;
+  people: Array<ArchiveChoice>;
   show: Show;
+  years: Array<ArchiveChoice>;
 }
 
-const { episodes, show } = Astro.props;
+const { cards, episodes, people, show, years } = Astro.props;
 ---
+
+<script is:inline>
+  // Arriving with a cut in the hash: hold the archive back until the
+  // explorer has applied it, rather than flash every episode first.
+  if (
+    /[#&](q|kind|guest|year|progress|sort|view)=/.test(location.hash) &&
+    !document.querySelector('[data-explorer][data-live]')
+  ) {
+    document.documentElement.dataset.xpPending = '';
+  }
+</script>
 
 {
   episodes.length === 0 ? (
-    <div class="flex flex-col items-center">
-      <div class="h-auto w-full max-w-80">
+    <div class="empty">
+      <div class="empty-art">
         <UFOIllustration />
       </div>
-
-      <p class="text-light-text-heading py-10 text-lg font-bold dark:text-white">
-        No episodes yet. Check back soon!
+      <p>
+        No episodes yet. The first one lands here the moment it’s in the feed.
       </p>
     </div>
   ) : (
-    <ul aria-label="EpisodeList">
-      {episodes.map((episode) => {
-        return (
-          <li class="dark:border-dark-border border-b">
-            <div class="flex w-full flex-col py-12 lg:flex-row">
-              <img
-                alt={`${episode.title} - episode art`}
-                aria-hidden="true"
-                class="mb-3 block h-20 w-20 rounded-md lg:mr-6"
-                height={80}
-                loading="lazy"
-                src={episode.episodeThumbnail ?? show.image}
-                width={80}
-              />
-
-              <div class="flex flex-col">
-                <FormattedDate date={new Date(episode.published)} />
-
-                <h2 class="text-light-text-heading my-2 text-lg font-bold dark:text-white">
-                  <a
-                    href={`/${episode.episodeSlug}`}
-                    style={
-                      'view-transition-name: var(--should-vt); --vt-name: vt-' +
-                      dasherize(episode.title)
-                    }
-                  >
-                    {episode.episodeNumber}: {episode.title}
-                  </a>
-                </h2>
-
-                <p class="mb-5">{episode.description}</p>
-
-                <div class="flex items-center gap-6 text-sm">
-                  <FullPlayButton
-                    client:visible
-                    episode={{
-                      audio: episode.audio,
-                      episodeNumber: episode.episodeNumber,
-                      id: episode.id,
-                      title: episode.title
-                    }}
-                  />
-
-                  <a
-                    class="text-light-text-heading font-bold dark:text-white"
-                    href={`/${episode.episodeSlug}`}
-                  >
-                    Show notes
-                  </a>
-                </div>
-              </div>
-            </div>
-          </li>
-        );
-      })}
-    </ul>
+    <section aria-labelledby="xp-archive-title" class="xp" data-explorer>
+      <h2 class="xp-heading" id="xp-archive-title">
+        All episodes <span>{episodes.length}</span>
+      </h2>
+      <Toolbar people={people} total={episodes.length} years={years} />
+      <div class="xp-stage">
+        {/* The Close-Up: two skeletons, one change. Opening a card re-targets
+            its artwork, facts line and title to these slots, and the archive
+            folds into a filmstrip beside it. The slots are empty boxes; the
+            two text slots hold an invisible copy, so they take the size the
+            travelling part will have when it lands. */}
+        {/* Only boxes: what shows in it belongs to the open card, so it is
+            no landmark of its own. */}
+        <div aria-hidden="true" class="xp-closeup" data-xp-closeup>
+          <span aria-hidden="true" class="xp-cu-glow" />
+          <span aria-hidden="true" class="xp-cu-art" />
+          <div class="xp-cu-col">
+            <p aria-hidden="true" class="xp-cu-facts" data-xp-ghost="facts" />
+            <p aria-hidden="true" class="xp-cu-title" data-xp-ghost="title" />
+            <span aria-hidden="true" class="xp-cu-detail" />
+          </div>
+        </div>
+        <ol aria-label="Episodes" class="xp-list" data-view="grid">
+          {cards.map((card) => (
+            <Card card={card} show={show} />
+          ))}
+        </ol>
+      </div>
+      {/* The open card's detail, after its description: where to resume and
+          what to do. One copy for the archive, moved into the card that
+          opens (explorer.ts). */}
+      <template data-xp-actions>
+        <p class="xp-resume" hidden />
+        <div class="xp-actions">
+          <span aria-hidden="true" class="xp-play-slot" />
+          <button
+            aria-pressed="false"
+            class="button-secondary xp-queue"
+            type="button"
+          >
+            <QueueIcon size={18} />
+            <span>
+              <span class="xp-long">Add to </span>Up next
+            </span>
+          </button>
+          <a class="button-secondary xp-open">
+            <span>
+              Open<span class="xp-long"> episode</span>
+            </span>
+            <ArrowOutIcon size={16} />
+          </a>
+          <button class="icon-button xp-close" type="button">
+            <CloseIcon />
+            <span class="sr-only">Close the episode</span>
+          </button>
+        </div>
+      </template>
+      <div class="xp-empty" data-xp-empty hidden>
+        <div class="empty-art">
+          <UFOIllustration />
+        </div>
+        <p>
+          Nothing in the archive matches{' '}
+          <span data-xp-empty-what>those filters</span>.
+        </p>
+        <button class="button-secondary" data-xp-clear type="button">
+          Show every episode
+        </button>
+      </div>
+    </section>
   )
 }
+
+<script>
+  import { startExplorer } from './explorer/explorer';
+
+  document.addEventListener('astro:page-load', startExplorer);
+
+  /*
+    The card you open morphs into the episode page: its artwork into the
+    cover, its title into the heading. Only that one card carries
+    view-transition names (hundreds of named elements would be costly), set
+    just before the navigation starts. Coming back, the card for the episode
+    you left is named so both fly home.
+  */
+  const NAMED = 'data-vt-named';
+
+  function name(row: HTMLElement | null) {
+    document.querySelectorAll<HTMLElement>(`[${NAMED}]`).forEach((el) => {
+      el.style.viewTransitionName = '';
+      el.style.removeProperty('view-transition-class');
+      el.style.contentVisibility = '';
+      el.removeAttribute(NAMED);
+    });
+    const slug = row?.dataset.vt;
+    if (!row || !slug) {
+      return;
+    }
+    // Cards skip rendering while off screen (content-visibility), and a card
+    // just swapped in hasn't been judged on screen yet; a skipped element
+    // can't be captured, so the named card always renders.
+    row.style.contentVisibility = 'visible';
+    row.setAttribute(NAMED, '');
+    // In the close-up the artwork has turned over: its back is the face
+    // that shows, so that is the one that morphs.
+    const art =
+      (row.dataset.on !== undefined &&
+        row.querySelector<HTMLElement>('.xp-back [data-vt-art]')) ||
+      row.querySelector<HTMLElement>('[data-vt-art]');
+    const title = row.querySelector<HTMLElement>('[data-vt-title]');
+    for (const [el, value] of [
+      [art, `vt-art-${slug}`],
+      [title, `vt-${slug}`]
+    ] as const) {
+      if (el) {
+        el.style.viewTransitionName = value;
+        el.setAttribute(NAMED, '');
+      }
+    }
+    // Two different blocks of type share the title's name: they hand over
+    // rather than cross-fade (explorer.css).
+    title?.style.setProperty('view-transition-class', 'xp-morph-title');
+  }
+
+  let leaving = '';
+  // The latest episode is both the hero and a card; come home to the one
+  // you left from. Remembered per episode, as the way back (browser Back,
+  // or a link on the episode page) has no row to say.
+  let fromCard = false;
+  const leftFromCard = new Map<string, boolean>();
+
+  document.addEventListener('astro:before-preparation', (event) => {
+    leaving = event.from.pathname;
+    const link = (event.sourceElement as HTMLElement | undefined)?.closest?.(
+      '[data-episode-row] a[href]'
+    );
+    const row = link
+      ? (link.closest('[data-episode-row]') as HTMLElement)
+      : null;
+    if (row) {
+      fromCard = row.matches('li');
+      leftFromCard.set(event.to.pathname, fromCard);
+    } else {
+      fromCard = leftFromCard.get(leaving) ?? false;
+    }
+    name(row);
+  });
+
+  document.addEventListener('astro:after-swap', () => {
+    const rows = [
+      ...document.querySelectorAll<HTMLElement>('[data-episode-row]')
+    ].filter(
+      (candidate) =>
+        candidate.querySelector('[data-vt-title]')?.getAttribute('href') ===
+        leaving
+    );
+    const row =
+      rows.find((candidate) => candidate.matches('li') === fromCard) ??
+      rows[0] ??
+      null;
+    name(row);
+    // Back to a card: the explorer starts now rather than at page-load, so
+    // the archive is in its view and order, and the card in sight, before
+    // the morph home is captured.
+    if (row?.matches('li')) {
+      startExplorer();
+    }
+  });
+</script>
