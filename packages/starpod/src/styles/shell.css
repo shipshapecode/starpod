@@ -241,7 +241,6 @@
 }
 
 .topbar-show {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -259,15 +258,9 @@
   border-radius: 8px;
 }
 
-/* The artwork's link covers the row: a tap on the title goes home too. */
-.topbar-show a::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-}
-
 .topbar-title {
   overflow: hidden;
+  text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

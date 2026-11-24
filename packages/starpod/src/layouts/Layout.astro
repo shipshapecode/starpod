@@ -362,10 +362,14 @@ const publicationLinkTag =
 
       <header class="topbar">
         <!-- The show's artwork, a site's own ShowArtwork as in the rail, is
-             the home link, and reaches over the title too (shell.css). -->
+             the home link. The title goes home too, for a pointer; to the
+             keyboard and assistive tech it's the same link, so it stays out
+             of their way. -->
         <div class="topbar-show">
           <span class="topbar-art"><ShowArtwork image={show.image} /></span>
-          <span class="topbar-title">{show.title}</span>
+          <a aria-hidden="true" class="topbar-title" href="/" tabindex="-1"
+            >{show.title}</a
+          >
         </div>
         <button
           class="topbar-follow"
