@@ -452,7 +452,7 @@ test.describe('episode page navigation', () => {
     ).toBeVisible();
     await expect(
       panel.getByRole('link', { name: 'All 3 episodes with Chris Coyier' })
-    ).toHaveAttribute('href', '/?guest=chriscoyier');
+    ).toHaveAttribute('href', '/#guest=chriscoyier');
 
     await person.click();
     await expect(person).toHaveAttribute('aria-expanded', 'false');
@@ -476,7 +476,7 @@ test.describe('episode page navigation', () => {
     await expect(hosted).toContainText('Hosted by');
     await expect(
       hosted.getByRole('link', { name: /Jason Lengstorf/ })
-    ).toHaveAttribute('href', /\/\?guest=/);
+    ).toHaveAttribute('href', /\/#guest=/);
 
     await guest.getByRole('button', { name: /^First speaks at/ }).click();
     await expect(page.locator('.dock-controls')).toContainText(

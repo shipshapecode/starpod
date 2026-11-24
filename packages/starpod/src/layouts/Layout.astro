@@ -186,15 +186,11 @@ const publicationLinkTag =
     <ClientRouter />
   </head>
   <body>
-    <!-- Skip links are plain fragment jumps in this document: the router
-         leaves them alone (data-astro-reload), as it would otherwise compare
-         against a location the explorer's pushState has moved on from and
-         fetch and swap the whole page. -->
-    <a class="skip-link" data-astro-reload href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">Skip to content</a>
     <!-- The island sits at the end of the page and this reaches it in one
          step (it takes focus, its title is next). It is shown only while an
          episode is loaded, when there is an island (shell.css). -->
-    <a class="skip-link" data-astro-reload href="#player">Skip to the player</a>
+    <a class="skip-link" href="#player">Skip to the player</a>
 
     <div class="app">
       <!-- The divider between the rail and the page, and the only anchor the

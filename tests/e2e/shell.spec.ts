@@ -711,9 +711,9 @@ test.describe('skip links', () => {
     const tab = browserName === 'webkit' ? 'Alt+Tab' : 'Tab';
     await page.goto('/');
     await expect(page.locator('[data-explorer][data-live]')).toBeAttached();
-    // A search pushes ?q= into the address without the router knowing.
+    // A search moves the address to #q=, through the router.
     await page.getByRole('searchbox', { name: 'Search episodes' }).fill('css');
-    await expect(page).toHaveURL(/\?q=css$/);
+    await expect(page).toHaveURL(/#q=css$/);
     await page.evaluate(() => {
       (window as Window & { routed?: number }).routed = 0;
       document.addEventListener('astro:before-preparation', () => {
@@ -736,7 +736,7 @@ test.describe('skip links', () => {
 
     // A fragment jump in this document: the explorer and its search stay,
     // and the router never starts a navigation.
-    await expect(page).toHaveURL(/\?q=css#main$/);
+    await expect(page).toHaveURL(/\/#main$/);
     await page.waitForTimeout(500);
     expect(
       await page.evaluate(() => (window as Window & { routed?: number }).routed)
@@ -859,11 +859,9 @@ test.describe('search palette', () => {
         return hit?.closest('[role="option"]') === row;
       })
     ).toBe(true);
-    // Chosen: the person's episodes are fetched (the page swap that follows
-    // is the router's, and slow on a busy dev server).
-    const chosen = page.waitForRequest(/\?guest=/);
+    // Chosen: the explorer shows the person's episodes.
     await first.click();
-    await chosen;
+    await expect(page).toHaveURL(/\/#guest=[^&]+$/);
   });
 
   test('opens from the collapsed rail with ⌘K and goes to the chosen episode', async ({

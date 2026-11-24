@@ -206,10 +206,10 @@ describe('SearchDialog', () => {
     );
     const options = screen.getAllByRole('option');
     expect(options[0]).toHaveTextContent('Ada Lovelace');
-    expect(options[0]).toHaveAttribute('href', '/?guest=ada');
+    expect(options[0]).toHaveAttribute('href', '/#guest=ada');
 
     fireEvent.keyDown(document, { key: 'Enter' });
-    expect(navigate).toHaveBeenCalledWith('/?guest=ada');
+    expect(navigate).toHaveBeenCalledWith('/#guest=ada');
   });
 
   it('closes when Escape is pressed', async () => {

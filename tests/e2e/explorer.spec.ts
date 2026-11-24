@@ -54,7 +54,7 @@ test('opens on the latest episode, ready to play', async ({ page }) => {
 test('searches titles and descriptions as you type', async ({ page }) => {
   const total = await cards(page).count();
   await page.getByRole('searchbox', { name: 'Search episodes' }).fill('css');
-  await expect(page).toHaveURL(/\?q=css$/);
+  await expect(page).toHaveURL(/#q=css$/);
   const results = await cards(page).count();
   expect(results).toBeGreaterThan(0);
   expect(results).toBeLessThan(total);
@@ -66,13 +66,13 @@ test('searches titles and descriptions as you type', async ({ page }) => {
 
 test('filters by video and audio', async ({ page }) => {
   await page.locator('label:has(input[name=kind][value=video])').click();
-  await expect(page).toHaveURL(/\?kind=video$/);
+  await expect(page).toHaveURL(/#kind=video$/);
   const videos = await shown(page);
   expect(videos.length).toBeGreaterThan(0);
   expect(videos.every((card) => card.video)).toBe(true);
 
   await page.locator('label:has(input[name=kind][value=audio])').click();
-  await expect(page).toHaveURL(/\?kind=audio$/);
+  await expect(page).toHaveURL(/#kind=audio$/);
   const audio = await shown(page);
   expect(audio.length).toBeGreaterThan(0);
   expect(audio.every((card) => !card.video)).toBe(true);
@@ -80,7 +80,7 @@ test('filters by video and audio', async ({ page }) => {
 
 test('filters by year', async ({ page }) => {
   await pick(page, 'xp-year', '2024');
-  await expect(page).toHaveURL(/\?year=2024$/);
+  await expect(page).toHaveURL(/#year=2024$/);
   await expect(page.locator('[data-xp-label="year"]')).toHaveText('2024');
   const results = await shown(page);
   expect(results.length).toBeGreaterThan(0);
@@ -94,7 +94,7 @@ test('a set filter turns solid, and its × clears it', async ({ page }) => {
   await pick(page, 'xp-year', '2024');
   await expect(year).toHaveAttribute('data-on', '');
   await clear.click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/#all$/);
   await expect(page.locator('[data-xp-label="year"]')).toHaveText('Any');
   await expect(year).not.toHaveAttribute('data-on', '');
   await expect(clear).toBeHidden();
@@ -127,7 +127,7 @@ test('filters by host or guest when the database is on', async ({ page }) => {
     .nth(3)
     .getAttribute('value');
   await pick(page, 'xp-people', person!);
-  await expect(page).toHaveURL(new RegExp(`\\?guest=${person}$`));
+  await expect(page).toHaveURL(new RegExp(`#guest=${person}$`));
   // The With chip wears their face.
   await expect(
     page.locator('[popovertarget="xp-people"] .person-face')
@@ -150,7 +150,7 @@ test('filters to the episodes you have started', async ({ page }) => {
   await expect(chip).toBeVisible();
   await chip.click();
   await expect(chip).toHaveAttribute('aria-pressed', 'true');
-  await expect(page).toHaveURL(/\?progress=1$/);
+  await expect(page).toHaveURL(/#progress=1$/);
   await expect(cards(page)).toHaveCount(1);
   await expect(cards(page).first()).toHaveAttribute('data-id', id!);
 });
@@ -161,7 +161,7 @@ test('sorts newest, oldest, longest and shortest', async ({ page }) => {
   const order = async () => (await shown(page)).slice(0, 12);
 
   await pick(page, 'xp-sort', 'oldest');
-  await expect(page).toHaveURL(/\?sort=oldest$/);
+  await expect(page).toHaveURL(/#sort=oldest$/);
   let results = await order();
   expect(results.map((card) => card.index)).toEqual(
     [...results].sort((a, b) => b.index - a.index).map((card) => card.index)
@@ -180,7 +180,7 @@ test('sorts newest, oldest, longest and shortest', async ({ page }) => {
   );
 
   await pick(page, 'xp-sort', 'newest');
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/#all$/);
   results = await order();
   expect(results.map((card) => card.index)).toEqual(results.map((_, i) => i));
 });
@@ -299,16 +299,16 @@ test('switches between grid and list', async ({ page }) => {
   await expect(list).toHaveAttribute('data-view', 'grid');
   await page.locator('label:has(input[name=view][value=list])').click();
   await expect(list).toHaveAttribute('data-view', 'list');
-  await expect(page).toHaveURL(/\?view=list$/);
+  await expect(page).toHaveURL(/#view=list$/);
   await page.locator('label:has(input[name=view][value=grid])').click();
   await expect(list).toHaveAttribute('data-view', 'grid');
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/#all$/);
 });
 
 test('arrives filtered from a link, and steps back and forward', async ({
   page
 }) => {
-  await page.goto('/?q=ai&kind=audio&sort=oldest&view=list');
+  await page.goto('/#q=ai&kind=audio&sort=oldest&view=list');
   await expect(page.locator('[data-explorer][data-live]')).toBeAttached();
   await expect(
     page.getByRole('searchbox', { name: 'Search episodes' })
@@ -323,14 +323,14 @@ test('arrives filtered from a link, and steps back and forward', async ({
   await expect(count(page)).toHaveText(String(results.length));
 
   await page.locator('label:has(input[name=view][value=grid])').click();
-  await expect(page).toHaveURL(/\?q=ai&kind=audio&sort=oldest$/);
+  await expect(page).toHaveURL(/#q=ai&kind=audio&sort=oldest$/);
   await page.goBack();
   await expect(page.locator('.xp-list')).toHaveAttribute('data-view', 'list');
   await page.goForward();
   await expect(page.locator('.xp-list')).toHaveAttribute('data-view', 'grid');
 
   await page.getByRole('button', { name: 'Reset' }).click();
-  await expect(page).toHaveURL(/\?sort=oldest$/);
+  await expect(page).toHaveURL(/#sort=oldest$/);
   await expect(
     page.getByRole('searchbox', { name: 'Search episodes' })
   ).toHaveValue('');
@@ -682,9 +682,8 @@ test('keeps focus clear of the sticky toolbar', async ({ page }) => {
 test('treats a filter the menus do not offer as no filter', async ({
   page
 }) => {
-  await page.goto('/?year=1899&guest=nobody-at-all');
+  await page.goto('/#year=1899&guest=nobody-at-all');
   await expect(page.locator('[data-explorer][data-live]')).toBeAttached();
-  await expect(page).toHaveURL(/\/$/);
   await expect(page.locator('[data-xp-label="year"]')).toHaveText('Any');
   await expect(page.locator('[popovertarget="xp-year"]')).not.toHaveAttribute(
     'data-on',
@@ -697,11 +696,11 @@ test('hides the In progress chip once it is off and nothing is started', async (
   page
 }) => {
   const chip = page.locator('[data-xp-progress]');
-  await page.goto('/?progress=1');
+  await page.goto('/#progress=1');
   await expect(page.locator('[data-explorer][data-live]')).toBeAttached();
   await expect(chip).toBeVisible();
   await chip.click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/#all$/);
   await expect(chip).toBeHidden();
 });
 

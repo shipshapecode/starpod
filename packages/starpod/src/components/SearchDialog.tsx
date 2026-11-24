@@ -223,7 +223,7 @@ export default function SearchDialog({
   // close at once, the page is changing anyway.
   const hrefFor = (item: Item) =>
     item.kind === 'person'
-      ? `/?guest=${encodeURIComponent(item.person.value)}`
+      ? `/#guest=${encodeURIComponent(item.person.value)}`
       : `/${item.episode.episodeSlug}`;
   const choose = (item: Item) => {
     leaving.current = true;
