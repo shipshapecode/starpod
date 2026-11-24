@@ -1296,6 +1296,13 @@
   bottom: auto;
 }
 
+/* Kept inside the screen, it no longer sits beside what it names: no caret. */
+@container anchored(fallback: --rail-fly-fit) {
+  .rail-fly-box::before {
+    display: none;
+  }
+}
+
 .rail-fly-box > :last-child {
   min-height: 0;
   overflow-y: auto;
@@ -1383,6 +1390,7 @@
    hover 8px inside the flyout's corners. */
 .rail-fly .platforms {
   flex-direction: column;
+  flex-wrap: nowrap;
   gap: 0;
 }
 
