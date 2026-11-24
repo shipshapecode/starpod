@@ -3,9 +3,10 @@ import {
   compare,
   DEFAULT_STATE,
   isFiltered,
+  isStateHash,
   matches,
   parseState,
-  toSearch,
+  toHash,
   type ExplorerEntry
 } from 'starpod/src/components/explorer/query';
 
@@ -24,7 +25,7 @@ describe('explorer query', () => {
   it('reads every documented parameter', () => {
     expect(
       parseState(
-        '?q=%20css%20&kind=audio&guest=chriscoyier&year=2023&progress=1&sort=longest&view=list'
+        '#q=%20css%20&kind=audio&guest=chriscoyier&year=2023&progress=1&sort=longest&view=list'
       )
     ).toEqual({
       q: 'css',
@@ -38,21 +39,29 @@ describe('explorer query', () => {
   });
 
   it('falls back to defaults for missing or unknown values', () => {
-    expect(parseState('?kind=vinyl&sort=random&view=table&year=next')).toEqual(
+    expect(parseState('#kind=vinyl&sort=random&view=table&year=next')).toEqual(
       DEFAULT_STATE
     );
   });
 
   it('leaves defaults out of the URL', () => {
-    expect(toSearch(DEFAULT_STATE)).toBe('');
-    expect(toSearch({ ...DEFAULT_STATE, kind: 'video', view: 'list' })).toBe(
-      '?kind=video&view=list'
+    expect(toHash(DEFAULT_STATE)).toBe('');
+    expect(toHash({ ...DEFAULT_STATE, kind: 'video', view: 'list' })).toBe(
+      '#kind=video&view=list'
     );
   });
 
+  it("tells its own hashes from the page's anchors", () => {
+    expect(isStateHash('')).toBe(true);
+    expect(isStateHash('#all')).toBe(true);
+    expect(isStateHash('#guest=argyleink&sort=oldest')).toBe(true);
+    expect(isStateHash('#main')).toBe(false);
+    expect(isStateHash('#guest=argyleink&utm=x')).toBe(false);
+  });
+
   it('round-trips through the URL', () => {
-    const state = parseState('?q=ai&guest=argyleink&sort=oldest');
-    expect(parseState(toSearch(state))).toEqual(state);
+    const state = parseState('#q=ai&guest=argyleink&sort=oldest');
+    expect(parseState(toHash(state))).toEqual(state);
   });
 
   it('knows sort and view only rearrange', () => {

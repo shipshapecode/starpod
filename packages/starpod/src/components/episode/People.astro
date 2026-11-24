@@ -136,7 +136,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
               />
               <a
                 class="ep-pill"
-                href={`/?guest=${encodeURIComponent(person.id)}`}
+                href={`/#guest=${encodeURIComponent(person.id)}`}
               >
                 All {person.count} episodes with {person.name}
                 <ArrowOutIcon size={14} />
@@ -158,7 +158,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
           class="person-chip"
           data-speaks-as={host.speaksAs}
           data-voice={host.voice}
-          href={`/?guest=${encodeURIComponent(host.id)}`}
+          href={`/#guest=${encodeURIComponent(host.id)}`}
         >
           <PersonFace size={32} src={host.src} />
           {host.name}

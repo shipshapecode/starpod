@@ -19,10 +19,10 @@ const { cards, episodes, people, show, years } = Astro.props;
 ---
 
 <script is:inline>
-  // Arriving with a query: hold the archive back until the explorer has
-  // applied it, rather than flash every episode first.
+  // Arriving with a cut in the hash: hold the archive back until the
+  // explorer has applied it, rather than flash every episode first.
   if (
-    /[?&](q|kind|guest|year|progress|sort|view)=/.test(location.search) &&
+    /[#&](q|kind|guest|year|progress|sort|view)=/.test(location.hash) &&
     !document.querySelector('[data-explorer][data-live]')
   ) {
     document.documentElement.dataset.xpPending = '';

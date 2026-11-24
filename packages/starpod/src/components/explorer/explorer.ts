@@ -25,6 +25,7 @@
  * State lives in the URL query (see ./query.ts), so other pages can link
  * into a filtered archive and back/forward steps through the changes.
  */
+import { navigate } from 'astro:transitions/client';
 import {
   flip,
   onFlip,
@@ -50,10 +51,12 @@ import {
   compare,
   DEFAULT_STATE,
   inProgress,
+  ALL,
   isFiltered,
+  isStateHash,
   matches,
   parseState,
-  toSearch,
+  toHash,
   type ExplorerEntry,
   type ExplorerState
 } from './query';
@@ -285,7 +288,10 @@ export function startExplorer() {
     };
   }
 
-  let state = known(parseState(location.search));
+  // A hash that isn't the explorer's (a skip link's) leaves the whole archive.
+  let state = known(
+    parseState(isStateHash(location.hash) ? location.hash : '')
+  );
   // The page arrives newest first.
   let order = cards;
   let sorted: ExplorerState['sort'] = 'newest';
@@ -1444,17 +1450,16 @@ export function startExplorer() {
 
   let lastParam = '';
   function remember(next: ExplorerState, param: string) {
-    const url = location.pathname + toSearch(next) + location.hash;
-    if (url === location.pathname + location.search + location.hash) {
+    const hash = toHash(next) || ALL;
+    if (location.hash === hash || (!location.hash && hash === ALL)) {
       return;
     }
-    // Consecutive changes to one control (typing, arrowing through a menu)
-    // are one step in history; switching controls starts a new one.
-    if (param === lastParam) {
-      history.replaceState(history.state, '', url);
-    } else {
-      history.pushState(history.state, '', url);
-    }
+    // A change of hash alone is a move within the page to the router. Consecutive
+    // changes to one control (typing, arrowing through a menu) are one step
+    // in history; switching controls starts a new one.
+    void navigate(location.pathname + location.search + hash, {
+      history: param === lastParam ? 'replace' : 'push'
+    });
     lastParam = param;
   }
 
@@ -1489,7 +1494,7 @@ export function startExplorer() {
   }
 
   function commit(next: ExplorerState, param: string | null) {
-    if (toSearch(next) === toSearch(state)) {
+    if (toHash(next) === toHash(state)) {
       return;
     }
     readProgress(next);
@@ -1583,7 +1588,7 @@ export function startExplorer() {
           item.dataset.speaksAs = name;
           item.innerHTML =
             '<a class="person-chip"><span class="person-face" style="--person-size: 32px"><img alt="" decoding="async" height="32" width="32"></span><span class="xp-person"><span class="xp-person-name"></span><span class="person-fact"></span></span></a>';
-          item.querySelector('a')!.href = `/?guest=${encodeURIComponent(id)}`;
+          item.querySelector('a')!.href = `/#guest=${encodeURIComponent(id)}`;
           item.querySelector('img')!.src = photo;
           item.querySelector('.xp-person-name')!.textContent = name;
           item.querySelector('.person-fact')!.textContent = lines.get(id) ?? '';
@@ -2354,36 +2359,34 @@ export function startExplorer() {
     );
   }
 
-  // Back and forward between explorer states stay on the page; the router
-  // only takes over when the page itself changes.
+  // The address moved within the page: Back and Forward (which the router
+  // keeps on the page, as a change of hash), or a link to another cut, like
+  // a face in the close-up. The router announces neither; the browser does,
+  // with the Navigation API, and with hashchange for a step through history.
   const path = location.pathname;
-  addEventListener(
-    'popstate',
-    (event) => {
-      if (location.pathname !== path) {
-        return;
-      }
-      event.stopImmediatePropagation();
+  function fromAddress() {
+    if (location.pathname !== path || !isStateHash(location.hash)) {
+      return;
+    }
+    const next = known(parseState(location.hash));
+    if (toHash(next) !== toHash(state)) {
       lastParam = '';
-      const next = known(parseState(location.search));
       commit(next, null);
-      syncControls(next);
-    },
-    { capture: true, signal }
+    }
+  }
+  addEventListener('hashchange', fromAddress, { signal });
+  // The Navigation API's, where the browser has one (TypeScript's DOM
+  // types don't describe it yet).
+  (window as { navigation?: EventTarget }).navigation?.addEventListener(
+    'currententrychange',
+    fromAddress,
+    { signal }
   );
 
-  // Arriving with a query: show that cut at once, without motion. A filter
-  // the menus don't offer leaves the address as well.
-  if (toSearch(parseState(location.search)) !== toSearch(state)) {
-    history.replaceState(
-      history.state,
-      '',
-      location.pathname + toSearch(state) + location.hash
-    );
-  }
+  // Arriving with a cut: show it at once, without motion.
   readProgress();
   syncControls(state);
-  if (toSearch(state)) {
+  if (toHash(state)) {
     render(state);
   }
   delete document.documentElement.dataset.xpPending;

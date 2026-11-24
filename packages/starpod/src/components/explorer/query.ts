@@ -1,11 +1,14 @@
 /**
- * The explorer's state, and the URL query it lives in. Pure functions, shared
+ * The explorer's state, and the URL hash it lives in. Pure functions, shared
  * by the browser controller and the tests.
  *
- * The query is a contract other pages link into:
- * `?q=<text>&kind=video|audio&guest=<person id>&year=<yyyy>&sort=newest|oldest|longest|shortest&view=grid|list`,
+ * The hash is a contract other pages link into:
+ * `/#q=<text>&kind=video|audio&guest=<person id>&year=<yyyy>&sort=newest|oldest|longest|shortest&view=grid|list`,
  * plus `progress=1` for episodes the visitor has started. Defaults are left
- * out of the URL.
+ * out of the URL. It is the hash, not the query, because Astro's router
+ * treats a change of hash alone as a move within the page (no fetch, no
+ * swap, and Back and Forward step through it), and any change of query as
+ * another page.
  */
 
 import { RESUME_MIN_SECONDS } from '../media/position';
@@ -33,8 +36,36 @@ export const DEFAULT_STATE: ExplorerState = {
   view: 'grid'
 };
 
-export function parseState(search: string): ExplorerState {
-  const params = new URLSearchParams(search);
+const KEYS = new Set([
+  'q',
+  'kind',
+  'guest',
+  'year',
+  'progress',
+  'sort',
+  'view'
+]);
+
+/**
+ * The whole archive, once filters have been cleared on the page. The router
+ * takes a URL with no hash for another page, so clearing leaves this one.
+ */
+export const ALL = '#all';
+
+/**
+ * Is this hash the explorer's, rather than an in-page link (`#main`) that
+ * leaves the state where it is?
+ */
+export function isStateHash(hash: string): boolean {
+  if (hash === '' || hash === ALL) {
+    return true;
+  }
+  const keys = [...new URLSearchParams(hash.slice(1)).keys()];
+  return keys.length > 0 && keys.every((key) => KEYS.has(key));
+}
+
+export function parseState(hash: string): ExplorerState {
+  const params = new URLSearchParams(hash.replace(/^#/, ''));
   const kind = params.get('kind');
   const sort = params.get('sort') as Sort | null;
   const year = params.get('year') ?? '';
@@ -49,8 +80,8 @@ export function parseState(search: string): ExplorerState {
   };
 }
 
-/** The query string for a state, `''` when everything is at its default. */
-export function toSearch(state: ExplorerState): string {
+/** The hash for a state, `''` when everything is at its default. */
+export function toHash(state: ExplorerState): string {
   const params = new URLSearchParams();
   if (state.q) {
     params.set('q', state.q);
@@ -73,8 +104,8 @@ export function toSearch(state: ExplorerState): string {
   if (state.view !== 'grid') {
     params.set('view', state.view);
   }
-  const query = params.toString();
-  return query ? `?${query}` : '';
+  const hash = params.toString();
+  return hash ? `#${hash}` : '';
 }
 
 /** Is anything narrowing the archive? (Sort and view only rearrange it.) */
