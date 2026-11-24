@@ -268,7 +268,7 @@ export function startExplorer() {
   const cardOf = new Map<Element, Card>(cards.map((card) => [card.li, card]));
 
   /** A year or person the menus don't offer is no filter at all (a stale
-   * link, or people when the site has no guests database). */
+   * link, or people when no episode names anyone). */
   function known(next: ExplorerState): ExplorerState {
     const offered = (name: 'year' | 'guest') => {
       const field = form.elements.namedItem(name) as RadioNodeList | null;
