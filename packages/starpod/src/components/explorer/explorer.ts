@@ -37,6 +37,7 @@ import {
   currentEpisode,
   dequeue,
   enqueue,
+  isPlaying,
   playEpisode,
   queue,
   type PlayableEpisode
@@ -120,6 +121,11 @@ const WINDOWING =
   'onbeforematch' in HTMLElement.prototype &&
   CSS.supports('position-anchor', '--x') &&
   CSS.supports('grid-template-rows', 'subgrid');
+// Without anchor positioning the close-up can't take a card's parts: the
+// card opens in place in the archive instead (explorer.css), and the
+// archive doesn't fold into the strip.
+const ANCHORED =
+  typeof CSS !== 'undefined' && CSS.supports('position-anchor', '--x');
 // A card the shell glides keeps its containment and widens its clip (see
 // `fly`), where the browser has a clip to widen.
 const GLIDE_CLIP =
@@ -1343,8 +1349,17 @@ export function startExplorer() {
         order.forEach((card, i) => (card.li.style.order = String(i)));
       } else if (!windowed) {
         // Elsewhere the DOM order is the reading order (windowed, the
-        // window keeps its own in step).
+        // window keeps its own in step). Moving a card drops the focus in
+        // it, so that goes back where it was.
+        const focused = document.activeElement;
         list.append(...order.map((card) => card.li));
+        if (
+          focused instanceof HTMLElement &&
+          focused !== document.activeElement &&
+          list.contains(focused)
+        ) {
+          focused.focus({ preventScroll: true });
+        }
       }
     }
     list.dataset.view = next.view;
@@ -1429,8 +1444,8 @@ export function startExplorer() {
 
   let lastParam = '';
   function remember(next: ExplorerState, param: string) {
-    const url = location.pathname + toSearch(next);
-    if (url === location.pathname + location.search) {
+    const url = location.pathname + toSearch(next) + location.hash;
+    if (url === location.pathname + location.search + location.hash) {
       return;
     }
     // Consecutive changes to one control (typing, arrowing through a menu)
@@ -1448,17 +1463,26 @@ export function startExplorer() {
    * saving it as they listen): progress bars, and the In progress chip.
    */
   function readProgress(next = state) {
-    let started = 0;
     for (const card of cards) {
-      card.entry.position = readPosition(card.li.dataset.id!);
-      if (inProgress(card.entry)) {
-        started++;
-        card.li.style.setProperty(
-          '--xp-progress',
-          String(Math.min(card.entry.position / card.entry.duration, 1))
-        );
-      }
+      showProgress(card, readPosition(card.li.dataset.id!));
     }
+    countProgress(next);
+  }
+
+  function showProgress(card: Card, position: number) {
+    card.entry.position = position;
+    if (inProgress(card.entry)) {
+      card.li.style.setProperty(
+        '--xp-progress',
+        String(Math.min(position / card.entry.duration, 1))
+      );
+    } else {
+      card.li.style.removeProperty('--xp-progress');
+    }
+  }
+
+  function countProgress(next = state) {
+    const started = cards.filter((card) => inProgress(card.entry)).length;
     progressButton.hidden = started === 0 && !next.progress;
     progressButton.querySelector('[data-xp-progress-count]')!.textContent =
       String(started);
@@ -1572,8 +1596,10 @@ export function startExplorer() {
   }
 
   function fillResume(card: Card) {
-    // Shown only where Play would pick up (the engine's rule).
-    const seconds = resumePoint(card.li.dataset.id!);
+    // Shown only where Play would pick up (the engine's rule), and never for
+    // the loaded episode: its control pauses, or plays on from the playhead.
+    const id = card.li.dataset.id!;
+    const seconds = currentEpisode.peek()?.id === id ? 0 : resumePoint(id);
     resume.hidden = !seconds;
     // (A phone's close-up leaves out the long part: explorer.css.)
     const rest = document.createElement('span');
@@ -1813,7 +1839,7 @@ export function startExplorer() {
           home(next, true);
         }
         open = next;
-        root.toggleAttribute('data-open', Boolean(next));
+        root.toggleAttribute('data-open', ANCHORED && Boolean(next));
         mendAnchors();
       },
       {
@@ -1884,6 +1910,9 @@ export function startExplorer() {
         live.li.removeAttribute('data-playing');
       }
       live = card;
+      if (open) {
+        fillResume(open);
+      }
       if (card) {
         const disc = card.play.querySelector('[data-static]');
         const focused = Boolean(disc) && disc === document.activeElement;
@@ -1900,6 +1929,31 @@ export function startExplorer() {
         }
       }
     });
+  });
+
+  // A pause saves the place (the engine: where it stopped, or 0 at the
+  // end), and the loaded card's progress follows: its bar, the In progress
+  // count, and the cut when that filter is on. Only on a pause, never on a
+  // tick; read just after, once the engine's own save has landed.
+  let wasPlaying = isPlaying.peek();
+  let saved = 0;
+  const stopProgress = effect(() => {
+    const playing = isPlaying.value;
+    if (wasPlaying && !playing && live) {
+      const card = live;
+      clearTimeout(saved);
+      saved = window.setTimeout(() => {
+        const was = inProgress(card.entry);
+        showProgress(card, readPosition(card.li.dataset.id!));
+        if (inProgress(card.entry) !== was) {
+          countProgress();
+          if (state.progress) {
+            render(state);
+          }
+        }
+      }, 250);
+    }
+    wasPlaying = playing;
   });
 
   const stopQueue = effect(() => {
@@ -2355,6 +2409,11 @@ export function startExplorer() {
       stopQueue();
       stopClock();
       stopLive();
+      stopProgress();
+      clearTimeout(saved);
+      if (live) {
+        mount(null, live.play);
+      }
       clocked.forEach((el) => delete el.dataset.propsFor);
       unregister();
       swapping.forEach((timer) => clearTimeout(timer));

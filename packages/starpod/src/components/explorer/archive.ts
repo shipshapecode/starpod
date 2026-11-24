@@ -54,7 +54,8 @@ function avatarFor(img: string | null): Promise<string> {
     avatars.set(
       key,
       (async () => {
-        const photo = img && (await photos[`/src/img/people/${img}`]?.())?.default;
+        const photo =
+          img && (await photos[`/src/img/people/${img}`]?.())?.default;
         if (!photo) {
           return avatar;
         }
@@ -91,8 +92,22 @@ async function cardArt(src: string | undefined, fallback: string) {
   }
 }
 
-/** Each episode's people, keyed by episode slug, when the database is on. */
-async function peopleBySlug(): Promise<Map<string, Array<CastPerson>>> {
+let cast: Promise<Map<string, Array<CastPerson>>> | undefined;
+
+/**
+ * Each episode's people, keyed by episode slug: asked once, and empty when
+ * the database is off or out of reach (the cast is extra; the archive is
+ * not).
+ */
+function peopleBySlug(): Promise<Map<string, Array<CastPerson>>> {
+  cast ??= queryPeople().catch((error) => {
+    console.warn('[starpod] No cast for the archive:', error);
+    return new Map();
+  });
+  return cast;
+}
+
+async function queryPeople(): Promise<Map<string, Array<CastPerson>>> {
   const bySlug = new Map<string, Array<CastPerson>>();
   if (!database) {
     return bySlug;

@@ -8,6 +8,8 @@
  * out of the URL.
  */
 
+import { RESUME_MIN_SECONDS } from '../media/position';
+
 export const SORTS = ['newest', 'oldest', 'longest', 'shortest'] as const;
 export type Sort = (typeof SORTS)[number];
 
@@ -116,11 +118,9 @@ export function matches(entry: ExplorerEntry, state: ExplorerState): boolean {
   return true;
 }
 
-/** The engine resumes from 30 seconds in; anything less is a sample. */
-export const RESUME_MIN_SECONDS = 30;
-
+/** Started, by the engine's own rule: Play would pick up where it was left. */
 export function inProgress(entry: ExplorerEntry): boolean {
-  return entry.position >= RESUME_MIN_SECONDS;
+  return entry.position > RESUME_MIN_SECONDS;
 }
 
 export function compare(sort: Sort) {

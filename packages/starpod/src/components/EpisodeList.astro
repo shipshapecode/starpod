@@ -166,8 +166,10 @@ const { cards, episodes, people, show, years } = Astro.props;
 
   let leaving = '';
   // The latest episode is both the hero and a card; come home to the one
-  // you left from.
+  // you left from. Remembered per episode, as the way back (browser Back,
+  // or a link on the episode page) has no row to say.
   let fromCard = false;
+  const leftFromCard = new Map<string, boolean>();
 
   document.addEventListener('astro:before-preparation', (event) => {
     leaving = event.from.pathname;
@@ -177,7 +179,12 @@ const { cards, episodes, people, show, years } = Astro.props;
     const row = link
       ? (link.closest('[data-episode-row]') as HTMLElement)
       : null;
-    fromCard = Boolean(row?.matches('li'));
+    if (row) {
+      fromCard = row.matches('li');
+      leftFromCard.set(event.to.pathname, fromCard);
+    } else {
+      fromCard = leftFromCard.get(leaving) ?? false;
+    }
     name(row);
   });
 

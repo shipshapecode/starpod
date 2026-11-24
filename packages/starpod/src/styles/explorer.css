@@ -3263,20 +3263,9 @@
 
 /* ---------- Without anchor positioning: a plain detail view ----------
    No travel: the open card spans the archive in place, artwork beside its
-   text and detail, and the archive stays as it was. */
+   text and detail, and the archive stays as it was (explorer.ts leaves
+   data-open off, so it never folds into the strip). */
 @supports not (position-anchor: --xp) {
-  .xp[data-open] .xp-stage {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .xp[data-open] .xp-closeup {
-    display: none;
-  }
-
-  .xp[data-open] .xp-stage .xp-list {
-    grid-column: 1;
-  }
-
   .xp-card[data-on] {
     grid-column: 1 / -1;
     grid-row: span 2;
@@ -3294,7 +3283,9 @@
     height: auto;
   }
 
+  /* A size container: it takes its width from the box, never its content. */
   .xp-card[data-on] .xp-art {
+    width: 100%;
     height: 100%;
   }
 
@@ -3309,6 +3300,7 @@
 
   .xp-card[data-on] .xp-play {
     grid-area: art;
+    place-self: end start;
     margin: 12px;
   }
 }

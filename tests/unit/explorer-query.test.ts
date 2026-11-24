@@ -87,6 +87,12 @@ describe('explorer query', () => {
     ).toBe(true);
   });
 
+  it("counts an episode in progress by the engine's resume rule: past 30s", () => {
+    const progress = { ...DEFAULT_STATE, progress: true };
+    expect(matches(entry({ position: 30 }), progress)).toBe(false);
+    expect(matches(entry({ position: 30.5 }), progress)).toBe(true);
+  });
+
   it('sorts newest, oldest, longest and shortest', () => {
     const a = entry({ index: 0, duration: 1800 });
     const b = entry({ index: 1, duration: 5400 });

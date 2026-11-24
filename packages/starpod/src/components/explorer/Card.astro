@@ -16,7 +16,7 @@ const number =
   episode.episodeNumber === 'Bonus' ? 'Bonus' : episode.episodeNumber;
 // Sentence case under the title: "Ep 254 · Sep 24, 2026 · 1 hr 21 min".
 const short = episode.episodeNumber === 'Bonus' ? 'Bonus' : `Ep ${number}`;
-const detailId = `xp-detail-${episode.id.replace(/[^a-z0-9]/gi, '')}`;
+const detailId = `xp-detail-${card.index}`;
 const length = formatDuration(episode.duration);
 const playable = toPlayable(episode, show);
 // The episode's playable slice, once, on the card itself: the play disc, Up
