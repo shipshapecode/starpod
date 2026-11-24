@@ -22,7 +22,7 @@
  *   far away rise in.
  * - Everything is interruptible: a flip starts from the pixels on screen.
  *
- * State lives in the URL query (see ./query.ts), so other pages can link
+ * State lives in the URL hash (see ./query.ts), so other pages can link
  * into a filtered archive and back/forward steps through the changes.
  */
 import { navigate } from 'astro:transitions/client';
@@ -1454,9 +1454,9 @@ export function startExplorer() {
     if (location.hash === hash || (!location.hash && hash === ALL)) {
       return;
     }
-    // A change of hash alone is a move within the page to the router. Consecutive
-    // changes to one control (typing, arrowing through a menu) are one step
-    // in history; switching controls starts a new one.
+    // To the router, a change of hash alone is a move within the page.
+    // Consecutive changes to one control (typing, arrowing through a menu)
+    // are one step in history; switching controls starts a new one.
     void navigate(location.pathname + location.search + hash, {
       history: param === lastParam ? 'replace' : 'push'
     });
