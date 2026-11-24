@@ -1,0 +1,281 @@
+---
+/**
+ * A page's sticky bar: section links that track where you are, with one
+ * indicator that glides to the current link on its anchor. Whatever is in
+ * the default slot (the episode's play button and title) sits before the
+ * links and arrives once the bar docks. Wrap the bar and its sections in
+ * `.ep-body`, which drives the docking trigger and the reading progress.
+ */
+export interface Props {
+  label: string;
+  sections: Array<{ id: string; label: string }>;
+}
+
+const { label, sections } = Astro.props;
+---
+
+<div class="ep-bar">
+  <div class="ep-bar-row">
+    {
+      Astro.slots.has('default') && (
+        <div class="ep-bar-id">
+          <slot />
+        </div>
+      )
+    }
+    <nav aria-label={label} class="ep-nav" data-ep-nav>
+      <ol>
+        {
+          sections.map((section) => (
+            <li>
+              <a href={`#${section.id}`}>{section.label}</a>
+            </li>
+          ))
+        }
+      </ol>
+      <i aria-hidden="true" class="ep-nav-here"></i>
+    </nav>
+  </div>
+  <i aria-hidden="true" class="ep-bar-read"></i>
+</div>
+
+<script>
+  import { reducedMotion } from '../../motion/propflip';
+  import { focusInto } from './focus';
+
+  let tracking: AbortController | undefined;
+
+  // CSS shows where you are (`:target-current`); this mirrors it into
+  // `aria-current` once scrolling settles, keeps the current link in view
+  // when the links overflow, and stands in for `scroll-target-group` in
+  // browsers without it.
+  function track() {
+    tracking?.abort();
+    const nav = document.querySelector<HTMLElement>('[data-ep-nav]');
+    if (!nav) {
+      return;
+    }
+    tracking = new AbortController();
+    const { signal } = tracking;
+    const links = Array.from(nav.querySelectorAll('a'));
+    // Where the browser lands a section: its scroll margin, plus the page's
+    // scroll padding (the shell's, on phones).
+    const landing = (target: Element) =>
+      parseFloat(getComputedStyle(target).scrollMarginTop) +
+      (parseFloat(
+        getComputedStyle(document.documentElement).scrollPaddingTop
+      ) || 0);
+
+    const show = (current: HTMLAnchorElement | undefined) => {
+      for (const link of links) {
+        if (link === current) {
+          link.setAttribute('aria-current', 'true');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      }
+      if (current && nav.scrollWidth > nav.clientWidth) {
+        nav.scrollTo({
+          left:
+            current.offsetLeft - (nav.clientWidth - current.offsetWidth) / 2,
+          behavior: reducedMotion() ? 'auto' : 'smooth'
+        });
+      }
+    };
+
+    // Glide to a section rather than jump (and leave history alone).
+    nav.addEventListener(
+      'click',
+      (event) => {
+        const link = (event.target as Element).closest('a');
+        const target =
+          link &&
+          document.getElementById(decodeURIComponent(link.hash.slice(1)));
+        // A modified click (a new tab or window) is the browser's.
+        const modified =
+          event.button !== 0 ||
+          event.ctrlKey ||
+          event.metaKey ||
+          event.shiftKey ||
+          event.altKey;
+        if (!link || !target || modified || reducedMotion()) {
+          return;
+        }
+        event.preventDefault();
+        history.replaceState(history.state, '', link.hash);
+        target.scrollIntoView({ behavior: 'smooth' });
+        glideOn(target);
+        // Where the glide is going is where Tab carries on from, with a
+        // focus ring only when the link was followed from the keyboard (a
+        // click with no pointer type; Firefox gives it a detail of 1).
+        focusInto(target, { visible: !(event as PointerEvent).pointerType });
+      },
+      { signal }
+    );
+
+    // A glide sets its end before it starts, but transcript groups it passes
+    // render at their real height on the way and move the section: aim again
+    // where it settles, until it's there, the page can go no further, or
+    // you take over.
+    function glideOn(target: HTMLElement, tries = 2) {
+      const yours = new AbortController();
+      const done = () => yours.abort();
+      for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown']) {
+        addEventListener(type, done, { signal: yours.signal, passive: true });
+      }
+      signal.addEventListener('abort', done, { signal: yours.signal });
+      addEventListener(
+        'scrollend',
+        () => {
+          done();
+          const off = target.getBoundingClientRect().top - landing(target);
+          const room =
+            off > 0
+              ? document.documentElement.scrollHeight - innerHeight - scrollY
+              : scrollY;
+          if (tries && Math.abs(off) > 2 && room > 1) {
+            target.scrollIntoView({ behavior: 'smooth' });
+            glideOn(target, tries - 1);
+          } else {
+            hold(target);
+          }
+        },
+        { once: true, signal: yours.signal }
+      );
+    }
+
+    // Groups above a landed section can still settle to their real height
+    // after the glide ends. Chromium and Firefox keep the section put with
+    // scroll anchoring; WebKit doesn't (though it accepts overflow-anchor),
+    // so the section is held under the bar for a moment, until you take
+    // over. Where anchoring did its job there is nothing to correct.
+    function hold(target: HTMLElement) {
+      const yours = new AbortController();
+      const done = () => yours.abort();
+      for (const type of ['wheel', 'touchstart', 'pointerdown', 'keydown']) {
+        addEventListener(type, done, { signal: yours.signal, passive: true });
+      }
+      signal.addEventListener('abort', done, { signal: yours.signal });
+      const until = performance.now() + 1500;
+      let lastY = scrollY;
+      const tick = (now: number) => {
+        if (yours.signal.aborted) {
+          return;
+        }
+        const off = target.getBoundingClientRect().top - landing(target);
+        // You scrolled (a scrollbar drag fires none of the events above):
+        // the page moved, and not to keep the section put. Scroll anchoring
+        // moves the page but keeps the section put; a group settling moves
+        // the section but not the page.
+        if (Math.abs(scrollY - lastY) > 1 && Math.abs(off) > 2) {
+          done();
+          return;
+        }
+        // To the pixel: the glide already got it within a couple.
+        if (Math.abs(off) > 0.5) {
+          scrollBy({ top: off, behavior: 'instant' });
+        }
+        lastY = scrollY;
+        if (now < until) {
+          requestAnimationFrame(tick);
+        } else {
+          done();
+        }
+      };
+      requestAnimationFrame(tick);
+    }
+
+    if (CSS.supports('scroll-target-group', 'auto')) {
+      const sync = () =>
+        show(links.find((link) => link.matches(':target-current')));
+      sync();
+      // :target-current catches up with a scroll two frames after it ends
+      // (read at once, a jump, as with reduced motion, left aria-current one
+      // section behind the indicator).
+      addEventListener(
+        'scrollend',
+        () => requestAnimationFrame(() => requestAnimationFrame(sync)),
+        { signal }
+      );
+      return;
+    }
+
+    // Without it: the last section whose top has reached the line a link
+    // lands it on, just under the bar (its scroll margin plus the page's
+    // scroll padding), rechecked whenever a section crosses that line. (A
+    // looser line marked the section after a short one that a link had
+    // just landed on.)
+    const targets = links.map((link) =>
+      document.getElementById(decodeURIComponent(link.hash.slice(1)))
+    );
+    const first = targets.find(Boolean);
+    if (!first) {
+      return;
+    }
+    const line = () => landing(first) + 1;
+    const update = () => {
+      const at = line();
+      const passed = targets.filter(
+        (target) => target && target.getBoundingClientRect().top <= at
+      );
+      show(links[targets.indexOf(passed.at(-1) ?? targets[0])]);
+    };
+    let observer: IntersectionObserver | undefined;
+    const observe = () => {
+      observer?.disconnect();
+      const at = Math.round(line());
+      observer = new IntersectionObserver(update, {
+        rootMargin: `-${at}px 0px -${Math.max(0, innerHeight - at - 1)}px 0px`
+      });
+      targets.forEach((target) => target && observer!.observe(target));
+    };
+    observe();
+    addEventListener('resize', observe, { signal });
+    // A glide's last frames creep onto the line after the crossing is
+    // reported: check again once the scroll stops.
+    addEventListener('scrollend', update, { signal });
+    signal.addEventListener('abort', () => observer?.disconnect());
+  }
+
+  // Where trigger animations are missing, CSS can't tell when the stage's
+  // meta has passed under the sticky line, the moment the episode's play
+  // and title arrive in the bar (Chrome's --ep-docked trigger). This tells
+  // it, by data-docked on the bar, from an IntersectionObserver on the meta
+  // with the sticky line as its top edge.
+  let docking: AbortController | undefined;
+
+  function dock() {
+    docking?.abort();
+    const bar = document.querySelector<HTMLElement>('.ep-bar');
+    const meta = document.querySelector('.stage-meta');
+    if (
+      !bar?.querySelector('.ep-bar-id') ||
+      !meta ||
+      CSS.supports('animation-trigger: --ep-docked play-forwards')
+    ) {
+      return;
+    }
+    docking = new AbortController();
+    const { signal } = docking;
+    let observer: IntersectionObserver | undefined;
+    const observe = () => {
+      observer?.disconnect();
+      const line = parseFloat(getComputedStyle(bar).top) || 0;
+      observer = new IntersectionObserver(
+        ([entry]) =>
+          bar.toggleAttribute(
+            'data-docked',
+            !entry.isIntersecting && entry.boundingClientRect.bottom <= line
+          ),
+        { rootMargin: `-${line}px 0px 0px 0px` }
+      );
+      observer.observe(meta);
+    };
+    observe();
+    addEventListener('resize', observe, { signal });
+    signal.addEventListener('abort', () => observer?.disconnect());
+  }
+
+  document.addEventListener('astro:page-load', track);
+  document.addEventListener('astro:page-load', dock);
+</script>

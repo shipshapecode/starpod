@@ -1,0 +1,2229 @@
+/* =====================================================================
+   Episode page (and the standalone pages that share its patterns)
+   One sticky bar that tracks where you are, scroll-driven reading aids,
+   a transcript you can navigate by, people you can open, and onward
+   journeys. Every effect degrades to a plain, complete page.
+   ===================================================================== */
+
+@property --ep-arc {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+@property --ep-p {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+/* A host poster's ground, tinted by its photo once that is sampled. */
+@property --ab-ground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+:root {
+  /* Where sticky page chrome starts: under the top bar on phones and
+     tablets, at the very top beside the rail. */
+  --ep-stick: calc(var(--topbar-h) + env(safe-area-inset-top));
+  --ep-bar-h: 56px;
+  /* What covers the bottom of the viewport: tab bar and dock. */
+  --ep-floor: calc(var(--tabbar-h) + var(--dock-h));
+  --ep-under-bar: calc(var(--ep-stick) + var(--ep-bar-h));
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --ep-stick: 0px;
+    --ep-floor: var(--dock-h);
+  }
+}
+
+/* Landscape phones: the top bar scrolls away with the page (shell.css), so
+   the sticky chrome starts at the top, under the safe area. */
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 1023px) {
+  :root {
+    --ep-stick: env(safe-area-inset-top);
+  }
+}
+
+/* Links into a section land below the bar. (A margin on the sections, not
+   padding on html:has(.ep-bar): that :has() restyles the whole document
+   whenever anything in the page changes.) The root's scroll padding on
+   phones (--scroll-pad-top/-bottom, from the shell) already clears the top
+   and tab bars and adds to these margins, so they leave it out. */
+.ep-body section[id] {
+  scroll-margin-top: calc(
+    var(--ep-under-bar) + 16px - var(--scroll-pad-top, 0px)
+  );
+}
+
+/* Focus moving onto a control scrolls it clear of the bar above and the
+   dock below, rather than leaving it under either. */
+.ep-body :is(a[href], button, input, select, textarea, [tabindex]) {
+  scroll-margin-block: calc(
+      var(--ep-under-bar) + 16px - var(--scroll-pad-top, 0px)
+    )
+    calc(var(--ep-floor) + 16px - var(--scroll-pad-bottom, 0px));
+}
+
+/* The stage's title and play button have gone once its meta has passed
+   under the sticky line: that triggers the bar's own play and title. The
+   range runs on far past the page, so the trigger holds until the meta comes
+   back. (Chrome resolves trigger ranges once, so the subject is the meta,
+   whose place never moves when the transcript below it opens up.) */
+:root {
+  trigger-scope: --ep-docked;
+}
+
+.stage-meta {
+  timeline-trigger-name: --ep-docked;
+  timeline-trigger-source: view(block var(--ep-stick) 0px);
+  timeline-trigger-activation-range: exit 100% exit 100000%;
+}
+
+/* The content after a stage (or a page header): reading progress is
+   measured from the moment its top passes under the sticky line. */
+.ep-body {
+  view-timeline: --ep-read block;
+  view-timeline-inset: var(--ep-stick) 0px;
+}
+
+.ep-section {
+  margin-bottom: clamp(56px, 7vw, 96px);
+}
+
+/* ---------- The bar ---------- */
+
+.ep-bar {
+  position: sticky;
+  top: var(--ep-stick);
+  /* In the page's flow it sits under the dock (45): at scroll 0 it can fall
+     right where the dock floats, and must not cover the dock's controls. */
+  z-index: 44;
+  container: ep-bar / scroll-state;
+  interpolate-size: allow-keywords;
+  margin: 0 calc(var(--gutter) * -1) clamp(32px, 5vw, 56px);
+}
+
+/* Once stuck at the top it lifts over the flying picture (46), so a
+   picture returning to the stage passes beneath the page's chrome. It
+   sticks the moment the body's top passes under the sticky line, which is
+   where the body's view timeline (--ep-read, inset by that line) finishes
+   its entry. */
+@supports (animation-timeline: view()) {
+  .ep-bar {
+    animation: ep-bar-lift step-end both;
+    animation-timeline: --ep-read;
+    animation-range: entry calc(100% - 1px) entry 100%;
+  }
+}
+
+@keyframes ep-bar-lift {
+  from {
+    z-index: 44;
+  }
+
+  to {
+    z-index: 47;
+  }
+}
+
+.ep-bar-row {
+  display: flex;
+  align-items: center;
+  height: var(--ep-bar-h);
+  padding: 0 var(--gutter);
+  box-sizing: border-box;
+  border-block: 1px solid var(--line);
+  transition:
+    background-color 300ms var(--ease-out),
+    border-color 300ms var(--ease-out);
+}
+
+/* Docked: the bar takes the top bar's glass. Browsers that can't tell
+   when it is docked always give it the glass. */
+@container ep-bar scroll-state(stuck: top) {
+  .ep-bar-row {
+    border-top-color: transparent;
+    background: color-mix(in oklch, var(--ground) 86%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+  }
+}
+
+@supports not (container-type: scroll-state) {
+  .ep-bar-row {
+    background: color-mix(in oklch, var(--ground) 86%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+  }
+}
+
+/* The episode itself: play and title. It only arrives once the stage has
+   scrolled away (the bar docks), growing in from nothing so the section
+   links slide over to make room, and leaves the same way. */
+.ep-bar-id {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  max-width: min(40%, 30rem);
+  margin-inline-end: 16px;
+  overflow: clip;
+  overflow-clip-margin: 6px;
+}
+
+@supports (animation-trigger: --ep-docked play-forwards) {
+  .ep-bar-id {
+    animation-name: ep-bar-arrive;
+    animation-duration: calc(560ms * var(--slomo));
+    animation-timing-function: var(--ease-out);
+    animation-fill-mode: both;
+    animation-trigger: --ep-docked play-forwards play-backwards;
+  }
+}
+
+/* Without trigger animations SectionBar's script marks the bar docked
+   (data-docked); until then the episode is collapsed and hidden the same
+   way, and it arrives without the tween. */
+@supports not (animation-trigger: --ep-docked play-forwards) {
+  .ep-bar:not([data-docked]) .ep-bar-id {
+    width: 0;
+    margin-inline-end: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Hidden as well as collapsed while undocked, so its controls are not in
+   the tab order or the accessibility tree until they can be seen. */
+@keyframes ep-bar-arrive {
+  from {
+    width: 0;
+    margin-inline-end: 0;
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Its parts follow in order as it opens: the disc, the number, the name. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-trigger: --ep-docked play-forwards) {
+    .ep-bar-ring,
+    .ep-bar-title > * {
+      animation-name: ep-bar-part;
+      animation-duration: calc(420ms * var(--slomo));
+      animation-timing-function: var(--ease-out);
+      animation-fill-mode: both;
+      animation-trigger: --ep-docked play-forwards play-backwards;
+    }
+
+    .ep-bar-title > * {
+      animation-delay: calc(60ms * var(--slomo));
+      animation-delay: calc(sibling-index() * 60ms * var(--slomo));
+    }
+  }
+}
+
+@keyframes ep-bar-part {
+  from {
+    opacity: 0;
+    translate: -10px 0;
+  }
+}
+
+.ep-bar-ring {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  /* Playback fills the ring, read from the media clock on the ring itself
+     (BarPlay binds it only while this episode is loaded): exact progress
+     about four times a second, drawn as it comes. A tween between ticks
+     would restyle the ring every frame (a conic gradient can't run on the
+     compositor), for steps under a degree. Paused, the arc dims to Muted. */
+  --ep-arc: var(--muted);
+  background: conic-gradient(
+    var(--ep-arc) calc(var(--ep-p) * 1turn),
+    var(--line) 0
+  );
+  transition: --ep-arc 300ms var(--ease-out);
+}
+
+.ep-bar-ring[data-current] {
+  --ep-p: var(--live-progress);
+  --ep-arc: color-mix(
+    in oklch,
+    var(--accent) calc((1 - var(--live-paused)) * 100%),
+    var(--muted)
+  );
+}
+
+.ep-bar-play {
+  --fill-a: var(--ink);
+  --fill-b: var(--ink);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--fill-a), var(--fill-b));
+  color: var(--on-ink);
+  cursor: pointer;
+  transition:
+    --fill-a 300ms var(--ease-out),
+    --fill-b 300ms var(--ease-out),
+    color 300ms var(--ease-out),
+    scale 400ms var(--ease-spring);
+}
+
+.ep-bar-play:is(:focus-visible, [data-flash]) {
+  --fill-a: var(--glow-a);
+  --fill-b: var(--glow-b);
+  color: var(--on-glow);
+}
+
+.ep-bar-play:active {
+  scale: 0.92;
+}
+
+/* Touch: the disc stays 40px, and its button answers a 44px square. The
+   episode's clip grows to take it in (WebKit has no overflow-clip-margin)
+   without moving anything: 2px above and below, and 4px before the disc,
+   since on phones nothing follows the disc and the clip ends at it. */
+@media (pointer: coarse) {
+  .ep-bar-play::after {
+    content: '';
+    position: absolute;
+    inset-block: -5px;
+    inset-inline: -7px -3px;
+    border-radius: 999px;
+  }
+
+  .ep-bar-id {
+    margin-block: -2px;
+    margin-inline-start: -4px;
+    padding-block: 2px;
+    padding-inline-start: 4px;
+  }
+}
+
+.ep-bar-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--ink);
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.ep-bar-number {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.ep-bar-name {
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  .ep-bar-title {
+    display: none;
+  }
+}
+
+/* Reading progress along the bar's lower edge: how far through the page
+   below the stage you are, on a view timeline. Shown once docked. */
+.ep-bar-read {
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--line-strong);
+  opacity: 0;
+  scale: 0 1;
+  transform-origin: left;
+  transition: opacity 300ms var(--ease-out);
+}
+
+@supports (animation-timeline: view()) {
+  .ep-bar-read {
+    animation: ep-read linear both;
+    animation-timeline: --ep-read;
+    animation-range: contain 0% contain 100%;
+  }
+
+  @container ep-bar scroll-state(stuck: top) {
+    .ep-bar-read {
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes ep-read {
+  to {
+    scale: 1 1;
+  }
+}
+
+/* ---------- Section links ---------- */
+
+/* The links scroll sideways when they don't fit; edges fade only on the
+   side there is more to see (scroll-state queries). */
+.ep-nav {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  container: ep-nav / scroll-state;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.ep-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.ep-nav ol {
+  display: flex;
+  gap: 2px;
+  width: max-content;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  scroll-target-group: auto;
+}
+
+.ep-nav ol::before,
+.ep-nav ol::after {
+  content: '';
+  position: sticky;
+  z-index: 2;
+  flex: none;
+  width: 32px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 250ms var(--ease-out);
+}
+
+.ep-nav ol::before {
+  left: 0;
+  margin-inline-end: -32px;
+  background: linear-gradient(to right, var(--ground), transparent);
+}
+
+.ep-nav ol::after {
+  right: 0;
+  margin-inline-start: -32px;
+  background: linear-gradient(to left, var(--ground), transparent);
+}
+
+@container ep-nav scroll-state(scrollable: inline-start) {
+  .ep-nav ol::before {
+    opacity: 1;
+  }
+}
+
+@container ep-nav scroll-state(scrollable: inline-end) {
+  .ep-nav ol::after {
+    opacity: 1;
+  }
+}
+
+.ep-nav a {
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 300ms var(--ease-out);
+}
+
+@media (hover: hover) {
+  .ep-nav a:hover {
+    color: var(--ink);
+  }
+}
+
+/* You are here: the browser tracks the current section (scroll-target-group)
+   and the link for it becomes the anchor. One indicator glides between
+   links on that anchor; nothing is measured. */
+.ep-nav a:target-current {
+  anchor-name: --ep-here;
+  color: var(--accent-ink);
+}
+
+@supports not (scroll-target-group: auto) {
+  .ep-nav a[aria-current] {
+    anchor-name: --ep-here;
+    color: var(--accent-ink);
+  }
+}
+
+.ep-nav-here {
+  position: absolute;
+  position-anchor: --ep-here;
+  top: anchor(top);
+  left: anchor(left);
+  width: anchor-size(width);
+  height: anchor-size(height);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  position-visibility: anchor-valid;
+  transition:
+    left calc(520ms * var(--slomo)) var(--ease-spring),
+    width calc(420ms * var(--slomo)) var(--ease-out);
+}
+
+/* Touch: each link is a 44px-tall target, and the pill under the current
+   one keeps its size. */
+@media (pointer: coarse) {
+  .ep-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .ep-nav-here {
+    top: calc(anchor(top) + 4px);
+    height: calc(anchor-size(height) - 8px);
+  }
+}
+
+@supports not (anchor-name: --ep-here) {
+  .ep-nav-here {
+    display: none;
+  }
+
+  .ep-nav a[aria-current] {
+    background: var(--accent-soft);
+  }
+}
+
+/* ---------- Reveals ---------- */
+
+/* Cards and headings rise in as they enter, scrubbed by scroll. The range
+   is the first 120px past the entry edge, so anything you land on by a link
+   or find-in-page is already whole, tall cards are never left half faded,
+   and nothing waits on a scroll it can't get. Bars on a chart (ep-grow) fill
+   to their value the same way. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .ep-reveal,
+    .ep-grow {
+      animation: ep-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 120px;
+    }
+
+    .ep-grow {
+      animation-name: ep-grow;
+      transform-origin: left;
+    }
+
+    /* Siblings that enter together, a row of cards, arrive one after
+       another: each starts a little further into its entry. */
+    .ep-reveal {
+      animation-range: entry calc(min(sibling-index() - 1, 3) * 16px) entry
+        calc(120px + min(sibling-index() - 1, 3) * 16px);
+    }
+
+    /* Related cards sit in a sideways scroller, so they reveal on the
+       shelf's own view timeline in the page. Fade and scale only: a
+       translate would grow the scroller's overflow. */
+    .ep-shelf-wrap {
+      view-timeline: --ep-shelf block;
+    }
+
+    .ep-shelf-item {
+      animation: ep-arrive linear both;
+      animation-timeline: --ep-shelf;
+      animation-range: entry 0% entry 160px;
+      animation-range: entry calc(min(sibling-index() - 1, 4) * 24px) entry
+        calc(160px + min(sibling-index() - 1, 4) * 24px);
+    }
+  }
+}
+
+@keyframes ep-reveal {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+
+@keyframes ep-grow {
+  from {
+    scale: 0 1;
+  }
+}
+
+@keyframes ep-arrive {
+  from {
+    opacity: 0;
+    scale: 0.94;
+  }
+}
+
+/* ---------- Pointer light and image skeletons ---------- */
+
+/* Cards light up where the pointer is (prop-for-that `pointer-local`, bound
+   to each card, so only the card under the pointer restyles). A soft glow
+   follows it across the surface, and the gradient ring an outlined card
+   draws on hover turns its brightest side to face the pointer. */
+:is(.ep-person, .ep-sponsor, .ep-pager-link) {
+  background-image: radial-gradient(
+    16rem circle at calc(var(--live-local-pointer-x-ratio) * 100%)
+      calc(var(--live-local-pointer-y-ratio) * 100%),
+    color-mix(
+      in oklch,
+      var(--accent) calc(var(--live-local-pointer-inside) * 12%),
+      transparent
+    ),
+    transparent
+  );
+}
+
+:is(.ep-sponsor, .ep-pager-link) {
+  transition: --live-local-pointer-inside 300ms var(--ease-out);
+}
+
+:is(.ep-sponsor, .ep-pager-link)::after {
+  background: conic-gradient(
+    from
+      calc(
+        atan2(
+            var(--live-local-pointer-y-ratio) - 0.5,
+            var(--live-local-pointer-x-ratio) - 0.5
+          ) +
+          90deg
+      ),
+    var(--glow-b),
+    var(--glow-a) 25%,
+    var(--glow-a) 75%,
+    var(--glow-b)
+  );
+}
+
+/* Episode art leans toward the pointer. */
+@media (prefers-reduced-motion: no-preference) {
+  .ep-card .ep-card-art {
+    transform: perspective(900px)
+      rotateX(
+        calc(
+          (0.5 - var(--live-local-pointer-y-ratio)) * 10deg *
+            var(--live-local-pointer-inside)
+        )
+      )
+      rotateY(
+        calc(
+          (var(--live-local-pointer-x-ratio) - 0.5) * 12deg *
+            var(--live-local-pointer-inside)
+        )
+      );
+  }
+}
+
+/* Portraits and art hold a still placeholder until they load: nothing runs
+   on the many lazy images still off screen. */
+.ep-card-art {
+  background: var(--raised);
+}
+
+/* ---------- People ---------- */
+
+/* Guests lead in cards (the hosts do when there are no guests), and the
+   hosts follow on one compact line. A card holds the ringed portrait, the
+   name, the line that says something, and a trailing stat; along its lower
+   edge, when the transcript names them, how much of the talking is theirs.
+   The person's identity itself (ring, fact line, chip) is people.css. */
+.ep-people {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 25rem), 1fr));
+  grid-auto-flow: dense;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each card is a PropFLIP box: opening one re-flows the grid and every card
+   flips from where it was; its children un-squish (fix-kids). */
+.ep-person {
+  --r: var(--r-card);
+  --p: 0px;
+  --also: --live-local-pointer-inside 300ms var(--ease-out);
+  border-radius: var(--r-card);
+  background-color: var(--surface);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    0 2px 8px color-mix(in oklch, var(--ink) 6%, transparent);
+  /* The opening card reveals its panel as it grows, rather than spilling
+     over its neighbours mid-flight. The margin keeps focus rings whole. */
+  overflow: clip;
+  overflow-clip-margin: 5px;
+}
+
+.ep-person[data-open] {
+  grid-column: 1 / -1;
+}
+
+/* Their share of the talking: a 4px bar in their voice along the card's
+   lower edge, drawn as a background so the card's corners clip it. */
+.ep-person[data-share] {
+  background-image:
+    linear-gradient(
+      var(--person-ring, var(--line-strong)),
+      var(--person-ring, var(--line-strong))
+    ),
+    radial-gradient(
+      16rem circle at calc(var(--live-local-pointer-x-ratio) * 100%)
+        calc(var(--live-local-pointer-y-ratio) * 100%),
+      color-mix(
+        in oklch,
+        var(--accent) calc(var(--live-local-pointer-inside) * 12%),
+        transparent
+      ),
+      transparent
+    );
+  background-position:
+    left bottom,
+    0 0;
+  background-repeat: no-repeat;
+  background-size:
+    calc(var(--ep-share) * 100%) 4px,
+    auto;
+}
+
+.ep-person-head {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px 16px 16px;
+}
+
+.ep-person-who {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+}
+
+/* A card that opens opens from anywhere on it: the button's hit area
+   stretches over the whole head (the seek chip sits above it). Hover tints
+   it; nothing moves. */
+button.ep-person-who {
+  cursor: pointer;
+  outline: none;
+}
+
+button.ep-person-who::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-card);
+  background-color: transparent;
+  transition: background-color var(--quick);
+}
+
+@media (hover: hover) {
+  button.ep-person-who:hover::after {
+    background-color: color-mix(in oklch, var(--ink) 4%, transparent);
+  }
+}
+
+button.ep-person-who:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.ep-person-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ep-person-name {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 1.0625rem;
+  font-weight: 650;
+  line-height: 1.375rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Phones: the name may take two lines, and the trailing stat drops under
+   the text so it never squeezes them. */
+@media (max-width: 639px) {
+  .ep-person-name {
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .ep-person-head {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 8px;
+  }
+
+  .ep-person-head > :is(.ep-chip, .ep-person-stat) {
+    grid-row: 2;
+    grid-column: 1;
+    justify-self: start;
+    margin-inline-start: 78px;
+  }
+
+  .ep-person-head > .ep-person-stat {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* A tally the fact line above already gives would only repeat it. */
+  .ep-person-head > .ep-chip-quiet[data-counted] {
+    display: none;
+  }
+
+  .ep-person-caret {
+    grid-row: 1;
+    grid-column: 2;
+  }
+}
+
+.ep-person-stat {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1rem;
+}
+
+/* A trailing stat: a seek chip to someone's first line, or their tally. */
+.ep-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  white-space: nowrap;
+  transition: background-color var(--quick);
+}
+
+button.ep-chip {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  button.ep-chip:hover {
+    background: color-mix(in oklch, var(--accent) 24%, var(--accent-soft));
+  }
+}
+
+.ep-chip-quiet {
+  background: var(--raised);
+  color: var(--muted);
+}
+
+.ep-person-caret {
+  flex: none;
+  color: var(--muted);
+  transition: rotate calc(480ms * var(--slomo)) var(--ease-spring);
+}
+
+[data-open] .ep-person-caret {
+  rotate: 180deg;
+}
+
+/* Open: their other episodes as art, in a tray 4px in from the card (the
+   card's 28px corner, the tray's 24px, the tiles' 20px), then the way on to
+   all of them. On phones the tray scrolls sideways and the next tile peeks. */
+.ep-person-more {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin: 0 4px 4px;
+  padding: 4px 4px 12px;
+  border-radius: var(--r-tray);
+  background: var(--raised);
+}
+
+.ep-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 639px) {
+  .ep-tiles {
+    grid-template-columns: none;
+    grid-auto-columns: 44%;
+    grid-auto-flow: column;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .ep-tiles > li {
+    scroll-snap-align: start;
+  }
+}
+
+.ep-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* Focus rings the art, on its own corners. */
+.ep-tile:focus-visible {
+  outline: none;
+}
+
+.ep-tile:focus-visible .ep-tile-art {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.ep-tile-art {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: clip;
+  border-radius: var(--r-tile);
+  background: var(--surface);
+}
+
+.ep-tile-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The hairline over the art, which also takes the hover tint. */
+.ep-tile-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  pointer-events: none;
+  transition: background-color var(--quick);
+}
+
+@media (hover: hover) {
+  .ep-tile:hover .ep-tile-art::after {
+    background-color: color-mix(in oklch, oklch(0% 0 0) 12%, transparent);
+  }
+}
+
+.ep-tile-chip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: color-mix(in oklch, oklch(0% 0 0) 42%, transparent);
+  backdrop-filter: blur(10px) saturate(1.4);
+  color: oklch(100% 0 0);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  line-height: 1rem;
+}
+
+.ep-tile-title {
+  display: -webkit-box;
+  overflow: hidden;
+  padding-inline: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.ep-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  margin-inline-start: 4px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: box-shadow var(--quick);
+}
+
+@media (hover: hover) {
+  .ep-pill:hover {
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+}
+
+/* With guests, the hosts in one line under them. */
+.ep-hosted {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin: 16px 0 0;
+}
+
+.ep-hosted-label {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ep-hosted .person-chip {
+  transition: color var(--quick);
+}
+
+@media (hover: hover) {
+  .ep-hosted .person-chip:hover {
+    color: var(--accent-ink);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ep-person-more {
+    animation: ep-rise calc(420ms * var(--slomo)) var(--ease-out)
+      calc(140ms * var(--slomo)) both;
+  }
+
+  .ep-tiles > li {
+    animation: ep-fade calc(320ms * var(--slomo)) var(--ease-out) both;
+    animation-delay: calc(180ms * var(--slomo));
+    animation-delay: calc(
+      (140ms + min(sibling-index(), 4) * 40ms) * var(--slomo)
+    );
+  }
+
+  /* Opening a card ripples out from it: the neighbours it moves set off one
+     after another by their distance from it (People.astro writes which card
+     on the list). A custom property can't fall back, so this is gated. */
+  @supports (width: calc(abs(sibling-index() - 1) * 1px)) {
+    [data-ep-person] {
+      --flip-delay: calc(
+        min(abs(sibling-index() - var(--ep-from, 1)), 5) * 24ms
+      );
+    }
+  }
+}
+
+@keyframes ep-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ep-rise {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+/* ---------- Sponsors ---------- */
+
+.ep-sponsors {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ep-sponsor {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background-color: var(--surface);
+  color: var(--muted);
+  text-decoration: none;
+}
+
+/* A sponsor's logo sits on a white circle, wherever it appears. Logos drawn
+   in ink stay dark on it in either theme. */
+.ep-logo {
+  --ink: oklch(22% 0.02 280);
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 50%;
+  background: oklch(100% 0 0);
+  box-shadow: inset 0 0 0 1px oklch(0% 0 0 / 10%);
+}
+
+.ep-logo > svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ep-sponsor-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ep-sponsor-name {
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 1.25rem;
+}
+
+.ep-sponsor .ep-pill {
+  flex: none;
+  margin: 0;
+}
+
+@media (hover: hover) {
+  .ep-sponsor:hover .ep-pill {
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+}
+
+/* ---------- Previews ---------- */
+
+/* Long notes and transcripts start as a preview. The fade is set in fixed
+   lengths, and drops away when the preview clips nothing. prop-for-
+   that's `truncated` says whether the preview really clips its content: only
+   then does its "more" button show, laid over the fade; when nothing is cut
+   off it stays hidden. Browsers without style queries keep the button below. */
+.ep-clamp-box {
+  position: relative;
+}
+
+.ep-clamp[data-clamped] {
+  max-height: 34rem;
+  overflow: clip;
+  overflow-clip-margin: 8px;
+  /* Faded only when the preview clips something: content that fits (not
+     truncated) pushes the fade's start past the end. */
+  mask-image: linear-gradient(
+    oklch(0% 0 0) calc(24rem + (1 - var(--live-truncated, 1)) * 100rem),
+    transparent 34rem
+  );
+}
+
+.ep-more {
+  margin-top: 1.25rem;
+}
+
+@container style(--live-truncated: 1) {
+  .ep-more {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 0;
+  }
+}
+
+@container style(--live-truncated: 0) {
+  .ep-more {
+    display: none;
+  }
+}
+
+/* ---------- Transcript ---------- */
+
+/* A preview until the visitor asks for all of it. */
+.transcript[data-clamped] {
+  max-height: 26rem;
+  /* clip, not hidden: no scroll container, so heads stay sticky to the page. */
+  overflow: clip;
+  overflow-clip-margin: 8px;
+  mask-image: linear-gradient(
+    oklch(0% 0 0) calc(14rem + (1 - var(--live-truncated, 1)) * 100rem),
+    transparent 26rem
+  );
+}
+
+/* A turn: who spoke and when, in a gutter, then the words. */
+.transcript .ep-turn {
+  display: grid;
+  /* Wide enough for a speaker's name; feed transcripts only carry times. */
+  grid-template-columns: var(--ep-gutter, 7rem) minmax(0, 1fr);
+  column-gap: 1rem;
+  margin: 0 -8px 0.6rem;
+  padding: 6px 8px;
+  border-radius: var(--r-row);
+  overflow: clip;
+  overflow-clip-margin: 6px;
+  transition:
+    background-color 500ms var(--ease-out),
+    color 500ms var(--ease-out);
+}
+
+/* A long transcript comes in groups of 20 turns, and a group off screen
+   skips rendering and styling. Per turn, content-visibility made every
+   scrolled frame track thousands of boxes (25-30ms frames on the 5,411-turn
+   transcript); with every turn rendered, each playback write on <html>
+   restyled 44k elements. Groups keep both small. The group's own box takes
+   in the turns' negative margins, since it clips its paint. */
+.ep-turns {
+  margin-inline: -8px;
+  padding-inline: 8px;
+  /* Until it has rendered, a group is as tall as the first one (measured
+     by the page), and after that as tall as it last was. */
+  contain-intrinsic-block-size: auto calc(var(--ep-group-h, 1800) * 1px);
+}
+/* Not a group still hidden="until-found": the browser hides it with
+   content-visibility, which auto would undo (and find in page with it). */
+.ep-turns:not([hidden]) {
+  content-visibility: auto;
+}
+
+/* A paragraph that continues a turn lines up with the words, not the gutter. */
+@media (min-width: 640px) {
+  .transcript p:not(.ep-turn) {
+    margin-left: calc(var(--ep-gutter, 7rem) + 1rem);
+  }
+}
+
+/* A long turn's head sticks while its words are on screen. Short turns are
+   barely taller than their head, and thousands of sticky heads cost every
+   scrolled frame, so only long ones (data-long, set where turns are made)
+   stick. */
+.ep-turn[data-long] > .ep-turn-head {
+  position: sticky;
+  top: calc(var(--ep-under-bar) + 10px);
+  container: ep-turn / scroll-state;
+}
+
+.ep-turn-head {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding-top: 3px;
+}
+
+.ep-turn-head .seek-chip {
+  margin: 0;
+}
+
+/* Touch: a timestamp (lib/seek-chip.mjs) answers a 44px-tall target
+   without changing the line it sits in. */
+@media (pointer: coarse) {
+  .seek-chip {
+    position: relative;
+  }
+
+  .seek-chip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: 44px;
+    translate: -50% -50%;
+  }
+
+  /* A turn's chip sits 6px under the turn's clipped top: its area reaches
+     5px up and the rest down. */
+  .ep-turn-head .seek-chip::after {
+    top: -5px;
+    translate: -50% 0;
+  }
+}
+
+.ep-turn-head strong {
+  max-width: 100%;
+  color: var(--ink);
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+/* Each speaker in their voice from the live script (the page maps names to
+   --ep-voice): voice 0 condensed Archivo, voice 1 Young Serif, the rest the
+   plain grotesque in ink. */
+@container style(--ep-voice: 0) {
+  .ep-turn-head strong {
+    color: var(--voice-0);
+    font-family: var(--font-voice-0);
+    font-stretch: 72%;
+    font-weight: 850;
+    text-transform: uppercase;
+  }
+}
+
+@container style(--ep-voice: 1) {
+  .ep-turn-head strong {
+    color: var(--voice-1);
+    font-family: var(--font-voice-1);
+    font-weight: 400;
+  }
+}
+
+/* Stuck: the head trails a rule down the rest of the turn, so you can see
+   how much more of this speaker there is. The turn's own paint containment
+   cuts it off where the turn ends. */
+@container ep-turn scroll-state(stuck: top) {
+  .ep-turn-head > :last-child::after {
+    content: '';
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 1px;
+    width: 2px;
+    height: 100vh;
+    border-radius: 2px;
+    background: linear-gradient(var(--line-strong), transparent 40vh);
+  }
+}
+
+/* The line being heard. */
+.ep-turn[data-live] {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+.ep-turn[data-live] .ep-turn-head .seek-chip {
+  --tw-gradient-from: var(--accent);
+  --tw-gradient-to: var(--accent);
+  color: var(--on-ink);
+}
+
+@media (max-width: 639px) {
+  .transcript .ep-turn {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 4px;
+  }
+
+  .ep-turn-head {
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    justify-self: start;
+    padding-top: 0;
+  }
+
+  .ep-turn-head strong {
+    padding: 1px 8px;
+    border-radius: 0 6px 6px 0;
+    transition: background-color 200ms var(--ease-out);
+  }
+
+  /* No gutter on phones: a stuck head floats over the words, so it gets
+     a ground to stand on. */
+  @container ep-turn scroll-state(stuck: top) {
+    .ep-turn-head > strong {
+      background: var(--surface);
+    }
+
+    .ep-turn-head > :last-child::after {
+      content: none;
+    }
+  }
+}
+
+/* Who is speaking: one card anchored to the active turn's head, timestamp
+   and name (SpeakerCard), so it never covers the timestamp. Above the head
+   by choice, below it when there is no room (a head stuck under the bar);
+   the caret reads which from an anchored container query. It takes no
+   pointer events, so a click always reaches what is under it. The popover
+   is never transformed; PropFLIP moves the box inside it. */
+.ep-who {
+  position-anchor: --ep-who;
+  pointer-events: none;
+  inset: auto;
+  /* Room above the name stops at the bar, so a card that would hide under
+     it flips below instead. */
+  top: var(--ep-under-bar);
+  bottom: anchor(top);
+  left: anchor(left);
+  align-self: end;
+  margin: 0 0 12px -10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  overflow: visible;
+  container-type: anchored;
+  position-try-fallbacks: flip-block;
+  transition:
+    display calc(200ms * var(--slomo)) allow-discrete,
+    overlay calc(200ms * var(--slomo)) allow-discrete;
+}
+
+/* Without anchor positioning it has no place by its name (it would open at
+   the corner of the screen), so it stays away. */
+@supports not (anchor-name: --ep-who) {
+  .ep-who {
+    display: none;
+  }
+}
+
+.ep-who-box {
+  --r: var(--r-card);
+  --also:
+    opacity calc(200ms * var(--slomo)) var(--ease-out),
+    translate calc(300ms * var(--slomo)) var(--ease-out);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px 8px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+}
+
+.ep-who:not(:popover-open) .ep-who-box {
+  opacity: 0;
+  translate: 0 4px;
+}
+
+@starting-style {
+  .ep-who:popover-open .ep-who-box {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+.ep-who-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ep-who-text strong {
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 1.25rem;
+}
+
+.ep-who-caret {
+  position: absolute;
+  top: 100%;
+  left: 26px;
+  width: 14px;
+  height: 7px;
+  background: var(--surface);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+@container anchored(fallback: flip-block) {
+  .ep-who-caret {
+    top: auto;
+    bottom: 100%;
+    rotate: 180deg;
+  }
+}
+
+/* Jump to the live line. Two zero-height markers sit in the flow around the
+   live turn: the one before it is sticky to the bottom edge, the one after it
+   to the top (LiveTurn). Each shows its button only while it is stuck, which
+   is exactly while the whole turn is off screen on its side, pointing that
+   way; while any of the turn is visible, neither shows. */
+.ep-now {
+  position: sticky;
+  z-index: 3;
+  height: 0;
+  container: ep-now / scroll-state;
+}
+
+.ep-now[data-edge='top'] {
+  top: calc(var(--ep-under-bar) + 12px);
+}
+
+.ep-now[data-edge='bottom'] {
+  bottom: calc(var(--ep-floor) + 12px);
+}
+
+.transcript[data-clamped] .ep-now {
+  display: none;
+}
+
+.ep-now-jump {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem 0.95rem 0.5rem 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--on-ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  white-space: nowrap;
+  box-shadow: var(--shadow-float);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  scale: 0.85;
+  translate: -50% 0;
+  transition:
+    opacity calc(240ms * var(--slomo)) var(--ease-out),
+    scale calc(420ms * var(--slomo)) var(--ease-spring),
+    translate calc(420ms * var(--slomo)) var(--ease-out),
+    visibility calc(240ms * var(--slomo)) allow-discrete;
+}
+
+.ep-now-caret {
+  transition: rotate calc(420ms * var(--slomo)) var(--ease-spring);
+}
+
+@container ep-now scroll-state(stuck: top) {
+  .ep-now-jump {
+    opacity: 1;
+    visibility: visible;
+    scale: 1;
+  }
+
+  .ep-now-caret {
+    rotate: 180deg;
+  }
+}
+
+@container ep-now scroll-state(stuck: bottom) {
+  .ep-now-jump {
+    opacity: 1;
+    visibility: visible;
+    scale: 1;
+    translate: -50% -100%;
+  }
+}
+
+/* Phones: at the top it keeps to the right, clear of the stuck speaker;
+   at the bottom to the left, clear of the floating video's corner. */
+@media (max-width: 639px) {
+  .ep-now-jump {
+    left: 100%;
+    translate: -100% 0;
+  }
+
+  @container ep-now scroll-state(stuck: bottom) {
+    .ep-now-jump {
+      left: 0;
+      translate: 0 -100%;
+    }
+  }
+}
+
+/* ---------- Onward ---------- */
+
+.ep-pager {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 12px;
+  margin-bottom: clamp(32px, 5vw, 56px);
+}
+
+.ep-pager-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background-color: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.ep-pager-link[rel='next'] {
+  flex-direction: row-reverse;
+  text-align: end;
+}
+
+/* The card's 28px corner, 8px in: the art's 20px. */
+.ep-pager-link .ep-card-art {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-tile);
+  object-fit: cover;
+}
+
+/* The hairline over every piece of art: an outline drawn just inside it,
+   above the picture. */
+.ep-card-art {
+  outline: 1px solid var(--hairline);
+  outline-offset: -1px;
+}
+
+.ep-pager-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding-inline: 4px;
+}
+
+.ep-pager-label,
+.ep-card-facts {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  line-height: 1.125rem;
+}
+
+.ep-card-title {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-stretch: 78%;
+  font-weight: 800;
+  line-height: 1.02;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+/* The shelf: a snap carousel. Native carousel buttons and markers where the
+   browser has them; a plain sideways scroll everywhere else. */
+.ep-shelf-wrap {
+  position: relative;
+  container: ep-shelf / inline-size;
+}
+
+.ep-shelf-title {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 40px;
+}
+
+/* The next card always peeks: so many whole cards and four tenths of one,
+   by the shelf's own width. 16px above and below so rings and shadows are
+   never cut. */
+.ep-shelf {
+  --ep-shown: 2;
+  display: grid;
+  grid-auto-columns: calc(
+    (100cqi - var(--ep-shown) * 16px) / (var(--ep-shown) + 0.4)
+  );
+  grid-auto-flow: column;
+  gap: 16px;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 16px var(--gutter);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--gutter);
+  scroll-snap-type: x mandatory;
+  scroll-marker-group: after;
+  list-style: none;
+}
+
+@container ep-shelf (width >= 560px) {
+  .ep-shelf {
+    --ep-shown: 3;
+  }
+}
+
+@container ep-shelf (width >= 860px) {
+  .ep-shelf {
+    --ep-shown: 4;
+  }
+}
+
+@container ep-shelf (width >= 1160px) {
+  .ep-shelf {
+    --ep-shown: 5;
+  }
+}
+
+.ep-shelf-item {
+  container: ep-card / scroll-state;
+  scroll-snap-align: start;
+}
+
+/* Imagery leads; the facts sit 8px under it and 4px in. */
+.ep-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.ep-card > :not(.ep-card-art) {
+  margin-inline: 4px;
+}
+
+.ep-card .ep-card-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 2px;
+  aspect-ratio: 1;
+  border-radius: var(--r-tile);
+  object-fit: cover;
+  transition:
+    scale calc(480ms * var(--slomo)) var(--ease-spring),
+    opacity calc(320ms * var(--slomo)) var(--ease-out),
+    transform 240ms var(--ease-out);
+}
+
+.ep-card-reason {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 2px 2px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1rem;
+}
+
+.ep-card-reason .person-face {
+  border-width: 1px;
+  padding: 1px;
+}
+
+.ep-card-reason .person-face::before {
+  inset: 1px;
+}
+
+.ep-card-reason:not(:has(.person-face)) {
+  padding-inline-start: 10px;
+}
+
+/* The card the shelf rests on leads; the rest sit back a little. */
+@supports (container-type: scroll-state) {
+  .ep-card .ep-card-art {
+    scale: 0.94;
+    opacity: 0.82;
+  }
+
+  @container ep-card scroll-state(snapped: inline) {
+    .ep-card .ep-card-art {
+      scale: 1;
+      opacity: 1;
+    }
+  }
+}
+
+.ep-shelf::scroll-button(*) {
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition:
+    opacity 200ms var(--ease-out),
+    visibility 200ms,
+    background-color 200ms var(--ease-out);
+}
+
+/* At either end the arrow that can't go further is gone, not dimmed. */
+.ep-shelf::scroll-button(*):disabled {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.ep-shelf::scroll-button(inline-start) {
+  content: '←' / 'Scroll related episodes back';
+  right: 48px;
+}
+
+.ep-shelf::scroll-button(inline-end) {
+  content: '→' / 'Scroll related episodes on';
+  right: 0;
+}
+
+.ep-shelf::scroll-marker-group {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ep-shelf-item::scroll-marker {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  transition:
+    width calc(360ms * var(--slomo)) var(--ease-spring),
+    background-color 200ms var(--ease-out);
+}
+
+.ep-shelf-item::scroll-marker:target-current {
+  width: 20px;
+  background: var(--accent);
+}
+
+/* ---------- About: the hosts ---------- */
+
+/* One poster per host, two across from 1024px: the photo on top, its lower
+   third fading into a colour sampled from it (img-color), then the name in
+   the host's voice, what they have done on the show, the bio, their two
+   latest episodes and the way to all of them, and their links. Until the
+   colour arrives the poster is plain Surface. */
+.ab-hosts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 1024px) {
+  .ab-hosts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ab-host {
+  --ab-ground: color-mix(
+    in oklch,
+    var(--live-img, transparent) 20%,
+    var(--surface)
+  );
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  border-radius: var(--r-card);
+  background: var(--ab-ground);
+  box-shadow:
+    inset 0 0 0 1px var(--line),
+    0 2px 8px color-mix(in oklch, var(--ink) 6%, transparent);
+  transition: --ab-ground 600ms var(--ease-out);
+}
+
+.ab-host-photo {
+  position: relative;
+  aspect-ratio: 4 / 3;
+}
+
+.ab-host-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--r-card) var(--r-card) 0 0;
+  outline: 1px solid var(--hairline);
+  outline-offset: -1px;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.ab-host-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 62%, var(--ab-ground));
+  pointer-events: none;
+}
+
+.ab-host-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: -28px;
+  padding: 0 24px 24px;
+}
+
+.ab-host-name {
+  margin: 0;
+  color: var(--person-ring, var(--ink));
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+[data-voice='0'] > .ab-host-body > .ab-host-name {
+  font-family: var(--font-voice-0);
+  font-stretch: 72%;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+[data-voice='1'] > .ab-host-body > .ab-host-name {
+  font-family: var(--font-voice-1);
+  font-weight: 400;
+}
+
+.ab-host-bio {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--text);
+}
+
+/* Their two latest episodes, in a tray (24px, 4px in: 20px tiles). */
+.ab-host-tray {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 4px 12px;
+  border-radius: var(--r-tray);
+  background: color-mix(in oklch, var(--surface) 72%, transparent);
+}
+
+.ab-host-tray .ep-tiles {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: row;
+  overflow: visible;
+}
+
+/* The hosts' latest episodes together, once, when every poster's tray
+   would have shown the same ones. */
+.ab-latest {
+  margin-top: 32px;
+}
+
+.ab-latest-title {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 650;
+  line-height: 1.25rem;
+}
+
+.ab-host-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ab-host-links .ep-pill {
+  margin: 0;
+}
+
+/* ---------- Contact ---------- */
+
+/* The form reports itself (prop-for-that `field` on each field, `form-state`
+   on the form): a label confirms its field once it is valid, and the send
+   button's lower edge fills as the form gets there. */
+.ep-field label::after {
+  content: '✓' / '';
+  margin-inline-start: 0.4em;
+  color: var(--accent-ink);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+
+@container style(--live-valid: 1) and style(--live-empty: 0) {
+  .ep-field label::after {
+    opacity: 1;
+  }
+}
+
+.ep-send::after {
+  content: '';
+  position: absolute;
+  inset: auto 1.25rem 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--glow-a), var(--glow-b));
+  transform-origin: left;
+  scale: var(--live-completion) 1;
+  transition: scale 300ms var(--ease-out);
+}
+
+/* ---------- The stage, split (episode/split.ts, demos/split.html) ---------- */
+
+/* One divider is the only anchor: the picture's side spans from the stage's
+   leading edge to it, the transcript from it to the trailing edge
+   (anchored-auto-layout attributes, set by split.ts). Only the divider is
+   ever flipped; the sides ride it. Desktop, with a transcript, where the
+   attributes work; otherwise the stage keeps its grid. */
+.ep-split,
+.ep-presets {
+  display: none;
+}
+
+/* split.ts reads the stage's width from this: across the stage, and no
+   taller with it. */
+.ep-split-gauge {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Outside the split, the side is no box: the room and the meta stay grid
+   items of the stage. */
+.stage-side {
+  display: contents;
+}
+
+@media (min-width: 1024px) {
+  .stage[data-split-on] {
+    --ep-gap: clamp(14px, 2vw, 32px);
+    position: relative;
+    display: block;
+    height: calc(var(--ep-h, 0) * 1px);
+  }
+
+  .stage[data-split-on] .stage-side {
+    display: block;
+    margin-inline-end: var(--ep-gap);
+    container: ep-side / inline-size;
+  }
+
+  .stage[data-split-on] .stage-meta {
+    margin-top: 22px;
+  }
+
+  /* The title sets to its side's width, not the window's. */
+  :root[data-world='stage'] .stage[data-split-on] .stage-title {
+    font-size: clamp(1.75rem, 8cqi, 4rem);
+  }
+
+  :root[data-world='stage'] .stage[data-split-on] .stage-script {
+    position: absolute;
+    top: 0;
+    min-height: 0;
+    margin-inline-start: var(--ep-gap);
+    container: ep-script / inline-size;
+  }
+
+  :root[data-world='stage'] .stage[data-split-on] .script {
+    position: sticky;
+    top: var(--gutter);
+    height: auto;
+    max-height: min(72vh, calc(100% - 60px));
+  }
+
+  .stage[data-split-on] .ep-split {
+    --flip-dx: 0.32s;
+    --flip-ex: var(--ease-out);
+    /* In flow, the stage's only in-flow child, so it anchors both sides
+       wherever it sits in the source: between them, in reading order. */
+    position: relative;
+    left: calc(var(--ep-x) * 1px);
+    z-index: 4;
+    display: block;
+    width: 1px;
+    height: 100%;
+    background: var(--line);
+    cursor: col-resize;
+    touch-action: none;
+    outline: none;
+  }
+
+  /* A wider grip than the line. */
+  .ep-split::before {
+    content: '';
+    position: absolute;
+    inset: 0 -8px;
+  }
+
+  .ep-split::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -2px;
+    width: 5px;
+    height: 2.5rem;
+    margin-top: -1.25rem;
+    border-radius: 3px;
+    background: var(--line-strong);
+    opacity: 0;
+    transition:
+      opacity 200ms var(--ease-out),
+      background-color 200ms var(--ease-out),
+      scale 250ms var(--ease-spring);
+  }
+
+  .ep-split:is(:hover, :focus-visible, [data-held])::after {
+    opacity: 1;
+  }
+
+  .ep-split:is(:focus-visible, [data-held])::after {
+    background: var(--ink);
+    scale: 1 1.3;
+  }
+
+  .ep-split[data-held] {
+    background: var(--muted);
+  }
+
+  /* No lines after all: the picture takes the stage. */
+  .stage[data-split-on]:has(.script[data-state='empty'])
+    :is(.ep-split, .ep-presets) {
+    display: none;
+  }
+
+  .stage[data-split-on]:has(.script[data-state='empty']) .stage-side {
+    inset-inline-end: 0;
+    margin: 0;
+  }
+
+  /* Presets: Watch / Balanced / Read, one indicator gliding on its anchor. */
+  .stage[data-split-on] .ep-presets {
+    position: relative;
+    display: inline-grid;
+    grid-auto-flow: column;
+    margin-bottom: 18px;
+    padding: 3px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: var(--ground);
+  }
+
+  .ep-presets button {
+    position: relative;
+    z-index: 1;
+    padding: 0.35rem 0.8rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    cursor: pointer;
+    transition: color 300ms var(--ease-out);
+  }
+
+  /* Touch: a 40px target each. */
+  @media (pointer: coarse) {
+    .ep-presets button {
+      min-height: 40px;
+    }
+  }
+
+  .ep-presets [aria-pressed='true'] {
+    anchor-name: --ep-on;
+    color: var(--on-ink);
+  }
+
+  .ep-presets-on {
+    border-radius: 999px;
+    background: var(--ink);
+    position-visibility: anchor-valid;
+  }
+
+  /* Layout alone keeps it on the chosen preset; it slides only for a
+     choice (split.ts sets data-sliding for that one move), so resizing or
+     dragging never animates it. Edges and size travel together, so it is
+     never larger than the bigger of the two presets. */
+  .ep-presets[data-sliding] .ep-presets-on {
+    transition:
+      inset 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+      width 0.25s cubic-bezier(0.25, 1, 0.5, 1),
+      height 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  /* The transcript re-forms by its own width: the full exchange, then a
+     compact one, then only the line being heard. */
+  @container ep-script (width < 28rem) {
+    :root[data-world='stage']
+      .stage-script
+      .script-line:is(
+        [data-d='-3'],
+        [data-d='-4'],
+        [data-d='-5'],
+        [data-d='2']
+      ) {
+      display: none;
+    }
+
+    :root[data-world='stage'] .stage-script .script-line[data-d='0'] {
+      --size: clamp(1.6rem, 8.5cqi, 2.6rem);
+    }
+  }
+
+  @container ep-script (width < 22rem) {
+    :root[data-world='stage'] .stage-script .script-line:not([data-d='0']) {
+      display: none;
+    }
+
+    :root[data-world='stage']
+      .stage-script
+      .script[data-state='preview']
+      .script-line:not(:first-child) {
+      display: none;
+    }
+
+    :root[data-world='stage'] .stage-script .script-line[data-d='0'] {
+      --size: clamp(1.35rem, 10cqi, 2rem);
+    }
+  }
+}
