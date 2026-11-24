@@ -85,43 +85,47 @@ test('works for bonus episodes with no episode number', async ({ page }) => {
 
 test.describe('transcripts', () => {
   const timestampButtons = (page: Page) =>
-    page.getByRole('button', { name: /^Play from/ });
+    page
+      .locator('article.transcript')
+      .getByRole('button', { name: /^Play from/ });
 
   // Episode 6 has no markdown transcript in src/content/transcripts, so it
   // falls back to the transcript referenced by the feed's <podcast:transcript>
-  // tag. Those timestamps are compact (e.g. "0:04"), with no brackets.
+  // tag. Its timestamps are the shared seek chip (e.g. "0:04").
   test('falls back to the RSS transcript with clickable timestamps when no markdown exists', async ({
     page
   }) => {
     await page.goto('/6');
 
     await expect(
-      page.getByRole('heading', { name: 'Episode Transcript' })
+      page.getByRole('heading', { name: 'Transcript', exact: true })
     ).toBeVisible();
     await expect(page.locator('article.transcript')).not.toBeEmpty();
     await expect(timestampButtons(page).first()).toBeVisible();
     await expect(timestampButtons(page).first()).toHaveText(/^\d{1,2}:\d{2}/);
     await expect(
-      page.getByText('No transcript available for this episode.')
+      page.getByText('No transcript for this one yet.', { exact: false })
     ).toHaveCount(0);
   });
 
   // Episode 120 has an explicit markdown transcript AND the feed exposes an RSS
-  // transcript for it — the markdown one must win. Its timestamps come from the
-  // markdown source, so they keep their bracketed form (e.g. "[00:00:00]").
+  // transcript for it — the markdown one must win. Its timestamps render as
+  // the same seek chip; its bold speaker names prove the markdown source.
   test('prefers the explicit markdown transcript, with its own clickable timestamps', async ({
     page
   }) => {
     await page.goto('/120');
 
     await expect(
-      page.getByRole('heading', { name: 'Episode Transcript' })
+      page.getByRole('heading', { name: 'Transcript', exact: true })
     ).toBeVisible();
     await expect(page.locator('article.transcript')).not.toBeEmpty();
-    // Bracketed labels prove the markdown transcript rendered, not the RSS one.
-    await expect(timestampButtons(page).first()).toHaveText(/^\[\d{2}:\d{2}/);
+    await expect(timestampButtons(page).first()).toHaveText(/^\d{1,2}:\d{2}/);
+    // Speaker names (bold in the markdown) prove the markdown transcript
+    // rendered; feed transcripts carry no speakers.
+    await expect(page.locator('article.transcript strong').first()).toBeVisible();
     await expect(
-      page.getByText('No transcript available for this episode.')
+      page.getByText('No transcript for this one yet.', { exact: false })
     ).toHaveCount(0);
   });
 
