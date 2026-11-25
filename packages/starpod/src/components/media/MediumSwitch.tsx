@@ -62,7 +62,7 @@ export default function MediumSwitch({ compact = false, shortcut = false }: Prop
       </button>
       <span
         aria-hidden="true"
-        class="medium-thumb absolute inset-[3px_auto_3px_3px] w-[calc(50%-3px)] rounded-full bg-ink [transition:translate_520ms_var(--ease-spring)]"
+        class="medium-thumb absolute inset-[3px_auto_3px_3px] w-[calc(50%-3px)] rounded-full bg-ink transition-[translate] duration-520 ease-(--ease-spring)"
       />
     </div>
   );

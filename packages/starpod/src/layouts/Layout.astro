@@ -186,11 +186,11 @@ const publicationLinkTag =
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link fixed top-2 left-2 z-100 rounded-[var(--radius)] px-4 py-[0.6rem] bg-ink [translate:0_-200%] [transition:translate_200ms_var(--ease-out)] focus:[translate:0_0]" href="#main">Skip to content</a>
+    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-[var(--radius)] px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-(--ease-out) focus:translate-y-0" href="#main">Skip to content</a>
     <!-- The island sits at the end of the page and this reaches it in one
          step (it takes focus, its title is next). It is shown only while an
          episode is loaded, when there is an island (shell.css). -->
-    <a class="skip-link fixed top-2 left-2 z-100 rounded-[var(--radius)] px-4 py-[0.6rem] bg-ink [translate:0_-200%] [transition:translate_200ms_var(--ease-out)] focus:[translate:0_0]" href="#player">Skip to the player</a>
+    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-[var(--radius)] px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-(--ease-out) focus:translate-y-0" href="#player">Skip to the player</a>
 
     <div class="app grid min-h-dvh grid-cols-[minmax(0,1fr)] content-start lg:grid-cols-[var(--rail-w)_minmax(0,1fr)]">
       <!-- The divider between the rail and the page, and the only anchor the
@@ -364,7 +364,7 @@ const publicationLinkTag =
 
       <!-- Top bar (phones, tablets, foldables). -->
       <header
-        class="topbar sticky top-0 z-30 col-span-full box-content flex h-(--topbar-h) items-center gap-3 border-b border-line bg-[color-mix(in_oklch,var(--ground)_86%,transparent)] px-(--gutter) pt-[env(safe-area-inset-top)] [backdrop-filter:blur(14px)_saturate(1.4)]"
+        class="topbar sticky top-0 z-30 col-span-full box-content flex h-(--topbar-h) items-center gap-3 border-b border-line bg-[color-mix(in_oklch,var(--ground)_86%,transparent)] px-(--gutter) pt-[env(safe-area-inset-top)] backdrop-blur-[14px] backdrop-saturate-140"
       >
         <!-- The show's artwork, a site's own ShowArtwork as in the rail, is
              the home link. The title goes home too, for a pointer; to the

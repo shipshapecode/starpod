@@ -95,11 +95,11 @@ const cast = await Promise.all(
          audio-only episodes and for anyone choosing to listen. -->
     <div
       aria-hidden="true"
-      class="absolute inset-[-12%] [background:var(--art)_center/cover] [filter:blur(48px)_saturate(1.35)_brightness(0.55)] [transform:scale(1.1)]"
+      class="absolute inset-[-12%] bg-(image:--art) bg-cover bg-center [filter:blur(48px)_saturate(1.35)_brightness(0.55)] [transform:scale(1.1)]"
       style={`--art: url("${art}")`}></div>
     <img
       alt={`${episode.title} - episode art`}
-      class="stage-art absolute top-1/2 left-1/2 aspect-square h-[74%] w-auto rounded-[calc(var(--radius-frame)-2px)] object-cover shadow-[var(--shadow-float)] [translate:-50%_-50%] [transition:scale_700ms_var(--ease-out),opacity_500ms_var(--ease-out)]"
+      class="stage-art absolute top-1/2 left-1/2 aspect-square h-[74%] w-auto rounded-[calc(var(--radius-frame)-2px)] object-cover shadow-[var(--shadow-float)] -translate-1/2 [transition:scale_700ms_var(--ease-out),opacity_500ms_var(--ease-out)]"
       decoding="async"
       fetchpriority="high"
       height="960"

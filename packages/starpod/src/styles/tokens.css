@@ -167,49 +167,54 @@
 
 /* ---------- Browser surfaces ---------- */
 
-html {
-  background: var(--ground);
-  scrollbar-color: var(--line-strong) transparent;
-  -webkit-text-size-adjust: 100%;
-}
+/* Element defaults sit in the base layer, under Tailwind's utilities: a
+   class on an element (text-muted on a link, a heading's colour) wins over
+   them, as everything else in the system does. */
+@layer base {
+  html {
+    background: var(--ground);
+    scrollbar-color: var(--line-strong) transparent;
+    -webkit-text-size-adjust: 100%;
+  }
 
-body {
-  margin: 0;
-  background: var(--ground);
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 1rem;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-  caret-color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    caret-color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
 
-::selection {
-  background: var(--accent);
-  color: var(--on-ink);
-}
+  ::selection {
+    background: var(--accent);
+    color: var(--on-ink);
+  }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
 
-a {
-  color: inherit;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-}
+  a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
 
-h1,
-h2,
-h3 {
-  color: var(--ink);
-  text-wrap: balance;
-}
+  h1,
+  h2,
+  h3 {
+    color: var(--ink);
+    text-wrap: balance;
+  }
 
-p {
-  text-wrap: pretty;
+  p {
+    text-wrap: pretty;
+  }
 }
 
 /* The original pill: a 1px gradient-ready border around a padded label. */

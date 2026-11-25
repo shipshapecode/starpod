@@ -1,10 +1,6 @@
 /* ---------- App shell: rail, top bar, main, tab bar, dock, sheets ---------- */
 
 /* The colour stays here: the global `a { color: inherit }` would beat a utility. */
-.skip-link {
-  color: var(--on-ink);
-}
-
 /* The player is there only while an episode is loaded (the island renders
    nothing before), so its skip link waits for one. */
 :root:is(:not([data-episode]), [data-episode='']) .skip-link[href='#player'] {

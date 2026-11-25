@@ -121,7 +121,7 @@ export default function Scrubber({ duration, episode, time }: Props) {
       {createPortal(
         <div
           aria-hidden="true"
-          class="scrub-preview pointer-events-none fixed top-[var(--top,100vh)] left-[var(--x,50vw)] z-60 flex w-max max-w-[min(320px,calc(100vw-24px))] origin-[50%_100%] flex-col gap-1 rounded-[12px] border border-line bg-surface px-[13px] pt-[10px] pb-[11px] opacity-0 shadow-[var(--shadow-float)] [scale:0.94] [transition:opacity_160ms_var(--ease-out),scale_240ms_var(--ease-out)] [translate:-50%_calc(-100%_-_14px)] data-open:opacity-100 data-open:[scale:1]"
+          class="scrub-preview pointer-events-none fixed top-[var(--top,100vh)] left-[var(--x,50vw)] z-60 flex w-max max-w-[min(320px,calc(100vw-24px))] origin-[50%_100%] flex-col gap-1 rounded-[12px] border border-line bg-surface px-[13px] pt-[10px] pb-[11px] opacity-0 shadow-[var(--shadow-float)] scale-94 [transition:opacity_160ms_var(--ease-out),scale_240ms_var(--ease-out)] -translate-x-1/2 -translate-y-[calc(100%+14px)] data-open:opacity-100 data-open:scale-100"
           data-open={preview ? '' : undefined}
           style={
             preview

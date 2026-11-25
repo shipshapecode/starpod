@@ -23,7 +23,7 @@ export default function SearchButton({ variant = 'rail' }: Props) {
   return (
     <button
       aria-label="Search episodes (⌘K)"
-      class="search-trigger halo flex w-full cursor-pointer items-center gap-[0.6rem] rounded-full border border-line bg-ground px-3 py-[0.6rem] text-[0.875rem] text-muted [transition:color_200ms_var(--ease-out)] hover:text-text"
+      class="search-trigger halo flex w-full cursor-pointer items-center gap-[0.6rem] rounded-full border border-line bg-ground px-3 py-[0.6rem] text-[0.875rem] text-muted transition-[color] duration-200 ease-(--ease-out) hover:text-text"
       data-search-trigger
       onClick={() => (isSearchOpen.value = true)}
       type="button"
