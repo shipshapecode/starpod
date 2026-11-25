@@ -1151,10 +1151,13 @@ button.ep-chip {
 /* ---------- Previews ---------- */
 
 /* Long notes and transcripts start as a preview. The fade is set in fixed
-   lengths, and drops away when the preview clips nothing. prop-for-
-   that's `truncated` says whether the preview really clips its content: only
-   then does its "more" button show, laid over the fade; when nothing is cut
-   off it stays hidden. Browsers without style queries keep the button below. */
+   lengths, and drops away when the preview clips nothing. The "more" button
+   is laid over the fade from the start: prop-for-that's `truncated` only
+   says whether the preview really clips its content once it has measured it
+   (near the screen, and late on a slow device), and a button that started
+   in the flow would then leave it, moving everything below by its height
+   (a section link that had just landed included). When nothing is cut off
+   the button hides, which takes nothing out of the flow either. */
 .ep-clamp-box {
   position: relative;
 }
@@ -1175,13 +1178,11 @@ button.ep-chip {
   margin-top: 1.25rem;
 }
 
-@container style(--live-truncated: 1) {
-  .ep-more {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    margin: 0;
-  }
+.ep-more {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0;
 }
 
 @container style(--live-truncated: 0) {
