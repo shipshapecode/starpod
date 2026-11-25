@@ -594,7 +594,7 @@
       {
         "name": "reduced-motion",
         "value": "1ms",
-        "purpose": "All animation and transition durations collapse under prefers-reduced-motion."
+        "purpose": "Under prefers-reduced-motion, animation durations collapse to 1ms (so their events still fire); transition durations and delays are 0s."
       }
     ],
     "breakpoints": [
@@ -634,7 +634,7 @@
       "stage: data-current, data-playing, data-watching, data-buffering",
       "controls: data-buffering on .play-toggle, data-flash (keyboard acts as hover)",
       "script lines: data-v (voice), data-d (distance), data-long, data-index",
-      "--playback-progress (0 to 1)"
+      "--live-progress (0 to 1), from the media clock (data-props-for=\"media-clock\")"
     ]
   },
   "components": [
@@ -721,7 +721,7 @@
   ],
   "narrative": {
     "northStar": "The Typeset Conversation",
-    "overview": "**Creative North Star: \"The Typeset Conversation\"**\n\nA podcast is people talking, so Starpod typesets the conversation. The episode stage puts the video (or the show's artwork) beside a live script in which each voice has its own face, the line being heard swells to display size, and spoken lines shrink and soften back into the page. Everything else (the list of episodes, the shell, the pages) speaks in the same condensed, uppercase display voice and a calm grotesque for UI.\n\nOne engine runs the whole visit. A single persistent `<video>` element plays the episode's HLS video or MP3, moves physically between the episode stage and the dock, and writes playback state onto `<html data-*>` and a live `--playback-progress` number so CSS can react without islands. Light and dark are both first-class: day uses Iris, night uses Aqua. The styles are still scoped under `<html data-world=\"stage\">`, which is hardcoded; there is one world.\n\nThe system is generic by construction. Show artwork and cast photos supply the only imagery colour, shown in full colour, and every surface has to look deliberate for any show's art.",
+    "overview": "**Creative North Star: \"The Typeset Conversation\"**\n\nA podcast is people talking, so Starpod typesets the conversation. The episode stage puts the video (or the show's artwork) beside a live script in which each voice has its own face, the line being heard swells to display size, and spoken lines shrink and soften back into the page. Everything else (the list of episodes, the shell, the pages) speaks in the same condensed, uppercase display voice and a calm grotesque for UI.\n\nOne engine runs the whole visit. A single persistent `<video>` element plays the episode's HLS video or MP3, moves physically between the episode stage and the dock, and writes playback state onto `<html data-*>` so CSS can react without islands (progress is the media clock's `--live-progress`, on whatever opts into it). Light and dark are both first-class: day uses Iris, night uses Aqua. The styles are still scoped under `<html data-world=\"stage\">`, which is hardcoded; there is one world.\n\nThe system is generic by construction. Show artwork and cast photos supply the only imagery colour, shown in full colour, and every surface has to look deliberate for any show's art.",
     "keyCharacteristics": [
       "One OKLCH palette, one shell, one Stage world.",
       "Light is computed, not painted: the scrubber, the dock edge, and the stage light all take their position or colour from real playback.",
@@ -738,7 +738,7 @@
       },
       {
         "name": "The Computed Light Rule",
-        "body": "Every moving gradient or glow takes its position from `--playback-progress`, from sampled video, or from a hover/focus state. A gradient that no state drives does not belong in the system.",
+        "body": "Every moving gradient or glow takes its position from the media clock's `--live-progress`, from sampled video, or from a hover/focus state. A gradient that no state drives does not belong in the system.",
         "section": "colors"
       },
       {
@@ -798,10 +798,10 @@
       }
     ],
     "dos": [
-      "**Do** read state from the engine: style `[data-current]`, `[data-playing]`, `[data-watching]`, `[data-buffering]`, `html[data-medium]`, `html[data-host]`, and `--playback-progress` instead of adding new JS-driven classes.",
+      "**Do** read state from the engine: style `[data-current]`, `[data-playing]`, `[data-watching]`, `[data-buffering]`, `html[data-medium]`, `html[data-host]`, and the media clock's `--live-progress` instead of adding new JS-driven classes.",
       "**Do** style new work with Tailwind utilities on the token colours; keep custom CSS for what Tailwind cannot express (`@property` animations, the ring, view transitions, voice typography).",
       "**Do** choose the hover by the control's shape: ring for outlined, gradient fill for solid, gradient icon for bare icons, always with a transition.",
-      "**Do** use the easings: expo-out (`cubic-bezier(0.16, 1, 0.3, 1)`) for state and reveal, the `--ease-halo` curve for the ring, and the overshooting `linear()` spring for press, thumb, and glyph motion. Everything collapses to 1ms under `prefers-reduced-motion`.",
+      "**Do** use the easings: expo-out (`cubic-bezier(0.16, 1, 0.3, 1)`) for state and reveal, the `--ease-halo` curve for the ring, and the overshooting `linear()` spring for press, thumb, and glyph motion. Under `prefers-reduced-motion` animations collapse to 1ms (so their events still fire), and transition durations and delays are 0s.",
       "**Do** open standalone pages with `PageHeader` and align them to the breadcrumbs.",
       "**Do** give fields visible labels and the accent border plus Accent Wash ring on focus."
     ],

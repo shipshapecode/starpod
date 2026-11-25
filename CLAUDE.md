@@ -72,7 +72,9 @@ connection is configured in `db/index.ts`.
   whole visit. It plays the episode's HLS video (hls.js outside Safari) or MP3,
   and physically moves between an episode stage's `[data-media-slot]` and the
   persisted dock's `[data-media-dock]`. It mirrors playback state onto
-  `<html data-*>` and `--playback-progress` so CSS can react without islands.
+  `<html data-*>` attributes so CSS can react without islands; progress is
+  the media clock's `--live-progress`, written on elements that opt in with
+  `data-props-for="media-clock"` (`src/components/media/publish.ts`).
 - Styling: tokens in `src/styles/tokens.css`, app shell in `shell.css`, the
   episode stage in `stage.css` and `worlds.css` (rules still scoped to
   `<html data-world="stage">`), and hover/press states in `interactions.css`

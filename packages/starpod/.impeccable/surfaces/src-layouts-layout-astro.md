@@ -47,9 +47,10 @@ speakers); size carries volume and lines recede as they pass; condensed
 uppercase Archivo for every title; calm Familjen UI; full-colour show art and
 cast photos; light sampled from the playing video.
 
-STORY: The home page is the episode list. Clicking a row morphs its art and
-title into the episode stage, where the conversation is already set beside
-the video. Pressing play makes the script perform in sync; clicking any line
+STORY: The home page is the episode explorer. Clicking a card opens its
+close-up in place (its art, facts line and title move into the close-up's
+slots); from there the episode link morphs the art and title into the
+episode stage, where the conversation is already set beside the video. Pressing play makes the script perform in sync; clicking any line
 or timestamp seeks; the dock carries playback across pages; the rail (or top
 bar, tab bar, and More sheet) keeps follow and navigation visible.
 
