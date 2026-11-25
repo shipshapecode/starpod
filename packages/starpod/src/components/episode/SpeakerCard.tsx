@@ -130,15 +130,21 @@ export default function SpeakerCard({ root, speakers }: Props) {
 
   return (
     <div aria-hidden="true" class="ep-who" popover="manual" ref={card}>
-      <div class="ep-who-box PropFLIP" ref={box}>
+      <div
+        class="ep-who-box PropFLIP relative flex items-center gap-3 border border-line bg-surface py-2 pr-5 pl-2"
+        ref={box}
+      >
         <span class="person-face" style="--person-size: 48px">
           <img alt="" height="48" ref={photo} width="48" />
         </span>
-        <span class="ep-who-text flex flex-col gap-0.5">
-          <strong ref={name} />
+        <span class="flex flex-col gap-0.5">
+          <strong
+            class="text-[0.9375rem] leading-5 font-[650] text-ink"
+            ref={name}
+          />
           <span class="person-fact" ref={fact} />
         </span>
-        <i class="ep-who-caret" />
+        <i class="absolute top-full left-[26px] h-[7px] w-3.5 bg-surface [clip-path:polygon(0_0,100%_0,50%_100%)] anchored-flip-block:top-auto anchored-flip-block:bottom-full anchored-flip-block:rotate-180" />
       </div>
     </div>
   );

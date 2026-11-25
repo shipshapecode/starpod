@@ -123,6 +123,18 @@ const together =
           .map(tile)
       )
     : [];
+
+// The photo's lower third fades into the poster's ground (.ab-host-photo's
+// ::after); a hairline sits just inside it, above the picture.
+const hostPhoto =
+  'block size-full rounded-t-(--r-card) object-cover object-[center_30%] outline-1 -outline-offset-1 outline-(--hairline)';
+
+// The name in the host's voice: voice 0 condensed Archivo, voice 1 Young
+// Serif, anyone else the plain grotesque.
+const voiceName: Record<number, string> = {
+  0: 'font-(family-name:--font-voice-0) font-[850] font-stretch-[72%] uppercase',
+  1: 'font-(family-name:--font-voice-1) font-normal'
+};
 ---
 
 <Layout title="About">
@@ -142,26 +154,39 @@ const together =
       <ul class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {
           posters.map((host) => (
-            <li class="ab-host ep-reveal" data-voice={host.voice}>
+            <li
+              class="ab-host ep-reveal flex flex-col overflow-clip rounded-(--r-card) bg-(--ab-ground)"
+              data-voice={host.voice}
+            >
               <div
-                class="ab-host-photo"
+                class="ab-host-photo relative aspect-[4/3]"
                 data-props-for="img-color"
                 data-props-to=".ab-host"
               >
                 {host.photo ? (
-                  <Image alt="" src={host.photo} width={720} />
+                  <Image alt="" class={hostPhoto} src={host.photo} width={720} />
                 ) : (
-                  <img alt="" height={540} src={avatar} width={720} />
+                  <img
+                    alt=""
+                    class={hostPhoto}
+                    height={540}
+                    src={avatar}
+                    width={720}
+                  />
                 )}
               </div>
 
               <div class="ab-host-body relative -mt-7 flex flex-col items-start gap-3 px-6 pb-6">
-                <h3 class="ab-host-name">{host.name}</h3>
+                <h3
+                  class={`m-0 text-[clamp(1.75rem,4vw,2.5rem)] leading-none text-[var(--person-ring,var(--ink))] ${voiceName[host.voice ?? -1] ?? 'font-extrabold'}`}
+                >
+                  {host.name}
+                </h3>
                 {host.stats && <p class="person-fact">{host.stats}</p>}
                 {host.bio && <p class="max-w-[48ch] text-text">{host.bio}</p>}
 
                 {together.length === 0 && host.recent.length > 0 && (
-                  <div class="ab-host-tray">
+                  <div class="ab-host-tray box-border grid w-full justify-items-start gap-3 rounded-(--r-tray) bg-[color-mix(in_oklch,var(--surface)_72%,transparent)] px-1 pt-1 pb-3">
                     <Tiles
                       items={host.recent}
                       label={`Latest episodes with ${host.name}`}

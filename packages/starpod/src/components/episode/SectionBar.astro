@@ -14,21 +14,25 @@ export interface Props {
 const { label, sections } = Astro.props;
 ---
 
-<div class="ep-bar">
-  <div class="ep-bar-row">
+{/* In the page's flow the bar sits under the dock (45): at scroll 0 it can
+    fall right where the dock floats, and must not cover the dock's controls. */}
+<div class="ep-bar sticky top-(--ep-stick) z-44 -mx-(--gutter) mb-[clamp(32px,5vw,56px)]">
+  <div class="ep-bar-row box-border flex h-(--ep-bar-h) items-center border-y border-line px-(--gutter) transition-[background-color,border-color] duration-300 ease-(--ease-out)">
     {
       Astro.slots.has('default') && (
-        <div class="ep-bar-id">
+        <div class="ep-bar-id me-4 flex max-w-[min(40%,30rem)] min-w-0 flex-none items-center gap-3 overflow-clip overflow-clip-margin-[6px] pointer-coarse:-ms-1 pointer-coarse:-my-0.5 pointer-coarse:py-0.5 pointer-coarse:ps-1">
           <slot />
         </div>
       )
     }
-    <nav aria-label={label} class="ep-nav" data-ep-nav>
-      <ol>
+    <nav aria-label={label} class="ep-nav relative min-w-0 flex-1 overflow-x-auto overscroll-x-contain" data-ep-nav>
+      <ol class="flex w-max scroll-target-group gap-0.5 py-1">
         {
           sections.map((section) => (
             <li>
-              <a href={`#${section.id}`}>{section.label}</a>
+              <a
+                class="relative z-1 block rounded-full px-[0.85rem] py-[0.45rem] text-[0.875rem] font-[650] whitespace-nowrap text-muted no-underline transition-[color] duration-300 ease-(--ease-out) hover:text-ink target-current:text-accent-ink target-current:anchor-name-[--ep-here] pointer-coarse:flex pointer-coarse:min-h-11 pointer-coarse:items-center"
+                href={`#${section.id}`}>{section.label}</a>
             </li>
           ))
         }
@@ -36,7 +40,7 @@ const { label, sections } = Astro.props;
       <i aria-hidden="true" class="ep-nav-here"></i>
     </nav>
   </div>
-  <i aria-hidden="true" class="ep-bar-read"></i>
+  <i aria-hidden="true" class="ep-bar-read absolute inset-x-0 top-auto -bottom-px h-0.5 origin-left scale-x-0 bg-line-strong opacity-0 transition-[opacity] duration-300 ease-(--ease-out)"></i>
 </div>
 
 <script>

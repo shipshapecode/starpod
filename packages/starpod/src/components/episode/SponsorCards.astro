@@ -18,12 +18,12 @@ const svgs = import.meta.glob('/src/img/sponsors/*.svg', {
 });
 ---
 
-<ul class="ep-sponsors">
+<ul class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] gap-3">
   {
     sponsors.map((sponsor) => (
       <li class="ep-reveal">
         <a
-          class="ep-sponsor halo"
+          class="ep-sponsor halo flex items-center gap-3.5 rounded-(--r-card) border border-line bg-surface py-3 pr-3 pl-3.5 text-muted no-underline"
           data-props-for="pointer-local"
           href={sponsor.url}
           rel="noopener"
