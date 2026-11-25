@@ -28,7 +28,7 @@ export default function MediumSwitch({ compact = false, shortcut = false }: Prop
   return (
     <div
       aria-label="Watch or listen"
-      class="medium-switch"
+      class="medium-switch relative inline-grid grid-cols-[1fr_1fr] rounded-full border border-line-strong bg-ground p-[3px]"
       data-compact={compact ? '' : undefined}
       data-props-for="pointer-local"
       data-shortcut={shortcut ? 'medium' : undefined}
@@ -60,7 +60,10 @@ export default function MediumSwitch({ compact = false, shortcut = false }: Prop
         <HeadphonesIcon size={compact ? 16 : 18} />
         <span>Listen</span>
       </button>
-      <span aria-hidden="true" class="medium-thumb" />
+      <span
+        aria-hidden="true"
+        class="medium-thumb absolute inset-[3px_auto_3px_3px] w-[calc(50%-3px)] rounded-full bg-ink [transition:translate_520ms_var(--ease-spring)]"
+      />
     </div>
   );
 }

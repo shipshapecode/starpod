@@ -23,14 +23,14 @@ export default function SearchButton({ variant = 'rail' }: Props) {
   return (
     <button
       aria-label="Search episodes (⌘K)"
-      class="search-trigger halo"
+      class="search-trigger halo flex w-full cursor-pointer items-center gap-[0.6rem] rounded-full border border-line bg-ground px-3 py-[0.6rem] text-[0.875rem] text-muted [transition:color_200ms_var(--ease-out)] hover:text-text"
       data-search-trigger
       onClick={() => (isSearchOpen.value = true)}
       type="button"
     >
       <SearchIcon size={18} />
       <span>Search episodes</span>
-      <kbd>⌘K</kbd>
+      <kbd class="ml-auto rounded-[6px] border border-line px-[0.4rem] py-[0.1rem] [font-family:inherit] text-[0.75rem]">⌘K</kbd>
     </button>
   );
 }

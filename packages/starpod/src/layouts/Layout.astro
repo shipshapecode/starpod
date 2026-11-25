@@ -186,13 +186,13 @@ const publicationLinkTag =
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link fixed top-2 left-2 z-100 rounded-[var(--radius)] px-4 py-[0.6rem] bg-ink [translate:0_-200%] [transition:translate_200ms_var(--ease-out)] focus:[translate:0_0]" href="#main">Skip to content</a>
     <!-- The island sits at the end of the page and this reaches it in one
          step (it takes focus, its title is next). It is shown only while an
          episode is loaded, when there is an island (shell.css). -->
-    <a class="skip-link" href="#player">Skip to the player</a>
+    <a class="skip-link fixed top-2 left-2 z-100 rounded-[var(--radius)] px-4 py-[0.6rem] bg-ink [translate:0_-200%] [transition:translate_200ms_var(--ease-out)] focus:[translate:0_0]" href="#player">Skip to the player</a>
 
-    <div class="app">
+    <div class="app grid min-h-dvh grid-cols-[minmax(0,1fr)] content-start lg:grid-cols-[var(--rail-w)_minmax(0,1fr)]">
       <!-- The divider between the rail and the page, and the only anchor the
            layout hangs on (demos/split.html): drag it, fling it, double-click
            it, or step it with the arrow keys. It comes first: a fixed box can
@@ -265,10 +265,12 @@ const publicationLinkTag =
           </div>
 
           <div class="rail-about">
-            <p class="rail-title">
-              <a href="/">{show.title}</a>
+            <p
+              class="rail-title font-(family-name:--font-display) text-[1.3rem] leading-[1.15] font-bold tracking-[-0.015em] text-ink"
+            >
+              <a class="no-underline" href="/">{show.title}</a>
             </p>
-            <p class="rail-blurb">{starpodConfig.blurb}</p>
+            <p class="rail-blurb mt-[-0.6rem] line-clamp-3 text-[0.875rem] leading-[1.45] text-muted">{starpodConfig.blurb}</p>
           </div>
 
           <div
@@ -309,7 +311,7 @@ const publicationLinkTag =
           <i class="rail-island-slot" {...{ 'data-⚓️-name': '--home-rail' }}
           ></i>
 
-          <div class="rail-follow">
+          <div class="rail-follow mt-auto">
             <p
               class="rail-label"
               {...{
@@ -360,12 +362,15 @@ const publicationLinkTag =
         </div>
       </aside>
 
-      <header class="topbar">
+      <!-- Top bar (phones, tablets, foldables). -->
+      <header
+        class="topbar sticky top-0 z-30 col-span-full box-content flex h-(--topbar-h) items-center gap-3 border-b border-line bg-[color-mix(in_oklch,var(--ground)_86%,transparent)] px-(--gutter) pt-[env(safe-area-inset-top)] [backdrop-filter:blur(14px)_saturate(1.4)]"
+      >
         <!-- The show's artwork, a site's own ShowArtwork as in the rail, is
              the home link. The title goes home too, for a pointer; to the
              keyboard and assistive tech it's the same link, so it stays out
              of their way. -->
-        <div class="topbar-show flex min-w-0 items-center gap-2.5 font-bold">
+        <div class="topbar-show flex min-w-0 items-center gap-2.5 font-bold text-ink">
           <span class="w-9 flex-none"><ShowArtwork image={show.image} /></span>
           <a aria-hidden="true" class="truncate no-underline" href="/" tabindex="-1"
             >{show.title}</a
@@ -381,7 +386,15 @@ const publicationLinkTag =
         </button>
       </header>
 
-      <main id="main" class:list={['main relative', !isHome && 'max-w-[1280px]']}>
+      <!-- Stage light may spill past the column; it never scrolls the page
+           (overflow-x-clip). -->
+      <main
+        id="main"
+        class:list={[
+          'main relative min-w-0 overflow-x-clip p-(--gutter) pb-[calc(var(--dock-h)+var(--tabbar-h)+48px)] lg:col-[2] lg:pb-[calc(var(--dock-h)+64px)]',
+          !isHome && 'max-w-[1280px]'
+        ]}
+      >
         {
           !isHome && (
             <div class="crumbs mb-5 text-[0.8125rem]">
@@ -437,7 +450,10 @@ const publicationLinkTag =
       <div data-pip-bar-host></div>
     </div>
 
-    <nav aria-label="Main" class="tabbar">
+    <nav
+      aria-label="Main"
+      class="tabbar fixed inset-x-0 bottom-0 z-40 grid h-(--tabbar-h) grid-cols-[repeat(3,1fr)] border-t border-line bg-surface pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
+    >
       <a aria-current={isHome ? 'page' : undefined} href="/">
         <ListIcon />
         <span>Episodes</span>
