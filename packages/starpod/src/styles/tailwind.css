@@ -13,6 +13,9 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* Utilities and variants for the modern CSS Tailwind doesn't ship. */
+@import './utilities.css';
+
 /*
   Starpod's palette as Tailwind utilities (bg-accent-soft, text-on-glow,
   from-glow-a…). `inline` keeps them pointing at the live tokens, so they
