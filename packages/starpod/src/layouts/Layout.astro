@@ -406,7 +406,12 @@ const publicationLinkTag =
       </main>
     </div>
 
-    <div class="dock" transition:persist="dock">
+    <!-- The dock block holds the island's stations, the room the picture
+         floats in and the island itself, all fixed to the screen; it has no
+         box of its own, so it never blocks the page. It keeps the sidebar's
+         own clock (rail.css), so the stations and the picture's room follow
+         it as it folds and unfolds. -->
+    <div class="dock contents [--rail-glide:calc(0.55s*var(--slomo))_var(--ease-out)]" transition:persist="dock">
       <!-- Where the picture may float: the screen between the chrome. Its
            corners are the picture-in-picture places (player.css). -->
       <i aria-hidden="true" class="player-room" data-player-room></i>
@@ -416,9 +421,9 @@ const publicationLinkTag =
       <i aria-hidden="true" class="pip-zone" data-pip-zone="ne"></i>
       <!-- The island's homes: empty stations it fills (the fourth, the
            rail's, is in the sidebar). player.css places them. -->
-      <i aria-hidden="true" class="island-home" data-home="pill" {...{ 'data-⚓️-name': '--home-pill' }}></i>
-      <i aria-hidden="true" class="island-home" data-home="dock" {...{ 'data-⚓️-name': '--home-dock' }}></i>
-      <i aria-hidden="true" class="island-home" data-home="card" {...{ 'data-⚓️-name': '--home-card' }}></i>
+      <i aria-hidden="true" class="island-home pointer-events-none fixed" data-home="pill" {...{ 'data-⚓️-name': '--home-pill' }}></i>
+      <i aria-hidden="true" class="island-home pointer-events-none fixed" data-home="dock" {...{ 'data-⚓️-name': '--home-dock' }}></i>
+      <i aria-hidden="true" class="island-home pointer-events-none fixed" data-home="card" {...{ 'data-⚓️-name': '--home-card' }}></i>
       <Island client:only="preact" />
       <script>
         // The media clock's source, registered ahead of prop-for-that/auto so
