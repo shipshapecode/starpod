@@ -1,228 +1,527 @@
-import type { JSX } from 'preact/jsx-runtime';
-import { useEffect, useState, useRef, useCallback } from 'preact/hooks';
-import { isSearchOpen } from './state';
+import { Fragment, type TargetedEvent, type TargetedMouseEvent } from 'preact';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'preact/hooks';
+import { navigate } from 'astro:transitions/client';
+import { flipFrom, layoutRect, nudge, reducedMotion } from '../motion/propflip';
+import { isSearchOpen, islandAt, islandBack } from './state';
+import { personFact } from '../lib/cast';
 import type { Episode } from '../lib/rss';
 
-export default function SearchDialog() {
+/** A host or guest, as the explorer's With filter lists them. */
+export interface PalettePerson {
+  value: string;
+  label: string;
+  count: number;
+  avatar?: string;
+  host?: boolean;
+  /** The show's first two hosts wear their voice's ring colour. */
+  voice?: number;
+}
+
+type Item =
+  | { kind: 'person'; key: string; person: PalettePerson }
+  | { kind: 'episode'; key: string; episode: Episode };
+
+/** A row's element id, stable across re-filters, for the input's
+ * aria-activedescendant. */
+const optionId = (item: Item) => `sp-option-${item.key}`;
+
+/** The text with what the visitor typed left plain and the rest in bold:
+ * the completion carries the weight, as in a search suggestion. */
+function Completion({ text, query }: { text: string; query: string }) {
+  const typed = query.trim();
+  if (!typed) {
+    return <>{text}</>;
+  }
+  const at = text.toLowerCase().indexOf(typed.toLowerCase());
+  if (at < 0) {
+    return <b>{text}</b>;
+  }
+  const end = at + typed.length;
+  return (
+    <>
+      {at > 0 && <b>{text.slice(0, at)}</b>}
+      {text.slice(at, end)}
+      {end < text.length && <b>{text.slice(end)}</b>}
+    </>
+  );
+}
+
+/** The search trigger on screen (rail pill, rail icon or tab): where the palette grows from and returns to. */
+function findTrigger() {
+  const shown = [
+    ...document.querySelectorAll<HTMLElement>('[data-search-trigger]')
+  ].filter((el) => el.getBoundingClientRect().width > 0);
+  return shown.find((el) => el === document.activeElement) ?? shown[0];
+}
+
+/**
+ * The command palette. A modal <dialog> whose panel grows out of the search
+ * trigger and flies back into it (PropFLIP: a start that was never in the
+ * layout). Its contents are un-squished, so they are revealed rather than
+ * scaled. Results glide to their new places as the list re-filters, and the
+ * selection is an anchored highlight that slides from row to row.
+ */
+export default function SearchDialog({
+  people = []
+}: {
+  people?: Array<PalettePerson>;
+}) {
   const [query, setQuery] = useState('');
   const [episodes, setEpisodes] = useState<Episode[]>([]);
-  const [filteredEpisodes, setFilteredEpisodes] = useState<Episode[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  // Mounted from opening until the panel has flown back into its trigger.
+  const [mounted, setMounted] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const rowsBefore = useRef(new Map<string, DOMRect>());
+  const leaving = useRef(false);
+  const open = isSearchOpen.value;
 
-  // Load episodes on mount
-  useEffect(() => {
+  // Load episodes as the island hydrates (not after a painted frame).
+  useLayoutEffect(() => {
     fetch('/api/episodes/search.json')
       .then((res) => res.json())
       .then((data) => setEpisodes(data))
       .catch(console.error);
   }, []);
 
-  // Filter episodes based on query
-  useEffect(() => {
-    if (!query.trim()) {
-      setFilteredEpisodes(episodes.slice(0, 8));
+  // Before typing: the people most on the show. Typing: up to three people
+  // whose names match, then up to eight episodes.
+  const items = useMemo((): Array<Item> => {
+    const asPerson = (person: PalettePerson): Item => ({
+      kind: 'person',
+      key: `p:${person.value}`,
+      person
+    });
+    const asEpisode = (episode: Episode): Item => ({
+      kind: 'episode',
+      key: `e:${episode.id}`,
+      episode
+    });
+    const lowerQuery = query.trim().toLowerCase();
+    if (!lowerQuery) {
+      return people.length
+        ? people.slice(0, 6).map(asPerson)
+        : episodes.slice(0, 8).map(asEpisode);
+    }
+    return [
+      ...people
+        .filter((person) => person.label.toLowerCase().includes(lowerQuery))
+        .slice(0, 3)
+        .map(asPerson),
+      ...episodes
+        .filter(
+          (episode) =>
+            episode.title.toLowerCase().includes(lowerQuery) ||
+            episode.description.toLowerCase().includes(lowerQuery) ||
+            (episode.episodeNumber?.toLowerCase().includes(lowerQuery) ?? false)
+        )
+        .slice(0, 8)
+        .map(asEpisode)
+    ];
+  }, [query, episodes, people]);
+  const hasPeople = items[0]?.kind === 'person';
+  const firstEpisode = items.findIndex((item) => item.kind === 'episode');
+
+  // Opening mounts the panel in the same commit (a layout effect): a passive
+  // effect waits for a painted frame, and on an idle page in WebKit that
+  // frame could be seconds away, so ⌘K seemed to do nothing.
+  useLayoutEffect(() => {
+    if (open) {
+      setQuery('');
       setSelectedIndex(0);
+      setMounted(true);
+    }
+  }, [open]);
+
+  // Grow out of the trigger, or fly back into it and close.
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current;
+    const box = boxRef.current;
+    if (!dialog || !box) {
+      return;
+    }
+    const trigger = findTrigger();
+    if (open) {
+      // Reopened mid-return: carry on from where the panel is.
+      const first =
+        dialog.dataset.state === 'closing'
+          ? box.getBoundingClientRect()
+          : trigger?.getBoundingClientRect();
+      if (!dialog.open) {
+        dialog.showModal();
+      }
+      if (first) {
+        flipFrom(box, first);
+      }
+      dialog.dataset.state = 'open';
+      inputRef.current?.focus();
+      return;
+    }
+    dialog.dataset.state = 'closing';
+    const done = () => {
+      if (!isSearchOpen.value) {
+        dialog.close();
+        setMounted(false);
+      }
+    };
+    if (!trigger || leaving.current || reducedMotion()) {
+      leaving.current = false;
+      done();
+      return;
+    }
+    const last = layoutRect(box);
+    const to = trigger.getBoundingClientRect();
+    nudge(box, {
+      tx: to.left - last.left,
+      ty: to.top - last.top,
+      sx: to.width / last.width,
+      sy: to.height / last.height
+    });
+    Promise.all(
+      box.getAnimations().map((animation) => animation.finished)
+    ).then(
+      done,
+      () => {} // interrupted by reopening
+    );
+  }, [open, mounted]);
+
+  // Rows that stay in the list glide from where they were; new ones fade in.
+  useLayoutEffect(() => {
+    const before = rowsBefore.current;
+    rowsBefore.current = new Map();
+    resultsRef.current
+      ?.querySelectorAll<HTMLElement>('[data-id]')
+      .forEach((row) => {
+        const first = before.get(row.dataset.id!);
+        if (first) {
+          flipFrom(row, first);
+        }
+      });
+  }, [items]);
+
+  const onInput = (e: TargetedEvent<HTMLInputElement>) => {
+    rowsBefore.current = new Map(
+      [
+        ...(resultsRef.current?.querySelectorAll<HTMLElement>('[data-id]') ??
+          [])
+      ].map((row) => [row.dataset.id!, row.getBoundingClientRect()])
+    );
+    setQuery(e.currentTarget.value);
+    setSelectedIndex(0);
+  };
+
+  // Leaving for an episode, or for a person's episodes in the explorer:
+  // close at once, the page is changing anyway.
+  const hrefFor = (item: Item) =>
+    item.kind === 'person'
+      ? `/#guest=${encodeURIComponent(item.person.value)}`
+      : `/${item.episode.episodeSlug}`;
+  const choose = (item: Item) => {
+    leaving.current = true;
+    isSearchOpen.value = false;
+    void navigate(hrefFor(item));
+  };
+
+  // Handle keyboard shortcuts. One document listener for the component's
+  // life, always reading the latest results and selection.
+  const handleKeyDown = useRef((_e: KeyboardEvent) => {});
+  handleKeyDown.current = (e: KeyboardEvent) => {
+    // Open search with cmd+k or ctrl+k
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      // The now-playing card is a modal that leaves the rest of the page
+      // inert: the shortcut closes it first (the island's own way home,
+      // loaded lazily so the palette doesn't carry the player), then opens
+      // the palette on the next frame. The island lifts inert only once it
+      // has landed, but a modal <dialog> escapes its ancestors' inert, so
+      // the palette takes typing at once.
+      if (!isSearchOpen.value && islandAt.value === 'card') {
+        void import('./media/Island').then(({ go }) => {
+          go(islandBack.value);
+          requestAnimationFrame(() => (isSearchOpen.value = true));
+        });
+        return;
+      }
+      isSearchOpen.value = !isSearchOpen.value;
       return;
     }
 
-    const lowerQuery = query.toLowerCase();
-    const filtered = episodes
-      .filter(
-        (episode) =>
-          episode.title.toLowerCase().includes(lowerQuery) ||
-          episode.description.toLowerCase().includes(lowerQuery) ||
-          (episode.episodeNumber?.toLowerCase().includes(lowerQuery) ?? false)
-      )
-      .slice(0, 8);
-
-    setFilteredEpisodes(filtered);
-    setSelectedIndex(0);
-  }, [query, episodes]);
-
-  // Focus input when dialog opens
-  useEffect(() => {
-    if (isSearchOpen.value) {
-      setQuery('');
-      setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 0);
+    // Close on escape
+    if (e.key === 'Escape' && isSearchOpen.value) {
+      e.preventDefault();
+      isSearchOpen.value = false;
+      return;
     }
-  }, [isSearchOpen.value]);
 
-  // Handle keyboard shortcuts
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      // Open search with cmd+k or ctrl+k
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    // Moving through and choosing results belong to the field (the
+    // combobox): Enter on Cancel cancels.
+    if (
+      isSearchOpen.value &&
+      items.length > 0 &&
+      e.target === inputRef.current
+    ) {
+      if (e.key === 'ArrowDown') {
         e.preventDefault();
-        isSearchOpen.value = !isSearchOpen.value;
-        return;
-      }
-
-      // Close on escape
-      if (e.key === 'Escape' && isSearchOpen.value) {
+        setSelectedIndex((prev) => (prev < items.length - 1 ? prev + 1 : prev));
+      } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        isSearchOpen.value = false;
-        return;
-      }
-
-      // Navigation and selection when dialog is open
-      if (isSearchOpen.value && filteredEpisodes.length > 0) {
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          setSelectedIndex((prev) =>
-            prev < filteredEpisodes.length - 1 ? prev + 1 : prev
-          );
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
-        } else if (e.key === 'Enter') {
-          e.preventDefault();
-          const selected = filteredEpisodes[selectedIndex];
-          if (selected) {
-            window.location.href = `/${selected.episodeSlug}`;
-          }
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const selected = items[selectedIndex];
+        if (selected) {
+          choose(selected);
         }
       }
-    },
-    [filteredEpisodes, selectedIndex]
-  );
+    }
+  };
 
-  // Add global keyboard listener
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+  // Listen from the moment the island hydrates (a layout effect runs inside
+  // hydration), not after a painted frame: passive effects waited ~0.7s
+  // behind other islands here, and longer on an idle page in WebKit.
+  useLayoutEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => handleKeyDown.current(e);
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   // Scroll selected item into view
   useEffect(() => {
-    if (resultsRef.current) {
-      const selectedEl = resultsRef.current.querySelector(
-        `[data-index="${selectedIndex}"]`
-      );
-      selectedEl?.scrollIntoView({ block: 'nearest' });
-    }
+    resultsRef.current
+      ?.querySelector(`[data-index="${selectedIndex}"]`)
+      ?.scrollIntoView({ block: 'nearest' });
   }, [selectedIndex]);
 
-  // Handle backdrop click
-  const handleBackdropClick = (e: JSX.TargetedMouseEvent<HTMLDivElement>) => {
+  // Clicking the scrim (the dialog around the panel) closes it.
+  const handleBackdropClick = (e: TargetedMouseEvent<HTMLDialogElement>) => {
     if (e.target === e.currentTarget) {
       isSearchOpen.value = false;
     }
   };
 
-  if (!isSearchOpen.value) {
+  if (!mounted) {
     return null;
   }
 
   return (
-    <div
-      class="fixed inset-0 z-[100] flex items-start justify-center bg-black/50 backdrop-blur-sm pt-[10vh]"
+    <dialog
+      ref={dialogRef}
+      class="sp-pal"
+      data-state="from"
       onClick={handleBackdropClick}
-      role="dialog"
+      onCancel={(e) => {
+        e.preventDefault();
+        isSearchOpen.value = false;
+      }}
       aria-modal="true"
       aria-label="Search episodes"
     >
-      <div class="bg-light-card dark:bg-dark-card w-full max-w-xl mx-4 rounded-lg shadow-2xl border border-light-input-border dark:border-dark-border overflow-hidden">
-        {/* Search Input */}
-        <div class="flex items-center border-b border-light-input-border dark:border-dark-border px-4">
-          <span
-            class="search-icon h-5 w-5 text-light-icon dark:text-dark-icon shrink-0"
+      <div ref={boxRef} class="sp-box PropFLIP fix-kids">
+        <div class="sp-in">
+          <i
             aria-hidden="true"
+            class="sp-light"
+            data-props-for="pointer-local"
           />
-          <input
-            ref={inputRef}
-            type="text"
-            class="flex-1 bg-transparent px-4 py-4 text-light-text-heading dark:text-white placeholder-light-text-body dark:placeholder-dark-text-body outline-none border-none focus:ring-0"
-            placeholder="Search episodes..."
-            value={query}
-            onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
-            aria-label="Search episodes"
-            aria-autocomplete="list"
-            aria-controls="search-results"
-          />
-          <kbd class="hidden sm:inline-flex items-center gap-1 px-2 py-1 text-xs text-light-text-body dark:text-dark-text-body bg-light-input-bg dark:bg-dark-input-bg rounded border border-light-input-border dark:border-dark-input-border">
-            <span class="text-xs">ESC</span>
-          </kbd>
-        </div>
+          {/* Search Input */}
+          <div class="sp-field">
+            <span
+              class="search-icon text-muted h-5 w-5 shrink-0"
+              aria-hidden="true"
+            />
+            <input
+              ref={inputRef}
+              type="text"
+              class="text-ink placeholder-muted flex-1 border-none bg-transparent px-3 py-4 outline-none! focus:ring-0"
+              placeholder="Search episodes..."
+              value={query}
+              onInput={onInput}
+              autocapitalize="off"
+              autocomplete="off"
+              autocorrect="off"
+              enterkeyhint="search"
+              spellcheck={false}
+              role="combobox"
+              aria-label="Search episodes"
+              aria-autocomplete="list"
+              aria-controls="search-results"
+              aria-expanded={items.length > 0}
+              aria-activedescendant={
+                items[selectedIndex] && optionId(items[selectedIndex])
+              }
+            />
+            <kbd class="sp-esc text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs sm:inline-flex">
+              <span class="text-xs">ESC</span>
+            </kbd>
+            {/* On touch, where there is no Escape key to show. */}
+            <button
+              class="sp-cancel"
+              onClick={() => (isSearchOpen.value = false)}
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
 
-        {/* Results */}
-        <div
-          ref={resultsRef}
-          id="search-results"
-          class="max-h-80 overflow-y-auto p-2"
-          role="listbox"
-        >
-          {filteredEpisodes.length === 0 ? (
-            <div class="p-4 text-center text-light-text-body dark:text-dark-text-body">
-              {query
-                ? 'No episodes found'
-                : 'Start typing to search episodes...'}
+          {/* Results */}
+          <div
+            ref={resultsRef}
+            id="search-results"
+            class="sp-results"
+            role="listbox"
+            aria-label="Results"
+          >
+            {items.length === 0 ? (
+              <div class="text-text p-4 text-center">
+                {query ? 'Nothing found' : 'Start typing to search episodes...'}
+              </div>
+            ) : (
+              <>
+                <i class="sp-hl" aria-hidden="true" />
+                {items.map((item, index) => {
+                  const selected = index === selectedIndex;
+                  const caption =
+                    index === 0 && hasPeople
+                      ? 'People'
+                      : index === firstEpisode && hasPeople
+                        ? 'Episodes'
+                        : null;
+                  return (
+                    <Fragment key={item.key}>
+                      {caption && (
+                        <p aria-hidden="true" class="sp-group">
+                          {caption}
+                        </p>
+                      )}
+                      <a
+                        href={hrefFor(item)}
+                        id={optionId(item)}
+                        data-id={item.key}
+                        data-index={index}
+                        class={
+                          // Whole class strings: the Tailwind Prettier plugin
+                          // trims the space a template would join them by.
+                          item.kind === 'person'
+                            ? 'sp-row PropFLIP sp-person'
+                            : 'sp-row PropFLIP'
+                        }
+                        role="option"
+                        aria-selected={selected}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          choose(item);
+                        }}
+                        onPointerMove={() =>
+                          !selected && setSelectedIndex(index)
+                        }
+                      >
+                        {item.kind === 'person' ? (
+                          <>
+                            <span
+                              class="person-face"
+                              data-voice={item.person.voice}
+                              style="--person-size: 32px"
+                            >
+                              <img
+                                alt=""
+                                height="32"
+                                loading="lazy"
+                                src={item.person.avatar}
+                                width="32"
+                              />
+                            </span>
+                            <span class="sp-text">
+                              <span class="sp-name">
+                                <Completion
+                                  query={query}
+                                  text={item.person.label}
+                                />
+                              </span>
+                              <span class="person-fact">
+                                {personFact({
+                                  host: Boolean(item.person.host),
+                                  count: item.person.count
+                                })}
+                              </span>
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <img
+                              alt=""
+                              class="sp-thumb"
+                              height="40"
+                              loading="lazy"
+                              src={item.episode.episodeThumbnail}
+                              width="40"
+                            />
+                            <span class="sp-text">
+                              <span class="sp-head">
+                                <span class="sp-num">
+                                  #{item.episode.episodeNumber}
+                                </span>
+                                <span class="sp-title">
+                                  <Completion
+                                    query={query}
+                                    text={item.episode.title}
+                                  />
+                                </span>
+                              </span>
+                              <span class="sp-desc">
+                                {item.episode.description}
+                              </span>
+                            </span>
+                          </>
+                        )}
+                        {selected && (
+                          <kbd class="text-text bg-surface border-line hidden items-center rounded border px-2 py-1 text-xs sm:inline-flex">
+                            ↵
+                          </kbd>
+                        )}
+                      </a>
+                    </Fragment>
+                  );
+                })}
+              </>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div class="border-line text-text flex items-center justify-between border-t px-4 py-2 text-xs">
+            <div class="flex items-center gap-4">
+              <span class="hidden items-center gap-1 sm:inline-flex">
+                <kbd class="bg-raised border-line rounded border px-1.5 py-0.5">
+                  ↑
+                </kbd>
+                <kbd class="bg-raised border-line rounded border px-1.5 py-0.5">
+                  ↓
+                </kbd>
+                <span>to navigate</span>
+              </span>
+              <span class="hidden items-center gap-1 sm:inline-flex">
+                <kbd class="bg-raised border-line rounded border px-1.5 py-0.5">
+                  ↵
+                </kbd>
+                <span>to select</span>
+              </span>
             </div>
-          ) : (
-            filteredEpisodes.map((episode, index) => (
-              <a
-                key={episode.id}
-                href={`/${episode.episodeSlug}`}
-                data-index={index}
-                class={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                  index === selectedIndex
-                    ? 'bg-light-input-bg dark:bg-dark-input-bg'
-                    : 'hover:bg-light-input-bg dark:hover:bg-dark-input-bg'
-                }`}
-                role="option"
-                aria-selected={index === selectedIndex}
-                onClick={() => (isSearchOpen.value = false)}
-              >
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs font-medium text-light-icon dark:text-dark-icon">
-                      #{episode.episodeNumber}
-                    </span>
-                    <span class="text-sm font-semibold text-light-text-heading dark:text-white truncate">
-                      {episode.title}
-                    </span>
-                  </div>
-                  <p class="text-xs text-light-text-body dark:text-dark-text-body truncate mt-1">
-                    {episode.description}
-                  </p>
-                </div>
-                {index === selectedIndex && (
-                  <kbd class="hidden sm:inline-flex items-center px-2 py-1 text-xs text-light-text-body dark:text-dark-text-body bg-light-card dark:bg-dark-card rounded border border-light-input-border dark:border-dark-input-border">
-                    ↵
-                  </kbd>
-                )}
-              </a>
-            ))
-          )}
-        </div>
-
-        {/* Footer */}
-        <div class="flex items-center justify-between px-4 py-2 border-t border-light-input-border dark:border-dark-border text-xs text-light-text-body dark:text-dark-text-body">
-          <div class="flex items-center gap-4">
-            <span class="hidden sm:inline-flex items-center gap-1">
-              <kbd class="px-1.5 py-0.5 bg-light-input-bg dark:bg-dark-input-bg rounded border border-light-input-border dark:border-dark-input-border">
-                ↑
-              </kbd>
-              <kbd class="px-1.5 py-0.5 bg-light-input-bg dark:bg-dark-input-bg rounded border border-light-input-border dark:border-dark-input-border">
-                ↓
-              </kbd>
-              <span>to navigate</span>
-            </span>
-            <span class="hidden sm:inline-flex items-center gap-1">
-              <kbd class="px-1.5 py-0.5 bg-light-input-bg dark:bg-dark-input-bg rounded border border-light-input-border dark:border-dark-input-border">
-                ↵
-              </kbd>
-              <span>to select</span>
+            {/* A count only once there is something asked. */}
+            <span aria-live="polite">
+              {query.trim() &&
+                `${items.length} ${items.length === 1 ? 'result' : 'results'}`}
             </span>
           </div>
-          <span>
-            {filteredEpisodes.length}{' '}
-            {filteredEpisodes.length === 1 ? 'result' : 'results'}
-          </span>
         </div>
       </div>
-    </div>
+    </dialog>
   );
 }

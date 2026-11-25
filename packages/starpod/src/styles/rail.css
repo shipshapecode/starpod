@@ -1,0 +1,2061 @@
+/*
+  The collapsible sidebar (desktop, ≥1024px), held by one divider: the line
+  between the rail and the page is an anchor (--rail-edge) you can drag,
+  fling, double-click or step with the arrow keys (demos/split.html).
+
+  Contract: at rest, <html data-rail="expanded|collapsed"> and --rail-w (the
+  rail's width, published where it is read: on the dock and the player's
+  layers; inside .app the grid carries it). Live, the
+  divider: anything may anchor to --rail-edge and ride it through a drag or a
+  glide.
+
+  Nothing about the rail ever changes a custom property on :root. One that
+  every element inherits restyles the whole page (measured: 81ms on the
+  longest episode page, 21ms on home); an attribute on :root costs 0.1ms.
+
+  The rail is anchored to the divider. Its form (open, or the icon rail) is
+  html[data-rail] at rest and html[data-rail-form] while the divider is held,
+  written when the hand crosses the middle, so the contents re-form mid-drag
+  and back. (A size container would say the same, but re-evaluating it and
+  laying out the anchored pieces on every frame of a drag cost ~4ms; between
+  crossings the pieces that fill their slots simply sit in them, in flow.)
+  Inside, it is laid out twice. Slots are in-flow
+  boxes sized for the form, so they snap; every slot is named --slot and scopes
+  that name to itself (data-⚓️-scope-name). Each visible piece is anchored to
+  the slot it sits in with Anchored Auto Layout and tweens left/top/width/height
+  to wherever the slot lands: x eases out, y springs, sizes ease, and each group
+  cascades across by its slot's sibling-index(). Nothing measures; a second
+  change of mind reverses from wherever the pieces are.
+*/
+
+@property --rail-i {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+:root {
+  --rail-open: 272px;
+  --rail-shut: 72px;
+}
+
+.rail-edge {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --rail-w: var(--rail-open);
+  }
+
+  :root[data-rail='collapsed'] {
+    .app {
+      grid-template-columns: var(--rail-shut) minmax(0, 1fr);
+    }
+
+    .rail-edge {
+      left: var(--rail-shut);
+    }
+
+    :is(.dock, .player-air) {
+      --rail-w: var(--rail-shut);
+    }
+  }
+
+  /* The shell's clock: the rail's pieces and the divider's glide. */
+  .rail,
+  .rail-edge {
+    --flip-dx: 0.55s;
+    --flip-ex: var(--ease-out);
+    --flip-dy: 0.7s;
+    --flip-ey: var(--ease-spring);
+    --flip-ds: 0.55s;
+    --flip-es: var(--ease-out);
+  }
+
+  /* A gliding main column must never scroll the page sideways. */
+  .app {
+    overflow-x: clip;
+  }
+
+  /* After a release the main column glides on the divider's x clock. Only its
+     own transition changes, never a custom property it would pass down: on a
+     long page that would restyle every element under it. */
+  .main[data-gliding] {
+    transition: translate calc(0.55s * var(--slomo)) var(--ease-out);
+  }
+
+  /* ---------- The divider ---------- */
+
+  /* A 1px line at the rail's width. While held it follows the pointer (one
+     inline number); released, PropFLIP glides it to a stop and everything
+     anchored to it rides along. */
+  .rail-edge {
+    position: fixed;
+    inset-block: 0;
+    left: var(--rail-open);
+    z-index: 26;
+    display: block;
+    width: 1px;
+    background: var(--line);
+    cursor: col-resize;
+    outline: none;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .rail-edge::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline: -6px;
+  }
+
+  .rail-edge::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -2px;
+    width: 5px;
+    height: 2.5rem;
+    margin-top: -1.25rem;
+    border-radius: 3px;
+    background: var(--line-strong);
+    opacity: 0;
+    transition:
+      opacity calc(0.2s * var(--slomo)) ease,
+      background-color calc(0.2s * var(--slomo)) ease,
+      scale calc(0.25s * var(--slomo)) var(--ease-spring);
+  }
+
+  .rail-edge:is(:hover, :focus-visible, [data-held])::after {
+    opacity: 1;
+  }
+
+  .rail-edge:is(:focus-visible, [data-held])::after {
+    background: var(--ink);
+    scale: 1 1.3;
+  }
+
+  .rail-edge[data-held] {
+    background: var(--muted);
+  }
+
+  /* ---------- The surface ---------- */
+
+  /* Above main's sticky bars (20), below the dock (45). The divider draws
+     the edge. */
+  .rail {
+    z-index: 25;
+    display: block;
+    padding: 0;
+    border-right: 0;
+  }
+
+  .rail-in {
+    --pad: 22px;
+    --gap: 1.25rem;
+    /* The open form's spacing, which the icon form leaves alone: the title
+       block keeps to it while it fades out (see .rail-about below). */
+    --open-pad: 22px;
+    --open-top: 28px;
+    --open-gap: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    box-sizing: border-box;
+    min-height: 100%;
+    padding: 28px var(--pad) 24px;
+  }
+
+  .rail-in > * {
+    flex-shrink: 0;
+  }
+
+  /* On shorter screens, or while the now-playing island lives in the rail,
+     the open rail still fits without scrolling: the blurb gives way. */
+  @media (max-height: 880px) {
+    .rail-in {
+      --gap: 14px;
+      --open-top: 20px;
+      --open-gap: 14px;
+      padding-top: 20px;
+    }
+
+    .rail-blurb {
+      display: none;
+    }
+  }
+
+  :root[data-island='rail'] .rail-blurb {
+    display: none;
+  }
+
+  /* On a short screen the playing island takes the title's room too (the
+     art still names the show), so the follow marks and hosts stay on it. */
+  @media (max-height: 800px) {
+    :root[data-island='rail'] .rail-about {
+      display: none;
+    }
+  }
+
+  /* The island's home in the rail takes no room until the player sizes it. */
+  .rail-island-slot {
+    display: block;
+    margin-bottom: calc(-1 * var(--gap));
+  }
+
+  /* ---------- Slots: the skeleton, sized per form ---------- */
+
+  .rail-slot {
+    display: block;
+  }
+
+  .rail-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  /* A slot keeps its size while the rail is narrower than the form it is
+     in (an expand starts in the open form at the icon rail's width): a
+     squeezed slot would pull its piece smaller, and out of square, before
+     it grows. */
+  .rail-head > .rail-slot {
+    flex-shrink: 0;
+  }
+
+  :is(.rail-nav .rail-slot, .rail-slot-search) {
+    min-width: 48px;
+  }
+
+  .rail-slot-art {
+    width: 72px;
+    height: 72px;
+  }
+
+  .rail-slot-toggle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .rail-slot-search {
+    height: 40px;
+  }
+
+  /* In the open rail the icons, not their fills, keep to the column's
+     inline-start line with the art, the headers and the faces: a search or
+     nav slot reaches past the column by the inset its icon keeps inside its
+     pill (the padding, and the search pill's border), so the hover and
+     current fills, the focus ring and the hit area grow outward instead.
+     Both sides, so the labels and the shortcut keep to the column too. */
+  .rail-slot-search {
+    margin-inline: -15px;
+  }
+
+  .rail-nav .rail-slot {
+    margin-inline: -14px;
+  }
+
+  /* Groups cascade from the top. Only across and in size: a group travels
+     up or down as one, so its pieces never bunch or cross. */
+  :is(.rail-nav .rail-slot, .rail .platforms > .platform-item) {
+    --rail-i: calc(sibling-index() - 1);
+  }
+
+  .rail-nav .rail-slot {
+    height: 42px;
+  }
+
+  /* The marks sit in one row, their icons from the column's inline-start
+     line to its end: six 36px circles 6px apart, the first reaching past
+     the line by an icon's inset in its circle and the last as far past the
+     end, as the nav's fills do. The list's own box (which the label rides)
+     keeps to the column, and the places are fixed, so a glide's targets
+     hold still. */
+  .rail .platforms {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .rail .platforms > .platform-item:where(:first-child) {
+    margin-inline-start: -9px;
+  }
+
+  /* The label's room above the group is the layout's own box, so it is
+     kept whatever an overriding Platforms renders. */
+  .rail-follow-body {
+    margin-top: 26px;
+  }
+
+  /* A mark's place in the list, for the deck below: sibling-index(), or
+     where that's missing (Firefox) a count by nth-child, so the first mark
+     still lies in front and each after it smaller and further back. */
+  @supports not (z-index: sibling-index()) {
+    .rail .platforms > .platform-item {
+      &:nth-child(1) {
+        --sib: 1;
+      }
+
+      &:nth-child(2) {
+        --sib: 2;
+      }
+
+      &:nth-child(3) {
+        --sib: 3;
+      }
+
+      &:nth-child(4) {
+        --sib: 4;
+      }
+
+      &:nth-child(5) {
+        --sib: 5;
+      }
+
+      &:nth-child(n + 6) {
+        --sib: 6;
+      }
+    }
+  }
+
+  .rail .platforms > .platform-item {
+    z-index: calc(20 - var(--sib, sibling-index()));
+    flex: none;
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Hosted by. At rest, one co-author credit: the faces overlapped in a
+     tight stack beside a line naming them together. Hovered, focused within
+     or tapped, the stack fans out into a row per host and gathers again;
+     each face travels on its anchor, first out is last back, and a name
+     arrives once its face has landed. The rows' room is kept below the
+     stack, so nothing moves when it opens. One host is simply that host. */
+  .rail .host-list {
+    display: flex;
+    align-items: flex-start;
+    min-height: calc(var(--hosts, 1) * 46px - 6px);
+    margin-top: 26px;
+  }
+
+  .rail-host {
+    --rail-i: calc((sibling-count() - sibling-index()) * 2);
+    display: block;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    border-radius: 50%;
+  }
+
+  .rail-host + .rail-host {
+    margin-left: -12px;
+  }
+
+  /* The resting stack shows three faces at most, so the credit beside it
+     fits the open rail whatever the cast (the config allows eight): the
+     rest wait unseen under the third, and fan out with the others. */
+  .rail-hosts-in {
+    --stacked: min(var(--hosts), 3);
+  }
+
+  :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form])) {
+    .rail-hosts:not(:hover, :focus-within, [data-open], :has(.is-fanned))
+      .rail-host:nth-child(n + 4) {
+      margin-left: -40px;
+
+      .person-face {
+        opacity: 0;
+      }
+    }
+  }
+
+  :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form])) {
+    :is(
+      .rail-hosts:is(:hover, :focus-within, [data-open]),
+      .rail-hosts:has(.is-fanned)
+    ) {
+      .host-list {
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .rail-host {
+        --rail-i: calc((sibling-index() - 1) * 2);
+        width: 100%;
+        height: 40px;
+        border-radius: 999px;
+      }
+
+      .rail-host + .rail-host {
+        margin-left: 0;
+      }
+    }
+  }
+
+  /* The icon rail: whenever the rail is narrower than the midpoint between
+     its two stops, at rest or under the hand. */
+  :where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) {
+    /* The icon column keeps to the leading edge: the form can switch while
+       the rail is still wide (a glide starts in its new form), and the icons
+       then travel straight to their places. */
+    .rail-in {
+      --pad: 12px;
+      --gap: 12px;
+      align-items: flex-start;
+      padding-block: 20px;
+    }
+
+    .rail-head {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Every item a 48px circle on a 56px pitch (the art a tile). */
+    :is(
+      .rail-slot-art,
+      .rail-slot-toggle,
+      .rail-slot-search,
+      .rail-nav .rail-slot
+    ) {
+      width: 48px;
+      height: 48px;
+      margin-inline: 0;
+    }
+
+    .rail-nav {
+      gap: 8px;
+    }
+
+    /* The marks gather into a deck, the first on top and each one behind it
+       a little smaller and 4px lower, so only its rim shows. Hovering the
+       deck fans it. The faces gather into an overlapping stack. */
+    .rail .platforms {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 0;
+      width: 48px;
+    }
+
+    .rail-follow-body {
+      margin-top: 0;
+    }
+
+    .rail .platforms > .platform-item {
+      width: calc(34px - 2px * var(--sib, sibling-index()));
+      height: calc(34px - 2px * var(--sib, sibling-index()));
+      margin-inline-start: 0;
+    }
+
+    .rail .platforms > .platform-item + .platform-item {
+      margin-top: calc(2px * var(--sib, sibling-index()) - 30px);
+    }
+
+    .rail-follow:has(.rail-stack:is(:hover, :focus-visible))
+      .platforms
+      > .platform-item
+      + .platform-item {
+      margin-top: calc(2px * var(--sib, sibling-index()) - 24px);
+    }
+
+    .rail .host-list {
+      flex-direction: column;
+      align-items: center;
+      width: 48px;
+      min-height: 0;
+      margin-top: 0;
+    }
+
+    .rail-host {
+      width: 36px;
+      height: 36px;
+    }
+
+    .rail-host + .rail-host {
+      margin-top: -18px;
+      margin-left: 0;
+    }
+
+    /* Content from an overriding component, which knows nothing of the
+       pieces, keeps to the icon column too: a group's stack still opens the
+       whole component in its flyout, and a nav link is named by the
+       tooltip. (The built-in pieces ride the rail itself, unclipped.) */
+    :is(.rail-nav, .rail-follow-body, .rail-hosts-body) {
+      max-width: 48px;
+      overflow-x: clip;
+    }
+  }
+
+  /* ---------- Pieces ---------- */
+
+  .rail-toggle {
+    --icon-a: var(--muted);
+    --icon-b: var(--muted);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .rail-toggle svg {
+    stroke: var(--icon-paint);
+  }
+
+  .rail-toggle:is(:hover, :focus-visible) {
+    --icon-a: var(--glow-a);
+    --icon-b: var(--glow-b);
+    background: var(--raised);
+  }
+
+  .rail-chevron {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: rotate calc(0.6s * var(--slomo)) var(--ease-spring);
+  }
+
+  /* Icons keep one inline offset in both forms, so only the box changes
+     around them and the labels leave or return. */
+  .rail-search .search-trigger {
+    height: 100%;
+    padding-inline: 14px;
+    overflow: clip;
+    white-space: nowrap;
+  }
+
+  .rail-search .search-trigger > * {
+    flex: none;
+  }
+
+  /* Pressable, so a pill; in the icon rail the same pill is a circle, its
+     20px icon centred by the inset. */
+  .rail-nav a {
+    padding-inline: 14px;
+    border-radius: 999px;
+    overflow: clip;
+    white-space: nowrap;
+  }
+
+  /* A label too long for the open rail ends in an ellipsis; prop-for-that's
+     `truncated` reports it, and the link is then named by the tooltip. */
+  .rail-nav a > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Labels return once the boxes have room, and leave at once. The form
+     reaches them through the nav's and search box's own properties (set in
+     the icon form below), never as a root-keyed rule on the labels: such a
+     rule's subject, :not(svg), gave Chrome nothing to aim its invalidation
+     at, so every change of the rail's form restyled the whole document. */
+  :is(.rail-nav a, .rail-search .search-trigger) > :not(svg) {
+    opacity: var(--rail-label-o, 1);
+    translate: var(--rail-label-x, 0) 0;
+    transition: var(
+      --rail-label-fade,
+      opacity calc(0.26s * var(--slomo)) ease calc(0.2s * var(--slomo)),
+      translate calc(0.4s * var(--slomo)) var(--ease-out)
+        calc(0.16s * var(--slomo))
+    );
+  }
+
+  /* The title and blurb keep the open width (never re-wrapping) and fade
+     where they stand; in the icon rail they take no room. */
+  .rail-about {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: calc(var(--rail-open) - 44px);
+    transform-origin: 0 0;
+    transition:
+      opacity calc(0.3s * var(--slomo)) ease calc(0.2s * var(--slomo)),
+      scale calc(0.5s * var(--slomo)) var(--ease-out) calc(0.15s * var(--slomo)),
+      filter calc(0.4s * var(--slomo)) ease calc(0.15s * var(--slomo));
+  }
+
+  .rail .rail-label {
+    margin: 0;
+    padding: 0 0 10px;
+    line-height: 16px;
+    white-space: nowrap;
+  }
+
+  /* Faces are the shared people identity (people.css): a ringed circle,
+     2px clear of the photo, with the hairline. Here the clear gap is filled
+     with Surface, so where the stack overlaps one face from the next. One
+     size in the open rail, stacked or fanned; a little smaller in the icon
+     rail's column. */
+  .rail-host .person-face {
+    --person-size: 40px;
+    margin: 0;
+    background: var(--surface);
+  }
+
+  .rail .rail-label {
+    --fade: calc(0.3s * var(--slomo)) ease calc(0.2s * var(--slomo));
+  }
+
+  /* Stacked, the names wait unseen (still the links' names) and leave at
+     once; the credit line speaks for them. */
+  .rail-host-name {
+    --fade: calc(0.1s * var(--slomo)) ease;
+    margin: 10px 0 0 52px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .host-credit {
+    --fade: calc(0.25s * var(--slomo)) ease calc(0.3s * var(--slomo));
+    --stack-w: calc(40px + (var(--stacked) - 1) * 28px);
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: calc(anchor-size(width) - var(--stack-w) - 10px);
+    min-height: 40px;
+    margin: 0 0 0 calc(var(--stack-w) + 10px);
+    color: var(--ink);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    line-height: 1.25;
+    text-wrap: balance;
+    pointer-events: none;
+  }
+
+  .rail-host {
+    transition: background-color var(--quick);
+  }
+
+  .rail-host:is(:hover, :focus-visible) {
+    background: var(--raised);
+  }
+
+  :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form])) {
+    :is(
+      .rail-hosts:is(:hover, :focus-within, [data-open]),
+      .rail-hosts:has(.is-fanned)
+    ) {
+      .rail-host-name {
+        --fade: calc(0.25s * var(--slomo)) ease
+          calc((0.3s + var(--rail-i) * 20ms) * var(--slomo));
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .host-credit {
+        --fade: calc(0.1s * var(--slomo)) ease;
+        opacity: 0;
+      }
+    }
+  }
+
+  /* Collapsed, a stack is one button that opens its flyout. */
+  .rail-stack {
+    display: none;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    cursor: pointer;
+  }
+
+  :where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) {
+    .rail-chevron {
+      rotate: 180deg;
+    }
+
+    .rail-nav,
+    .rail-search {
+      --rail-label-o: 0;
+      --rail-label-x: -6px;
+      --rail-label-fade:
+        opacity calc(0.1s * var(--slomo)) ease,
+        translate calc(0.2s * var(--slomo)) ease;
+    }
+
+    /* Out of the column, where the open form had it, so the title and blurb
+       fade where they stand: in flow, the icon form's padding and its
+       taller head would move them 10px across and 16px down in the
+       collapse's first frame. */
+    .rail-about {
+      position: absolute;
+      top: calc(var(--open-top) + 72px + var(--open-gap));
+      left: var(--open-pad);
+      opacity: 0;
+      scale: 0.94;
+      filter: blur(4px);
+      visibility: hidden;
+      transition:
+        opacity calc(0.12s * var(--slomo)) ease,
+        scale calc(0.3s * var(--slomo)) ease,
+        filter calc(0.3s * var(--slomo)) ease,
+        visibility 0s calc(0.3s * var(--slomo));
+    }
+
+    :is(.rail .rail-label, .rail-host-name, .host-credit) {
+      --fade: calc(0.12s * var(--slomo)) ease;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .rail .platform {
+      box-shadow: 0 0 0 2px var(--surface);
+    }
+
+    .rail-host .person-face {
+      --person-size: 36px;
+    }
+
+    .rail-stack {
+      display: block;
+    }
+  }
+}
+
+/* ---------- The rail follows the media and the pointer ---------- */
+
+@media (min-width: 1024px) {
+  /* While an episode is loaded the show art wears its progress as a ring:
+     lit while it plays, dim while paused; in the icon rail it is the
+     now-playing mark. The ring is a leaf that opts into the media clock
+     itself (data-props-for="media-clock" writes --live-progress and
+     --live-paused on it four times a second). On the art, an anchored
+     piece, each write re-laid every anchored box in the rail; on this leaf
+     it repaints the ring and nothing else. The drawing is its ::before, so
+     the style query reads the clock from the ring. Until there is media the
+     clock reads 0 and 0, so playing also waits for the player's attribute. */
+  .rail-ring {
+    position: absolute;
+    inset: -4px;
+    display: none;
+    pointer-events: none;
+  }
+
+  :root:not([data-episode=''])[data-episode] .rail-ring {
+    display: block;
+  }
+
+  .rail-ring::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: 15px;
+    background: conic-gradient(
+      var(--accent) calc(var(--live-progress) * 1turn),
+      var(--line-strong) 0
+    );
+    mask:
+      linear-gradient(oklch(0% 0 0) 0 0) content-box,
+      linear-gradient(oklch(0% 0 0) 0 0);
+    mask-composite: exclude;
+    opacity: 0.45;
+    transition: opacity calc(0.4s * var(--slomo)) ease;
+  }
+
+  @container style(--live-paused: 0) {
+    :root[data-playing='true'] .rail-ring::before {
+      opacity: 1;
+    }
+  }
+
+  /* Held, the art's lean stands down: the hand is on the divider, and it
+     would only chase it across a rail that is moving. */
+  :root[data-rail-held] .rail-art .tilt {
+    --tilt-in: 0;
+  }
+}
+
+/* Without typed attr() the links stay in flow, but the nav's one highlight
+   still glides between them (as below, where it rides their slots): it
+   rides the hovered or focused link, or else the current page, and the
+   links keep only their ink. Without anchor positioning at all, each link
+   keeps its own hover and current fills (shell.css). */
+@supports (anchor-name: --a) and
+  (not (anchor-name: attr(data-a type(<custom-ident>)))) {
+  @media (min-width: 1024px) {
+    .rail-nav {
+      isolation: isolate;
+    }
+
+    .rail-nav a:is(:hover, :focus-visible),
+    .rail-nav:not(:has(a:is(:hover, :focus-visible))) a[aria-current='page'] {
+      anchor-name: --rail-hl;
+    }
+
+    /* (The link the collapsed rail's tooltip names keeps that anchor too.) */
+    .rail-nav a[data-tip-at]:is(:hover, :focus-visible),
+    .rail-nav:not(:has(a:is(:hover, :focus-visible)))
+      a[data-tip-at][aria-current='page'] {
+      anchor-name: --rail-hl, --rail-tip-at;
+    }
+
+    .rail-nav a,
+    .rail-nav a:hover,
+    .rail-nav a[aria-current='page'] {
+      background: none;
+    }
+
+    .rail-hl {
+      position: absolute;
+      position-anchor: --rail-hl;
+      position-visibility: anchors-valid;
+      top: anchor(top);
+      left: anchor(left);
+      z-index: -1;
+      width: anchor-size(width);
+      height: anchor-size(height);
+      border-radius: var(--radius);
+      background: var(--raised);
+      pointer-events: none;
+      transition:
+        top calc(0.3s * var(--slomo)) var(--ease-out),
+        left calc(0.3s * var(--slomo)) var(--ease-out),
+        width calc(0.3s * var(--slomo)) var(--ease-out),
+        height calc(0.3s * var(--slomo)) var(--ease-out),
+        background-color calc(0.2s * var(--slomo)) ease,
+        scale calc(0.35s * var(--slomo)) var(--ease-spring);
+    }
+
+    .rail-nav:not(:has(a:is(:hover, :focus-visible):not([aria-current])))
+      .rail-hl {
+      background: var(--accent-soft);
+    }
+
+    .rail-nav:has(a:active) .rail-hl {
+      scale: 0.97;
+    }
+  }
+}
+
+/* The travelling pieces need typed attr() for their anchors. Elsewhere the
+   same slots hold the pieces in flow: the rail still collapses and lays out,
+   it just doesn't travel. */
+@supports (anchor-name: attr(data-a type(<custom-ident>))) {
+  @media (min-width: 1024px) {
+    /* The rail rides the divider: pinned top, bottom and left, its right
+       side anchored to the line (data-⚓️-before), even while the line is
+       mid-glide on a transform. */
+    .rail {
+      position: fixed;
+    }
+
+    /* Under the hand nothing animates: the pieces follow the pane's width
+       directly. Only a re-form (crossing the threshold) travels. Nor does
+       the switch into anchoring for a re-form (data-anchoring, one style
+       flush): in flow a piece is 100% of its slot, anchored it is the
+       anchor's size, and eased between the two while anchored the 100%
+       resolves against the rail, so the art grew to the rail's whole box
+       and shrank back before travelling. */
+    .rail[data-held]:not([data-reforming]) [data-⚓️-to],
+    .rail[data-anchoring][data-reforming] [data-⚓️-to] {
+      transition-duration: 0s;
+      transition-delay: 0s;
+    }
+
+    .rail .platforms [data-⚓️-fill] {
+      width: anchor-size(width);
+      height: anchor-size(height);
+    }
+
+    /* The hosts fan out and gather down the column as well as across. */
+    .rail-host > [data-⚓️-to] {
+      --lag-y: var(--lag);
+    }
+
+    /* The shared face is position: relative; as a piece it rides its slot. */
+    .rail-host > .person-face {
+      position: absolute;
+    }
+
+    /* One highlight for the nav (island.html's track list): it glides to
+       the hovered or focused link, or else rests on the current page, and
+       gives a little under a press. It rides the links' slots, so in a
+       collapse it travels on its own clock beside the icons. The slotted
+       links keep only their ink; a link from an overriding InfoCard, outside
+       any slot, keeps its own hover and current fills. */
+    .rail-nav .rail-slot:has(> a:is(:hover, :focus-visible)),
+    .rail-nav:not(:has(a:is(:hover, :focus-visible)))
+      .rail-slot:has(> a[aria-current='page']) {
+      anchor-name: --slot, --rail-hl;
+    }
+
+    .rail-nav .rail-slot > a,
+    .rail-nav .rail-slot > a:hover,
+    .rail-nav .rail-slot > a[aria-current='page'] {
+      background: none;
+    }
+
+    .rail-hl {
+      position: absolute;
+      position-anchor: --rail-hl;
+      position-visibility: anchors-valid;
+      top: anchor(top);
+      left: anchor(left);
+      z-index: -1;
+      width: anchor-size(width);
+      height: anchor-size(height);
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--raised) 60%, transparent);
+      pointer-events: none;
+      transition:
+        top calc(0.3s * var(--slomo)) var(--ease-out),
+        left calc(0.3s * var(--slomo)) var(--ease-out),
+        width calc(0.3s * var(--slomo)) var(--ease-out),
+        height calc(0.3s * var(--slomo)) var(--ease-out),
+        background-color calc(0.2s * var(--slomo)) ease,
+        scale calc(0.35s * var(--slomo)) var(--ease-spring);
+    }
+
+    .rail-nav:not(:has(a:is(:hover, :focus-visible):not([aria-current])))
+      .rail-hl {
+      background: color-mix(in oklch, var(--accent-soft) 80%, transparent);
+    }
+
+    .rail-nav:has(a:active) .rail-hl {
+      scale: 0.97;
+    }
+
+    /* Through a re-form the highlight rides its link's travelling box, not
+       the slot the link is bound for, and takes no glide of its own: on its
+       own clock it led the link, and mid-expand sat under the next one. */
+    .rail[data-reforming] .rail-nav {
+      .rail-slot:has(> a:is(:hover, :focus-visible)),
+      &:not(:has(a:is(:hover, :focus-visible)))
+        .rail-slot:has(> a[aria-current='page']) {
+        anchor-name: --slot;
+
+        > a {
+          anchor-name: --rail-hl;
+        }
+
+        > a[data-tip-at] {
+          anchor-name: --rail-hl, --rail-tip-at;
+        }
+      }
+
+      .rail-hl {
+        transition:
+          background-color calc(0.2s * var(--slomo)) ease,
+          scale calc(0.35s * var(--slomo)) var(--ease-spring);
+      }
+    }
+
+    /* Between the stops (under the hand, and through a glide either way)
+       the title and blurb shrink with the rail instead of being cut by its
+       edge: the width ratio via tan(atan2()), against the inner column. That
+       column is a size container for this one block only, so a frame of
+       drag re-evaluates one element rather than the rail. At either stop
+       they are full size. (100cqi is that column's content box, inside its
+       padding, which the forms set differently: the fit is taken from the
+       rail's own width, so the switch of form doesn't change it. Taken
+       from the column alone, less the padding a second time, it drew the
+       title at 81% at rest and grew it as a collapse began.) */
+    .rail-in {
+      container-type: inline-size;
+    }
+
+    .rail-about {
+      /* The rail's width (the column plus its padding, whichever form)
+         against the open one: the same number through the switch of form. */
+      transform: scale(
+        min(
+          1,
+          tan(
+            atan2(
+              100cqi + 2 * var(--pad) - 2 * var(--open-pad),
+              var(--rail-open) - 2 * var(--open-pad)
+            )
+          )
+        )
+      );
+    }
+
+    /* At rest and under the hand, the pieces that fill their slots sit in
+       them in flow; only a re-form (data-reforming: a toggle, a release, a
+       crossing) anchors them, so it travels. Chrome lays every anchored box
+       out again whenever anything on the page lays out, so pieces anchored
+       at rest cost every hover's layout about twice as much, page-wide.
+       Relative, not static, so what they hold (the art's ring, a mark's
+       halo) keeps them as its containing block. In the icon rail the follow
+       marks stay anchored at rest: hovering their deck fans them. */
+    .rail:not([data-reforming]) [data-⚓️-fill]:not(.rail-stack, .rail-hl) {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      /* Back into flow at once: the anchored size and the slot's 100% are
+         the same pixels, and easing between them would lay the rail out
+         every frame for nothing. */
+      transition:
+        background-color var(--quick),
+        color var(--quick),
+        opacity var(--fade, 0s),
+        visibility var(--fade, 0s);
+    }
+
+    :where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form]))
+      .rail:not([data-held]):not([data-reforming])
+      .platforms
+      [data-⚓️-fill] {
+      position: absolute;
+      width: anchor-size(width);
+      height: anchor-size(height);
+    }
+
+    /* Expanding, the open form's slots are as wide as the column, which
+       widens with the rail every frame of the glide: a size that waits out
+       its stagger would restart the wait on each new target and stay put
+       until the rail lands, then snap open. Sizes there follow at once;
+       positions keep the stagger. */
+    :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form]))
+      .rail {
+      --lag-size: 0s;
+    }
+
+    .rail[data-ready] [data-⚓️-to] {
+      --lag: calc(min(var(--rail-i) * 18ms, 144ms) * var(--slomo));
+      transition:
+        left calc(var(--flip-dx) * var(--slomo)) var(--flip-ex) var(--lag),
+        right calc(var(--flip-dx) * var(--slomo)) var(--flip-ex) var(--lag),
+        top calc(var(--flip-dy) * var(--slomo)) var(--flip-ey) var(--lag-y, 0s),
+        bottom calc(var(--flip-dy) * var(--slomo)) var(--flip-ey)
+          var(--lag-y, 0s),
+        width calc(var(--flip-ds) * var(--slomo)) var(--flip-es)
+          var(--lag-size, var(--lag)),
+        height calc(var(--flip-ds) * var(--slomo)) var(--flip-es)
+          var(--lag-size, var(--lag)),
+        border-radius calc(var(--flip-ds) * var(--slomo)) var(--flip-es)
+          var(--lag-size, var(--lag)),
+        background-color var(--quick),
+        color var(--quick),
+        opacity var(--fade, 0s),
+        visibility var(--fade, 0s);
+    }
+  }
+}
+
+@supports not (anchor-name: attr(data-a type(<custom-ident>))) {
+  @media (min-width: 1024px) {
+    /* The rail stays a sticky grid item and fills its column, which follows
+       the divider while it is held. */
+    .rail {
+      inset: auto;
+      top: 0;
+    }
+
+    .rail [data-⚓️-to] {
+      position: static;
+    }
+
+    /* Pieces that draw on absolute pseudo-elements stay position: relative
+       (a face's hairline and speaking light, a follow mark's halo), so the
+       drawing keeps to the piece rather than spreading over its block. */
+    .rail :is(.person-face, .platform) {
+      position: relative;
+    }
+
+    .rail [data-⚓️-fill] {
+      width: 100%;
+      height: 100%;
+    }
+
+    .rail-follow-body,
+    .rail .host-list {
+      min-height: 0;
+      margin-top: 0;
+    }
+
+    /* The stack and the rows without the travel: stacked, the names are
+       for assistive tech and the credit sits beside the faces, over the
+       rows' room kept below the stack, as it does on anchors. */
+    .rail-host {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .rail .rail-host-name {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+
+    :where(:root[data-rail-form='open'], :root:not([data-rail='collapsed']):not([data-rail-form])) {
+      .rail-hosts-in {
+        display: grid;
+        grid-template-columns: calc(40px + (var(--stacked) - 1) * 28px) 1fr;
+        column-gap: 10px;
+      }
+
+      .rail :is(.rail-label, .host-list) {
+        grid-column: 1 / -1;
+      }
+
+      .rail .host-list {
+        grid-row: 2;
+        min-height: calc(var(--hosts, 1) * 46px - 6px);
+      }
+
+      .rail .host-credit {
+        grid-row: 2;
+        grid-column: 2;
+        align-self: start;
+        width: auto;
+        margin: 0;
+      }
+
+      :is(
+        .rail-hosts:is(:hover, :focus-within, [data-open]),
+        .rail-hosts:has(.is-fanned)
+      ) {
+        .rail-host-name {
+          position: static;
+          width: auto;
+          height: auto;
+          overflow: visible;
+          clip-path: none;
+        }
+
+        .host-credit {
+          display: none;
+        }
+      }
+    }
+
+    :where(:root[data-rail-form='icons'], :root[data-rail='collapsed']:not([data-rail-form])) {
+      :is(.rail .rail-label, .rail-host-name, .host-credit) {
+        display: none;
+      }
+    }
+
+    .rail-art,
+    .rail-follow,
+    .rail-hosts {
+      position: relative;
+    }
+
+    .rail .rail-stack {
+      position: absolute;
+      inset: 0;
+    }
+  }
+
+  /* WebKit has anchor positioning, only not typed attr(): the flyouts and
+     the tooltip take plain anchor names, on the layout's own boxes, so they
+     still open beside what they name, and a flyout near the bottom flips
+     up as it does on attributes. */
+  @supports (anchor-name: --a) {
+    .rail-follow-body {
+      anchor-name: --rail-platforms;
+    }
+
+    .rail-hosts-body {
+      anchor-name: --rail-hosts;
+    }
+
+    #rail-follow-fly {
+      position-anchor: --rail-platforms;
+    }
+
+    #rail-hosts-fly {
+      position-anchor: --rail-hosts;
+    }
+
+    .rail-fly {
+      inset: auto;
+      top: anchor(top);
+      left: anchor(right);
+      position-try-fallbacks: flip-block, --rail-fly-fit;
+    }
+
+    .rail-tip {
+      position-anchor: --rail-tip-at;
+      left: anchor(right);
+    }
+  }
+}
+
+/* ---------- Names for the collapsed rail ---------- */
+
+/* One tooltip for every icon. Whichever icon it names owns the anchor, so
+   moving along the rail it glides from name to name on the anchor alone. */
+[data-tip-at] {
+  anchor-name: --rail-tip-at;
+}
+
+.rail-tip {
+  position: fixed;
+  top: anchor(center);
+  margin: 0 0 0 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
+  translate: 0 -50%;
+  pointer-events: none;
+  transition:
+    top calc(0.35s * var(--slomo)) var(--ease-out),
+    display calc(0.15s * var(--slomo)) allow-discrete,
+    overlay calc(0.15s * var(--slomo)) allow-discrete;
+}
+
+.rail-tip-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--r-card);
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: var(--shadow-soft);
+  transition:
+    opacity calc(0.15s * var(--slomo)) ease,
+    translate calc(0.25s * var(--slomo)) var(--ease-out);
+}
+
+.rail-tip-box::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 1px;
+  background: inherit;
+  rotate: 45deg;
+}
+
+.rail-tip-box kbd {
+  padding: 0 5px;
+  border-radius: 4px;
+  background: color-mix(in oklch, var(--on-ink) 16%, transparent);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.rail-tip-box kbd:empty {
+  display: none;
+}
+
+.rail-tip:not(:popover-open) .rail-tip-box {
+  opacity: 0;
+  translate: -4px 0;
+}
+
+@starting-style {
+  .rail-tip:popover-open .rail-tip-box {
+    opacity: 0;
+    translate: -4px 0;
+  }
+}
+
+/* A stack's flyout hangs off the stack's top edge and points at its first
+   mark. Near the bottom of the screen it flips up (position-try), and the
+   flyout's own anchored container query moves the caret and the origin it
+   grows from to the bottom, where the stack's last mark is. The anchored box
+   never transforms; the box inside it does. Fixed, so the fallback is
+   chosen against the viewport rather than the whole scrolling page. */
+.rail-fly {
+  position: fixed;
+  margin: 0 0 0 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  overflow: visible;
+  transition:
+    display calc(0.2s * var(--slomo)) allow-discrete,
+    overlay calc(0.2s * var(--slomo)) allow-discrete;
+}
+
+/* A screen too short for the flyout either way up: it keeps inside it, and
+   its list scrolls (the box itself can't, or it would clip the caret). */
+.rail-fly[popover] {
+  position-try-fallbacks: flip-block, --rail-fly-fit;
+}
+
+@position-try --rail-fly-fit {
+  top: 8px;
+  bottom: auto;
+}
+
+/* Kept inside the screen, it no longer sits beside what it names: no caret. */
+@container anchored(fallback: --rail-fly-fit) {
+  .rail-fly-box::before {
+    display: none;
+  }
+}
+
+.rail-fly-box > :last-child {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.rail-fly-box {
+  --caret: 10px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 16px);
+  width: 15rem;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  transform-origin: 0 calc(var(--caret) + 6px);
+  transition:
+    opacity calc(0.2s * var(--slomo)) ease,
+    scale calc(0.4s * var(--slomo)) var(--ease-spring),
+    translate calc(0.3s * var(--slomo)) var(--ease-out);
+}
+
+.rail-fly-box::before {
+  content: '';
+  position: absolute;
+  top: var(--caret);
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  border: solid var(--line);
+  border-width: 0 0 1px 1px;
+  border-radius: 0 0 0 2px;
+  background: var(--surface);
+  rotate: 45deg;
+}
+
+@container anchored(fallback: flip-block) {
+  .rail-fly-box {
+    transform-origin: 0 calc(100% - var(--caret) - 6px);
+  }
+
+  .rail-fly-box::before {
+    top: auto;
+    bottom: var(--caret);
+  }
+}
+
+/* The same, where the flip is measured as the flyout opens (WebKit has no
+   anchored container queries; Layout.astro sets data-flipped). */
+.rail-fly[data-flipped] .rail-fly-box {
+  transform-origin: 0 calc(100% - var(--caret) - 6px);
+}
+
+.rail-fly[data-flipped] .rail-fly-box::before {
+  top: auto;
+  bottom: var(--caret);
+}
+
+.rail-fly:not(:popover-open) .rail-fly-box {
+  opacity: 0;
+  scale: 0.9;
+  translate: -6px 0;
+}
+
+@starting-style {
+  .rail-fly:popover-open .rail-fly-box {
+    opacity: 0;
+    scale: 0.9;
+    translate: -6px 0;
+  }
+}
+
+.rail-fly-title {
+  margin: 6px 10px 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Every flyout row is the same list row: 44px, a 32px leading circle (a
+   ringed face, or a platform's glyph on Ground), the name, a pill-shaped
+   hover 8px inside the flyout's corners. */
+.rail-fly .platforms {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+.rail-fly :is(.platform, .host-row) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: calc(var(--r-card) - 8px);
+  background: none;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--quick);
+}
+
+.rail-fly :is(.platform, .host-row):is(:hover, :focus-visible) {
+  background: var(--raised);
+}
+
+.rail-fly .platform::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  border-radius: 50%;
+  background: var(--ground);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.rail-fly .platform-icon {
+  position: relative;
+  margin-inline: 7px;
+}
+
+.rail-fly .host-row .person-face {
+  --person-size: 32px;
+  margin: 0;
+}
+
+/* Stacked, the hosts' names are hidden, so under reduced motion (which
+   otherwise shows a label by the name) the speaker's ring lights, at once. */
+@media (prefers-reduced-motion: reduce) {
+  .rail-host[data-speaking] .person-face::after {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+/* A host speaking on the episode playing: their ring lights (people.css),
+   or under reduced motion a "Speaking" label follows their name. */
+:is(.rail-host-name, :is(.rail-fly, .sheet) .host-row) .person-speaking {
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* The rows follow the box in, one after another by their place in the list.
+   Without sibling-index() they arrive together, a beat behind the box. */
+.rail-fly :is(.platforms > li, .host-row) {
+  transition:
+    opacity calc(0.2s * var(--slomo)) ease,
+    translate calc(0.3s * var(--slomo)) var(--ease-out);
+}
+
+.rail-fly:popover-open :is(.platforms > li, .host-row) {
+  transition-delay: calc(40ms * var(--slomo));
+  transition-delay: calc(
+    min(40ms + (sibling-index() - 1) * 18ms, 160ms) * var(--slomo)
+  );
+}
+
+@starting-style {
+  .rail-fly:popover-open :is(.platforms > li, .host-row) {
+    opacity: 0;
+    translate: -4px 0;
+  }
+}
+
+/* ---------- Search: the command palette ---------- */
+
+/* The dialog covers the viewport (a click on it, outside the panel, closes
+   it) and is never transformed. The panel inside is the PropFLIP box that
+   grows out of the search trigger, its corners easing from the trigger's
+   pill to the panel's; its one child is un-squished (.fix-kids), so the
+   contents are revealed at full size rather than scaled. */
+.sp-pal {
+  --flip-dx: 0.5s;
+  --flip-ex: var(--ease-out);
+  --flip-dy: 0.6s;
+  --flip-ey: var(--ease-spring);
+  --flip-ds: 0.5s;
+  --flip-es: var(--ease-out);
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: max(10vh, env(safe-area-inset-top)) 16px 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+}
+
+.sp-pal[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sp-pal::backdrop {
+  background: color-mix(in oklch, var(--ground) 70%, transparent);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity calc(0.3s * var(--slomo)) ease;
+}
+
+.sp-pal[data-state='open']::backdrop {
+  opacity: 1;
+}
+
+.sp-box {
+  --r: 20px;
+  --also: --r calc(var(--flip-ds) * var(--slomo)) var(--flip-es);
+  width: 100%;
+  max-width: 36rem;
+  overflow: clip;
+  background: var(--surface);
+  outline: 1px solid var(--line);
+  outline-offset: -1px;
+  box-shadow: var(--shadow-float);
+}
+
+.sp-pal[data-state='open'] .sp-box {
+  --r: var(--r-card);
+}
+
+.sp-field {
+  display: flex;
+  align-items: center;
+  padding-inline: 12px;
+  border-bottom: 1px solid var(--line);
+  transition: border-color 200ms var(--ease-out);
+}
+
+.sp-field:focus-within {
+  border-color: var(--accent);
+}
+
+/* A steady height, so the panel never jumps as the results change. */
+.sp-results {
+  position: relative;
+  height: min(20rem, 46dvh);
+  padding: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Rows sit 8px inside the panel, so their corners are the panel's less 8. */
+.sp-row {
+  --r: var(--r-tile);
+  --also:
+    opacity calc(0.25s * var(--slomo)) ease,
+    translate calc(0.35s * var(--slomo)) var(--ease-out);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Rows arrive and re-sort top to bottom, by their place among the results
+   (the highlight is the first child). Together without sibling-index(). */
+.sp-results > .sp-row {
+  transition-delay: 0s;
+  transition-delay: calc(
+    min((sibling-index() - 2) * 18ms, 126ms) * var(--slomo)
+  );
+}
+
+@starting-style {
+  .sp-row {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+.sp-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sp-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.sp-num {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.sp-title,
+.sp-desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-title {
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* On a phone a title has two lines before it ends in an ellipsis. */
+@media (max-width: 639px) {
+  .sp-title {
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+/* Touch has no Escape key: a Cancel takes the key's place. (The field
+   gives way to it: an input's own minimum width would push it out of a
+   320px phone's palette.) */
+.sp-field input {
+  min-width: 0;
+}
+
+.sp-cancel {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .sp-field .sp-esc {
+    display: none;
+  }
+
+  .sp-cancel {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    min-height: 44px;
+    margin-inline-end: -8px;
+    padding-inline: 8px;
+    border: 0;
+    border-radius: var(--r-thumb);
+    background: none;
+    color: var(--accent-ink);
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
+/* What the visitor typed stays plain; the completion is bold. */
+:is(.sp-title, .sp-name) b {
+  font-weight: 700;
+}
+
+/* "People" and "Episodes": sentence case captions over their rows. */
+.sp-group {
+  margin: 6px 8px 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sp-group:not(:nth-child(2)) {
+  margin-top: 12px;
+}
+
+/* A person: the shared 32px face, the name, and their fact line ("Host ·
+   106 episodes"), which carries the count. */
+.sp-person {
+  min-height: 44px;
+  box-sizing: border-box;
+  padding-block: 4px;
+}
+
+.sp-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sp-desc {
+  color: var(--text);
+  font-size: 0.75rem;
+}
+
+/* A light follows the pointer across the panel, under the field and rows. */
+.sp-light {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    16rem circle at calc(var(--live-local-pointer-x-ratio) * 100%)
+      calc(var(--live-local-pointer-y-ratio) * 100%),
+    color-mix(in oklch, var(--glow-a) 14%, transparent),
+    transparent 70%
+  );
+  opacity: var(--live-local-pointer-inside);
+  pointer-events: none;
+  transition: opacity calc(0.3s * var(--slomo)) ease;
+}
+
+.sp-thumb {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-thumb);
+  object-fit: cover;
+  outline: 1px solid var(--hairline);
+  outline-offset: -1px;
+}
+
+/* The selection is one anchored highlight: the selected row owns the anchor
+   name, and the highlight glides to it. */
+.sp-row[aria-selected='true'] {
+  anchor-name: --sp-on;
+}
+
+.sp-hl {
+  position: absolute;
+  position-anchor: --sp-on;
+  inset: anchor(inside);
+  width: anchor-size(width);
+  height: anchor-size(height);
+  border-radius: var(--r-tile);
+  background: color-mix(in oklch, var(--raised) 80%, transparent);
+  pointer-events: none;
+  transition:
+    inset calc(0.28s * var(--slomo)) var(--ease-out),
+    width calc(0.28s * var(--slomo)) var(--ease-out),
+    height calc(0.28s * var(--slomo)) var(--ease-out);
+}
+
+@supports not (anchor-name: --a) {
+  .sp-hl {
+    display: none;
+  }
+
+  /* Without anchor positioning a stack's flyout can't open beside its
+     stack: it opens in one fixed place beside the icon rail, low, where the
+     stacks are, with no caret to point at one. */
+  .rail-fly {
+    inset: auto auto 16px calc(var(--rail-shut) + 8px);
+    margin: 0;
+  }
+
+  .rail-fly-box::before {
+    display: none;
+  }
+
+  .sp-row[aria-selected='true'] {
+    background: var(--raised);
+  }
+}
+
+/* ---------- Small screens: the top bar and the sheets ---------- */
+
+/* At the top of the page the bar lies flat on it. Once the page scrolls
+   under it (the bar is stuck), it frosts over, gains its hairline, and the
+   show's mark tucks in. The bar's own height never changes. */
+@supports (container-type: scroll-state) {
+  .topbar {
+    container-type: scroll-state;
+    border-bottom-color: transparent;
+    background: none;
+    backdrop-filter: none;
+  }
+
+  .topbar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-bottom: 1px solid var(--line);
+    background: color-mix(in oklch, var(--ground) 86%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+    opacity: 0;
+    transition: opacity calc(0.3s * var(--slomo)) ease;
+  }
+
+  .topbar-show img {
+    transform-origin: 0 50%;
+    transition: scale calc(0.45s * var(--slomo)) var(--ease-out);
+  }
+
+  @container scroll-state(stuck: top) {
+    .topbar::before {
+      opacity: 1;
+    }
+
+    .topbar-show img {
+      scale: 0.86;
+    }
+  }
+}
+
+/* ---------- Balanced rows ---------- */
+
+/* Rows of pills, balanced from the tree: no row more than one shorter than
+   another, the longer rows first, and never a lone item at the end when a
+   row can take one more. Each item works out how many share its row from
+   sibling-index() and sibling-count() and the list's --balance-max (how
+   many fit across). Six make 3 + 3, five 3 + 2, seven 4 + 3, eight 4 + 4,
+   four or fewer one row. */
+@supports (z-index: sibling-count()) {
+  .platforms > li {
+    --bal-n: sibling-count();
+    --bal-i: calc(sibling-index() - 1);
+    --bal-rows: round(up, var(--bal-n) / var(--balance-max, 4));
+    --bal-base: round(down, var(--bal-n) / var(--bal-rows));
+    --bal-extra: calc(var(--bal-n) - var(--bal-base) * var(--bal-rows));
+    --bal-cut: calc(var(--bal-extra) * (var(--bal-base) + 1));
+    /* 0 in the longer rows, 1 in the shorter ones after them */
+    --bal-late: sign(max(var(--bal-i) - var(--bal-cut) + 1, 0));
+    /* how many share this item's row */
+    --bal-per-row: calc(var(--bal-base) + 1 - var(--bal-late));
+  }
+}
+
+/* The hairline over the show's art, wherever the shell shows it. */
+:is(.show-art, .topbar-show) img {
+  outline: 1px solid var(--hairline);
+  outline-offset: -1px;
+}
+
+/* ---------- Sheets: the tray radius, a round close, nested lists ---------- */
+
+.sheet {
+  border-radius: var(--r-tray) var(--r-tray) 0 0;
+  overscroll-behavior: contain;
+}
+
+/* An open sheet holds the page still. A sheet rarely overflows, so a swipe
+   on it (or on its scrim) found nothing to scroll there and scrolled the
+   page behind instead. */
+:root:has(.sheet:popover-open) {
+  overflow: hidden;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -8px 0 12px;
+}
+
+.sheet-head .sheet-title {
+  margin: 0;
+}
+
+.sheet-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--raised);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color var(--quick);
+}
+
+.sheet-close:is(:hover, :focus-visible) {
+  background: color-mix(in oklch, var(--raised) 80%, var(--line-strong));
+}
+
+/* A link list is a panel nested in the sheet (4px in, so its rows' corners
+   are the panel's less 4), 48px rows with a 32px leading circle. */
+.sheet-nav {
+  gap: 0;
+  padding: 4px;
+  border-radius: var(--r-tray);
+  background: var(--raised);
+}
+
+.sheet-nav a {
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 8px 12px 8px 8px;
+  border-radius: calc(var(--r-tray) - 4px);
+  transition:
+    background-color var(--quick),
+    color var(--quick);
+}
+
+.sheet-nav a:hover {
+  background: color-mix(in oklch, var(--surface) 70%, transparent);
+}
+
+.sheet-nav a svg {
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.sheet .platform {
+  min-height: 44px;
+}
+
+/* The hosts, under the follow marks: titled like that group, their rows a
+   panel like the links above (48px, a 32px face). */
+.sheet .rail-fly-title {
+  margin: 0 0 0.6rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.sheet .host-list {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border-radius: var(--r-tray);
+  background: var(--raised);
+}
+
+.sheet .host-row {
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 48px;
+  margin: 0;
+  padding: 8px 12px 8px 8px;
+  border-radius: calc(var(--r-tray) - 4px);
+  text-decoration: none;
+  transition: background-color var(--quick);
+}
+
+.sheet .host-row:hover {
+  background: color-mix(in oklch, var(--surface) 70%, transparent);
+}
+
+.sheet .host-row .person-face {
+  --person-size: 32px;
+}
+
+/* The follow sheet's labelled pills: two to a row on a phone, three where
+   there is room, each row filled edge to edge. Without sibling-count() the
+   same grid without the balance. */
+.sheet .platforms {
+  --balance-max: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+}
+
+@media (min-width: 560px) {
+  .sheet .platforms {
+    --balance-max: 3;
+  }
+}
+
+/* A name keeps to one line, so a row's pills stay one height: under
+   360px a pill's padding, gap and type tighten for "Apple Podcasts" to fit
+   half a 320px phone. */
+.sheet .platform-name {
+  white-space: nowrap;
+}
+
+@media (max-width: 359px) {
+  .sheet .platform {
+    gap: 6px;
+    padding-inline: 0.65rem;
+  }
+
+  .sheet .platform-name {
+    font-size: 0.8125rem;
+  }
+}
+
+.sheet .platform {
+  justify-content: center;
+}
+
+@supports (z-index: sibling-count()) {
+  .sheet .platforms {
+    display: flex;
+  }
+
+  .sheet .platforms > li {
+    /* A hair under the share, then grow: a row never overfills by rounding. */
+    flex: 1 0
+      calc((100% - (var(--bal-per-row) - 1) * 8px) / var(--bal-per-row) - 1px);
+  }
+
+  .sheet .platforms .platform {
+    width: 100%;
+  }
+}
+
+/* The collapsed rail's flyout lists them one to a row, labelled; one is
+   always balanced. */
+
+/* A sheet's scrim fades with it, and its contents rise in behind it, one
+   after another. */
+.sheet::backdrop {
+  opacity: 0;
+  transition:
+    opacity calc(0.42s * var(--slomo)) ease,
+    display calc(0.42s * var(--slomo)) allow-discrete,
+    overlay calc(0.42s * var(--slomo)) allow-discrete;
+}
+
+.sheet:popover-open::backdrop {
+  opacity: 1;
+}
+
+@starting-style {
+  .sheet:popover-open::backdrop {
+    opacity: 0;
+  }
+}
+
+.sheet > * {
+  transition:
+    opacity calc(0.3s * var(--slomo)) ease,
+    translate calc(0.5s * var(--slomo)) var(--ease-out);
+  transition-delay: calc(100ms * var(--slomo));
+  transition-delay: calc(
+    min(60ms + 40ms * sibling-index(), 220ms) * var(--slomo)
+  );
+}
+
+@starting-style {
+  .sheet:popover-open > * {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}

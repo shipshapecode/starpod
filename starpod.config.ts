@@ -34,7 +34,7 @@ export default defineStarpodConfig({
   },
   rssFeed: 'https://rss.flightcast.com/w7bqgc792i30fd43a32uawx0.xml',
   links: [
-    { label: 'Store', href: 'https://whiskey.fund/' },
-    { label: 'Become a sponsor', href: '/sponsor' }
+    { label: 'Become a sponsor', href: '/sponsor', icon: 'sponsor' },
+    { label: 'Store', href: 'https://whiskey.fund/', icon: 'store' }
   ]
 });

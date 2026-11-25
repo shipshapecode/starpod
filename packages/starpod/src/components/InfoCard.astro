@@ -1,23 +1,77 @@
 ---
 import starpodConfig from 'virtual:starpod/config';
+import type { NavLinkIcon } from '../utils/config';
+import {
+  ArrowOutIcon,
+  BagIcon,
+  HeartIcon,
+  InfoIcon,
+  LinkIcon,
+  MailIcon,
+  MegaphoneIcon
+} from './icons';
+
+export interface Props {
+  /**
+   * In the desktop rail: each link is a piece anchored to its own slot, so it
+   * can travel when the rail collapses (styles/rail.css).
+   */
+  anchored?: boolean;
+}
 
 const links = starpodConfig.links ?? [];
+const path = Astro.url.pathname.replace(/\/$/, '');
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+// The page a local link opens, whatever query or hash it carries.
+const opens = (href: string) =>
+  isExternal(href)
+    ? null
+    : new URL(href, Astro.url).pathname.replace(/\/$/, '');
+const ICONS: Record<NavLinkIcon, typeof LinkIcon> = {
+  external: ArrowOutIcon,
+  heart: HeartIcon,
+  link: LinkIcon,
+  sponsor: MegaphoneIcon,
+  store: BagIcon
+};
+const iconFor = (link: (typeof links)[number]) =>
+  ICONS[link.icon ?? (isExternal(link.href) ? 'external' : 'link')];
+
+const items: Array<{
+  href: string;
+  Icon: typeof LinkIcon;
+  label: string;
+  rel?: string;
+}> = [
+  { href: '/about', Icon: InfoIcon, label: 'About' },
+  { href: '/contact', Icon: MailIcon, label: 'Contact' },
+  ...links.map((link) => ({
+    href: link.href,
+    Icon: iconFor(link),
+    label: link.label,
+    rel: isExternal(link.href) ? 'noopener' : undefined
+  }))
+];
+const slot = Astro.props.anchored ? '--slot' : undefined;
+const on = Astro.props.anchored ? '' : undefined;
 ---
 
-<div
-  class="m-2 mb-2 rounded-lg bg-light-card px-4 py-12 sm:px-6 md:px-4 lg:px-16 dark:bg-dark-card"
->
-  <a class="animated-bottom-border block pt-5 after:mt-5" href="/about">
-    About</a
-  >
-  <a class="animated-bottom-border block pt-5 after:mt-5" href="/contact">
-    Contact
-  </a>
-  {
-    links.map((link) => (
-      <a class="animated-bottom-border block pt-5 after:mt-5" href={link.href}>
-        {link.label}
+{
+  items.map(({ href, Icon, label, rel }) => (
+    <span
+      class={slot && 'rail-slot'}
+      {...{ 'data-⚓️-name': slot, 'data-⚓️-scope-name': slot }}
+    >
+      <a
+        aria-current={opens(href) === path ? 'page' : undefined}
+        data-tip={on}
+        {...{ 'data-⚓️-to': slot, 'data-⚓️-fill': on }}
+        href={href}
+        rel={rel}
+      >
+        <Icon />
+        <span data-props-for={slot && 'truncated'}>{label}</span>
       </a>
-    ))
-  }
-</div>
+    </span>
+  ))
+}
