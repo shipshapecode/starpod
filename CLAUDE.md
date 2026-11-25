@@ -20,7 +20,7 @@ Whatnot podcast).
 - **Lint fix:** `pnpm lint:fix`
 - **All tests:** `pnpm test` (runs unit + e2e concurrently)
 - **Unit tests only:** `pnpm test:unit` (Vitest)
-- **Single unit test:** `pnpm exec vitest run tests/unit/Dock.test.tsx`
+- **Single unit test:** `pnpm exec vitest run tests/unit/Island.test.tsx`
 - **E2E tests only:** `pnpm test:e2e` (Playwright, auto-starts dev server)
 - **Seed remote DB:** `pnpm db:seed`
 - **Push schema to DB:** `pnpm db:push`
@@ -30,7 +30,7 @@ Whatnot podcast).
 
 ### Framework Stack
 
-- **Astro 5** with static output, deployed to Vercel
+- **Astro 6** with static output, deployed to Vercel
 - **Preact** for interactive components (player, search, contact form)
 - **Tailwind CSS v4** via Vite plugin
 - **Drizzle ORM** with Turso/libSQL for episode guests and sponsors
@@ -49,6 +49,9 @@ Whatnot podcast).
 ### Data Flow
 
 Episodes are fetched from the RSS feed at build time via `src/lib/rss.ts`.
+Each episode's hosts and guests come from the database where it lists the
+episode, else from the feed's `<podcast:person>` tags (`src/lib/people.ts`);
+with neither, the pieces that show people leave themselves out.
 Guest/sponsor data lives in `db/data/` as TypeScript files and is seeded to
 Turso via `db/seed.ts`. The DB schema is in `db/schema.ts` (Drizzle ORM) with
 tables: Episode, Person, HostOrGuest, Sponsor, SponsorForEpisode. The DB
@@ -75,13 +78,17 @@ connection is configured in `db/index.ts`.
   `<html data-*>` attributes so CSS can react without islands; progress is
   the media clock's `--live-progress`, written on elements that opt in with
   `data-props-for="media-clock"` (`src/components/media/publish.ts`).
-- Styling: tokens in `src/styles/tokens.css`, app shell in `shell.css`, the
-  episode stage in `stage.css` and `worlds.css` (rules still scoped to
-  `<html data-world="stage">`), and hover/press states in `interactions.css`
-  (loaded last). Prefer Tailwind utilities for new work; the palette is
-  exposed as Tailwind colors via `@theme inline` in `tailwind.css`.
-- Video comes from the feed's `<podcast:alternateEnclosure>`, which
-  `rss-to-json` drops, so `src/lib/feed-media.ts` scans the raw XML.
+- Styling: `src/styles/global.css` imports everything in cascade order:
+  tokens in `tokens.css`, the people identity in `people.css`, the app shell
+  in `shell.css`, the episode stage in `stage.css` and `worlds.css` (rules
+  still scoped to `<html data-world="stage">`), hover/press states in
+  `interactions.css`, then the rail, explorer, player and episode page
+  (`rail.css`, `explorer.css`, `player.css`, `episode.css`). Prefer Tailwind
+  utilities for new work; the palette is exposed as Tailwind colors via
+  `@theme inline` in `tailwind.css`.
+- Video comes from the feed's `<podcast:alternateEnclosure>` (HLS or another
+  video type), and people from its `<podcast:person>` tags; `rss-to-json`
+  drops both, so `src/lib/feed-media.ts` scans the raw XML.
   `/api/cues/[episode].json` serves timed transcript lines for the stage's
   live transcript (`src/lib/cues.ts`).
 - `src/lib/` — Core utilities: RSS fetching, image optimization, LLM content

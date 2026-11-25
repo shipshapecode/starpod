@@ -29,15 +29,18 @@ reach play, subscribe, and other CTAs without hunting.
 ## Positioning
 
 The whole site comes from the feed: episodes, artwork, transcripts
-(`<podcast:transcript>`), and video (`<podcast:alternateEnclosure>` HLS
-streams) all flow from RSS at build time. Updating the site is a dependency
+(`<podcast:transcript>`), video (`<podcast:alternateEnclosure>`, HLS or
+another video type) and the people on each episode (`<podcast:person>`) all
+flow from RSS at build time. Updating the site is a dependency
 update. It is free and open source.
 
 ## Operating Context
 
 - The site is built statically by Astro and deployed (reference: Vercel).
-- Content comes from RSS at build time; guests and sponsors optionally come
-  from a Turso/Drizzle database (`database` option).
+- Content comes from RSS at build time. Hosts and guests come from a
+  Turso/Drizzle database (`database` option) where it lists an episode, else
+  from the feed's `<podcast:person>` tags; sponsors come only from the
+  database.
 - Consumers customize with `customCss`, Starlight-style component overrides
   (`virtual:starpod/components/*`), config `links`, and custom pages composed
   from the package `Layout`.
@@ -47,7 +50,7 @@ update. It is free and open source.
 ## Capabilities and Constraints
 
 - **Video-first, automatically:** when an episode's feed item has a video
-  `alternateEnclosure` (HLS), that episode leads with video and the visitor can
+  `alternateEnclosure` (HLS or another video type), that episode leads with video and the visitor can
   switch to audio at will. Episodes without video lead with artwork plus audio.
   Podcasters configure nothing for this.
 - **Playback persists across pages:** video docks to a mini video player when
@@ -72,8 +75,9 @@ update. It is free and open source.
 
 ## Evidence on Hand
 
-- The live reference feed (Flightcast) has 261 episodes. 71 of them carry HLS
-  video streams, and nearly all carry JSON transcripts.
+- The live reference feed (Flightcast) had 261 episodes in November 2026. 71
+  of them carried HLS video streams, and nearly all carried JSON
+  transcripts.
 - Show artwork, episode artwork, host photos (`src/img/people/`), and sponsor
   logos live in the reference site.
 - No testimonials, usage numbers, or press exist. Do not invent them.
