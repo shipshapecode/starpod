@@ -6,8 +6,6 @@
 
 :root[data-world='stage'] {
   --font-display: var(--astro-font-archivo), var(--font-ui);
-  --radius: 3px;
-  --radius-lg: 4px;
 }
 
 :root[data-world='stage'] .stage-title,

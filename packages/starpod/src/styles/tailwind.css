@@ -36,6 +36,45 @@
   --color-on-glow: var(--on-glow);
   --color-voice-0: var(--voice-0);
   --color-voice-1: var(--voice-1);
+  --color-media-ground: var(--media-ground);
+  --color-on-media: var(--on-media);
+  --color-on-media-ink: var(--on-media-ink);
+  --color-media-shade: var(--media-shade);
+  --color-media-glass: var(--media-glass);
+  --color-iris-100: var(--iris-100);
+  --color-iris-200: var(--iris-200);
+  --color-iris-300: var(--iris-300);
+  --color-iris-500: var(--iris-500);
+  --color-iris-700: var(--iris-700);
+  --color-aqua-100: var(--aqua-100);
+  --color-aqua-200: var(--aqua-200);
+  --color-aqua-400: var(--aqua-400);
+  --color-aqua-700: var(--aqua-700);
+}
+
+/*
+  The typography plugin's prose (the show notes) in the token colours, which
+  follow light and dark themselves, rather than its gray scales.
+*/
+.prose {
+  --tw-prose-body: var(--text);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-lead: var(--text);
+  --tw-prose-links: var(--accent-ink);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-counters: var(--muted);
+  --tw-prose-bullets: var(--line-strong);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--ink);
+  --tw-prose-quote-borders: var(--line-strong);
+  --tw-prose-captions: var(--muted);
+  --tw-prose-kbd: var(--ink);
+  --tw-prose-kbd-shadows: var(--hairline);
+  --tw-prose-code: var(--ink);
+  --tw-prose-pre-code: var(--text);
+  --tw-prose-pre-bg: var(--raised);
+  --tw-prose-th-borders: var(--line-strong);
+  --tw-prose-td-borders: var(--line);
 }
 
 /*

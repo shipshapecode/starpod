@@ -904,9 +904,9 @@ button.ep-chip {
   z-index: 1;
   padding: 3px 8px;
   border-radius: 999px;
-  background: color-mix(in oklch, oklch(0% 0 0) 42%, transparent);
+  background: color-mix(in oklch, var(--media-shade) 50%, transparent);
   backdrop-filter: blur(10px) saturate(1.4);
-  color: oklch(100% 0 0);
+  color: var(--on-media);
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   font-weight: 650;
@@ -1012,7 +1012,7 @@ button.ep-chip {
 /* A sponsor's logo sits on a white circle, wherever it appears. Logos drawn
    in ink stay dark on it in either theme. */
 .ep-logo {
-  --ink: oklch(22% 0.02 280);
+  --ink: var(--on-media-ink);
   position: relative;
   display: grid;
   flex: none;
@@ -1022,8 +1022,8 @@ button.ep-chip {
   height: 40px;
   padding: 8px;
   border-radius: 50%;
-  background: oklch(100% 0 0);
-  box-shadow: inset 0 0 0 1px oklch(0% 0 0 / 10%);
+  background: var(--on-media);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--media-shade) 10%, transparent);
 }
 
 .ep-logo > svg {

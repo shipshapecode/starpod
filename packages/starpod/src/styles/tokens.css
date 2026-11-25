@@ -40,6 +40,14 @@
   --voice-0: var(--iris-700);
   --voice-1: var(--aqua-700);
   --media-ground: oklch(19% 0.03 280);
+  /* Over video and artwork, the same in either scheme: On Media is light
+     text and the play disc on media, with On-Media Ink on the disc; Media
+     Shade is the dark of glass chips, scrims and lifted shadows, mixed to
+     whatever strength each needs (Media Glass is the usual chip). */
+  --on-media: oklch(98% 0.005 285);
+  --on-media-ink: oklch(20% 0.04 285);
+  --media-shade: oklch(15% 0.02 280);
+  --media-glass: color-mix(in oklch, var(--media-shade) 72%, transparent);
   --shadow-soft: 0 1px 2px oklch(28% 0.05 290 / 0.06),
     0 10px 30px -12px oklch(28% 0.06 290 / 0.22);
   --shadow-float: 0 2px 6px oklch(20% 0.05 290 / 0.12),
@@ -89,8 +97,10 @@
     1
   );
 
-  --radius: 8px;
-  --radius-lg: 14px;
+  /* Chrome and the media frame are near-square. (Not --radius-lg: that is
+     Tailwind's, behind rounded-lg.) */
+  --radius: 3px;
+  --radius-frame: 4px;
   /* Component radii, nested concentrically: an inner radius is its
      container's radius minus the inset between them. */
   --r-thumb: 12px;

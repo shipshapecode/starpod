@@ -439,7 +439,7 @@
 }
 
 .sheet::backdrop {
-  background: oklch(10% 0.02 280 / 0.45);
+  background: color-mix(in oklch, var(--media-shade) 50%, transparent);
 }
 
 .sheet .platforms {

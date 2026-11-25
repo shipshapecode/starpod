@@ -19,8 +19,8 @@
 :root {
   /* The sticky toolbar sits under the top bar below desktop. */
   --xp-stick: calc(var(--topbar-h) + env(safe-area-inset-top));
-  --xp-glass: oklch(15% 0.02 280 / 0.78);
-  --xp-on-glass: oklch(97% 0.005 280);
+  --xp-glass: color-mix(in oklch, var(--media-shade) 78%, transparent);
+  --xp-on-glass: var(--on-media);
 }
 
 @media (min-width: 1024px) {
@@ -475,7 +475,7 @@
       backdrop-filter: blur(14px) saturate(1.4);
       box-shadow:
         0 1px 0 var(--line),
-        0 16px 32px -28px oklch(10% 0.03 280 / 0.6);
+        0 16px 32px -28px color-mix(in oklch, var(--media-shade) 60%, transparent);
     }
   }
 
@@ -1658,7 +1658,7 @@
    while the close-up is open, and the card in or leaving it. */
 .xp[data-open] .xp-card[data-depth] .xp-face,
 .xp-card:is([data-on], [data-swap]) .xp-face {
-  box-shadow: 0 14px 22px -16px oklch(0% 0 0 / 0.5);
+  box-shadow: 0 14px 22px -16px color-mix(in oklch, var(--media-shade) 50%, transparent);
 }
 
 .xp-card:is([data-on], [data-swap]) .xp-face {
@@ -1730,9 +1730,9 @@
   inset: 0 -100%;
   background: linear-gradient(
     90deg,
-    oklch(100% 0 0 / 0) 40%,
-    oklch(100% 0 0 / 0.09) 50%,
-    oklch(100% 0 0 / 0) 60%
+    transparent 40%,
+    color-mix(in oklch, var(--on-media) 9%, transparent) 50%,
+    transparent 60%
   );
   opacity: 0;
   transition: opacity 300ms var(--ease-out);
@@ -1814,7 +1814,7 @@
    with its number and kind printed on it. */
 .xp-back {
   rotate: y 180deg;
-  box-shadow: 0 60px 70px -40px oklch(0% 0 0 / 0.6);
+  box-shadow: 0 60px 70px -40px color-mix(in oklch, var(--media-shade) 60%, transparent);
   /* Out of 3D it would paint over the front, mirrored. */
   visibility: hidden;
 }
@@ -1828,13 +1828,13 @@
   background:
     radial-gradient(
       circle at 0 0,
-      oklch(10% 0.02 280 / 0.55),
-      oklch(10% 0.02 280 / 0) 55%
+      color-mix(in oklch, var(--media-shade) 55%, transparent),
+      transparent 55%
     ),
     linear-gradient(
       to top,
-      oklch(10% 0.02 280 / 0.5),
-      oklch(10% 0.02 280 / 0) 40%
+      color-mix(in oklch, var(--media-shade) 50%, transparent),
+      transparent 40%
     );
 }
 
@@ -1842,7 +1842,7 @@
   position: absolute;
   top: 5%;
   left: 7%;
-  color: oklch(100% 0 0 / 0.86);
+  color: color-mix(in oklch, var(--on-media) 86%, transparent);
   font-family: var(--font-display);
   /* In proportion to the box (as is everything on the back), so the card
      flying home is the open card made smaller, number and all. */
@@ -1857,7 +1857,7 @@
   position: absolute;
   right: 6%;
   bottom: 6%;
-  color: oklch(100% 0 0 / 0.9);
+  color: color-mix(in oklch, var(--on-media) 90%, transparent);
   font-size: var(--xp-tag-size, 2.8cqi);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;

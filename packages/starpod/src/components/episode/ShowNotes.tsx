@@ -82,7 +82,7 @@ export default function ShowNotes({ episode, children }: Props) {
 
   return (
     <div
-      class="prose prose-neutral dark:prose-invert prose-blockquote:not-italic mb-5 max-w-[70ch] wrap-anywhere prose-a:text-accent-ink [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:leading-7 [&>h2]:font-medium [&>h2]:text-ink [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-cyan-200 [&>h2:nth-of-type(3n)]:before:bg-violet-200 [&>h2:nth-of-type(3n+2)]:before:bg-indigo-200 [&>ul]:mt-6 [&>ul]:pl-5 [&_li>p]:m-0"
+      class="prose prose-blockquote:not-italic mb-5 max-w-[70ch] wrap-anywhere [&>h2]:mt-12 [&>h2]:flex [&>h2]:items-center [&>h2]:font-mono [&>h2]:text-sm [&>h2]:leading-7 [&>h2]:font-medium [&>h2]:text-ink [&>h2]:before:mr-3 [&>h2]:before:h-3 [&>h2]:before:w-1.5 [&>h2]:before:rounded-r-full [&>h2]:before:bg-aqua-200 [&>h2:nth-of-type(3n)]:before:bg-iris-200 [&>h2:nth-of-type(3n+2)]:before:bg-iris-300 [&>ul]:mt-6 [&>ul]:pl-5 [&_li>p]:m-0"
       onClick={handleClick}
       ref={root}
     >

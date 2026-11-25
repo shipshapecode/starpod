@@ -32,8 +32,9 @@ colors:
   on-ink-night: "oklch(16% 0.03 270)"
   media-ground-day: "oklch(19% 0.03 280)"
   media-ground-night: "oklch(9% 0.02 273)"
-  on-media-chip: "oklch(98% 0.005 285)"
+  on-media: "oklch(98% 0.005 285)"
   on-media-ink: "oklch(20% 0.04 285)"
+  media-shade: "oklch(15% 0.02 280)"
   media-glass: "oklch(15% 0.02 280 / 0.72)"
   hairline-day: "oklch(24% 0.05 292 / 0.1)"
   hairline-night: "oklch(97.65% 0.005 274.97 / 0.1)"
@@ -168,7 +169,7 @@ components:
     rounded: "{rounded.pill}"
     size: "44px"
   stage-play:
-    backgroundColor: "{colors.on-media-chip}"
+    backgroundColor: "{colors.on-media}"
     textColor: "{colors.on-media-ink}"
     rounded: "{rounded.pill}"
     size: "clamp(56px, 6vw, 76px)"
@@ -249,7 +250,7 @@ Cool violet-grey neutrals carrying two rationed accents: Iris (violet) owns the 
 - **Ground / Surface / Raised** (day and night): page ground, then the shell panels, cards, and fields, then hover fills and keyboard hints. All are faintly violet-tinted so neither scheme reads as dead grey.
 - **Line / Line Strong**: hairline dividers and every default border (a bare `border` resolves to Line). Line Strong is for secondary-button and switch borders and the breadcrumb chevron.
 - **Ink / Text / Muted**: headings and primary controls, then body, then metadata and secondary labels. **On Ink** is the text on ink-filled controls and flips with the scheme. **On Glow** is the text on the gradient fill (ink by day, on-ink by night).
-- **Media Ground** (media-ground-day / -night): the near-black field behind video and artwork in the stage frame and the floating picture. **On-Media Chip / Ink** form the fixed light play disc over media, and **Media Glass** is the translucent dark "Resume at" chip beside it; all three ignore the scheme.
+- **Media Ground** (media-ground-day / -night): the near-black field behind video and artwork in the stage frame and the floating picture. **On Media** (`--on-media`) is light text and the play disc over media, with **On-Media Ink** on the disc. **Media Shade** (`--media-shade`) is the one dark for everything over or lifted off media: glass chips, scrims behind sheets and the player card, and the deeper shadows, each a `color-mix()` of it at the strength it needs. **Media Glass** (`--media-glass`, Media Shade at 72%) is the usual chip, like "Resume at". All of these ignore the scheme, and Tailwind has them as `on-media`, `on-media-ink`, `media-shade` and `media-glass`, beside the Iris and Aqua steps (`iris-200`, `aqua-200`…).
 
 ### Named Rules
 **The Two Lamps Rule.** Iris is the only accent by day and Aqua the only accent by night. Accent fills are limited to interaction, the current item, and playback, and never decorate resting content.
@@ -258,7 +259,7 @@ Cool violet-grey neutrals carrying two rationed accents: Iris (violet) owns the 
 
 **The OKLCH Only Rule.** Every colour is authored in OKLCH, including shadows, masks, and backdrops. Hex and rgb are never used.
 
-**The One Palette Rule.** Starpod's styles use only the token colours above, which Tailwind's theme exposes as utilities. Tailwind's default palette is still loaded, but is not part of the system (the show notes' heading dots are the one place that still uses it). There are no parallel light/dark colour pairs; a single token class follows both schemes.
+**The One Palette Rule.** Starpod's styles use only the token colours above, which Tailwind's theme exposes as utilities. Tailwind's default palette is still loaded, but nothing uses it; the typography plugin's prose takes the tokens too. There are no parallel light/dark colour pairs; a single token class follows both schemes.
 
 ## Typography
 

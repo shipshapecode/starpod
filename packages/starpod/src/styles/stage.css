@@ -20,7 +20,7 @@
 .stage-frame {
   position: relative;
   aspect-ratio: 16 / 9;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-frame);
   overflow: hidden;
   background: var(--media-ground);
   box-shadow: var(--shadow-soft);
@@ -45,7 +45,7 @@
   width: auto;
   aspect-ratio: 1;
   object-fit: cover;
-  border-radius: calc(var(--radius-lg) - 2px);
+  border-radius: calc(var(--radius-frame) - 2px);
   box-shadow: var(--shadow-float);
   translate: -50% -50%;
   transition:
@@ -97,8 +97,8 @@
   aspect-ratio: 1;
   border: 0;
   border-radius: 999px;
-  background: oklch(98% 0.005 285);
-  color: oklch(20% 0.04 285);
+  background: var(--on-media);
+  color: var(--on-media-ink);
   box-shadow: var(--shadow-float);
   cursor: pointer;
   pointer-events: auto;

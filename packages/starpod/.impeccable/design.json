@@ -435,9 +435,9 @@
           "oklch(95% 0.02 273)"
         ]
       },
-      "on-media-chip": {
+      "on-media": {
         "role": "neutral",
-        "displayName": "On-Media Chip",
+        "displayName": "On Media",
         "canonical": "oklch(98% 0.005 285)",
         "tonalRamp": [
           "oklch(15% 0.005 285)",
@@ -463,6 +463,14 @@
           "oklch(72% 0.04 285)",
           "oklch(84% 0.04 285)",
           "oklch(95% 0.04 285)"
+        ]
+      },
+      "media-shade": {
+        "role": "neutral",
+        "displayName": "Media Shade",
+        "canonical": "oklch(15% 0.02 280)",
+        "tonalRamp": [
+          "oklch(15% 0.02 280)"
         ]
       },
       "media-glass": {
@@ -743,7 +751,7 @@
       },
       {
         "name": "The One Palette Rule",
-        "body": "Starpod's styles use only the token colours above, which Tailwind's theme exposes as utilities. Tailwind's default palette is still loaded but is not part of the system (the show notes' heading dots are the one place that still uses it). There are no parallel light/dark colour pairs; a single token class follows both schemes.",
+        "body": "Starpod's styles use only the token colours above, which Tailwind's theme exposes as utilities. Tailwind's default palette is still loaded, but nothing uses it; the typography plugin's prose takes the tokens too. There are no parallel light/dark colour pairs; a single token class follows both schemes.",
         "section": "colors"
       },
       {

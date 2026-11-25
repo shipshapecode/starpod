@@ -115,8 +115,8 @@
 }
 
 .stage-play {
-  --fill-a: oklch(98% 0.005 285);
-  --fill-b: oklch(98% 0.005 285);
+  --fill-a: var(--on-media);
+  --fill-b: var(--on-media);
 }
 
 [data-episode-row][data-current] .row-play {
