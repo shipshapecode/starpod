@@ -1,66 +1,13 @@
 /* ---------- The episode stage ---------- */
 
-.stage {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    'frame'
-    'meta'
-    'script';
-  gap: 20px;
-  margin-bottom: clamp(40px, 6vw, 80px);
-}
-
-.stage-room {
-  grid-area: frame;
-  position: relative;
-  min-width: 0;
-}
-
+/* The radius stays here: .PropFLIP (propflip.css) sets one too, and an
+   unlayered rule would beat a utility. */
 .stage-frame {
-  position: relative;
-  aspect-ratio: 16 / 9;
   border-radius: var(--radius-frame);
-  overflow: hidden;
-  background: var(--media-ground);
-  box-shadow: var(--shadow-soft);
-  isolation: isolate;
-}
-
-/* The artwork, at home on its own colour field: the fallback stage for
-   audio-only episodes and for anyone choosing to listen. */
-.stage-ambient {
-  position: absolute;
-  inset: -12%;
-  background: var(--art) center / cover;
-  filter: blur(48px) saturate(1.35) brightness(0.55);
-  transform: scale(1.1);
-}
-
-.stage-art {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  height: 74%;
-  width: auto;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: calc(var(--radius-frame) - 2px);
-  box-shadow: var(--shadow-float);
-  translate: -50% -50%;
-  transition:
-    scale 700ms var(--ease-out),
-    opacity 500ms var(--ease-out);
 }
 
 .stage[data-playing]:not([data-watching]) .stage-art {
   scale: 1.04;
-}
-
-.stage-slot {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
 }
 
 .stage-slot video {
@@ -120,12 +67,6 @@
   opacity: 1;
 }
 
-/* Meta block. */
-.stage-meta {
-  grid-area: meta;
-  min-width: 0;
-}
-
 /* "Episode 230 · Feb 5, 2026 · 1 hr 2 min · Video", as on the home hero:
    each fact carries its separator in the gap before it, and the line clips
    (overflow-hidden on the line), so whichever fact starts a line, wrapped or
@@ -145,16 +86,6 @@
 
 .stage-kind::before {
   margin-inline-end: -0.35rem;
-}
-
-.stage-title {
-  margin: 0 0 0.75rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 1.1rem + 2.4vw, 3.25rem);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -0.025em;
-  max-width: 22ch;
 }
 
 /* Up next leaves the row once the episode plays: no taller than Play (its
@@ -182,22 +113,12 @@
   translate: 3px -3px;
 }
 
-.stage-script {
-  grid-area: script;
-  min-width: 0;
-}
-
 /* Desktop composition is the worlds' call; see worlds.css. */
 
 /* ---------- Episode page body ---------- */
 
 .transcript p {
   margin: 0 0 1.1rem;
-}
-
-/* Islands that are direct stage children take part in its grid. */
-.stage > astro-island {
-  display: contents;
 }
 
 /* The cast: shown by the Stage world, beside the voices they speak in. */

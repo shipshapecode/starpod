@@ -69,16 +69,18 @@ const cast = await Promise.all(
 );
 ---
 
+<!-- Islands that are direct stage children take part in its grid
+     ([&>astro-island]:contents). -->
 <section
   aria-labelledby={titleId}
-  class="stage"
+  class="stage mb-[clamp(40px,6vw,80px)] grid grid-cols-[minmax(0,1fr)] gap-5 [grid-template-areas:'frame'_'meta'_'script'] [&>astro-island]:contents"
   data-has-video={episode.video ? '' : undefined}
   data-split={split ? '' : undefined}
   data-stage
   data-variant={variant}
 >
   <div class="stage-side">
-  <div class="stage-room">
+  <div class="stage-room relative min-w-0 [grid-area:frame]">
   <div aria-hidden="true" class="stage-light" style={`--art: url("${art}")`}>
     <canvas
       class="stage-light-canvas"
@@ -88,11 +90,16 @@ const cast = await Promise.all(
       width="32"
     ></canvas>
   </div>
-  <div class="stage-frame PropFLIP" data-stage-frame>
-    <div aria-hidden="true" class="stage-ambient" style={`--art: url("${art}")`}></div>
+  <div class="stage-frame PropFLIP relative isolate aspect-video overflow-hidden bg-media-ground shadow-[var(--shadow-soft)]" data-stage-frame>
+    <!-- The artwork, at home on its own colour field: the fallback stage for
+         audio-only episodes and for anyone choosing to listen. -->
+    <div
+      aria-hidden="true"
+      class="absolute inset-[-12%] [background:var(--art)_center/cover] [filter:blur(48px)_saturate(1.35)_brightness(0.55)] [transform:scale(1.1)]"
+      style={`--art: url("${art}")`}></div>
     <img
       alt={`${episode.title} - episode art`}
-      class="stage-art"
+      class="stage-art absolute top-1/2 left-1/2 aspect-square h-[74%] w-auto rounded-[calc(var(--radius-frame)-2px)] object-cover shadow-[var(--shadow-float)] [translate:-50%_-50%] [transition:scale_700ms_var(--ease-out),opacity_500ms_var(--ease-out)]"
       decoding="async"
       fetchpriority="high"
       height="960"
@@ -100,14 +107,14 @@ const cast = await Promise.all(
       style={`view-transition-name: vt-art-${dasherize(episode.title)}`}
       width="960"
     />
-    <div class="stage-slot" data-episode-id={episode.id} data-media-slot></div>
+    <div class="stage-slot absolute inset-0 z-1" data-episode-id={episode.id} data-media-slot></div>
     <StageControls client:load episode={playable} part="overlay" />
   </div>
   </div>
 
-  <div class="stage-meta">
+  <div class="stage-meta min-w-0 [grid-area:meta]">
     <Heading
-      class="stage-title"
+      class="stage-title mb-3 max-w-[22ch] font-(family-name:--font-display) text-[length:clamp(1.75rem,1.1rem+2.4vw,3.25rem)] leading-[1.04] font-bold tracking-[-0.025em]"
       id={titleId}
       style={`view-transition-name: vt-${dasherize(episode.title)}`}
     >
@@ -177,7 +184,7 @@ const cast = await Promise.all(
     )
   }
 
-  <div class="stage-script" id={scriptId}>
+  <div class="stage-script min-w-0 [grid-area:script]" id={scriptId}>
     {
       split && (
         <div
