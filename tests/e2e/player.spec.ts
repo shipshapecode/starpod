@@ -5,7 +5,8 @@ const VIDEO_EPISODE = '/will-ai-kill-us-all-jev-says-87';
 
 const media = (page: Page) => page.locator('video.starpod-media');
 const home = (page: Page) =>
-  media(page).evaluate((video) => video.parentElement?.className ?? '');
+  // The home's hook class comes first; any utilities follow it.
+  media(page).evaluate((video) => video.parentElement?.classList[0] ?? '');
 const playhead = (page: Page) =>
   media(page).evaluate((video) => (video as HTMLVideoElement).currentTime);
 
