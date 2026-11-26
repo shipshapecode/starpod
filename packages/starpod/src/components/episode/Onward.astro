@@ -36,7 +36,7 @@ const pager = [
     >
       {pager.map((card) => (
         <a
-          class={`ep-pager-link ep-reveal halo flex items-center gap-4 rounded-(--r-card) border border-line bg-surface p-2 text-text no-underline ${card.label === 'Next' ? 'flex-row-reverse text-end' : ''}`}
+          class={`ep-pager-link ep-reveal halo flex items-center gap-4 rounded-card border border-line bg-surface p-2 text-text no-underline ${card.label === 'Next' ? 'flex-row-reverse text-end' : ''}`}
           data-ep-card={dasherize(card.title)}
           data-props-for="pointer-local"
           href={card.href}
@@ -48,14 +48,14 @@ const pager = [
               drawn just inside it, above the picture. */}
           <img
             alt=""
-            class="ep-card-art size-18 flex-none rounded-(--r-tile) bg-raised object-cover outline-1 -outline-offset-1 outline-(--hairline)"
+            class="ep-card-art size-18 flex-none rounded-tile bg-raised object-cover outline-1 -outline-offset-1 outline-(--hairline)"
             height="72"
             loading="lazy"
             src={card.art}
             width="72"
           />
           <span class="flex min-w-0 flex-1 flex-col gap-1 px-1">
-            <span class="text-[0.8125rem] leading-[1.125rem] font-medium text-muted tabular-nums">
+            <span class="text-sm leading-4.5 font-medium text-muted tabular-nums">
               {card.label} · {card.number}
             </span>
             <span class="ep-card-title font-(family-name:--font-display) text-[1.15rem] leading-[1.02] font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
@@ -69,7 +69,7 @@ const pager = [
 {
   related.length > 0 && (
     <div class="ep-shelf-wrap relative @container/ep-shelf">
-      <h3 class="ep-reveal mb-1 text-[0.9375rem] leading-[40px] font-[650]">Related episodes</h3>
+      <h3 class="ep-reveal mb-1 text-base leading-10 font-demibold">Related episodes</h3>
       {/* The next card always peeks: so many whole cards and four tenths of
           one, by the shelf's own width. 16px above and below so rings and
           shadows are never cut. */}
@@ -88,19 +88,19 @@ const pager = [
               {/* Imagery leads; the facts sit 8px under it and 4px in. */}
               <img
                 alt=""
-                class="ep-card-art mb-0.5 block aspect-square h-auto w-full rounded-(--r-tile) bg-raised object-cover outline-1 -outline-offset-1 outline-(--hairline)"
+                class="ep-card-art mb-0.5 block aspect-square h-auto w-full rounded-tile bg-raised object-cover outline-1 -outline-offset-1 outline-(--hairline)"
                 height="320"
                 loading="lazy"
                 src={card.art}
                 width="320"
               />
-              <span class="mx-1 text-[0.8125rem] leading-[1.125rem] font-medium text-muted tabular-nums">
+              <span class="mx-1 text-sm leading-4.5 font-medium text-muted tabular-nums">
                 {card.number} · {formatDuration(card.duration)}
               </span>
               <span class="ep-card-title mx-1 font-(family-name:--font-display) text-[1.15rem] leading-[1.02] font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
               {card.reason && (
                 <span
-                  class={`ep-card-reason mx-1 inline-flex items-center gap-1.5 self-start rounded-full bg-accent-soft py-0.5 pr-2.5 text-[0.75rem] leading-4 font-[650] text-accent-ink ${card.face ? 'pl-0.5' : 'pl-2.5'}`}
+                  class={`ep-card-reason mx-1 inline-flex items-center gap-1.5 self-start rounded-full bg-accent-soft py-0.5 pr-2.5 text-xs leading-4 font-demibold text-accent-ink ${card.face ? 'pl-0.5' : 'pl-2.5'}`}
                 >
                   {card.face && <PersonFace size={20} src={card.face} />}
                   {card.reason}

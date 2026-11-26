@@ -65,7 +65,7 @@ const credit =
     class:list={[
       'host-list',
       anchored &&
-        'lg:mt-[26px] lg:flex lg:min-h-[calc(var(--hosts,1)*46px-6px)] lg:items-start'
+        'lg:mt-6.5 lg:flex lg:min-h-[calc(var(--hosts,1)*46px-6px)] lg:items-start'
     ]}
     {...{ 'data-⚓️-name': anchored ? '--rail-hosts' : undefined }}
   >
@@ -79,7 +79,7 @@ const credit =
             class:list={[
               'host-row text-ink mb-3 flex items-center font-semibold',
               anchored &&
-                'rail-host lg:m-0 lg:block lg:size-10 lg:flex-none lg:rounded-[50%] lg:[transition:background-color_var(--quick)]'
+                'rail-host lg:m-0 lg:block lg:size-10 lg:flex-none lg:rounded-full lg:[transition:background-color_var(--quick)]'
             ]}
             data-speaks-as={host.name}
             data-voice={index < 2 ? index : undefined}
@@ -136,7 +136,7 @@ const credit =
     anchored && credit && (
       <p
         aria-hidden="true"
-        class="host-credit lg:text-ink lg:pointer-events-none lg:box-border lg:flex lg:min-h-10 lg:items-center lg:text-[0.8125rem] lg:leading-[1.25] lg:font-[650] lg:text-balance"
+        class="host-credit lg:text-ink lg:font-demibold lg:pointer-events-none lg:box-border lg:flex lg:min-h-10 lg:items-center lg:text-sm lg:leading-[1.25] lg:text-balance"
         {...{
           'data-⚓️-to': '--rail-hosts',
           'data-⚓️-align-top': '',

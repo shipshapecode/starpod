@@ -30,7 +30,7 @@ export default function BarPlay({ episode }: Props) {
       data-props-for={current ? 'media-clock' : undefined}
     >
       <PlayToggle
-        class="ep-bar-play grid size-[34px] cursor-pointer place-items-center rounded-full text-on-ink active:scale-92"
+        class="ep-bar-play grid size-8.5 cursor-pointer place-items-center rounded-full text-on-ink active:scale-92"
         episode={episode}
         labelFor={(playing) =>
           `${mounted && playing ? 'Pause' : 'Play'} this episode`

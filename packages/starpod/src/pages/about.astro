@@ -127,12 +127,12 @@ const together =
 // The photo's lower third fades into the poster's ground (.ab-host-photo's
 // ::after); a hairline sits just inside it, above the picture.
 const hostPhoto =
-  'block size-full rounded-t-(--r-card) object-cover object-[center_30%] outline-1 -outline-offset-1 outline-(--hairline)';
+  'block size-full rounded-t-card object-cover object-[center_30%] outline-1 -outline-offset-1 outline-(--hairline)';
 
 // The name in the host's voice: voice 0 condensed Archivo, voice 1 Young
 // Serif, anyone else the plain grotesque.
 const voiceName: Record<number, string> = {
-  0: 'font-(family-name:--font-voice-0) font-[850] font-stretch-[72%] uppercase',
+  0: 'font-(family-name:--font-voice-0) font-heavy font-stretch-[72%] uppercase',
   1: 'font-(family-name:--font-voice-1) font-normal'
 };
 ---
@@ -155,7 +155,7 @@ const voiceName: Record<number, string> = {
         {
           posters.map((host) => (
             <li
-              class="ab-host ep-reveal flex flex-col overflow-clip rounded-(--r-card) bg-(--ab-ground)"
+              class="ab-host ep-reveal flex flex-col overflow-clip rounded-card bg-(--ab-ground)"
               data-voice={host.voice}
             >
               <div
@@ -183,10 +183,10 @@ const voiceName: Record<number, string> = {
                   {host.name}
                 </h3>
                 {host.stats && <p class="person-fact">{host.stats}</p>}
-                {host.bio && <p class="max-w-[48ch] text-text">{host.bio}</p>}
+                {host.bio && <p class="max-w-bio text-text">{host.bio}</p>}
 
                 {together.length === 0 && host.recent.length > 0 && (
-                  <div class="ab-host-tray box-border grid w-full justify-items-start gap-3 rounded-(--r-tray) bg-[color-mix(in_oklch,var(--surface)_72%,transparent)] px-1 pt-1 pb-3">
+                  <div class="ab-host-tray box-border grid w-full justify-items-start gap-3 rounded-tray bg-[color-mix(in_oklch,var(--surface)_72%,transparent)] px-1 pt-1 pb-3">
                     <Tiles
                       items={host.recent}
                       label={`Latest episodes with ${host.name}`}
@@ -240,7 +240,7 @@ const voiceName: Record<number, string> = {
       {
         together.length > 0 && (
           <div class="ep-reveal mt-8">
-            <h3 class="mb-3 text-[0.9375rem] leading-5 font-[650]">Latest episodes</h3>
+            <h3 class="mb-3 text-base leading-5 font-demibold">Latest episodes</h3>
             <Tiles items={together} label="Latest episodes with the hosts" />
           </div>
         )

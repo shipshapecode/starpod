@@ -139,12 +139,12 @@ export default function SpeakerCard({ root, speakers }: Props) {
         </span>
         <span class="flex flex-col gap-0.5">
           <strong
-            class="text-[0.9375rem] leading-5 font-[650] text-ink"
+            class="text-base leading-5 font-demibold text-ink"
             ref={name}
           />
           <span class="person-fact" ref={fact} />
         </span>
-        <i class="absolute top-full left-[26px] h-[7px] w-3.5 bg-surface [clip-path:polygon(0_0,100%_0,50%_100%)] anchored-flip-block:top-auto anchored-flip-block:bottom-full anchored-flip-block:rotate-180" />
+        <i class="absolute top-full left-6.5 h-[7px] w-3.5 bg-surface [clip-path:polygon(0_0,100%_0,50%_100%)] anchored-flip-block:top-auto anchored-flip-block:bottom-full anchored-flip-block:rotate-180" />
       </div>
     </div>
   );

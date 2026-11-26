@@ -34,6 +34,81 @@
 }
 
 /*
+  The type, leading, measure, blur, tracking, weight, shadow and radius
+  scales are Starpod's own, not Tailwind's, and they live here. `static`
+  emits every step below as a variable on :root, so the stylesheets read
+  the same steps (var(--text-sm), var(--leading-snug)) the utilities use.
+
+  A text-* step sets only font-size, with no paired line-height, so
+  line-height keeps inheriting unless a leading-* says otherwise.
+*/
+@theme static {
+  --text-*: initial;
+  --text-3xs: 0.625rem; /* 10px */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.8125rem; /* 13px, most UI text */
+  --text-md: 0.875rem; /* 14px */
+  --text-base: 0.9375rem; /* 15px, card copy */
+  --text-lg: 1rem; /* 16px, body */
+  --text-xl: 1.0625rem; /* 17px, leads */
+  --text-2xl: 1.125rem; /* 18px */
+  --text-3xl: 1.3125rem; /* 21px */
+
+  --leading-*: initial;
+  --leading-none: 1;
+  --leading-tight: 1.2;
+  --leading-snug: 1.3;
+  --leading-normal: 1.45;
+  --leading-relaxed: 1.75;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-demibold: 650;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-heavy: 850;
+  --font-weight-black: 900;
+
+  --tracking-tight: -0.025em;
+  --tracking-snug: -0.01em;
+
+  /* Reading measures, narrowest first. */
+  --container-headline: 18ch;
+  --container-title: 22ch;
+  --container-blurb: 40ch;
+  --container-bio: 48ch;
+  --container-lead: 60ch;
+  --container-notes: 70ch;
+  --container-transcript: 82ch;
+
+  --blur-xs: 4px;
+  --blur-sm: 8px;
+  /* The frosted bars and trays, and the island's deeper frost. */
+  --blur-glass: 14px;
+  --blur-haze: 28px;
+}
+
+/*
+  Shadows and radii are the tokens in tokens.css, which follow the scheme.
+  `inline reference` writes var(--shadow-soft) straight into the utility
+  and emits no theme variable, so a key named like its token
+  (--shadow-soft, --radius-frame) can't end up defined as itself.
+*/
+@theme inline reference {
+  --shadow-soft: var(--shadow-soft);
+  --shadow-float: var(--shadow-float);
+  --radius-chrome: var(--radius);
+  --radius-frame: var(--radius-frame);
+  --radius-thumb: var(--r-thumb);
+  --radius-row: var(--r-row);
+  --radius-tile: var(--r-tile);
+  --radius-tray: var(--r-tray);
+  --radius-card: var(--r-card);
+}
+
+/*
   Starpod's palette as Tailwind utilities (bg-accent-soft, text-on-glow,
   from-glow-a…). `inline` keeps them pointing at the live tokens, so they
   follow light and dark without a dark: variant.

@@ -99,7 +99,7 @@ const ids = (people: typeof card.people) =>
   </div>
   <div class="xp-text PropFLIP">
     <p class="xp-facts PropFLIP">
-      <span class="xp-number text-ink font-[650]" data-number={number}>{short}</span>
+      <span class="xp-number text-ink font-demibold" data-number={number}>{short}</span>
       <time datetime={date.toISOString()}
         >{
           date.toLocaleDateString('en-us', {
@@ -109,7 +109,7 @@ const ids = (people: typeof card.people) =>
         }<span class="xp-year">, {date.getFullYear()}</span></time
       >
       <span class="xp-facts-length">{length}</span>
-      {episode.video && <span class="xp-facts-kind text-accent-ink font-[650]">Video</span>}
+      {episode.video && <span class="xp-facts-kind text-accent-ink font-demibold">Video</span>}
     </p>
     <h3 class="xp-title PropFLIP">
       <a data-vt-title href={`/${episode.episodeSlug}`}>{episode.title}</a>
@@ -117,13 +117,13 @@ const ids = (people: typeof card.people) =>
   </div>
   <div class="xp-detail" id={detailId}>
     <p
-      class="xp-desc text-text m-0 line-clamp-2 text-[0.9375rem] leading-[1.5]"
+      class="xp-desc text-text m-0 line-clamp-2 text-base leading-[1.5]"
       data-props-for="truncated" data-props-to=".xp-detail">
       {episode.description}
     </p>
     <span
       aria-hidden="true"
-      class="xp-more text-accent-ink absolute right-0 bottom-0 hidden items-center gap-0.5 bg-[linear-gradient(to_right,transparent,color-mix(in_oklch,var(--raised)_calc(var(--xp-lit)*100%),var(--ground))_2rem)] pl-10 text-[0.8125rem] leading-(--xp-desc-lh) font-[650] transition-[--xp-lit] duration-[calc(240ms*var(--slomo))] ease-[ease]"
+      class="xp-more text-accent-ink absolute right-0 bottom-0 hidden items-center gap-0.5 bg-[linear-gradient(to_right,transparent,color-mix(in_oklch,var(--raised)_calc(var(--xp-lit)*100%),var(--ground))_2rem)] pl-10 text-sm leading-(--xp-desc-lh) font-demibold transition-[--xp-lit] duration-[calc(240ms*var(--slomo))] ease-[ease]"
       >More</span
     >
     {

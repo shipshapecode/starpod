@@ -382,9 +382,9 @@ const documentLinkTag =
   <div class="ep-body">
     <SectionBar label="Episode sections" sections={sections}>
       <BarPlay client:load episode={playerEpisode} />
-      <a class="ep-bar-title flex text-ink min-w-0 flex-col leading-[1.2] no-underline max-sm:hidden" href="#main">
-        <span class="text-[0.75rem] font-semibold tabular-nums text-muted">{numberOf(episode)}</span>
-        <span class="ep-bar-name truncate text-[0.875rem] font-bold">{episode.title}</span>
+      <a class="ep-bar-title flex text-ink min-w-0 flex-col leading-tight no-underline max-sm:hidden" href="#main">
+        <span class="text-xs font-semibold tabular-nums text-muted">{numberOf(episode)}</span>
+        <span class="ep-bar-name truncate text-md font-bold">{episode.title}</span>
       </a>
     </SectionBar>
 
@@ -452,7 +452,7 @@ const documentLinkTag =
 
     <section
       aria-labelledby="transcript-heading"
-      class="transcript-section mb-[clamp(56px,7vw,96px)] max-w-[82ch]"
+      class="transcript-section mb-[clamp(56px,7vw,96px)] max-w-transcript"
       id="transcript"
     >
       <h2 class="section-title ep-reveal" id="transcript-heading">

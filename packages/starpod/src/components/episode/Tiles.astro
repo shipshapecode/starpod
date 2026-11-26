@@ -24,7 +24,7 @@ const { items, label } = Astro.props;
           href={item.href}
         >
           {/* Focus rings the art, on its own corners. */}
-          <span class="ep-tile-art relative block aspect-square overflow-clip rounded-(--r-tile) bg-surface group-focus-visible/tile:outline-2 group-focus-visible/tile:outline-offset-3 group-focus-visible/tile:outline-accent">
+          <span class="ep-tile-art relative block aspect-square overflow-clip rounded-tile bg-surface group-focus-visible/tile:outline-2 group-focus-visible/tile:outline-offset-3 group-focus-visible/tile:outline-accent">
             <img
               alt=""
               class="block size-full object-cover"
@@ -33,9 +33,9 @@ const { items, label } = Astro.props;
               src={item.art}
               width="320"
             />
-            <span class="absolute top-2 left-2 z-1 rounded-full bg-[color-mix(in_oklch,var(--media-shade)_50%,transparent)] px-2 py-[3px] text-[0.75rem] leading-4 font-[650] text-on-media tabular-nums backdrop-blur-[10px] backdrop-saturate-140">{item.number}</span>
+            <span class="absolute top-2 left-2 z-1 rounded-full bg-[color-mix(in_oklch,var(--media-shade)_50%,transparent)] px-2 py-[3px] text-xs leading-4 font-demibold text-on-media tabular-nums backdrop-blur-[10px] backdrop-saturate-140">{item.number}</span>
           </span>
-          <span class="line-clamp-2 px-1 text-[0.875rem] leading-5 font-semibold">{item.title}</span>
+          <span class="line-clamp-2 px-1 text-md leading-5 font-semibold">{item.title}</span>
         </a>
       </li>
     ))

@@ -186,11 +186,11 @@ const publicationLinkTag =
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-[var(--radius)] px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-(--ease-out) focus:translate-y-0" href="#main">Skip to content</a>
+    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-chrome px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-(--ease-out) focus:translate-y-0" href="#main">Skip to content</a>
     <!-- The island sits at the end of the page and this reaches it in one
          step (it takes focus, its title is next). It is shown only while an
          episode is loaded, when there is an island (shell.css). -->
-    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-[var(--radius)] px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-(--ease-out) focus:translate-y-0" href="#player">Skip to the player</a>
+    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-chrome px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-(--ease-out) focus:translate-y-0" href="#player">Skip to the player</a>
 
     <div class="app grid min-h-dvh grid-cols-[minmax(0,1fr)] content-start lg:grid-cols-[var(--rail-w)_minmax(0,1fr)]">
       <!-- The divider between the rail and the page, and the only anchor the
@@ -270,7 +270,7 @@ const publicationLinkTag =
             >
               <a class="no-underline" href="/">{show.title}</a>
             </p>
-            <p class="rail-blurb mt-[-0.6rem] line-clamp-3 text-[0.875rem] leading-[1.45] text-muted">{starpodConfig.blurb}</p>
+            <p class="rail-blurb mt-[-0.6rem] line-clamp-3 text-md leading-normal text-muted">{starpodConfig.blurb}</p>
           </div>
 
           <div
@@ -328,7 +328,7 @@ const publicationLinkTag =
                  inert. The built-in list names the same anchor on itself,
                  and the later name in the tree wins, so it rides its list. -->
             <div
-              class="rail-follow-body lg:mt-[26px]"
+              class="rail-follow-body lg:mt-6.5"
               {...{ 'data-⚓️-name': '--rail-platforms' }}
             >
               <Platforms anchored />
@@ -364,7 +364,7 @@ const publicationLinkTag =
 
       <!-- Top bar (phones, tablets, foldables). -->
       <header
-        class="topbar sticky top-0 z-30 col-span-full box-content flex h-(--topbar-h) items-center gap-3 border-b border-line bg-[color-mix(in_oklch,var(--ground)_86%,transparent)] px-(--gutter) pt-[env(safe-area-inset-top)] backdrop-blur-[14px] backdrop-saturate-140"
+        class="topbar sticky top-0 z-30 col-span-full box-content flex h-(--topbar-h) items-center gap-3 border-b border-line bg-[color-mix(in_oklch,var(--ground)_86%,transparent)] px-(--gutter) pt-[env(safe-area-inset-top)] backdrop-blur-glass backdrop-saturate-140"
       >
         <!-- The show's artwork, a site's own ShowArtwork as in the rail, is
              the home link. The title goes home too, for a pointer; to the
@@ -377,7 +377,7 @@ const publicationLinkTag =
           >
         </div>
         <button
-          class="topbar-follow ml-auto flex cursor-pointer items-center gap-1.5 rounded-full border-0 bg-ink px-[0.9rem] py-2 text-[0.875rem] font-[650] text-on-ink"
+          class="topbar-follow ml-auto flex cursor-pointer items-center gap-1.5 rounded-full border-0 bg-ink px-[0.9rem] py-2 text-md font-demibold text-on-ink"
           popovertarget="follow-sheet"
           type="button"
         >
@@ -392,12 +392,12 @@ const publicationLinkTag =
         id="main"
         class:list={[
           'main relative min-w-0 overflow-x-clip p-(--gutter) pb-[calc(var(--dock-h)+var(--tabbar-h)+48px)] lg:col-[2] lg:pb-[calc(var(--dock-h)+64px)]',
-          !isHome && 'max-w-[1280px]'
+          !isHome && 'max-w-320'
         ]}
       >
         {
           !isHome && (
-            <div class="crumbs mb-5 text-[0.8125rem]">
+            <div class="crumbs mb-5 text-sm">
               <Breadcrumbs title={title} />
             </div>
           )
@@ -475,7 +475,7 @@ const publicationLinkTag =
         <p class="sheet-title m-0 text-[1.05rem] font-bold text-ink">Follow {show.title}</p>
         <button
           aria-label="Close"
-          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-[50%] border-0 bg-raised p-0 text-ink [transition:background-color_var(--quick)]"
+          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-full border-0 bg-raised p-0 text-ink [transition:background-color_var(--quick)]"
           popovertarget="follow-sheet"
           popovertargetaction="hide"
           type="button"
@@ -490,7 +490,7 @@ const publicationLinkTag =
         <p class="sheet-title m-0 text-[1.05rem] font-bold text-ink">{show.title}</p>
         <button
           aria-label="Close"
-          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-[50%] border-0 bg-raised p-0 text-ink [transition:background-color_var(--quick)]"
+          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-full border-0 bg-raised p-0 text-ink [transition:background-color_var(--quick)]"
           popovertarget="more-sheet"
           popovertargetaction="hide"
           type="button"
@@ -515,7 +515,7 @@ const publicationLinkTag =
       id="rail-tip"
       popover="hint"
     >
-      <span class="rail-tip-box relative flex items-center gap-2 rounded-(--r-card) bg-ink px-3 py-1.5 text-[0.8125rem] leading-[1.3] font-[650] whitespace-nowrap text-on-ink shadow-[var(--shadow-soft)] [transition:opacity_calc(0.15s*var(--slomo))_ease,translate_calc(0.25s*var(--slomo))_var(--ease-out)]"><span></span><kbd class="rounded-[4px] bg-on-ink/16 px-[5px] [font-family:inherit] text-[0.75rem] empty:hidden"></kbd></span>
+      <span class="rail-tip-box relative flex items-center gap-2 rounded-card bg-ink px-3 py-1.5 text-sm leading-snug font-demibold whitespace-nowrap text-on-ink shadow-soft [transition:opacity_calc(0.15s*var(--slomo))_ease,translate_calc(0.25s*var(--slomo))_var(--ease-out)]"><span></span><kbd class="rounded-[4px] bg-on-ink/16 px-[5px] [font-family:inherit] text-xs empty:hidden"></kbd></span>
     </div>
     <div
       class="rail-fly overflow-visible border-0 bg-transparent p-0 text-text [transition:display_calc(0.2s*var(--slomo))_allow-discrete,overlay_calc(0.2s*var(--slomo))_allow-discrete]"
@@ -528,7 +528,7 @@ const publicationLinkTag =
       id="rail-follow-fly"
       popover
     >
-      <div class="rail-fly-box relative flex max-h-[calc(100dvh-16px)] w-60 flex-col rounded-(--r-card) border border-line bg-surface p-2 shadow-[var(--shadow-float)] [transition:opacity_calc(0.2s*var(--slomo))_ease,scale_calc(0.4s*var(--slomo))_var(--ease-spring),translate_calc(0.3s*var(--slomo))_var(--ease-out)] *:last:min-h-0 *:last:overflow-y-auto *:last:overscroll-contain">
+      <div class="rail-fly-box relative flex max-h-[calc(100dvh-16px)] w-60 flex-col rounded-card border border-line bg-surface p-2 shadow-float [transition:opacity_calc(0.2s*var(--slomo))_ease,scale_calc(0.4s*var(--slomo))_var(--ease-spring),translate_calc(0.3s*var(--slomo))_var(--ease-out)] *:last:min-h-0 *:last:overflow-y-auto *:last:overscroll-contain">
         <p class="rail-fly-title">Follow the show</p>
         <Platforms />
       </div>
@@ -544,7 +544,7 @@ const publicationLinkTag =
       id="rail-hosts-fly"
       popover
     >
-      <div class="rail-fly-box relative flex max-h-[calc(100dvh-16px)] w-60 flex-col rounded-(--r-card) border border-line bg-surface p-2 shadow-[var(--shadow-float)] [transition:opacity_calc(0.2s*var(--slomo))_ease,scale_calc(0.4s*var(--slomo))_var(--ease-spring),translate_calc(0.3s*var(--slomo))_var(--ease-out)] *:last:min-h-0 *:last:overflow-y-auto *:last:overscroll-contain">
+      <div class="rail-fly-box relative flex max-h-[calc(100dvh-16px)] w-60 flex-col rounded-card border border-line bg-surface p-2 shadow-float [transition:opacity_calc(0.2s*var(--slomo))_ease,scale_calc(0.4s*var(--slomo))_var(--ease-spring),translate_calc(0.3s*var(--slomo))_var(--ease-out)] *:last:min-h-0 *:last:overflow-y-auto *:last:overscroll-contain">
         <Hosts />
       </div>
     </div>

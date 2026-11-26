@@ -85,7 +85,11 @@ connection is configured in `db/index.ts`.
   `interactions.css`, then the rail, explorer, player and episode page
   (`rail.css`, `explorer.css`, `player.css`, `episode.css`). Prefer Tailwind
   utilities for new work; the palette is exposed as Tailwind colors via
-  `@theme inline` in `tailwind.css`.
+  `@theme inline` in `tailwind.css`. The type, leading, measure, blur,
+  tracking, weight, shadow and radius scales are Starpod's own (`text-sm`
+  is 13px, `font-demibold` is 650, `rounded-card` is `--r-card`) and live in
+  `tailwind.css`; use those named steps rather than arbitrary values, and
+  `var(--text-sm)` and the like in the stylesheets.
 - Video comes from the feed's `<podcast:alternateEnclosure>` (HLS or another
   video type), and people from its `<podcast:person>` tags; `rss-to-json`
   drops both, so `src/lib/feed-media.ts` scans the raw XML.

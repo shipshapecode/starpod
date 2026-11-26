@@ -1054,7 +1054,7 @@
   --art-w: 40px;
   --art-h: 40px;
   --title-w: auto;
-  --title-size: 13px;
+  --title-size: var(--text-sm);
   --key: 34px;
   padding: 10px;
   gap: 8px 6px;
@@ -1456,7 +1456,7 @@
 
 .board-row[data-drop] .board-row-name {
   color: var(--muted);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   /* A hint, not a title: it wraps rather than losing its end. */
   white-space: normal;
 }

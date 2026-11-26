@@ -127,14 +127,14 @@
   .ep-bar-row {
     border-top-color: transparent;
     background: color-mix(in oklch, var(--ground) 86%, transparent);
-    backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(var(--blur-glass)) saturate(1.4);
   }
 }
 
 @supports not (container-type: scroll-state) {
   .ep-bar-row {
     background: color-mix(in oklch, var(--ground) 86%, transparent);
-    backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(var(--blur-glass)) saturate(1.4);
   }
 }
 
@@ -598,8 +598,8 @@ button.ep-person-who:focus-visible::after {
   background: var(--surface);
   box-shadow: inset 0 0 0 1px var(--line-strong);
   color: var(--ink);
-  font-size: 0.8125rem;
-  font-weight: 650;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-demibold);
   text-decoration: none;
   transition: box-shadow var(--quick);
 }
@@ -837,8 +837,8 @@ button.ep-person-who:focus-visible::after {
 .ep-turn-head strong {
   max-width: 100%;
   color: var(--ink);
-  font-size: 0.8125rem;
-  line-height: 1.2;
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
   overflow-wrap: break-word;
 }
 
@@ -850,7 +850,7 @@ button.ep-person-who:focus-visible::after {
     color: var(--voice-0);
     font-family: var(--font-voice-0);
     font-stretch: 72%;
-    font-weight: 850;
+    font-weight: var(--font-weight-heavy);
     text-transform: uppercase;
   }
 }
@@ -859,7 +859,7 @@ button.ep-person-who:focus-visible::after {
   .ep-turn-head strong {
     color: var(--voice-1);
     font-family: var(--font-voice-1);
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
   }
 }
 
@@ -1019,8 +1019,8 @@ button.ep-person-who:focus-visible::after {
   background: var(--ink);
   color: var(--on-ink);
   font: inherit;
-  font-size: 0.8125rem;
-  font-weight: 650;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-demibold);
   white-space: nowrap;
   box-shadow: var(--shadow-float);
   cursor: pointer;
@@ -1399,8 +1399,8 @@ button.ep-person-who:focus-visible::after {
     background: none;
     color: var(--muted);
     font: inherit;
-    font-size: 0.8125rem;
-    font-weight: 650;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-demibold);
     cursor: pointer;
     transition: color 300ms var(--ease-out);
   }

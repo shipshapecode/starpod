@@ -393,8 +393,8 @@ function PipBar({ episode, href }: { episode: PlayableEpisode; href: string }) {
       : 'Close artwork';
   return (
     <div class="pip-bar">
-      <div class="pip-bar-in relative box-border flex h-full items-center gap-0.5 rounded-full bg-surface py-0 pr-1 pl-3 shadow-[var(--shadow-soft)]">
-        <a class="pip-title min-w-0 flex-1 truncate text-[0.75rem] font-[650] text-ink no-underline decoration-auto hover:underline" href={href} title={episode.title}>
+      <div class="pip-bar-in relative box-border flex h-full items-center gap-0.5 rounded-full bg-surface py-0 pr-1 pl-3 shadow-soft">
+        <a class="pip-title min-w-0 flex-1 truncate text-xs font-demibold text-ink no-underline decoration-auto hover:underline" href={href} title={episode.title}>
           {episode.title}
         </a>
         <button
@@ -474,7 +474,7 @@ function Stations({ popover = false }: { popover?: boolean }) {
       )}
       {ISLAND_HOMES.map((home, i) => (
         <label
-          class={`relative z-1 cursor-pointer rounded-full px-3 py-1.5 font-(family-name:--font-ui) text-[12px] leading-none font-semibold normal-nums whitespace-nowrap text-muted [transition:color_var(--quick)] has-checked:text-on-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent ${popover ? 'has-checked:bg-ink' : 'has-checked:anchor-name-[--home-on]'}`}
+          class={`relative z-1 cursor-pointer rounded-full px-3 py-1.5 font-(family-name:--font-ui) text-xs leading-none font-semibold normal-nums whitespace-nowrap text-muted [transition:color_var(--quick)] has-checked:text-on-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent ${popover ? 'has-checked:bg-ink' : 'has-checked:anchor-name-[--home-on]'}`}
           data-home={home}
           key={home}
         >
@@ -573,8 +573,8 @@ function More({ docked, episode, following }: { docked: boolean; episode: Playab
         <MoreIcon class="island-more-dots" size={20} />
       </button>
       <div class="island-more-pop" id="island-more" popover="auto">
-        <div class="island-more-in relative grid justify-items-start gap-3 rounded-(--r-tray) border border-(--hairline) bg-surface p-3 text-ink shadow-[var(--shadow-float)]">
-          <p class="island-more-times m-0 ml-1 gap-2 text-[0.75rem] text-muted tabular-nums">
+        <div class="island-more-in relative grid justify-items-start gap-3 rounded-tray border border-(--hairline) bg-surface p-3 text-ink shadow-float">
+          <p class="island-more-times m-0 ml-1 gap-2 text-xs text-muted tabular-nums">
             <span>{elapsed}</span>
             <span>{remaining}</span>
           </p>
@@ -587,7 +587,7 @@ function More({ docked, episode, following }: { docked: boolean; episode: Playab
             {episode.video && <MediumSwitch compact />}
             <PipButton docked={docked} />
           </div>
-          <button class="text-button island-more-next max-w-[280px] items-center gap-2" disabled={!following} onClick={() => following && playEpisode(following)} type="button">
+          <button class="text-button island-more-next max-w-70 items-center gap-2" disabled={!following} onClick={() => following && playEpisode(following)} type="button">
             <NextIcon size={18} />
             <span class="truncate">{next}</span>
           </button>
@@ -830,10 +830,10 @@ export default function Island() {
   const watching = activeMedium.value === 'watch';
   const name = (
     <>
-      <b class="truncate font-(family-name:--font-display) text-[length:var(--title-size,14px)] leading-[1.15] font-[650] tracking-[-0.01em] normal-nums">
+      <b class="truncate font-(family-name:--font-display) text-[length:var(--title-size,14px)] leading-[1.15] font-demibold tracking-snug normal-nums">
         {episode.title}
       </b>
-      <span class="truncate font-(family-name:--font-ui) text-[12px] leading-[1.2] font-medium text-muted tabular-nums">
+      <span class="truncate font-(family-name:--font-ui) text-xs leading-tight font-medium text-muted tabular-nums">
         {episode.episodeNumber !== 'Bonus' ? `Ep ${episode.episodeNumber}` : 'Bonus'}
         {' · '}
         {watching ? 'Watching' : 'Listening'}
@@ -863,7 +863,7 @@ export default function Island() {
       <section
         aria-label={at === 'card' ? `Now playing: ${episode.title}` : 'Player'}
         aria-modal={at === 'card' ? 'true' : undefined}
-        class="island dock-controls pointer-events-auto z-45 grid cursor-pointer place-content-start items-center overflow-clip rounded-(--r) bg-[color-mix(in_oklch,var(--live-img-accent,transparent)_16%,color-mix(in_oklch,var(--surface)_80%,transparent))] text-ink shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--ink)_11%,transparent),0_30px_60px_-30px_color-mix(in_oklch,var(--media-shade)_60%,transparent)] backdrop-blur-[28px] backdrop-saturate-150 vt-name-[player-island] [position-visibility:always]"
+        class="island dock-controls pointer-events-auto z-45 grid cursor-pointer place-content-start items-center overflow-clip rounded-(--r) bg-[color-mix(in_oklch,var(--live-img-accent,transparent)_16%,color-mix(in_oklch,var(--surface)_80%,transparent))] text-ink shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--ink)_11%,transparent),0_30px_60px_-30px_color-mix(in_oklch,var(--media-shade)_60%,transparent)] backdrop-blur-haze backdrop-saturate-150 vt-name-[player-island] [position-visibility:always]"
         data-medium={activeMedium.value}
         data-state={at}
         id="player"
@@ -936,7 +936,7 @@ export default function Island() {
             </a>
           )}
           <a
-            class="island-open hidden w-max items-center gap-1.5 text-[0.8125rem] font-semibold text-muted no-underline decoration-auto [transition:color_var(--quick)] hover:text-ink"
+            class="island-open hidden w-max items-center gap-1.5 text-sm font-semibold text-muted no-underline decoration-auto [transition:color_var(--quick)] hover:text-ink"
             href={href}
           >
             Open the episode
@@ -945,7 +945,7 @@ export default function Island() {
           <i aria-hidden="true" class="island-light" data-props-for="media-clock" />
         </div>
 
-        <div aria-hidden="true" class="island-eq PropFLIP flex h-4 w-[18px] items-end gap-[3px] [--area:eq]">
+        <div aria-hidden="true" class="island-eq PropFLIP flex h-4 w-4.5 items-end gap-[3px] [--area:eq]">
           <i />
           <i />
           <i />
@@ -953,13 +953,13 @@ export default function Island() {
         </div>
 
         <div class="island-scrub PropFLIP flex min-w-0 items-center gap-2 [--area:scrub]" data-props-for="media-clock">
-          <span class="dock-time block w-[6.5ch] flex-none text-center text-[0.75rem] tabular-nums text-muted">
+          <span class="dock-time block w-[6.5ch] flex-none text-center text-xs tabular-nums text-muted">
             <span class="block h-lh whitespace-nowrap contain-strict">{elapsed}</span>
           </span>
           <span class="island-track relative block min-w-0 flex-1">
             <LiveScrubber episode={episode} />
           </span>
-          <span class="dock-time block w-[6.5ch] flex-none text-center text-[0.75rem] tabular-nums text-muted">
+          <span class="dock-time block w-[6.5ch] flex-none text-center text-xs tabular-nums text-muted">
             <span class="block h-lh whitespace-nowrap contain-strict">{remaining}</span>
           </span>
         </div>

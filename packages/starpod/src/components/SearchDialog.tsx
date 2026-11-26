@@ -325,7 +325,7 @@ export default function SearchDialog({
       aria-modal="true"
       aria-label="Search episodes"
     >
-      <div ref={boxRef} class="sp-box PropFLIP fix-kids w-full max-w-xl overflow-clip bg-surface shadow-[var(--shadow-float)] outline-1 -outline-offset-1 outline-line [--r:20px]">
+      <div ref={boxRef} class="sp-box PropFLIP fix-kids w-full max-w-xl overflow-clip bg-surface shadow-float outline-1 -outline-offset-1 outline-line [--r:20px]">
         <div class="sp-in">
           <i
             aria-hidden="true"
@@ -359,12 +359,12 @@ export default function SearchDialog({
                 items[selectedIndex] && optionId(items[selectedIndex])
               }
             />
-            <kbd class="sp-esc text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs sm:inline-flex pointer-coarse:hidden">
-              <span class="text-xs">ESC</span>
+            <kbd class="sp-esc text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs leading-4 sm:inline-flex pointer-coarse:hidden">
+              <span class="text-xs leading-4">ESC</span>
             </kbd>
             {/* On touch, where there is no Escape key to show. */}
             <button
-              class="sp-cancel hidden pointer-coarse:-me-2 pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:flex-none pointer-coarse:cursor-pointer pointer-coarse:items-center pointer-coarse:rounded-(--r-thumb) pointer-coarse:border-0 pointer-coarse:bg-transparent pointer-coarse:px-2 pointer-coarse:text-[0.9375rem] pointer-coarse:font-semibold pointer-coarse:text-accent-ink"
+              class="sp-cancel hidden pointer-coarse:-me-2 pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:flex-none pointer-coarse:cursor-pointer pointer-coarse:items-center pointer-coarse:rounded-thumb pointer-coarse:border-0 pointer-coarse:bg-transparent pointer-coarse:px-2 pointer-coarse:text-base pointer-coarse:font-semibold pointer-coarse:text-accent-ink"
               onClick={() => (isSearchOpen.value = false)}
               type="button"
             >
@@ -398,7 +398,7 @@ export default function SearchDialog({
                   return (
                     <Fragment key={item.key}>
                       {caption && (
-                        <p aria-hidden="true" class="sp-group mx-2 mt-1.5 mb-1 not-nth-2:mt-3 text-[0.75rem] font-semibold text-muted">
+                        <p aria-hidden="true" class="sp-group mx-2 mt-1.5 mb-1 not-nth-2:mt-3 text-xs font-semibold text-muted">
                           {caption}
                         </p>
                       )}
@@ -440,7 +440,7 @@ export default function SearchDialog({
                               />
                             </span>
                             <span class="grid min-w-0 flex-1 gap-0.5">
-                              <span class="sp-name min-w-0 truncate text-[0.875rem] leading-[1.125rem] font-medium text-ink">
+                              <span class="sp-name min-w-0 truncate text-md leading-4.5 font-medium text-ink">
                                 <Completion
                                   query={query}
                                   text={item.person.label}
@@ -458,7 +458,7 @@ export default function SearchDialog({
                           <>
                             <img
                               alt=""
-                              class="sp-thumb size-10 flex-none rounded-(--r-thumb) object-cover outline-1 -outline-offset-1 outline-(--hairline)"
+                              class="sp-thumb size-10 flex-none rounded-thumb object-cover outline-1 -outline-offset-1 outline-(--hairline)"
                               height="40"
                               loading="lazy"
                               src={item.episode.episodeThumbnail}
@@ -466,24 +466,24 @@ export default function SearchDialog({
                             />
                             <span class="grid min-w-0 flex-1 gap-0.5">
                               <span class="flex min-w-0 items-baseline gap-2">
-                                <span class="text-[0.75rem] font-medium text-muted">
+                                <span class="text-xs font-medium text-muted">
                                   #{item.episode.episodeNumber}
                                 </span>
-                                <span class="sp-title truncate text-[0.875rem] font-medium text-ink max-sm:line-clamp-2 max-sm:whitespace-normal">
+                                <span class="sp-title truncate text-md font-medium text-ink max-sm:line-clamp-2 max-sm:whitespace-normal">
                                   <Completion
                                     query={query}
                                     text={item.episode.title}
                                   />
                                 </span>
                               </span>
-                              <span class="truncate text-[0.75rem] text-text">
+                              <span class="truncate text-xs text-text">
                                 {item.episode.description}
                               </span>
                             </span>
                           </>
                         )}
                         {selected && (
-                          <kbd class="text-text bg-surface border-line hidden items-center rounded border px-2 py-1 text-xs sm:inline-flex">
+                          <kbd class="text-text bg-surface border-line hidden items-center rounded border px-2 py-1 text-xs leading-4 sm:inline-flex">
                             ↵
                           </kbd>
                         )}
@@ -496,7 +496,7 @@ export default function SearchDialog({
           </div>
 
           {/* Footer */}
-          <div class="border-line text-text flex items-center justify-between border-t px-4 py-2 text-xs">
+          <div class="border-line text-text flex items-center justify-between border-t px-4 py-2 text-xs leading-4">
             <div class="flex items-center gap-4">
               <span class="hidden items-center gap-1 sm:inline-flex">
                 <kbd class="bg-raised border-line rounded border px-1.5 py-0.5">

@@ -12,13 +12,13 @@ const { title } = Astro.props;
 
 <header class="mb-10 lg:mb-14">
   <h1
-    class="text-ink m-0 max-w-[18ch] font-(family-name:--font-display) text-[clamp(2.25rem,1.4rem+3vw,4rem)] leading-[0.95] font-extrabold tracking-[-0.01em] text-balance uppercase [font-stretch:72%]"
+    class="text-ink max-w-headline tracking-snug m-0 font-(family-name:--font-display) text-[clamp(2.25rem,1.4rem+3vw,4rem)] leading-[0.95] font-extrabold text-balance uppercase [font-stretch:72%]"
   >
     {title}
   </h1>
   {
     Astro.slots.has('default') && (
-      <div class="text-text mt-5 max-w-[62ch] text-lg leading-relaxed text-pretty">
+      <div class="text-text mt-5 max-w-[62ch] text-2xl leading-[1.625] text-pretty">
         <slot />
       </div>
     )

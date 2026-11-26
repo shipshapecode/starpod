@@ -42,7 +42,7 @@ const { cards, episodes, people, show, years } = Astro.props;
   ) : (
     <section aria-labelledby="xp-archive-title" class="xp" data-explorer>
       <h2
-        class="xp-heading m-0 flex items-baseline gap-[0.6rem] font-(family-name:--font-display) text-[clamp(1.35rem,1.1rem+0.8vw,1.75rem)] leading-[1.15] font-extrabold tracking-[-0.01em] uppercase font-stretch-[72%]"
+        class="xp-heading tracking-snug m-0 flex items-baseline gap-[0.6rem] font-(family-name:--font-display) text-[clamp(1.35rem,1.1rem+0.8vw,1.75rem)] leading-[1.15] font-extrabold uppercase font-stretch-[72%]"
         id="xp-archive-title"
       >
         All episodes{' '}
@@ -82,7 +82,7 @@ const { cards, episodes, people, show, years } = Astro.props;
           opens (explorer.ts). */}
       <template data-xp-actions>
         <p
-          class="xp-resume text-accent-ink m-0 mb-4 hidden text-[0.875rem] font-[650]"
+          class="xp-resume text-accent-ink text-md font-demibold m-0 mb-4 hidden"
           hidden
         />
         <div class="xp-actions hidden flex-wrap items-center gap-2.5 pb-1.5">
@@ -117,7 +117,7 @@ const { cards, episodes, people, show, years } = Astro.props;
         <div class="empty-art">
           <UFOIllustration />
         </div>
-        <p class="m-0 max-w-[40ch]">
+        <p class="max-w-blurb m-0">
           Nothing in the archive matches{' '}
           <span data-xp-empty-what>those filters</span>.
         </p>

@@ -129,13 +129,13 @@ export interface Board {
 export function mountBoard(host: HTMLElement): Board {
   host.innerHTML = `
     <i aria-hidden="true" class="slot slot-now" ${A}name="--slot-now"></i>
-    <section class="board-next min-w-0 self-start rounded-(--r-tray) bg-ink/5 p-3 [grid-area:queue]" aria-labelledby="board-next-title">
-      <h3 class="board-title mt-0 mr-0 mb-2.5 ml-1 font-(family-name:--font-ui) text-[14px] leading-[1.2] font-[650] normal-nums text-ink" id="board-next-title">Up next</h3>
+    <section class="board-next min-w-0 self-start rounded-tray bg-ink/5 p-3 [grid-area:queue]" aria-labelledby="board-next-title">
+      <h3 class="board-title mt-0 mr-0 mb-2.5 ml-1 font-(family-name:--font-ui) text-md leading-tight font-demibold normal-nums text-ink" id="board-next-title">Up next</h3>
       <ol class="board-next-list grid gap-2"></ol>
     </section>
-    <section class="board-shelf min-w-0 rounded-(--r-tray) bg-ink/5 p-3 [grid-area:shelf]" aria-labelledby="board-shelf-title">
-      <h3 class="board-title mt-0 mr-0 mb-2.5 ml-1 font-(family-name:--font-ui) text-[14px] leading-[1.2] font-[650] normal-nums text-ink" id="board-shelf-title">More episodes</h3>
-      <p class="-mt-1 mb-3 ml-1 max-w-[62ch] text-[0.75rem] leading-[1.4] text-muted">Tap a cover to queue it · drag any cover onto any slot</p>
+    <section class="board-shelf min-w-0 rounded-tray bg-ink/5 p-3 [grid-area:shelf]" aria-labelledby="board-shelf-title">
+      <h3 class="board-title mt-0 mr-0 mb-2.5 ml-1 font-(family-name:--font-ui) text-md leading-tight font-demibold normal-nums text-ink" id="board-shelf-title">More episodes</h3>
+      <p class="-mt-1 mb-3 ml-1 max-w-[62ch] text-xs leading-[1.4] text-muted">Tap a cover to queue it · drag any cover onto any slot</p>
       <p class="board-quiet absolute size-px overflow-hidden whitespace-nowrap [clip-path:inset(50%)]" id="board-hint">Enter queues a cover, or plays a queued one. Arrows move between covers, Alt with an arrow reorders Up next, Delete takes one out.</p>
       <div class="board-shelf-grid grid grid-cols-[repeat(auto-fill,minmax(84px,1fr))] gap-2.5 lg:grid-cols-[repeat(auto-fill,minmax(104px,1fr))] lg:gap-3.5"></div>
     </section>
@@ -216,7 +216,7 @@ export function mountBoard(host: HTMLElement): Board {
     tile.className =
       'tile pointer-events-auto z-2 cursor-grab touch-none select-none content-visibility-auto contain-intrinsic-[auto_96px_auto_96px]';
     tile.dataset.id = episode.id;
-    tile.innerHTML = `<div class="tile-face PropFLIP absolute inset-0 overflow-clip bg-media-ground shadow-[0_2px_8px_color-mix(in_oklch,var(--ink)_6%,transparent)] [--also:opacity_calc(0.15s*var(--slomo))_ease] [--r:var(--r-tile)]"><button aria-describedby="board-hint" class="tile-hit absolute inset-0 cursor-[inherit] rounded-[inherit] border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" tabindex="-1" type="button"><img class="absolute inset-0 size-full object-cover" alt="" decoding="async" draggable="false" loading="lazy"><span class="tile-chip absolute top-1.5 left-1.5 rounded-full bg-media-shade/50 px-2 py-0.5 font-(family-name:--font-ui) text-[9px] leading-[1.4] font-semibold text-on-media tabular-nums backdrop-blur-[8px] lg:top-2 lg:left-2 lg:text-[10px]"></span></button><button class="tile-remove absolute top-[3px] right-[3px] hidden size-[22px] cursor-pointer place-items-center rounded-full border-0 bg-media-shade/60 p-0 text-on-media opacity-0 backdrop-blur-[8px] [transition:opacity_var(--quick),background_var(--quick)] hover:bg-media-shade/85" tabindex="-1" type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>`;
+    tile.innerHTML = `<div class="tile-face PropFLIP absolute inset-0 overflow-clip bg-media-ground shadow-[0_2px_8px_color-mix(in_oklch,var(--ink)_6%,transparent)] [--also:opacity_calc(0.15s*var(--slomo))_ease] [--r:var(--r-tile)]"><button aria-describedby="board-hint" class="tile-hit absolute inset-0 cursor-[inherit] rounded-[inherit] border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent" tabindex="-1" type="button"><img class="absolute inset-0 size-full object-cover" alt="" decoding="async" draggable="false" loading="lazy"><span class="tile-chip absolute top-1.5 left-1.5 rounded-full bg-media-shade/50 px-2 py-0.5 font-(family-name:--font-ui) text-[9px] leading-[1.4] font-semibold text-on-media tabular-nums backdrop-blur-sm lg:top-2 lg:left-2 lg:text-3xs"></span></button><button class="tile-remove absolute top-[3px] right-[3px] hidden size-5.5 cursor-pointer place-items-center rounded-full border-0 bg-media-shade/60 p-0 text-on-media opacity-0 backdrop-blur-sm [transition:opacity_var(--quick),background_var(--quick)] hover:bg-media-shade/85" tabindex="-1" type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>`;
     const img = tile.querySelector('img')!;
     if (episode.image) {
       img.src = episode.image;
@@ -278,7 +278,7 @@ export function mountBoard(host: HTMLElement): Board {
         'board-row grid grid-cols-[56px_minmax(0,1fr)] items-center gap-3 transition-[opacity,translate] duration-[calc(0.35s*var(--slomo))] ease-(--ease-out)';
       // On phones a queued row's remove sits at its end (player.css), off
       // the cover, so a tap on the cover still plays it.
-      row.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="grid min-w-0 gap-0.5"><span class="board-row-name truncate text-[0.8125rem] font-semibold text-text"></span><span class="board-row-meta font-(family-name:--font-ui) text-[12px] leading-[1.3] font-medium text-muted tabular-nums"></span></span><button class="board-row-remove hidden" hidden type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
+      row.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="grid min-w-0 gap-0.5"><span class="board-row-name truncate text-sm font-semibold text-text"></span><span class="board-row-meta font-(family-name:--font-ui) text-xs leading-snug font-medium text-muted tabular-nums"></span></span><button class="board-row-remove hidden" hidden type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
       return row;
     });
     // The row after Up next says how to add one: the shelf is under it in
@@ -304,7 +304,7 @@ export function mountBoard(host: HTMLElement): Board {
     slots(shelfGrid, rest.length, () => {
       const cell = document.createElement('div');
       cell.className = 'grid min-w-0 content-start';
-      cell.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="shelf-cell-title mx-1 mt-2 mb-0 line-clamp-2 font-(family-name:--font-ui) text-[13px] leading-[1.3] font-semibold normal-nums text-ink"></span><span class="shelf-cell-meta mx-1 mt-0.5 mb-0 font-(family-name:--font-ui) text-[12px] leading-[1.3] font-medium text-muted tabular-nums"></span>`;
+      cell.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="shelf-cell-title mx-1 mt-2 mb-0 line-clamp-2 font-(family-name:--font-ui) text-sm leading-snug font-semibold normal-nums text-ink"></span><span class="shelf-cell-meta mx-1 mt-0.5 mb-0 font-(family-name:--font-ui) text-xs leading-snug font-medium text-muted tabular-nums"></span>`;
       return cell;
     });
     [...shelfGrid.children].forEach((cell, i) => {

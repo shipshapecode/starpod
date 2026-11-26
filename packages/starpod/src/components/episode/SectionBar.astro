@@ -31,7 +31,7 @@ const { label, sections } = Astro.props;
           sections.map((section) => (
             <li>
               <a
-                class="relative z-1 block rounded-full px-[0.85rem] py-[0.45rem] text-[0.875rem] font-[650] whitespace-nowrap text-muted no-underline transition-[color] duration-300 ease-(--ease-out) hover:text-ink target-current:text-accent-ink target-current:anchor-name-[--ep-here] pointer-coarse:flex pointer-coarse:min-h-11 pointer-coarse:items-center"
+                class="relative z-1 block rounded-full px-[0.85rem] py-[0.45rem] text-md font-demibold whitespace-nowrap text-muted no-underline transition-[color] duration-300 ease-(--ease-out) hover:text-ink target-current:text-accent-ink target-current:anchor-name-[--ep-here] pointer-coarse:flex pointer-coarse:min-h-11 pointer-coarse:items-center"
                 href={`#${section.id}`}>{section.label}</a>
             </li>
           ))

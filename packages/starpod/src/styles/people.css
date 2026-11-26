@@ -77,9 +77,9 @@
   align-items: center;
   gap: 4px;
   color: var(--accent-ink);
-  font-size: 0.75rem;
-  font-weight: 650;
-  line-height: 1;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-demibold);
+  line-height: var(--leading-none);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -99,9 +99,9 @@
   align-items: center;
   gap: 8px;
   color: var(--ink);
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.125rem;
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: --spacing(4.5);
   text-decoration: none;
 }
 
@@ -111,8 +111,8 @@
 
 .person-fact {
   color: var(--muted);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  line-height: 1.125rem;
+  font-weight: var(--font-weight-medium);
+  line-height: --spacing(4.5);
 }

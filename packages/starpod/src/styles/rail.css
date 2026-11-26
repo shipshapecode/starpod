@@ -498,7 +498,7 @@
   .rail .rail-label {
     margin: 0;
     padding: 0 0 10px;
-    line-height: 16px;
+    line-height: --spacing(4);
     white-space: nowrap;
   }
 
@@ -1201,8 +1201,8 @@
 .rail-fly-title {
   margin: 6px 10px 4px;
   color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* Every flyout row is the same list row: 44px, a 32px leading circle (a
@@ -1229,7 +1229,7 @@
   border-radius: calc(var(--r-card) - 8px);
   background: none;
   color: var(--ink);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
   transition: background-color var(--quick);
 }
@@ -1317,7 +1317,7 @@
 
 .sp-pal::backdrop {
   background: color-mix(in oklch, var(--ground) 70%, transparent);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(var(--blur-xs));
   opacity: 0;
   transition: opacity calc(0.3s * var(--slomo)) ease;
 }
@@ -1421,7 +1421,7 @@
     z-index: -1;
     border-bottom: 1px solid var(--line);
     background: color-mix(in oklch, var(--ground) 86%, transparent);
-    backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(var(--blur-glass)) saturate(1.4);
     opacity: 0;
     transition: opacity calc(0.3s * var(--slomo)) ease;
   }
@@ -1530,7 +1530,7 @@
    panel like the links above (48px, a 32px face). */
 .sheet .rail-fly-title {
   margin: 0 0 0.6rem;
-  font-weight: 650;
+  font-weight: var(--font-weight-demibold);
   letter-spacing: 0.04em;
 }
 
@@ -1590,7 +1590,7 @@
   }
 
   .sheet .platform-name {
-    font-size: 0.8125rem;
+    font-size: var(--text-sm);
   }
 }
 

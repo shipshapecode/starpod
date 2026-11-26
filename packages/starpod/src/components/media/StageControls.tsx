@@ -84,7 +84,7 @@ export default function StageControls({ episode, part }: Props) {
           size={30}
         />
         {!isCurrent && resumeAt > 0 && (
-          <span class="rounded-full bg-media-glass px-3 py-[0.35rem] text-[0.8125rem] font-[650] text-on-media backdrop-blur-[8px]">Resume at {formatClock(resumeAt)}</span>
+          <span class="rounded-full bg-media-glass px-3 py-[0.35rem] text-sm font-demibold text-on-media backdrop-blur-sm">Resume at {formatClock(resumeAt)}</span>
         )}
       </span>
     );
