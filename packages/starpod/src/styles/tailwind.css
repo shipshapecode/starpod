@@ -17,6 +17,23 @@
 @import './utilities.css';
 
 /*
+  The stylesheets, and the scripts' matchMedia, measure in px, so the
+  utilities do too. Rem steps would drift from them whenever a visitor
+  changes the browser's default font size: lg: would switch the layout at
+  a different width than the rail's own @media (min-width: 1024px), and
+  size-10 would stop lining up with the 40px geometry around it. The
+  values are Tailwind's defaults at 16px.
+*/
+@theme {
+  --spacing: 4px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/*
   Starpod's palette as Tailwind utilities (bg-accent-soft, text-on-glow,
   from-glow-a…). `inline` keeps them pointing at the live tokens, so they
   follow light and dark without a dark: variant.
