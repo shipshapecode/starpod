@@ -57,7 +57,7 @@ const ids = (people: typeof card.people) =>
   data-vt={dasherize(episode.title)}
   data-year={card.year}
 >
-  <div class="xp-art-box">
+  <div class="xp-art-box aspect-square min-w-0 [grid-area:art]">
     <button
       aria-controls={detailId}
       aria-expanded="false"
@@ -99,7 +99,7 @@ const ids = (people: typeof card.people) =>
   </div>
   <div class="xp-text PropFLIP">
     <p class="xp-facts PropFLIP">
-      <span class="xp-number" data-number={number}>{short}</span>
+      <span class="xp-number text-ink font-[650]" data-number={number}>{short}</span>
       <time datetime={date.toISOString()}
         >{
           date.toLocaleDateString('en-us', {
@@ -109,17 +109,23 @@ const ids = (people: typeof card.people) =>
         }<span class="xp-year">, {date.getFullYear()}</span></time
       >
       <span class="xp-facts-length">{length}</span>
-      {episode.video && <span class="xp-facts-kind">Video</span>}
+      {episode.video && <span class="xp-facts-kind text-accent-ink font-[650]">Video</span>}
     </p>
     <h3 class="xp-title PropFLIP">
       <a data-vt-title href={`/${episode.episodeSlug}`}>{episode.title}</a>
     </h3>
   </div>
   <div class="xp-detail" id={detailId}>
-    <p class="xp-desc" data-props-for="truncated" data-props-to=".xp-detail">
+    <p
+      class="xp-desc text-text m-0 line-clamp-2 text-[0.9375rem] leading-[1.5]"
+      data-props-for="truncated" data-props-to=".xp-detail">
       {episode.description}
     </p>
-    <span aria-hidden="true" class="xp-more">More</span>
+    <span
+      aria-hidden="true"
+      class="xp-more text-accent-ink absolute right-0 bottom-0 hidden items-center gap-0.5 bg-[linear-gradient(to_right,transparent,color-mix(in_oklch,var(--raised)_calc(var(--xp-lit)*100%),var(--ground))_2rem)] pl-10 text-[0.8125rem] leading-(--xp-desc-lh) font-[650] transition-[--xp-lit] duration-[calc(240ms*var(--slomo))] ease-[ease]"
+      >More</span
+    >
     {
       /* The cast, where to resume and the actions are made when the card
         opens (explorer.ts): only the open card shows them. */

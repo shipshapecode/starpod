@@ -41,8 +41,14 @@ const { cards, episodes, people, show, years } = Astro.props;
     </div>
   ) : (
     <section aria-labelledby="xp-archive-title" class="xp" data-explorer>
-      <h2 class="xp-heading" id="xp-archive-title">
-        All episodes <span>{episodes.length}</span>
+      <h2
+        class="xp-heading m-0 flex items-baseline gap-[0.6rem] font-(family-name:--font-display) text-[clamp(1.35rem,1.1rem+0.8vw,1.75rem)] leading-[1.15] font-extrabold tracking-[-0.01em] uppercase font-stretch-[72%]"
+        id="xp-archive-title"
+      >
+        All episodes{' '}
+        <span class="text-muted font-(family-name:--font-ui) text-[0.9rem] font-medium font-stretch-100%">
+          {episodes.length}
+        </span>
       </h2>
       <Toolbar people={people} total={episodes.length} years={years} />
       <div class="xp-stage">
@@ -54,7 +60,10 @@ const { cards, episodes, people, show, years } = Astro.props;
         {/* Only boxes: what shows in it belongs to the open card, so it is
             no landmark of its own. */}
         <div aria-hidden="true" class="xp-closeup" data-xp-closeup>
-          <span aria-hidden="true" class="xp-cu-glow" />
+          <span
+            aria-hidden="true"
+            class="xp-cu-glow pointer-events-none -z-1 aspect-square scale-125 self-center bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--live-img-accent,transparent)_var(--xp-glow,40%),transparent),transparent)] [grid-area:art]"
+          />
           <span aria-hidden="true" class="xp-cu-art" />
           <div class="xp-cu-col">
             <p aria-hidden="true" class="xp-cu-facts" data-xp-ghost="facts" />
@@ -72,12 +81,15 @@ const { cards, episodes, people, show, years } = Astro.props;
           what to do. One copy for the archive, moved into the card that
           opens (explorer.ts). */}
       <template data-xp-actions>
-        <p class="xp-resume" hidden />
-        <div class="xp-actions">
+        <p
+          class="xp-resume text-accent-ink m-0 mb-4 hidden text-[0.875rem] font-[650]"
+          hidden
+        />
+        <div class="xp-actions hidden flex-wrap items-center gap-2.5 pb-1.5">
           <span aria-hidden="true" class="xp-play-slot" />
           <button
             aria-pressed="false"
-            class="button-secondary xp-queue"
+            class="button-secondary xp-queue [&>svg]:flex-none"
             type="button"
           >
             <QueueIcon size={18} />
@@ -91,17 +103,21 @@ const { cards, episodes, people, show, years } = Astro.props;
             </span>
             <ArrowOutIcon size={16} />
           </a>
-          <button class="icon-button xp-close" type="button">
+          <button class="icon-button xp-close ml-auto" type="button">
             <CloseIcon />
             <span class="sr-only">Close the episode</span>
           </button>
         </div>
       </template>
-      <div class="xp-empty" data-xp-empty hidden>
+      <div
+        class="xp-empty text-text flex flex-col items-center gap-4 pt-4 pb-12 text-center"
+        data-xp-empty
+        hidden
+      >
         <div class="empty-art">
           <UFOIllustration />
         </div>
-        <p>
+        <p class="m-0 max-w-[40ch]">
           Nothing in the archive matches{' '}
           <span data-xp-empty-what>those filters</span>.
         </p>

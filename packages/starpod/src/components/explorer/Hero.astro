@@ -39,23 +39,26 @@ const number =
 
 <section
   aria-labelledby="xp-hero-title"
-  class="xp-hero"
+  class="xp-hero isolate mb-[clamp(40px,6vw,72px)] grid grid-cols-[minmax(0,1fr)] items-center gap-x-[clamp(24px,4vw,56px)] gap-y-5 [grid-template-areas:'media'_'meta'] min-[900px]:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] min-[900px]:[grid-template-areas:'media_meta']"
   data-episode-row
   data-id={episode.id}
   data-video={episode.video ? '' : undefined}
   data-vt={dasherize(episode.title)}
 >
-  <div aria-hidden="true" class="xp-hero-glow"></div>
   <div
-    class="xp-hero-media"
+    aria-hidden="true"
+    class="xp-hero-glow pointer-events-none -z-1 aspect-video translate-x-[calc(var(--px)*-56px)] translate-y-[calc(var(--py)*-40px+16px)] scale-115 bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--live-img-accent,transparent)_var(--xp-glow,45%),transparent),transparent)] transition-[translate] duration-700 ease-(--ease-out) [grid-area:media]"
+  ></div>
+  <div
+    class="xp-hero-media bg-media-ground relative isolate aspect-video origin-top overflow-hidden rounded-(--r-card) shadow-(--shadow-soft) [grid-area:media]"
     data-props-for="img img-color pointer-local"
     data-props-to=".xp-hero"
   >
-    <div aria-hidden="true" class="xp-hero-ambient" style={`--art: ${artUrl}`}>
+    <div aria-hidden="true" class="xp-hero-ambient absolute -inset-[12%] scale-110 bg-(image:--art) bg-cover bg-center filter-[blur(48px)_saturate(1.35)_brightness(0.55)]" style={`--art: ${artUrl}`}>
     </div>
     <img
       alt=""
-      class="xp-hero-art"
+      class="xp-hero-art absolute top-1/2 left-1/2 aspect-square h-[78%] w-auto translate-x-[calc(-50%+var(--px)*18px)] translate-y-[calc(-50%+var(--py)*12px)] rounded-(--r-tile) object-cover shadow-(--shadow-float) outline-1 -outline-offset-1 outline-(--hairline) [transition:scale_700ms_var(--ease-out),translate_500ms_var(--ease-out)]"
       data-vt-art
       decoding="async"
       fetchpriority="high"
@@ -63,25 +66,43 @@ const number =
       src={art}
       width="960"
     />
-    <span class="xp-chip xp-hero-kind">
+    <span class="xp-chip xp-hero-kind absolute top-[clamp(12px,2vw,20px)] left-[clamp(12px,2vw,20px)]">
       {episode.video ? <VideoIcon size={14} /> : <HeadphonesIcon size={14} />}
       {episode.video ? 'Video' : 'Audio'}
     </span>
-    <span class="xp-hero-play">
+    <span
+      class="xp-hero-play absolute bottom-[clamp(14px,2.5vw,28px)] left-[clamp(14px,2.5vw,28px)] z-2"
+    >
       <FullPlayButton client:load episode={playable} look="disc" />
     </span>
-    <span aria-hidden="true" class="xp-hero-progress"></span>
+    <span
+      aria-hidden="true"
+      class="xp-hero-progress absolute inset-x-0 bottom-0 z-3 h-[3px] origin-left scale-x-0 bg-[linear-gradient(90deg,var(--glow-b),var(--glow-a))] transition-[scale] duration-250 ease-linear"
+    ></span>
   </div>
 
-  <div class="xp-hero-meta">
+  <div class="xp-hero-meta [grid-area:meta]">
     <p class="mb-[0.6rem] text-[0.8125rem] font-[650] text-accent-ink">
-      <span aria-hidden="true" class="xp-onair"
-        ><span></span><span></span><span></span></span
+      <span
+        aria-hidden="true"
+        class="xp-onair mr-[0.4rem] hidden h-[0.7rem] items-end gap-0.5 align-[-1px]"
+        ><span class="h-full w-[2.5px] origin-bottom rounded-[1px] bg-current"
+        ></span><span
+          class="h-full w-[2.5px] origin-bottom rounded-[1px] bg-current"
+        ></span><span
+          class="h-full w-[2.5px] origin-bottom rounded-[1px] bg-current"
+        ></span></span
       >
       Latest episode
     </p>
-    <h2 class="xp-hero-title" id="xp-hero-title">
-      <a data-vt-title href={`/${episode.episodeSlug}`}>{episode.title}</a>
+    <h2
+      class="xp-hero-title m-0 mb-[0.85rem] font-(family-name:--font-display) max-w-[18ch] text-[clamp(2rem,1.2rem+2.6vw,3.6rem)] leading-[0.95] font-extrabold tracking-[-0.01em] uppercase font-stretch-[72%]"
+      id="xp-hero-title"
+    >
+      <a
+        class="no-underline decoration-auto transition-[color] duration-300 ease-(--ease-out) hover:text-voice-0"
+        data-vt-title
+        href={`/${episode.episodeSlug}`}>{episode.title}</a>
     </h2>
     <p
       class="xp-hero-facts mb-4 flex flex-wrap gap-x-4 gap-y-[0.2rem] overflow-hidden text-[0.875rem] font-medium tabular-nums text-muted"
@@ -125,7 +146,7 @@ const number =
     <p class="xp-hero-desc mb-5 line-clamp-4 max-w-[58ch] text-[1rem] text-text">{episode.description}</p>
     <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
       <FullPlayButton client:load episode={playable} look="pill" />
-      <a class="xp-hero-link inline-flex items-center gap-[0.35rem] font-[650] no-underline" href={`/${episode.episodeSlug}`}>
+      <a class="xp-hero-link text-accent-ink [&_svg]:transition-[translate] [&_svg]:duration-300 [&_svg]:ease-(--ease-spring) [&:hover_svg]:translate-x-[3px] [&:hover_svg]:-translate-y-[3px] inline-flex items-center gap-[0.35rem] font-[650] no-underline" href={`/${episode.episodeSlug}`}>
         Show notes and transcript
         <ArrowOutIcon size={16} />
       </a>
