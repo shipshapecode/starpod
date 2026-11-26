@@ -42,7 +42,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
 ---
 
 <ul
-  class="ep-people grid grid-flow-dense grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-3"
+  class="grid grid-flow-dense grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-3"
   data-ep-people
   data-episode={JSON.stringify(episode)}
 >
@@ -54,8 +54,8 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
       const who = (
         <>
           <PersonFace size={64} src={person.src} />
-          <span class="ep-person-text flex min-w-0 flex-col gap-0.5">
-            <span class="ep-person-name truncate text-[1.0625rem] leading-[1.375rem] font-[650] text-ink max-sm:line-clamp-2 max-sm:whitespace-normal">{person.name}</span>
+          <span class="flex min-w-0 flex-col gap-0.5">
+            <span class="truncate text-[1.0625rem] leading-[1.375rem] font-[650] text-ink max-sm:line-clamp-2 max-sm:whitespace-normal">{person.name}</span>
             <span class="person-fact">{person.fact}</span>
             {person.share !== undefined && (
               <span class="sr-only">
@@ -99,7 +99,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
                 their tally (hidden on phones when the fact line above
                 already gives it). */}
             {person.firstLine !== undefined ? (
-              <span class="ep-person-stat relative z-1 flex flex-col items-end gap-1 text-[0.75rem] leading-4 font-semibold text-muted max-sm:col-1 max-sm:row-2 max-sm:ms-[78px] max-sm:flex-row max-sm:items-center max-sm:gap-2 max-sm:justify-self-start">
+              <span class="relative z-1 flex flex-col items-end gap-1 text-[0.75rem] leading-4 font-semibold text-muted max-sm:col-1 max-sm:row-2 max-sm:ms-[78px] max-sm:flex-row max-sm:items-center max-sm:gap-2 max-sm:justify-self-start">
                 <span aria-hidden="true">First speaks</span>
                 <button
                   aria-label={`First speaks at ${chipLabel(person.firstLine)}`}
@@ -112,7 +112,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
               </span>
             ) : (
               <span
-                class="ep-chip ep-chip-quiet inline-flex h-8 items-center rounded-full bg-raised px-3 text-[0.8125rem] font-[650] whitespace-nowrap text-muted tabular-nums [transition:background-color_var(--quick)] max-sm:col-1 max-sm:row-2 max-sm:ms-[78px] max-sm:justify-self-start max-sm:data-counted:hidden"
+                class="ep-chip inline-flex h-8 items-center rounded-full bg-raised px-3 text-[0.8125rem] font-[650] whitespace-nowrap text-muted tabular-nums [transition:background-color_var(--quick)] max-sm:col-1 max-sm:row-2 max-sm:ms-[78px] max-sm:justify-self-start max-sm:data-counted:hidden"
                 data-counted={person.counted ? '' : undefined}
               >
                 {person.count} {person.count === 1 ? 'ep' : 'eps'}
@@ -121,7 +121,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
             {opens && (
               <svg
                 aria-hidden="true"
-                class="ep-person-caret flex-none text-muted transition-[rotate] duration-[calc(480ms*var(--slomo))] ease-(--ease-spring) in-data-open:rotate-180 max-sm:col-2 max-sm:row-1"
+                class="flex-none text-muted transition-[rotate] duration-[calc(480ms*var(--slomo))] ease-(--ease-spring) in-data-open:rotate-180 max-sm:col-2 max-sm:row-1"
                 fill="none"
                 height="16"
                 viewBox="0 0 16 16"
@@ -169,7 +169,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
 {
   hosts.length > 0 && (
     <p class="ep-hosted mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-      <span class="ep-hosted-label text-[0.8125rem] font-semibold text-muted">Hosted by</span>
+      <span class="text-[0.8125rem] font-semibold text-muted">Hosted by</span>
       {hosts.map((host) => (
         <a
           class="person-chip"

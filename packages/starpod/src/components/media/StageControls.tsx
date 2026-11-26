@@ -72,7 +72,7 @@ export default function StageControls({ episode, part }: Props) {
   if (part === 'overlay') {
     return (
       <span
-        class="stage-overlay pointer-events-none absolute inset-0 z-3 flex items-end justify-start gap-3 p-[clamp(14px,2.5vw,28px)]"
+        class="pointer-events-none absolute inset-0 z-3 flex items-end justify-start gap-3 p-[clamp(14px,2.5vw,28px)]"
         ref={anchor}
       >
         <PlayToggle
@@ -84,7 +84,7 @@ export default function StageControls({ episode, part }: Props) {
           size={30}
         />
         {!isCurrent && resumeAt > 0 && (
-          <span class="stage-resume rounded-full bg-media-glass px-3 py-[0.35rem] text-[0.8125rem] font-[650] text-on-media backdrop-blur-[8px]">Resume at {formatClock(resumeAt)}</span>
+          <span class="rounded-full bg-media-glass px-3 py-[0.35rem] text-[0.8125rem] font-[650] text-on-media backdrop-blur-[8px]">Resume at {formatClock(resumeAt)}</span>
         )}
       </span>
     );

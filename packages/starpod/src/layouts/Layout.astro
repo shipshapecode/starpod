@@ -371,8 +371,8 @@ const publicationLinkTag =
              keyboard and assistive tech it's the same link, so it stays out
              of their way. -->
         <div class="topbar-show flex min-w-0 items-center gap-2.5 font-bold text-ink">
-          <span class="topbar-art w-9 flex-none"><ShowArtwork image={show.image} /></span>
-          <a aria-hidden="true" class="topbar-title truncate no-underline" href="/" tabindex="-1"
+          <span class="w-9 flex-none"><ShowArtwork image={show.image} /></span>
+          <a aria-hidden="true" class="truncate no-underline" href="/" tabindex="-1"
             >{show.title}</a
           >
         </div>
@@ -392,7 +392,7 @@ const publicationLinkTag =
         id="main"
         class:list={[
           'main relative min-w-0 overflow-x-clip p-(--gutter) pb-[calc(var(--dock-h)+var(--tabbar-h)+48px)] lg:col-[2] lg:pb-[calc(var(--dock-h)+64px)]',
-          !isHome && 'main-page max-w-[1280px]'
+          !isHome && 'max-w-[1280px]'
         ]}
       >
         {

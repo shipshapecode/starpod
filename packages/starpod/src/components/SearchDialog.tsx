@@ -439,7 +439,7 @@ export default function SearchDialog({
                                 width="32"
                               />
                             </span>
-                            <span class="sp-text grid min-w-0 flex-1 gap-0.5">
+                            <span class="grid min-w-0 flex-1 gap-0.5">
                               <span class="sp-name min-w-0 truncate text-[0.875rem] leading-[1.125rem] font-medium text-ink">
                                 <Completion
                                   query={query}
@@ -464,9 +464,9 @@ export default function SearchDialog({
                               src={item.episode.episodeThumbnail}
                               width="40"
                             />
-                            <span class="sp-text grid min-w-0 flex-1 gap-0.5">
-                              <span class="sp-head flex min-w-0 items-baseline gap-2">
-                                <span class="sp-num text-[0.75rem] font-medium text-muted">
+                            <span class="grid min-w-0 flex-1 gap-0.5">
+                              <span class="flex min-w-0 items-baseline gap-2">
+                                <span class="text-[0.75rem] font-medium text-muted">
                                   #{item.episode.episodeNumber}
                                 </span>
                                 <span class="sp-title truncate text-[0.875rem] font-medium text-ink max-sm:line-clamp-2 max-sm:whitespace-normal">
@@ -476,7 +476,7 @@ export default function SearchDialog({
                                   />
                                 </span>
                               </span>
-                              <span class="sp-desc truncate text-[0.75rem] text-text">
+                              <span class="truncate text-[0.75rem] text-text">
                                 {item.episode.description}
                               </span>
                             </span>

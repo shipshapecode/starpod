@@ -151,7 +151,7 @@ const voiceName: Record<number, string> = {
     <section aria-labelledby="hosts-heading" class="mt-16 lg:mt-20">
       <h2 class="section-title" id="hosts-heading">Meet the hosts</h2>
 
-      <ul class="ab-hosts grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <ul class="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {
           posters.map((host) => (
             <li
@@ -178,12 +178,12 @@ const voiceName: Record<number, string> = {
 
               <div class="ab-host-body relative -mt-7 flex flex-col items-start gap-3 px-6 pb-6">
                 <h3
-                  class={`ab-host-name m-0 text-[clamp(1.75rem,4vw,2.5rem)] leading-none text-[var(--person-ring,var(--ink))] ${voiceName[host.voice ?? -1] ?? 'font-extrabold'}`}
+                  class={`m-0 text-[clamp(1.75rem,4vw,2.5rem)] leading-none text-[var(--person-ring,var(--ink))] ${voiceName[host.voice ?? -1] ?? 'font-extrabold'}`}
                 >
                   {host.name}
                 </h3>
                 {host.stats && <p class="person-fact">{host.stats}</p>}
-                {host.bio && <p class="ab-host-bio max-w-[48ch] text-text">{host.bio}</p>}
+                {host.bio && <p class="max-w-[48ch] text-text">{host.bio}</p>}
 
                 {together.length === 0 && host.recent.length > 0 && (
                   <div class="ab-host-tray box-border grid w-full justify-items-start gap-3 rounded-(--r-tray) bg-[color-mix(in_oklch,var(--surface)_72%,transparent)] px-1 pt-1 pb-3">
@@ -239,8 +239,8 @@ const voiceName: Record<number, string> = {
 
       {
         together.length > 0 && (
-          <div class="ab-latest ep-reveal mt-8">
-            <h3 class="ab-latest-title mb-3 text-[0.9375rem] leading-5 font-[650]">Latest episodes</h3>
+          <div class="ep-reveal mt-8">
+            <h3 class="mb-3 text-[0.9375rem] leading-5 font-[650]">Latest episodes</h3>
             <Tiles items={together} label="Latest episodes with the hosts" />
           </div>
         )

@@ -898,7 +898,7 @@ export default function Island() {
           class="island-art PropFLIP fix-kids relative h-(--art-h) w-(--art-w) overflow-clip bg-media-ground [--area:art] [--r:var(--r-thumb)] data-hot:outline-2 data-hot:outline-offset-2 data-hot:outline-accent"
           data-pip-zone="dock"
         >
-          <div class="island-art-in absolute inset-0">
+          <div class="absolute inset-0">
             {/* The artwork's palette, for the whole page to take its accent
                 from (--live-img, --live-img-accent, … on <html>; once per episode). */}
             {episode.image && (

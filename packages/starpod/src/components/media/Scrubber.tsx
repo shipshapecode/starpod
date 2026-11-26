@@ -129,9 +129,9 @@ export default function Scrubber({ duration, episode, time }: Props) {
               : undefined
           }
         >
-          <span class="scrub-preview-time text-[0.75rem] font-bold text-accent-ink tabular-nums">
+          <span class="text-[0.75rem] font-bold text-accent-ink tabular-nums">
             {formatClock(preview?.at ?? 0)}
-            {cue?.n && <span class="scrub-preview-name font-semibold text-muted"> · {cue.n}</span>}
+            {cue?.n && <span class="font-semibold text-muted"> · {cue.n}</span>}
           </span>
           {cue && (
             <span class="scrub-preview-line line-clamp-3 text-[0.875rem] leading-[1.35] text-pretty text-ink" data-v={cue.v ?? 'none'}>

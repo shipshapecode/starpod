@@ -82,7 +82,7 @@ const number =
   </div>
 
   <div class="xp-hero-meta [grid-area:meta]">
-    <p class="xp-hero-eyebrow mb-[0.6rem] text-[0.8125rem] font-[650] text-accent-ink">
+    <p class="mb-[0.6rem] text-[0.8125rem] font-[650] text-accent-ink">
       <span
         aria-hidden="true"
         class="xp-onair mr-[0.4rem] hidden h-[0.7rem] items-end gap-0.5 align-[-1px]"
@@ -144,7 +144,7 @@ const number =
       )
     }
     <p class="xp-hero-desc mb-5 line-clamp-4 max-w-[58ch] text-[1rem] text-text">{episode.description}</p>
-    <div class="xp-hero-actions flex flex-wrap items-center gap-x-5 gap-y-3">
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
       <FullPlayButton client:load episode={playable} look="pill" />
       <a class="xp-hero-link text-accent-ink [&_svg]:transition-[translate] [&_svg]:duration-300 [&_svg]:ease-(--ease-spring) [&:hover_svg]:translate-x-[3px] [&:hover_svg]:-translate-y-[3px] inline-flex items-center gap-[0.35rem] font-[650] no-underline" href={`/${episode.episodeSlug}`}>
         Show notes and transcript
