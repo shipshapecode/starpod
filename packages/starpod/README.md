@@ -110,11 +110,16 @@ starpod(starpodConfig, {
   database: true,
   // Replace built-in components with your own.
   components: { Hosts: './src/components/MyHosts.astro' },
-  // Stylesheets loaded after the built-in ones — override the theme's CSS
-  // custom properties here.
+  // Stylesheets loaded after the built-in ones — set the theme's CSS
+  // variables here (see Theming).
   customCss: ['./src/styles/theme.css']
 });
 ```
+
+For a different look, set the theme's variables (see Theming). For
+different markup or behaviour, override the component. Class names inside
+the built-in components aren't part of the API and can change between
+releases, so don't style against them.
 
 Overridable components: `Breadcrumbs`, `EpisodeList`, `Hosts`,
 `InfoCard`, `LargePlatforms`, `NotFoundContent`, `Platforms`, `ShowArtwork`.
@@ -150,6 +155,83 @@ For an overriding `InfoCard`, give each link an icon `<svg>` and its label
 in a `<span>`, as the built-in does. The icon sidebar then shows the icon
 alone and names the link in a tooltip. A link with bare text keeps its
 text, cut to the icon column, and is still named by the tooltip.
+
+## Theming
+
+Everything Starpod draws reads its values from CSS variables on `:root`:
+the built-in stylesheets with `var(--accent)`, and the Tailwind utilities
+too (`bg-accent` compiles to `background: var(--accent)`, `text-sm` to
+`font-size: var(--text-sm)`). Set the variables in a stylesheet listed in
+`customCss`, and both pick them up:
+
+```css
+/* src/styles/theme.css */
+:root {
+  --iris-500: oklch(62% 0.19 25);
+  --iris-700: oklch(48% 0.17 25);
+  --font-ui: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --r-card: 12px;
+}
+```
+
+The stylesheet loads after Starpod's, so a plain `:root` rule wins in both
+the light and the dark scheme. To change one scheme only, wrap the rule in
+`@media (prefers-color-scheme: dark)`, as Starpod's own `tokens.css` does.
+A font you name in `--font-ui` needs its own `@font-face` or `@import` in
+the same stylesheet.
+
+### Colour
+
+Write colours in OKLCH, as the built-in palette does.
+
+- **Accent scales:** `--iris-100` to `--iris-700` (the light scheme's
+  accent) and `--aqua-100` to `--aqua-700` (the dark scheme's). Changing a
+  scale re-colours that scheme's accents. The one exception is the dark
+  scheme's `--accent-soft`, a deep tint of its own, so set it alongside the
+  aqua scale.
+- **Surfaces and text, set per scheme:** `--ground` (the page),
+  `--surface`, `--raised`, `--line`, `--line-strong`, `--ink` (headings and
+  primary text), `--text`, `--muted`, `--on-ink` (text on an `--ink`
+  fill).
+- **Accent roles:** `--accent`, `--accent-ink`, `--accent-soft`, the
+  `--glow-a`/`--glow-b` gradient and `--on-glow` (text on it), and
+  `--voice-0`/`--voice-1` (the two hosts' transcript colours).
+- **Over video and artwork, the same in both schemes:** `--on-media`,
+  `--on-media-ink`, `--media-shade`, `--media-glass`, `--media-ground`.
+- **Effects:** `--hairline` (the edge drawn over images), and the
+  `--shadow-soft` and `--shadow-float` shadows.
+
+### Type
+
+- **Fonts:** `--font-ui` (everything), `--font-display` (the large display
+  titles, the UI font by default), and `--font-voice-0`/`--font-voice-1` (the two hosts'
+  transcript lines).
+- **Sizes:** `--text-3xs` (10px), `--text-2xs` (11px), `--text-xs` (12px),
+  `--text-sm` (13px, most UI text), `--text-md` (14px), `--text-base` (15px),
+  `--text-lg` (16px, body), `--text-xl` (17px), `--text-2xl` (18px) and
+  `--text-3xl` (21px). These are Starpod's own steps, not Tailwind's
+  defaults. The large display headings scale with the viewport and don't
+  use a step.
+- **Line heights:** `--leading-none` (1), `--leading-tight` (1.2),
+  `--leading-snug` (1.3), `--leading-normal` (1.45), `--leading-relaxed`
+  (1.75).
+- **Weights:** `--font-weight-normal` (400) to `--font-weight-black` (900).
+  They include `--font-weight-demibold` (650) and `--font-weight-heavy`
+  (850).
+- **Letter spacing:** `--tracking-tight` and `--tracking-snug`.
+
+### Shape and motion
+
+- **Radii:** `--radius` (chrome) and `--radius-frame` (the media frame).
+  Components nest from `--r-thumb` (12px) to `--r-row`, `--r-tile`,
+  `--r-tray` and `--r-card` (28px). Each inner radius is its container's
+  radius minus the gap between them, so change them together.
+- **Easing:** `--ease-out` and `--ease-spring`, and `--quick` for small
+  colour changes.
+
+Layout measurements such as `--rail-w`, `--topbar-h` and `--gutter` are
+also variables, but the layout's geometry depends on them, so they aren't
+meant for theming.
 
 ## Custom pages
 
