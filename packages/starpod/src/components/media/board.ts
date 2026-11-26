@@ -278,7 +278,7 @@ export function mountBoard(host: HTMLElement): Board {
         'board-row grid grid-cols-[56px_minmax(0,1fr)] items-center gap-3 transition-[opacity,translate] duration-[calc(0.35s*var(--slomo))] ease-(--ease-out)';
       // On phones a queued row's remove sits at its end (player.css), off
       // the cover, so a tap on the cover still plays it.
-      row.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="grid min-w-0 gap-0.5"><span class="board-row-name truncate text-[0.8125rem] font-semibold text-text"></span><span class="board-row-meta font-(family-name:--font-ui) text-[12px] leading-[1.3] font-medium text-muted tabular-nums"></span></span><button class="board-row-remove hidden" hidden type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
+      row.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="board-row-text grid min-w-0 gap-0.5"><span class="board-row-name truncate text-[0.8125rem] font-semibold text-text"></span><span class="board-row-meta font-(family-name:--font-ui) text-[12px] leading-[1.3] font-medium text-muted tabular-nums"></span></span><button class="board-row-remove hidden" hidden type="button"><svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>`;
       return row;
     });
     // The row after Up next says how to add one: the shelf is under it in
@@ -303,7 +303,7 @@ export function mountBoard(host: HTMLElement): Board {
     // imagery leads, its title and one unit of proof 8px under it, 4px in.
     slots(shelfGrid, rest.length, () => {
       const cell = document.createElement('div');
-      cell.className = 'grid min-w-0 content-start';
+      cell.className = 'shelf-cell grid min-w-0 content-start';
       cell.innerHTML = `<i aria-hidden="true" class="slot"></i><span class="shelf-cell-title mx-1 mt-2 mb-0 line-clamp-2 font-(family-name:--font-ui) text-[13px] leading-[1.3] font-semibold normal-nums text-ink"></span><span class="shelf-cell-meta mx-1 mt-0.5 mb-0 font-(family-name:--font-ui) text-[12px] leading-[1.3] font-medium text-muted tabular-nums"></span>`;
       return cell;
     });

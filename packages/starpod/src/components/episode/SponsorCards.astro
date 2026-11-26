@@ -18,7 +18,7 @@ const svgs = import.meta.glob('/src/img/sponsors/*.svg', {
 });
 ---
 
-<ul class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] gap-3">
+<ul class="ep-sponsors grid grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] gap-3">
   {
     sponsors.map((sponsor) => (
       <li class="ep-reveal">
@@ -34,8 +34,8 @@ const svgs = import.meta.glob('/src/img/sponsors/*.svg', {
               set:html={svgs[`/src/img/sponsors/${sponsor.img}`]?.() ?? ''}
             />
           </span>
-          <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span class="text-[0.9375rem] leading-5 font-[650] text-ink">{sponsor.name}</span>
+          <span class="ep-sponsor-text flex min-w-0 flex-1 flex-col gap-0.5">
+            <span class="ep-sponsor-name text-[0.9375rem] leading-5 font-[650] text-ink">{sponsor.name}</span>
             <span class="person-fact">
               {sponsor.count > 1
                 ? `Presented ${sponsor.count} episodes`

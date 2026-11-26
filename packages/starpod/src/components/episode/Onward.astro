@@ -54,8 +54,8 @@ const pager = [
             src={card.art}
             width="72"
           />
-          <span class="flex min-w-0 flex-1 flex-col gap-1 px-1">
-            <span class="text-[0.8125rem] leading-[1.125rem] font-medium text-muted tabular-nums">
+          <span class="ep-pager-text flex min-w-0 flex-1 flex-col gap-1 px-1">
+            <span class="ep-pager-label text-[0.8125rem] leading-[1.125rem] font-medium text-muted tabular-nums">
               {card.label} · {card.number}
             </span>
             <span class="ep-card-title font-(family-name:--font-display) text-[1.15rem] leading-[1.02] font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
@@ -69,7 +69,7 @@ const pager = [
 {
   related.length > 0 && (
     <div class="ep-shelf-wrap relative @container/ep-shelf">
-      <h3 class="ep-reveal mb-1 text-[0.9375rem] leading-[40px] font-[650]">Related episodes</h3>
+      <h3 class="ep-shelf-title ep-reveal mb-1 text-[0.9375rem] leading-[40px] font-[650]">Related episodes</h3>
       {/* The next card always peeks: so many whole cards and four tenths of
           one, by the shelf's own width. 16px above and below so rings and
           shadows are never cut. */}
@@ -94,7 +94,7 @@ const pager = [
                 src={card.art}
                 width="320"
               />
-              <span class="mx-1 text-[0.8125rem] leading-[1.125rem] font-medium text-muted tabular-nums">
+              <span class="ep-card-facts mx-1 text-[0.8125rem] leading-[1.125rem] font-medium text-muted tabular-nums">
                 {card.number} · {formatDuration(card.duration)}
               </span>
               <span class="ep-card-title mx-1 font-(family-name:--font-display) text-[1.15rem] leading-[1.02] font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
