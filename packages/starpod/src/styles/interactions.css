@@ -1,4 +1,6 @@
-/* Loaded last so these states win over each control's base styles. */
+/* Loaded after the tokens, shell and stage styles (global.css), so these
+   states win over those controls' base styles. The rail, explorer, player
+   and episode styles load after it and carry their own states. */
 
 /*
   Hover language. Three rules, carried over from the original site:

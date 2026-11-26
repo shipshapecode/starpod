@@ -427,7 +427,7 @@ test.describe('episode page navigation', () => {
             const after = await underBar(href);
             return after === before && Math.abs(after - 16) <= 1
               ? 'under the bar'
-              : `${after}px`;
+              : `${href} at ${after}px`;
           })
           .toBe('under the bar');
 
