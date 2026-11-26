@@ -224,10 +224,10 @@ const publicationLinkTag =
           'data-⚓️-pin-y': ''
         }}
       >
-        <div class="rail-in">
-          <div class="rail-head">
+        <div class="rail-in lg:box-border lg:flex lg:min-h-full lg:flex-col lg:gap-(--gap) lg:px-(--pad) lg:pt-7 lg:pb-6 lg:*:shrink-0">
+          <div class="rail-head lg:flex lg:items-start lg:justify-between">
             <span
-              class="rail-slot rail-slot-art"
+              class="rail-slot rail-slot-art lg:size-18 lg:shrink-0"
               {...{ 'data-⚓️-name': '--slot', 'data-⚓️-scope-name': '--slot' }}
             >
               <div
@@ -240,12 +240,12 @@ const publicationLinkTag =
                      is an anchored piece, and a write to it re-lays them all. -->
                 <i
                   aria-hidden="true"
-                  class="rail-ring"
+                  class="rail-ring lg:pointer-events-none lg:absolute lg:-inset-1 lg:hidden"
                   data-props-for="media-clock"></i>
               </div>
             </span>
             <span
-              class="rail-slot rail-slot-toggle"
+              class="rail-slot rail-slot-toggle lg:size-8 lg:shrink-0"
               {...{ 'data-⚓️-name': '--slot', 'data-⚓️-scope-name': '--slot' }}
             >
               <button
@@ -253,7 +253,7 @@ const publicationLinkTag =
                 aria-expanded="true"
                 aria-keyshortcuts="["
                 aria-label="Sidebar"
-                class="rail-toggle"
+                class="rail-toggle lg:grid lg:cursor-pointer lg:place-items-center lg:rounded-full lg:border-0 lg:bg-transparent lg:p-0 lg:text-muted"
                 data-tip="Collapse sidebar"
                 data-tip-key="["
                 type="button"
@@ -264,7 +264,7 @@ const publicationLinkTag =
             </span>
           </div>
 
-          <div class="rail-about">
+          <div class="rail-about lg:flex lg:w-[calc(var(--rail-open)-44px)] lg:origin-top-left lg:flex-col lg:gap-5 lg:[transition:opacity_calc(0.3s*var(--slomo))_ease_calc(0.2s*var(--slomo)),scale_calc(0.5s*var(--slomo))_var(--ease-out)_calc(0.15s*var(--slomo)),filter_calc(0.4s*var(--slomo))_ease_calc(0.15s*var(--slomo))]">
             <p
               class="rail-title font-(family-name:--font-display) text-[1.3rem] leading-[1.15] font-bold tracking-[-0.015em] text-ink"
             >
@@ -274,7 +274,7 @@ const publicationLinkTag =
           </div>
 
           <div
-            class="rail-slot rail-slot-search"
+            class="rail-slot rail-slot-search lg:-mx-[15px] lg:h-10 lg:min-w-12"
             {...{ 'data-⚓️-name': '--slot', 'data-⚓️-scope-name': '--slot' }}
           >
             <div
@@ -328,14 +328,14 @@ const publicationLinkTag =
                  inert. The built-in list names the same anchor on itself,
                  and the later name in the tree wins, so it rides its list. -->
             <div
-              class="rail-follow-body"
+              class="rail-follow-body lg:mt-[26px]"
               {...{ 'data-⚓️-name': '--rail-platforms' }}
             >
               <Platforms anchored />
             </div>
             <button
               aria-label="Follow the show"
-              class="rail-stack"
+              class="rail-stack lg:cursor-pointer lg:rounded-full lg:border-0 lg:bg-transparent lg:p-0"
               data-tip="Follow the show"
               {...{ 'data-⚓️-to': '--rail-platforms', 'data-⚓️-fill': '' }}
               popovertarget="rail-follow-fly"
@@ -353,7 +353,7 @@ const publicationLinkTag =
             </div>
             <button
               aria-label="Hosted by"
-              class="rail-stack"
+              class="rail-stack lg:cursor-pointer lg:rounded-full lg:border-0 lg:bg-transparent lg:p-0"
               data-tip="Hosted by"
               {...{ 'data-⚓️-to': '--rail-hosts', 'data-⚓️-fill': '' }}
               popovertarget="rail-hosts-fly"
@@ -471,11 +471,11 @@ const publicationLinkTag =
     </nav>
 
     <div class="sheet" id="follow-sheet" popover>
-      <div class="sheet-head">
-        <p class="sheet-title text-[1.05rem] font-bold text-ink">Follow {show.title}</p>
+      <div class="sheet-head -mt-2 mb-3 flex items-center justify-between gap-3">
+        <p class="sheet-title m-0 text-[1.05rem] font-bold text-ink">Follow {show.title}</p>
         <button
           aria-label="Close"
-          class="sheet-close"
+          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-[50%] border-0 bg-raised p-0 text-ink [transition:background-color_var(--quick)]"
           popovertarget="follow-sheet"
           popovertargetaction="hide"
           type="button"
@@ -486,11 +486,11 @@ const publicationLinkTag =
       <Platforms />
     </div>
     <div class="sheet" id="more-sheet" popover>
-      <div class="sheet-head">
-        <p class="sheet-title text-[1.05rem] font-bold text-ink">{show.title}</p>
+      <div class="sheet-head -mt-2 mb-3 flex items-center justify-between gap-3">
+        <p class="sheet-title m-0 text-[1.05rem] font-bold text-ink">{show.title}</p>
         <button
           aria-label="Close"
-          class="sheet-close"
+          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-[50%] border-0 bg-raised p-0 text-ink [transition:background-color_var(--quick)]"
           popovertarget="more-sheet"
           popovertargetaction="hide"
           type="button"
@@ -510,15 +510,15 @@ const publicationLinkTag =
          the icons; each stack opens a flyout that flips up near the bottom. -->
     <div
       aria-hidden="true"
-      class="rail-tip"
+      class="rail-tip pointer-events-none overflow-visible border-0 bg-transparent p-0 -translate-y-1/2"
       {...{ 'data-⚓️-to': '--rail-tip-at', 'data-⚓️-side': 'after' }}
       id="rail-tip"
       popover="hint"
     >
-      <span class="rail-tip-box"><span></span><kbd></kbd></span>
+      <span class="rail-tip-box relative flex items-center gap-2 rounded-(--r-card) bg-ink px-3 py-1.5 text-[0.8125rem] leading-[1.3] font-[650] whitespace-nowrap text-on-ink shadow-[var(--shadow-soft)] [transition:opacity_calc(0.15s*var(--slomo))_ease,translate_calc(0.25s*var(--slomo))_var(--ease-out)]"><span></span><kbd class="rounded-[4px] bg-on-ink/16 px-[5px] [font-family:inherit] text-[0.75rem] empty:hidden"></kbd></span>
     </div>
     <div
-      class="rail-fly"
+      class="rail-fly overflow-visible border-0 bg-transparent p-0 text-text [transition:display_calc(0.2s*var(--slomo))_allow-discrete,overlay_calc(0.2s*var(--slomo))_allow-discrete]"
       {...{
         'data-⚓️-to': '--rail-platforms',
         'data-⚓️-side': 'after',
@@ -528,13 +528,13 @@ const publicationLinkTag =
       id="rail-follow-fly"
       popover
     >
-      <div class="rail-fly-box">
+      <div class="rail-fly-box relative flex max-h-[calc(100dvh-16px)] w-60 flex-col rounded-(--r-card) border border-line bg-surface p-2 shadow-[var(--shadow-float)] [transition:opacity_calc(0.2s*var(--slomo))_ease,scale_calc(0.4s*var(--slomo))_var(--ease-spring),translate_calc(0.3s*var(--slomo))_var(--ease-out)] *:last:min-h-0 *:last:overflow-y-auto *:last:overscroll-contain">
         <p class="rail-fly-title">Follow the show</p>
         <Platforms />
       </div>
     </div>
     <div
-      class="rail-fly"
+      class="rail-fly overflow-visible border-0 bg-transparent p-0 text-text [transition:display_calc(0.2s*var(--slomo))_allow-discrete,overlay_calc(0.2s*var(--slomo))_allow-discrete]"
       {...{
         'data-⚓️-to': '--rail-hosts',
         'data-⚓️-side': 'after',
@@ -544,7 +544,7 @@ const publicationLinkTag =
       id="rail-hosts-fly"
       popover
     >
-      <div class="rail-fly-box">
+      <div class="rail-fly-box relative flex max-h-[calc(100dvh-16px)] w-60 flex-col rounded-(--r-card) border border-line bg-surface p-2 shadow-[var(--shadow-float)] [transition:opacity_calc(0.2s*var(--slomo))_ease,scale_calc(0.4s*var(--slomo))_var(--ease-spring),translate_calc(0.3s*var(--slomo))_var(--ease-out)] *:last:min-h-0 *:last:overflow-y-auto *:last:overscroll-contain">
         <Hosts />
       </div>
     </div>

@@ -40,14 +40,14 @@ function Completion({ text, query }: { text: string; query: string }) {
   }
   const at = text.toLowerCase().indexOf(typed.toLowerCase());
   if (at < 0) {
-    return <b>{text}</b>;
+    return <b class="font-bold">{text}</b>;
   }
   const end = at + typed.length;
   return (
     <>
-      {at > 0 && <b>{text.slice(0, at)}</b>}
+      {at > 0 && <b class="font-bold">{text.slice(0, at)}</b>}
       {text.slice(at, end)}
-      {end < text.length && <b>{text.slice(end)}</b>}
+      {end < text.length && <b class="font-bold">{text.slice(end)}</b>}
     </>
   );
 }
@@ -315,7 +315,7 @@ export default function SearchDialog({
   return (
     <dialog
       ref={dialogRef}
-      class="sp-pal"
+      class="sp-pal fixed inset-0 m-0 size-full max-h-none max-w-none border-0 bg-transparent px-4 pt-[max(10vh,env(safe-area-inset-top))] pb-0 text-text open:flex open:flex-col open:items-center"
       data-state="from"
       onClick={handleBackdropClick}
       onCancel={(e) => {
@@ -325,15 +325,15 @@ export default function SearchDialog({
       aria-modal="true"
       aria-label="Search episodes"
     >
-      <div ref={boxRef} class="sp-box PropFLIP fix-kids">
+      <div ref={boxRef} class="sp-box PropFLIP fix-kids w-full max-w-xl overflow-clip bg-surface shadow-[var(--shadow-float)] outline-1 -outline-offset-1 outline-line [--r:20px]">
         <div class="sp-in">
           <i
             aria-hidden="true"
-            class="sp-light"
+            class="sp-light pointer-events-none absolute inset-0 -z-1 bg-[radial-gradient(16rem_circle_at_calc(var(--live-local-pointer-x-ratio)*100%)_calc(var(--live-local-pointer-y-ratio)*100%),color-mix(in_oklch,var(--glow-a)_14%,transparent),transparent_70%)] opacity-(--live-local-pointer-inside) [transition:opacity_calc(0.3s*var(--slomo))_ease]"
             data-props-for="pointer-local"
           />
           {/* Search Input */}
-          <div class="sp-field">
+          <div class="sp-field flex items-center border-b border-line px-3 transition-[border-color] duration-200 ease-(--ease-out) focus-within:border-accent">
             <span
               class="search-icon text-muted h-5 w-5 shrink-0"
               aria-hidden="true"
@@ -341,7 +341,7 @@ export default function SearchDialog({
             <input
               ref={inputRef}
               type="text"
-              class="text-ink placeholder-muted flex-1 border-none bg-transparent px-3 py-4 outline-none! focus:ring-0"
+              class="text-ink placeholder-muted min-w-0 flex-1 border-none bg-transparent px-3 py-4 outline-none! focus:ring-0"
               placeholder="Search episodes..."
               value={query}
               onInput={onInput}
@@ -359,12 +359,12 @@ export default function SearchDialog({
                 items[selectedIndex] && optionId(items[selectedIndex])
               }
             />
-            <kbd class="sp-esc text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs sm:inline-flex">
+            <kbd class="sp-esc text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs sm:inline-flex pointer-coarse:hidden">
               <span class="text-xs">ESC</span>
             </kbd>
             {/* On touch, where there is no Escape key to show. */}
             <button
-              class="sp-cancel"
+              class="sp-cancel hidden pointer-coarse:-me-2 pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:flex-none pointer-coarse:cursor-pointer pointer-coarse:items-center pointer-coarse:rounded-(--r-thumb) pointer-coarse:border-0 pointer-coarse:bg-transparent pointer-coarse:px-2 pointer-coarse:text-[0.9375rem] pointer-coarse:font-semibold pointer-coarse:text-accent-ink"
               onClick={() => (isSearchOpen.value = false)}
               type="button"
             >
@@ -376,7 +376,7 @@ export default function SearchDialog({
           <div
             ref={resultsRef}
             id="search-results"
-            class="sp-results"
+            class="sp-results relative h-[min(20rem,46dvh)] overflow-y-auto overscroll-contain p-2"
             role="listbox"
             aria-label="Results"
           >
@@ -398,7 +398,7 @@ export default function SearchDialog({
                   return (
                     <Fragment key={item.key}>
                       {caption && (
-                        <p aria-hidden="true" class="sp-group mx-2 mt-1.5 mb-1 text-[0.75rem] font-semibold text-muted">
+                        <p aria-hidden="true" class="sp-group mx-2 mt-1.5 mb-1 not-nth-2:mt-3 text-[0.75rem] font-semibold text-muted">
                           {caption}
                         </p>
                       )}
@@ -411,8 +411,8 @@ export default function SearchDialog({
                           // Whole class strings: the Tailwind Prettier plugin
                           // trims the space a template would join them by.
                           item.kind === 'person'
-                            ? 'sp-row PropFLIP sp-person'
-                            : 'sp-row PropFLIP'
+                            ? 'sp-row PropFLIP sp-person relative z-1 box-border flex min-h-11 cursor-pointer items-center gap-3 p-2 py-1 text-inherit no-underline decoration-auto [--r:var(--r-tile)]'
+                            : 'sp-row PropFLIP relative z-1 flex cursor-pointer items-center gap-3 p-2 text-inherit no-underline decoration-auto [--r:var(--r-tile)]'
                         }
                         role="option"
                         aria-selected={selected}
@@ -458,7 +458,7 @@ export default function SearchDialog({
                           <>
                             <img
                               alt=""
-                              class="sp-thumb"
+                              class="sp-thumb size-10 flex-none rounded-(--r-thumb) object-cover outline-1 -outline-offset-1 outline-(--hairline)"
                               height="40"
                               loading="lazy"
                               src={item.episode.episodeThumbnail}

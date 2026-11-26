@@ -117,10 +117,13 @@ describe('SearchDialog', () => {
     expect(screen.getByText('2 results')).toBeInTheDocument();
     // The typed part stays plain; the completion is bold.
     // An episode row glides too, and is not a person row.
-    expect([...screen.getAllByRole('option')[0]!.classList]).toEqual([
+    // (The hook classes come first; the row's utilities follow them.)
+    const episodeRow = screen.getAllByRole('option')[0]!;
+    expect([...episodeRow.classList].slice(0, 2)).toEqual([
       'sp-row',
       'PropFLIP'
     ]);
+    expect(episodeRow).not.toHaveClass('sp-person');
     const title = screen.getAllByRole('option')[0]!.querySelector('.sp-title')!;
     expect(title.querySelector('b')?.textContent).toBe(' One');
   });
@@ -183,7 +186,7 @@ describe('SearchDialog', () => {
     expect(options[1]).toHaveAttribute('aria-selected', 'true');
     // Each person row keeps the row, glide and person classes apart.
     for (const option of options) {
-      expect([...option.classList]).toEqual([
+      expect([...option.classList].slice(0, 3)).toEqual([
         'sp-row',
         'PropFLIP',
         'sp-person'

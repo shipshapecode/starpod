@@ -62,7 +62,11 @@ const credit =
   </h3>
 
   <div
-    class="host-list"
+    class:list={[
+      'host-list',
+      anchored &&
+        'lg:mt-[26px] lg:flex lg:min-h-[calc(var(--hosts,1)*46px-6px)] lg:items-start'
+    ]}
     {...{ 'data-⚓️-name': anchored ? '--rail-hosts' : undefined }}
   >
     {
@@ -74,7 +78,8 @@ const credit =
           <Row
             class:list={[
               'host-row text-ink mb-3 flex items-center font-semibold',
-              anchored && 'rail-host'
+              anchored &&
+                'rail-host lg:m-0 lg:block lg:size-10 lg:flex-none lg:rounded-[50%] lg:[transition:background-color_var(--quick)]'
             ]}
             data-speaks-as={host.name}
             data-voice={index < 2 ? index : undefined}
@@ -108,7 +113,10 @@ const credit =
               )}
             </span>
             <span
-              class={slot && 'rail-host-name'}
+              class={
+                slot &&
+                'rail-host-name lg:pointer-events-none lg:mt-2.5 lg:ml-13 lg:whitespace-nowrap lg:opacity-0'
+              }
               {...{
                 'data-⚓️-to': slot,
                 'data-⚓️-align-top': on,
@@ -128,7 +136,7 @@ const credit =
     anchored && credit && (
       <p
         aria-hidden="true"
-        class="host-credit"
+        class="host-credit lg:text-ink lg:pointer-events-none lg:box-border lg:flex lg:min-h-10 lg:items-center lg:text-[0.8125rem] lg:leading-[1.25] lg:font-[650] lg:text-balance"
         {...{
           'data-⚓️-to': '--rail-hosts',
           'data-⚓️-align-top': '',
