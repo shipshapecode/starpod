@@ -114,7 +114,7 @@ const cast = await Promise.all(
 
   <div class="stage-meta min-w-0 [grid-area:meta]">
     <Heading
-      class="stage-title mb-3 max-w-title font-(family-name:--font-display) text-[length:clamp(1.75rem,1.1rem+2.4vw,3.25rem)] leading-[1.04] font-bold tracking-tight"
+      class="stage-title mb-3 max-w-title font-(family-name:--font-display) text-[length:clamp(1.75rem,1.1rem+2.4vw,3.25rem)] leading-none font-bold tracking-tight"
       id={titleId}
       style={`view-transition-name: vt-${dasherize(episode.title)}`}
     >
@@ -143,7 +143,7 @@ const cast = await Promise.all(
               data-voice={person.voice ?? 'none'}
             >
               <PersonFace src={person.src} />
-              <span class="flex flex-col leading-[1.25]">
+              <span class="flex flex-col leading-snug">
                 <span class="cast-name text-ink font-semibold">{person.name}</span>
                 <span class="text-muted text-xs leading-4 font-semibold">
                   {person.guest ? 'Guest' : 'Host'}
@@ -155,7 +155,7 @@ const cast = await Promise.all(
       )
     }
     <Sponsors sponsors={sponsors} />
-    <p class="stage-desc mb-5 max-w-[62ch] text-xl text-text">{episode.description}</p>
+    <p class="stage-desc mb-5 max-w-lead text-xl text-text">{episode.description}</p>
     <StageControls client:load episode={playable} part="actions" />
     {
       variant === 'feature' && (

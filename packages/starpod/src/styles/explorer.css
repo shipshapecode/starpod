@@ -966,8 +966,8 @@
     (var(--xp-w) - (var(--xp-cols) - 1) * var(--xp-gap-x)) / var(--xp-cols)
   );
   --xp-facts-lh: calc(var(--text-sm) * var(--leading-snug));
-  --xp-title-lh: calc(var(--xp-title-size) * 1.02);
-  --xp-desc-lh: calc(var(--text-base) * 1.5);
+  --xp-title-lh: calc(var(--xp-title-size) * var(--leading-none));
+  --xp-desc-lh: calc(var(--text-base) * var(--leading-normal));
   --xp-text-h: calc(var(--xp-facts-lh) + 0.3rem + 3 * var(--xp-title-lh));
   display: grid;
   grid-template-columns: repeat(var(--xp-cols), minmax(0, 1fr));
@@ -1591,7 +1591,7 @@
   font-size: var(--xp-title-size);
   font-stretch: 78%;
   font-weight: var(--font-weight-extrabold);
-  line-height: 1.02;
+  line-height: var(--leading-none);
   text-transform: uppercase;
 }
 
@@ -2260,7 +2260,7 @@
 }
 
 :is(.xp-card[data-on], .xp-fading-detail) .xp-desc {
-  max-width: 62ch;
+  max-width: var(--container-lead);
   margin-bottom: 1.1rem;
   -webkit-line-clamp: unset;
 }
@@ -2528,12 +2528,13 @@
   /* Three lines of description, a line to resume from (when there is
      one), and the row of actions. */
   .xp-closeup {
-    --xp-cu-body-h: calc(3 * var(--text-base) * 1.5 + 12px + 44px);
+    --xp-cu-body-h: calc(3 * var(--text-base) * var(--leading-normal) + 12px + 44px);
   }
 
   .xp-closeup[data-resume] {
     --xp-cu-body-h: calc(
-      3 * var(--text-base) * 1.5 + 12px + var(--text-md) * 1.4 + 8px + 44px
+      3 * var(--text-base) * var(--leading-normal) + 12px +
+        var(--text-md) * var(--leading-normal) + 8px + 44px
     );
   }
 
@@ -2619,7 +2620,7 @@
     flex: none;
     margin: 0 0 8px;
     overflow: hidden;
-    line-height: 1.4;
+    line-height: var(--leading-normal);
     text-overflow: ellipsis;
     white-space: nowrap;
   }

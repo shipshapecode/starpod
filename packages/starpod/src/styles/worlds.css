@@ -19,7 +19,7 @@
 
 :root[data-world='stage'] .stage-title {
   font-size: clamp(2rem, 1.2rem + 3vw, 4rem);
-  line-height: 0.95;
+  line-height: var(--leading-none);
   max-width: var(--container-headline);
 }
 
@@ -40,14 +40,14 @@
   font-family: var(--font-voice-0);
   font-stretch: 72%;
   font-weight: var(--font-weight-heavy);
-  font-size: 1.15rem;
+  font-size: var(--text-2xl);
   text-transform: uppercase;
 }
 
 :root[data-world='stage'] .cast-member[data-voice='1'] .cast-name {
   color: var(--voice-1);
   font-family: var(--font-voice-1);
-  font-size: 1.1rem;
+  font-size: var(--text-xl);
 }
 
 /* Phones: the title and Play come first; once this episode is in the
@@ -214,7 +214,7 @@
 }
 
 :root[data-world='stage'] .script-line[data-d='-2'] {
-  --size: 1.15rem;
+  --size: var(--text-2xl);
   opacity: 0.62;
 }
 
@@ -226,7 +226,7 @@
 /* Spoken lines don't only dim: they shrink, narrow, and soften back into
    the page. */
 :root[data-world='stage'] .script-line:is([data-d='-3'], [data-d='-4'], [data-d='-5']) {
-  --size: 0.9rem;
+  --size: var(--text-md);
   opacity: 0.4;
   filter: blur(0.4px);
   letter-spacing: var(--tracking-snug);
@@ -321,7 +321,7 @@
 :root[data-world='stage'] .script-line[data-v='none'][data-d='0'] {
   font-weight: var(--font-weight-bold);
   letter-spacing: -0.02em;
-  line-height: 1.02;
+  line-height: var(--leading-none);
 }
 
 /* Phones: the script's height limits. They come after the base script

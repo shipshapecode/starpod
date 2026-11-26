@@ -96,7 +96,7 @@ const number =
       Latest episode
     </p>
     <h2
-      class="xp-hero-title m-0 mb-[0.85rem] font-(family-name:--font-display) max-w-headline text-[clamp(2rem,1.2rem+2.6vw,3.6rem)] leading-[0.95] font-extrabold tracking-snug uppercase font-stretch-[72%]"
+      class="xp-hero-title m-0 mb-[0.85rem] font-(family-name:--font-display) max-w-headline text-[clamp(2rem,1.2rem+2.6vw,3.6rem)] leading-none font-extrabold tracking-snug uppercase font-stretch-[72%]"
       id="xp-hero-title"
     >
       <a
@@ -143,7 +143,7 @@ const number =
         </ul>
       )
     }
-    <p class="xp-hero-desc mb-5 line-clamp-4 max-w-[58ch] text-lg text-text">{episode.description}</p>
+    <p class="xp-hero-desc mb-5 line-clamp-4 max-w-lead text-lg text-text">{episode.description}</p>
     <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
       <FullPlayButton client:load episode={playable} look="pill" />
       <a class="xp-hero-link text-accent-ink [&_svg]:transition-[translate] [&_svg]:duration-300 [&_svg]:ease-(--ease-spring) [&:hover_svg]:translate-x-[3px] [&:hover_svg]:-translate-y-[3px] inline-flex items-center gap-[0.35rem] font-demibold no-underline" href={`/${episode.episodeSlug}`}>

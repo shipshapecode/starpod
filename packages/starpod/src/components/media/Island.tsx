@@ -830,7 +830,7 @@ export default function Island() {
   const watching = activeMedium.value === 'watch';
   const name = (
     <>
-      <b class="truncate font-(family-name:--font-display) text-[length:var(--title-size,14px)] leading-[1.15] font-demibold tracking-snug normal-nums">
+      <b class="truncate font-(family-name:--font-display) text-[length:var(--title-size,14px)] leading-tight font-demibold tracking-snug normal-nums">
         {episode.title}
       </b>
       <span class="truncate font-(family-name:--font-ui) text-xs leading-tight font-medium text-muted tabular-nums">

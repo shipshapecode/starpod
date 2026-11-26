@@ -134,7 +134,7 @@ export default function Scrubber({ duration, episode, time }: Props) {
             {cue?.n && <span class="font-semibold text-muted"> · {cue.n}</span>}
           </span>
           {cue && (
-            <span class="scrub-preview-line line-clamp-3 text-md leading-[1.35] text-pretty text-ink" data-v={cue.v ?? 'none'}>
+            <span class="scrub-preview-line line-clamp-3 text-md leading-snug text-pretty text-ink" data-v={cue.v ?? 'none'}>
               {cue.t}
             </span>
           )}

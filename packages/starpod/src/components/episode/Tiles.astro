@@ -33,7 +33,7 @@ const { items, label } = Astro.props;
               src={item.art}
               width="320"
             />
-            <span class="absolute top-2 left-2 z-1 rounded-full bg-[color-mix(in_oklch,var(--media-shade)_50%,transparent)] px-2 py-[3px] text-xs leading-4 font-demibold text-on-media tabular-nums backdrop-blur-[10px] backdrop-saturate-140">{item.number}</span>
+            <span class="absolute top-2 left-2 z-1 rounded-full bg-[color-mix(in_oklch,var(--media-shade)_50%,transparent)] px-2 py-[3px] text-xs leading-4 font-demibold text-on-media tabular-nums backdrop-blur-sm backdrop-saturate-140">{item.number}</span>
           </span>
           <span class="line-clamp-2 px-1 text-md leading-5 font-semibold">{item.title}</span>
         </a>

@@ -1129,7 +1129,7 @@ button.ep-person-who:focus-visible::after {
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: 1.1rem;
+  font-size: var(--text-xl);
   cursor: pointer;
   transition:
     opacity 200ms var(--ease-out),
