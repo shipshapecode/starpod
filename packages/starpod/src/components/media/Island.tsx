@@ -498,12 +498,15 @@ function SpeedButton() {
   return (
     <button
       aria-label={`Playback speed ${playbackRate.value}×, change`}
-      class="text-button island-speed"
-      data-props-for="pointer-local"
+      class="icon-button island-speed"
       onClick={() => setRate(RATES[(RATES.indexOf(playbackRate.value) + 1) % RATES.length]!)}
       type="button"
     >
-      {playbackRate.value}×
+      {/* Painted like the icons beside it: --icon-a/--icon-b fade into the
+          gradient on hover and focus (interactions.css). */}
+      <span class="bg-linear-to-b from-(--icon-a) to-(--icon-b) bg-clip-text text-sm font-demibold text-transparent tabular-nums">
+        {playbackRate.value}×
+      </span>
     </button>
   );
 }
