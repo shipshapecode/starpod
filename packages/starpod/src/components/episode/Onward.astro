@@ -48,7 +48,7 @@ const pager = [
               drawn just inside it, above the picture. */}
           <img
             alt=""
-            class="ep-card-art size-18 flex-none rounded-tile bg-raised object-cover outline-1 -outline-offset-1 outline-(--hairline)"
+            class="ep-card-art size-18 flex-none rounded-tile bg-raised object-cover outline-1 -outline-offset-1 outline-hairline"
             height="72"
             loading="lazy"
             src={card.art}
@@ -58,7 +58,7 @@ const pager = [
             <span class="text-sm leading-4.5 font-medium text-muted tabular-nums">
               {card.label} · {card.number}
             </span>
-            <span class="ep-card-title font-(family-name:--font-display) text-2xl leading-none font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
+            <span class="ep-card-title font-display text-2xl leading-none font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
           </span>
         </a>
       ))}
@@ -75,7 +75,7 @@ const pager = [
           shadows are never cut. */}
       <ul
         aria-label="Related episodes"
-        class="ep-shelf -mx-(--gutter) grid snap-x snap-mandatory auto-cols-[calc((100cqi-var(--ep-shown)*16px)/(var(--ep-shown)+0.4))] grid-flow-col scroll-px-(--gutter) gap-4 overflow-x-auto overscroll-x-contain px-(--gutter) py-4 [--ep-shown:2] @min-[560px]/ep-shelf:[--ep-shown:3] @min-[860px]/ep-shelf:[--ep-shown:4] @min-[1160px]/ep-shelf:[--ep-shown:5]"
+        class="ep-shelf -mx-gutter grid snap-x snap-mandatory auto-cols-[calc((100cqi-var(--ep-shown)*16px)/(var(--ep-shown)+0.4))] grid-flow-col scroll-px-gutter gap-4 overflow-x-auto overscroll-x-contain px-gutter py-4 [--ep-shown:2] @min-[560px]/ep-shelf:[--ep-shown:3] @min-[860px]/ep-shelf:[--ep-shown:4] @min-[1160px]/ep-shelf:[--ep-shown:5]"
       >
         {related.map((card) => (
           <li class="ep-shelf-item snap-start">
@@ -88,7 +88,7 @@ const pager = [
               {/* Imagery leads; the facts sit 8px under it and 4px in. */}
               <img
                 alt=""
-                class="ep-card-art mb-0.5 block aspect-square h-auto w-full rounded-tile bg-raised object-cover outline-1 -outline-offset-1 outline-(--hairline)"
+                class="ep-card-art mb-0.5 block aspect-square h-auto w-full rounded-tile bg-raised object-cover outline-1 -outline-offset-1 outline-hairline"
                 height="320"
                 loading="lazy"
                 src={card.art}
@@ -97,7 +97,7 @@ const pager = [
               <span class="mx-1 text-sm leading-4.5 font-medium text-muted tabular-nums">
                 {card.number} · {formatDuration(card.duration)}
               </span>
-              <span class="ep-card-title mx-1 font-(family-name:--font-display) text-2xl leading-none font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
+              <span class="ep-card-title mx-1 font-display text-2xl leading-none font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
               {card.reason && (
                 <span
                   class={`ep-card-reason mx-1 inline-flex items-center gap-1.5 self-start rounded-full bg-accent-soft py-0.5 pr-2.5 text-xs leading-4 font-demibold text-accent-ink ${card.face ? 'pl-0.5' : 'pl-2.5'}`}

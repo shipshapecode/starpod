@@ -30,17 +30,17 @@ const segThumb = {
 ---
 
 <div
-  class="xp-bar sticky top-(--xp-stick) z-20 mx-[calc(var(--gutter)*-1)] mt-0 mb-5.5 [container:xp-bar/scroll-state]"
+  class="xp-bar sticky top-(--xp-stick) z-20 -mx-gutter mt-0 mb-5.5 [container:xp-bar/scroll-state]"
   data-xp-bar
 >
   <form
     aria-label="Filter episodes"
-    class="xp-bar-in bg-ground/88 m-0 grid gap-2 px-(--gutter) py-3 backdrop-blur-glass backdrop-saturate-140 transition-[background-color,box-shadow] duration-300 ease-(--ease-out)"
+    class="xp-bar-in bg-ground/88 m-0 grid gap-2 px-gutter py-3 backdrop-blur-glass backdrop-saturate-140 transition-[background-color,box-shadow] duration-300 ease-out"
     role="search"
   >
     <div class="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-2">
       <label
-        class="xp-search border-line-strong bg-surface text-muted focus-within:border-accent focus-within:shadow-[0_0_0_4px_var(--accent-soft)] flex h-10 min-w-0 flex-[1_1_10rem] items-center gap-2 rounded-full border px-4 [transition:border-color_var(--quick),box-shadow_var(--quick)]"
+        class="xp-search border-line-strong bg-surface text-muted focus-within:border-accent focus-within:ring-4 focus-within:ring-accent-soft flex h-10 min-w-0 flex-[1_1_10rem] items-center gap-2 rounded-full border px-4 transition-[border-color,box-shadow]"
       >
         <SearchIcon size={18} />
         <span class="sr-only">Search episodes</span>
@@ -79,7 +79,7 @@ const segThumb = {
     </div>
 
     <div
-      class="xp-chips -my-1.5 mx-[calc(var(--gutter)*-1)] flex scroll-px-(--gutter) items-center gap-2 overflow-x-auto overscroll-x-contain px-(--gutter) py-1.5 [container:xp-chips/scroll-state] [scrollbar-width:none]"
+      class="xp-chips -my-1.5 -mx-gutter flex scroll-px-gutter items-center gap-2 overflow-x-auto overscroll-x-contain px-gutter py-1.5 [container:xp-chips/scroll-state] [scrollbar-width:none]"
     >
       <fieldset class="xp-seg" {...segRoot}>
         <legend class="sr-only">Kind</legend>
@@ -123,7 +123,7 @@ const segThumb = {
           <ChevronIcon class="xp-chevron" size={16} />
         </button>
         <button
-          class="xp-unset bg-on-ink/16 text-on-ink hover:bg-on-ink/30 focus-visible:outline-accent absolute inset-y-2 end-2 grid w-6 cursor-pointer place-items-center rounded-[50%] border-0 p-0 [transition:background-color_var(--quick)] focus-visible:outline-2 focus-visible:outline-offset-2"
+          class="xp-unset bg-on-ink/16 text-on-ink hover:bg-on-ink/30 focus-visible:outline-accent absolute inset-y-2 end-2 grid w-6 cursor-pointer place-items-center rounded-[50%] border-0 p-0 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
           data-xp-unset="year" hidden type="button">
           <CloseIcon size={14} />
           <span class="sr-only">Any year</span>
@@ -146,7 +146,7 @@ const segThumb = {
               <ChevronIcon class="xp-chevron" size={16} />
             </button>
             <button
-          class="xp-unset bg-on-ink/16 text-on-ink hover:bg-on-ink/30 focus-visible:outline-accent absolute inset-y-2 end-2 grid w-6 cursor-pointer place-items-center rounded-[50%] border-0 p-0 [transition:background-color_var(--quick)] focus-visible:outline-2 focus-visible:outline-offset-2"
+          class="xp-unset bg-on-ink/16 text-on-ink hover:bg-on-ink/30 focus-visible:outline-accent absolute inset-y-2 end-2 grid w-6 cursor-pointer place-items-center rounded-[50%] border-0 p-0 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
           data-xp-unset="guest" hidden type="button">
               <CloseIcon size={14} />
               <span class="sr-only">Anyone</span>
@@ -155,7 +155,7 @@ const segThumb = {
         )
       }
       <button
-        class="xp-reset text-accent-ink inline-flex h-10 flex-none cursor-pointer items-center gap-1.5 rounded-full border border-transparent bg-transparent px-[0.9rem] text-sm font-demibold whitespace-nowrap [transition:background-color_var(--quick),border-color_var(--quick),color_var(--quick)] [&:hover]:underline [&:hover]:underline-offset-[0.2em]"
+        class="xp-reset text-accent-ink inline-flex h-10 flex-none cursor-pointer items-center gap-1.5 rounded-full border border-transparent bg-transparent px-[0.9rem] text-sm font-demibold whitespace-nowrap transition-colors [&:hover]:underline [&:hover]:underline-offset-[0.2em]"
         data-xp-reset
         hidden
         type="reset"

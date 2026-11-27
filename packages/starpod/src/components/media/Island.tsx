@@ -474,7 +474,7 @@ function Stations({ popover = false }: { popover?: boolean }) {
       )}
       {ISLAND_HOMES.map((home, i) => (
         <label
-          class={`relative z-1 cursor-pointer rounded-full px-3 py-1.5 font-(family-name:--font-ui) text-xs leading-none font-semibold normal-nums whitespace-nowrap text-muted [transition:color_var(--quick)] has-checked:text-on-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent ${popover ? 'has-checked:bg-ink' : 'has-checked:anchor-name-[--home-on]'}`}
+          class={`relative z-1 cursor-pointer rounded-full px-3 py-1.5 font-ui text-xs leading-none font-semibold normal-nums whitespace-nowrap text-muted transition-colors has-checked:text-on-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent ${popover ? 'has-checked:bg-ink' : 'has-checked:anchor-name-[--home-on]'}`}
           data-home={home}
           key={home}
         >
@@ -573,7 +573,7 @@ function More({ docked, episode, following }: { docked: boolean; episode: Playab
         <MoreIcon class="island-more-dots" size={20} />
       </button>
       <div class="island-more-pop" id="island-more" popover="auto">
-        <div class="island-more-in relative grid justify-items-start gap-3 rounded-tray border border-(--hairline) bg-surface p-3 text-ink shadow-float">
+        <div class="island-more-in relative grid justify-items-start gap-3 rounded-tray border border-hairline bg-surface p-3 text-ink shadow-float">
           <p class="island-more-times m-0 ml-1 gap-2 text-xs text-muted tabular-nums">
             <span>{elapsed}</span>
             <span>{remaining}</span>
@@ -830,10 +830,10 @@ export default function Island() {
   const watching = activeMedium.value === 'watch';
   const name = (
     <>
-      <b class="truncate font-(family-name:--font-display) text-[length:var(--title-size,14px)] leading-tight font-demibold tracking-snug normal-nums">
+      <b class="truncate font-display text-[length:var(--title-size,14px)] leading-tight font-demibold tracking-snug normal-nums">
         {episode.title}
       </b>
-      <span class="truncate font-(family-name:--font-ui) text-xs leading-tight font-medium text-muted tabular-nums">
+      <span class="truncate font-ui text-xs leading-tight font-medium text-muted tabular-nums">
         {episode.episodeNumber !== 'Bonus' ? `Ep ${episode.episodeNumber}` : 'Bonus'}
         {' · '}
         {watching ? 'Watching' : 'Listening'}
@@ -936,7 +936,7 @@ export default function Island() {
             </a>
           )}
           <a
-            class="island-open hidden w-max items-center gap-1.5 text-sm font-semibold text-muted no-underline decoration-auto [transition:color_var(--quick)] hover:text-ink"
+            class="island-open hidden w-max items-center gap-1.5 text-sm font-semibold text-muted no-underline decoration-auto transition-colors hover:text-ink"
             href={href}
           >
             Open the episode

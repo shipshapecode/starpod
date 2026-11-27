@@ -103,7 +103,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
                 <span aria-hidden="true">First speaks</span>
                 <button
                   aria-label={`First speaks at ${chipLabel(person.firstLine)}`}
-                  class="ep-chip inline-flex h-8 cursor-pointer items-center rounded-full bg-accent-soft px-3 text-sm font-demibold whitespace-nowrap text-accent-ink tabular-nums [transition:background-color_var(--quick)] hover:bg-[color-mix(in_oklch,var(--accent)_24%,var(--accent-soft))]"
+                  class="ep-chip inline-flex h-8 cursor-pointer items-center rounded-full bg-accent-soft px-3 text-sm font-demibold whitespace-nowrap text-accent-ink tabular-nums transition-colors hover:bg-[color-mix(in_oklch,var(--accent)_24%,var(--accent-soft))]"
                   data-seek={person.firstLine}
                   type="button"
                 >
@@ -112,7 +112,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
               </span>
             ) : (
               <span
-                class="ep-chip inline-flex h-8 items-center rounded-full bg-raised px-3 text-sm font-demibold whitespace-nowrap text-muted tabular-nums [transition:background-color_var(--quick)] max-sm:col-1 max-sm:row-2 max-sm:ms-19.5 max-sm:justify-self-start max-sm:data-counted:hidden"
+                class="ep-chip inline-flex h-8 items-center rounded-full bg-raised px-3 text-sm font-demibold whitespace-nowrap text-muted tabular-nums transition-colors max-sm:col-1 max-sm:row-2 max-sm:ms-19.5 max-sm:justify-self-start max-sm:data-counted:hidden"
                 data-counted={person.counted ? '' : undefined}
               >
                 {person.count} {person.count === 1 ? 'ep' : 'eps'}
@@ -121,7 +121,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
             {opens && (
               <svg
                 aria-hidden="true"
-                class="flex-none text-muted transition-[rotate] duration-[calc(480ms*var(--slomo))] ease-(--ease-spring) in-data-open:rotate-180 max-sm:col-2 max-sm:row-1"
+                class="flex-none text-muted transition-[rotate] duration-[calc(480ms*var(--slomo))] ease-spring in-data-open:rotate-180 max-sm:col-2 max-sm:row-1"
                 fill="none"
                 height="16"
                 viewBox="0 0 16 16"

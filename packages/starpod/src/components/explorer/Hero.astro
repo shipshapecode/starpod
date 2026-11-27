@@ -47,7 +47,7 @@ const number =
 >
   <div
     aria-hidden="true"
-    class="xp-hero-glow pointer-events-none -z-1 aspect-video translate-x-[calc(var(--px)*-56px)] translate-y-[calc(var(--py)*-40px+16px)] scale-115 bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--live-img-accent,transparent)_var(--xp-glow,45%),transparent),transparent)] transition-[translate] duration-700 ease-(--ease-out) [grid-area:media]"
+    class="xp-hero-glow pointer-events-none -z-1 aspect-video translate-x-[calc(var(--px)*-56px)] translate-y-[calc(var(--py)*-40px+16px)] scale-115 bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--live-img-accent,transparent)_var(--xp-glow,45%),transparent),transparent)] transition-[translate] duration-700 ease-out [grid-area:media]"
   ></div>
   <div
     class="xp-hero-media bg-media-ground relative isolate aspect-video origin-top overflow-hidden rounded-card shadow-soft [grid-area:media]"
@@ -58,7 +58,7 @@ const number =
     </div>
     <img
       alt=""
-      class="xp-hero-art absolute top-1/2 left-1/2 aspect-square h-[78%] w-auto translate-x-[calc(-50%+var(--px)*18px)] translate-y-[calc(-50%+var(--py)*12px)] rounded-tile object-cover shadow-float outline-1 -outline-offset-1 outline-(--hairline) [transition:scale_700ms_var(--ease-out),translate_500ms_var(--ease-out)]"
+      class="xp-hero-art absolute top-1/2 left-1/2 aspect-square h-[78%] w-auto translate-x-[calc(-50%+var(--px)*18px)] translate-y-[calc(-50%+var(--py)*12px)] rounded-tile object-cover shadow-float outline-1 -outline-offset-1 outline-hairline [transition:scale_700ms_var(--ease-out),translate_500ms_var(--ease-out)]"
       data-vt-art
       decoding="async"
       fetchpriority="high"
@@ -77,7 +77,7 @@ const number =
     </span>
     <span
       aria-hidden="true"
-      class="xp-hero-progress absolute inset-x-0 bottom-0 z-3 h-[3px] origin-left scale-x-0 bg-[linear-gradient(90deg,var(--glow-b),var(--glow-a))] transition-[scale] duration-250 ease-linear"
+      class="xp-hero-progress absolute inset-x-0 bottom-0 z-3 h-[3px] origin-left scale-x-0 bg-linear-90/srgb from-glow-b to-glow-a transition-[scale] duration-250 ease-linear"
     ></span>
   </div>
 
@@ -96,11 +96,11 @@ const number =
       Latest episode
     </p>
     <h2
-      class="xp-hero-title m-0 mb-[0.85rem] font-(family-name:--font-display) max-w-headline text-[clamp(2rem,1.2rem+2.6vw,3.6rem)] leading-none font-extrabold tracking-snug uppercase font-stretch-[72%]"
+      class="xp-hero-title m-0 mb-[0.85rem] font-display max-w-headline text-[clamp(2rem,1.2rem+2.6vw,3.6rem)] leading-none font-extrabold tracking-snug uppercase font-stretch-[72%]"
       id="xp-hero-title"
     >
       <a
-        class="no-underline decoration-auto transition-[color] duration-300 ease-(--ease-out) hover:text-voice-0"
+        class="no-underline decoration-auto transition-[color] duration-300 ease-out hover:text-voice-0"
         data-vt-title
         href={`/${episode.episodeSlug}`}>{episode.title}</a>
     </h2>
@@ -146,7 +146,7 @@ const number =
     <p class="xp-hero-desc mb-5 line-clamp-4 max-w-lead text-lg text-text">{episode.description}</p>
     <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
       <FullPlayButton client:load episode={playable} look="pill" />
-      <a class="xp-hero-link text-accent-ink [&_svg]:transition-[translate] [&_svg]:duration-300 [&_svg]:ease-(--ease-spring) [&:hover_svg]:translate-x-[3px] [&:hover_svg]:-translate-y-[3px] inline-flex items-center gap-[0.35rem] font-demibold no-underline" href={`/${episode.episodeSlug}`}>
+      <a class="xp-hero-link text-accent-ink [&_svg]:transition-[translate] [&_svg]:duration-300 [&_svg]:ease-spring [&:hover_svg]:translate-x-[3px] [&:hover_svg]:-translate-y-[3px] inline-flex items-center gap-[0.35rem] font-demibold no-underline" href={`/${episode.episodeSlug}`}>
         Show notes and transcript
         <ArrowOutIcon size={16} />
       </a>

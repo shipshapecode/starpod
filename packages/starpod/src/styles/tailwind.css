@@ -88,10 +88,15 @@
   /* The frosted bars and trays, and the island's deeper frost. */
   --blur-glass: 14px;
   --blur-haze: 28px;
+
+  /* Every transition-* utility, and var(--quick) in the stylesheets. */
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /*
-  Shadows and radii are the tokens in tokens.css, which follow the scheme.
+  Shadows, radii, easings, fonts and the layout spacing are the tokens in
+  tokens.css (the colours and shadows follow the scheme).
   `inline reference` writes var(--shadow-soft) straight into the utility
   and emits no theme variable, so a key named like its token
   (--shadow-soft, --radius-frame) can't end up defined as itself.
@@ -106,6 +111,20 @@
   --radius-tile: var(--r-tile);
   --radius-tray: var(--r-tray);
   --radius-card: var(--r-card);
+
+  --ease-*: initial;
+  --ease-out: var(--ease-out);
+  --ease-spring: var(--ease-spring);
+  --ease-halo: var(--ease-halo);
+
+  --font-ui: var(--font-ui);
+  --font-display: var(--font-display);
+  --font-voice-0: var(--font-voice-0);
+  --font-voice-1: var(--font-voice-1);
+
+  --spacing-gutter: var(--gutter);
+  --spacing-topbar: var(--topbar-h);
+  --spacing-tabbar: var(--tabbar-h);
 }
 
 /*
@@ -136,6 +155,7 @@
   --color-on-media-ink: var(--on-media-ink);
   --color-media-shade: var(--media-shade);
   --color-media-glass: var(--media-glass);
+  --color-hairline: var(--hairline);
   --color-iris-100: var(--iris-100);
   --color-iris-200: var(--iris-200);
   --color-iris-300: var(--iris-300);

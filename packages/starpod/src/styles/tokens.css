@@ -111,8 +111,10 @@
   /* The hairline drawn over every image and portrait, so light and dark art
      meet the page with the same edge. */
   --hairline: color-mix(in oklch, var(--ink) 10%, transparent);
-  /* Colour and fill changes on small controls. */
-  --quick: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Colour and fill changes on small controls: Tailwind's default
+     transition (tailwind.css), so transition-colors and var(--quick) match. */
+  --quick: var(--default-transition-duration)
+    var(--default-transition-timing-function);
   --rail-w: 0px;
   --topbar-h: 60px;
   --tabbar-h: calc(62px + env(safe-area-inset-bottom));

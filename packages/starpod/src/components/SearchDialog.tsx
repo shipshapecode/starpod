@@ -333,7 +333,7 @@ export default function SearchDialog({
             data-props-for="pointer-local"
           />
           {/* Search Input */}
-          <div class="sp-field flex items-center border-b border-line px-3 transition-[border-color] duration-200 ease-(--ease-out) focus-within:border-accent">
+          <div class="sp-field flex items-center border-b border-line px-3 transition-[border-color] duration-200 ease-out focus-within:border-accent">
             <span
               class="search-icon text-muted h-5 w-5 shrink-0"
               aria-hidden="true"
@@ -458,7 +458,7 @@ export default function SearchDialog({
                           <>
                             <img
                               alt=""
-                              class="sp-thumb size-10 flex-none rounded-thumb object-cover outline-1 -outline-offset-1 outline-(--hairline)"
+                              class="sp-thumb size-10 flex-none rounded-thumb object-cover outline-1 -outline-offset-1 outline-hairline"
                               height="40"
                               loading="lazy"
                               src={item.episode.episodeThumbnail}

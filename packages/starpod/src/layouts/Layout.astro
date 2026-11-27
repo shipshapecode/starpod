@@ -186,11 +186,11 @@ const publicationLinkTag =
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-chrome px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-(--ease-out) focus:translate-y-0" href="#main">Skip to content</a>
+    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-chrome px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-out focus:translate-y-0" href="#main">Skip to content</a>
     <!-- The island sits at the end of the page and this reaches it in one
          step (it takes focus, its title is next). It is shown only while an
          episode is loaded, when there is an island (shell.css). -->
-    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-chrome px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-(--ease-out) focus:translate-y-0" href="#player">Skip to the player</a>
+    <a class="skip-link fixed top-2 left-2 text-on-ink z-100 rounded-chrome px-4 py-[0.6rem] bg-ink -translate-y-[200%] transition-[translate] duration-200 ease-out focus:translate-y-0" href="#player">Skip to the player</a>
 
     <div class="app grid min-h-dvh grid-cols-[minmax(0,1fr)] content-start lg:grid-cols-[var(--rail-w)_minmax(0,1fr)]">
       <!-- The divider between the rail and the page, and the only anchor the
@@ -266,7 +266,7 @@ const publicationLinkTag =
 
           <div class="rail-about lg:flex lg:w-[calc(var(--rail-open)-44px)] lg:origin-top-left lg:flex-col lg:gap-5 lg:[transition:opacity_calc(0.3s*var(--slomo))_ease_calc(0.2s*var(--slomo)),scale_calc(0.5s*var(--slomo))_var(--ease-out)_calc(0.15s*var(--slomo)),filter_calc(0.4s*var(--slomo))_ease_calc(0.15s*var(--slomo))]">
             <p
-              class="rail-title font-(family-name:--font-display) text-3xl leading-tight font-bold tracking-snug text-ink"
+              class="rail-title font-display text-3xl leading-tight font-bold tracking-snug text-ink"
             >
               <a class="no-underline" href="/">{show.title}</a>
             </p>
@@ -364,7 +364,7 @@ const publicationLinkTag =
 
       <!-- Top bar (phones, tablets, foldables). -->
       <header
-        class="topbar sticky top-0 z-30 col-span-full box-content flex h-(--topbar-h) items-center gap-3 border-b border-line bg-[color-mix(in_oklch,var(--ground)_86%,transparent)] px-(--gutter) pt-[env(safe-area-inset-top)] backdrop-blur-glass backdrop-saturate-140"
+        class="topbar sticky top-0 z-30 col-span-full box-content flex h-topbar items-center gap-3 border-b border-line bg-ground/86 px-gutter pt-[env(safe-area-inset-top)] backdrop-blur-glass backdrop-saturate-140"
       >
         <!-- The show's artwork, a site's own ShowArtwork as in the rail, is
              the home link. The title goes home too, for a pointer; to the
@@ -391,7 +391,7 @@ const publicationLinkTag =
       <main
         id="main"
         class:list={[
-          'main relative min-w-0 overflow-x-clip p-(--gutter) pb-[calc(var(--dock-h)+var(--tabbar-h)+48px)] lg:col-[2] lg:pb-[calc(var(--dock-h)+64px)]',
+          'main relative min-w-0 overflow-x-clip p-gutter pb-[calc(var(--dock-h)+var(--tabbar-h)+48px)] lg:col-[2] lg:pb-[calc(var(--dock-h)+64px)]',
           !isHome && 'max-w-320'
         ]}
       >
@@ -457,7 +457,7 @@ const publicationLinkTag =
 
     <nav
       aria-label="Main"
-      class="tabbar fixed inset-x-0 bottom-0 z-40 grid h-(--tabbar-h) grid-cols-[repeat(3,1fr)] border-t border-line bg-surface pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
+      class="tabbar fixed inset-x-0 bottom-0 z-40 grid h-tabbar grid-cols-[repeat(3,1fr)] border-t border-line bg-surface pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
     >
       <a aria-current={isHome ? 'page' : undefined} href="/">
         <ListIcon />
@@ -475,7 +475,7 @@ const publicationLinkTag =
         <p class="sheet-title m-0 text-xl font-bold text-ink">Follow {show.title}</p>
         <button
           aria-label="Close"
-          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-full border-0 bg-raised p-0 text-ink [transition:background-color_var(--quick)]"
+          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-full border-0 bg-raised p-0 text-ink transition-colors"
           popovertarget="follow-sheet"
           popovertargetaction="hide"
           type="button"
@@ -490,7 +490,7 @@ const publicationLinkTag =
         <p class="sheet-title m-0 text-xl font-bold text-ink">{show.title}</p>
         <button
           aria-label="Close"
-          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-full border-0 bg-raised p-0 text-ink [transition:background-color_var(--quick)]"
+          class="sheet-close grid size-11 flex-none cursor-pointer place-items-center rounded-full border-0 bg-raised p-0 text-ink transition-colors"
           popovertarget="more-sheet"
           popovertargetaction="hide"
           type="button"
