@@ -665,7 +665,7 @@
   grid-template:
     'station station station station station' 36px
     'art art art art art' var(--art-h)
-    'title title title title title' 64px
+    'title title title title title' auto
     'scrub scrub scrub scrub scrub' 28px
     'prev play next skip .' 64px
     'tools tools tools tools tools' 44px
@@ -691,7 +691,7 @@
     grid-template:
       'station station station station station . queue' 36px
       'art art art art art . queue' var(--art-h)
-      'title title title title title . queue' 72px
+      'title title title title title . queue' auto
       'scrub scrub scrub scrub scrub . queue' 28px
       'prev play next skip tools . queue' 64px
       '. . . . . . queue' auto
@@ -717,7 +717,7 @@
     grid-template:
       'station station station station station . queue' 36px
       'art art art art art . queue' var(--art-h)
-      'title title title title title . queue' 72px
+      'title title title title title . queue' auto
       'scrub scrub scrub scrub scrub . queue' 28px
       'prev play next skip . . queue' 64px
       'tools tools tools tools tools . queue' 44px
@@ -797,7 +797,7 @@
   grid-template:
     'top top top top top top' 44px
     'art art art art art art' var(--art-h)
-    'title title title title title title' 96px
+    'title title title title title title' auto
     'scrub scrub scrub scrub scrub scrub' 44px
     '. prev play next skip .' 64px
     'tools tools tools tools tools tools' 52px
@@ -813,7 +813,7 @@
 /* Narrower than the tools' row (318px), they take two lines. */
 @media (max-width: 359px) {
   :root[data-phone] .island[data-state='card'] {
-    grid-template-rows: 44px var(--art-h) 96px 44px 64px 104px auto auto;
+    grid-template-rows: 44px var(--art-h) auto 44px 64px 104px auto auto;
   }
 
   :root[data-phone] [data-state='card'] .island-tools {
