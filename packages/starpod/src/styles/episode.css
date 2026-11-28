@@ -595,19 +595,12 @@ button.ep-person-who:focus-visible::after {
   margin-inline-start: 4px;
   padding: 0 14px;
   border-radius: 999px;
+  border: 1px solid var(--line-strong);
   background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line-strong);
   color: var(--ink);
   font-size: var(--text-sm);
   font-weight: var(--font-weight-demibold);
   text-decoration: none;
-  transition: box-shadow var(--quick);
-}
-
-@media (hover: hover) {
-  .ep-pill:hover {
-    box-shadow: inset 0 0 0 1px var(--ink);
-  }
 }
 
 /* With guests, the hosts in one line under them. */
@@ -689,9 +682,12 @@ button.ep-person-who:focus-visible::after {
   margin: 0;
 }
 
+/* Hovering the sponsor card draws its pill's outline (interactions.css). */
 @media (hover: hover) {
   .ep-sponsor:hover .ep-pill {
-    box-shadow: inset 0 0 0 1px var(--ink);
+    --halo: 100;
+    --icon-a: var(--glow-a);
+    --icon-b: var(--glow-b);
   }
 }
 
@@ -1212,7 +1208,7 @@ button.ep-person-who:focus-visible::after {
 
 /* The hosts' latest episodes together, once, when every poster's tray
    would have shown the same ones. */
-.ab-host-links .ep-pill {
+.ab-host .ep-pill {
   margin: 0;
 }
 
@@ -1235,7 +1231,8 @@ button.ep-person-who:focus-visible::after {
   }
 }
 
-.ep-send::after {
+/* ::before, since ::after is the outline (interactions.css). */
+.ep-send::before {
   content: '';
   position: absolute;
   inset: auto 1.25rem 6px;

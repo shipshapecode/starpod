@@ -101,7 +101,7 @@ export default function ContactForm() {
 
       <div>
         <button
-          class="button-primary ep-send w-full justify-center disabled:cursor-progress disabled:opacity-70 sm:w-auto"
+          class="button-secondary ep-send w-full justify-center disabled:cursor-progress disabled:opacity-70 sm:w-auto"
           disabled={sending}
           type="submit"
         >

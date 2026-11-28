@@ -151,15 +151,20 @@ const voiceName: Record<number, string> = {
     <section aria-labelledby="hosts-heading" class="mt-16 lg:mt-20">
       <h2 class="section-title" id="hosts-heading">Meet the hosts</h2>
 
-      <ul class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {/* Each poster is a subgrid of six rows (photo, name, stats, bio,
+          episodes, links), so side by side the bios, episodes and links
+          line up even when one host's bio runs longer. The list's row gap is
+          the posters' own 12px (a subgrid's rows share it), and each poster's
+          margin makes up the 24px between stacked posters. */}
+      <ul class="grid grid-cols-1 gap-x-6 gap-y-3 lg:grid-cols-2">
         {
           posters.map((host) => (
             <li
-              class="ab-host ep-reveal flex flex-col overflow-clip rounded-card bg-(--ab-ground)"
+              class="ab-host ep-reveal row-span-6 mb-3 grid grid-cols-1 grid-rows-subgrid overflow-clip rounded-card bg-(--ab-ground) pb-6"
               data-voice={host.voice}
             >
               <div
-                class="ab-host-photo relative aspect-[4/3]"
+                class="ab-host-photo relative row-start-1 aspect-[4/3] max-h-75 w-full"
                 data-props-for="img-color"
                 data-props-to=".ab-host"
               >
@@ -176,34 +181,40 @@ const voiceName: Record<number, string> = {
                 )}
               </div>
 
-              <div class="ab-host-body relative -mt-7 flex flex-col items-start gap-3 px-6 pb-6">
+              {/* Over the photo's faded foot, and sized to the poster (the
+                  wrapper is the container: on the poster itself, containment
+                  would stop it being a subgrid), so the longest one-word name
+                  still fits on one line. */}
+              <div class="@container relative row-start-2 mx-6 -mt-10">
                 <h3
-                  class={`m-0 text-[clamp(1.75rem,4vw,2.5rem)] leading-none text-[var(--person-ring,var(--ink))] ${voiceName[host.voice ?? -1] ?? 'font-extrabold'}`}
+                  class={`m-0 text-[min(2.5rem,100cqi/8.5)] leading-none text-[var(--person-ring,var(--ink))] ${voiceName[host.voice ?? -1] ?? 'font-extrabold'}`}
                 >
                   {host.name}
                 </h3>
-                {host.stats && <p class="person-fact">{host.stats}</p>}
-                {host.bio && <p class="max-w-bio text-text">{host.bio}</p>}
+              </div>
+              {host.stats && <p class="person-fact row-start-3 mx-6">{host.stats}</p>}
+              {host.bio && <p class="row-start-4 mx-6 max-w-bio text-text">{host.bio}</p>}
 
-                {together.length === 0 && host.recent.length > 0 && (
-                  <div class="ab-host-tray box-border grid w-full justify-items-start gap-3 rounded-tray bg-surface/72 px-1 pt-1 pb-3">
-                    <Tiles
-                      items={host.recent}
-                      label={`Latest episodes with ${host.name}`}
-                    />
-                    {host.id && (
-                      <a
-                        aria-label={`All ${host.count} episodes with ${host.name}`}
-                        class="ep-pill"
-                        href={`/#guest=${encodeURIComponent(host.id)}`}
-                      >
-                        All {host.count}
-                        <ArrowOutIcon size={14} />
-                      </a>
-                    )}
-                  </div>
-                )}
-                {together.length > 0 && host.id && (
+              {together.length === 0 && host.recent.length > 0 && (
+                <div class="ab-host-tray row-start-5 mx-6 box-border grid justify-items-start gap-3 self-start rounded-tray bg-surface/72 px-1 pt-1 pb-3">
+                  <Tiles
+                    items={host.recent}
+                    label={`Latest episodes with ${host.name}`}
+                  />
+                  {host.id && (
+                    <a
+                      aria-label={`All ${host.count} episodes with ${host.name}`}
+                      class="ep-pill"
+                      href={`/#guest=${encodeURIComponent(host.id)}`}
+                    >
+                      All {host.count}
+                      <ArrowOutIcon size={14} />
+                    </a>
+                  )}
+                </div>
+              )}
+              {together.length > 0 && host.id && (
+                <div class="row-start-5 mx-6">
                   <a
                     aria-label={`All ${host.count} episodes with ${host.name}`}
                     class="ep-pill"
@@ -212,26 +223,26 @@ const voiceName: Record<number, string> = {
                     All {host.count}
                     <ArrowOutIcon size={14} />
                   </a>
-                )}
+                </div>
+              )}
 
-                {linksFor(host).length > 0 && (
-                  <ul class="ab-host-links mt-1 flex flex-wrap gap-2">
-                    {linksFor(host).map(({ href, Icon, label }) => (
-                      <li>
-                        <a
-                          class="ep-pill"
-                          href={href}
-                          rel="noopener"
-                          target="_blank"
-                        >
-                          <Icon size={16} />
-                          {label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              {linksFor(host).length > 0 && (
+                <ul class="ab-host-links row-start-6 mx-6 mt-1 flex flex-wrap gap-2 self-start">
+                  {linksFor(host).map(({ href, Icon, label }) => (
+                    <li>
+                      <a
+                        class="ep-pill"
+                        href={href}
+                        rel="noopener"
+                        target="_blank"
+                      >
+                        <Icon size={16} />
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))
         }

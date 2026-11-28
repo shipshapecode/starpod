@@ -458,12 +458,6 @@
     color var(--quick);
 }
 
-@media (hover: hover) {
-  .xp-pick:not([data-on], [aria-pressed='true']):hover {
-    border-color: var(--ink);
-  }
-}
-
 .xp-pick b {
   color: var(--ink);
   font-weight: var(--font-weight-bold);
