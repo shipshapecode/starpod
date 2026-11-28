@@ -40,6 +40,14 @@
   --voice-0: var(--iris-700);
   --voice-1: var(--aqua-700);
   --media-ground: oklch(19% 0.03 280);
+  /* Over video and artwork, the same in either scheme: On Media is light
+     text and the play disc on media, with On-Media Ink on the disc; Media
+     Shade is the dark of glass chips, scrims and lifted shadows, mixed to
+     whatever strength each needs (Media Glass is the usual chip). */
+  --on-media: oklch(98% 0.005 285);
+  --on-media-ink: oklch(20% 0.04 285);
+  --media-shade: oklch(15% 0.02 280);
+  --media-glass: color-mix(in oklch, var(--media-shade) 72%, transparent);
   --shadow-soft: 0 1px 2px oklch(28% 0.05 290 / 0.06),
     0 10px 30px -12px oklch(28% 0.06 290 / 0.22);
   --shadow-float: 0 2px 6px oklch(20% 0.05 290 / 0.12),
@@ -89,8 +97,10 @@
     1
   );
 
-  --radius: 8px;
-  --radius-lg: 14px;
+  /* Chrome and the media frame are near-square. (Not --radius-lg: that is
+     Tailwind's, behind rounded-lg.) */
+  --radius: 3px;
+  --radius-frame: 4px;
   /* Component radii, nested concentrically: an inner radius is its
      container's radius minus the inset between them. */
   --r-thumb: 12px;
@@ -101,8 +111,10 @@
   /* The hairline drawn over every image and portrait, so light and dark art
      meet the page with the same edge. */
   --hairline: color-mix(in oklch, var(--ink) 10%, transparent);
-  /* Colour and fill changes on small controls. */
-  --quick: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Colour and fill changes on small controls: Tailwind's default
+     transition (tailwind.css), so transition-colors and var(--quick) match. */
+  --quick: var(--default-transition-duration)
+    var(--default-transition-timing-function);
   --rail-w: 0px;
   --topbar-h: 60px;
   --tabbar-h: calc(62px + env(safe-area-inset-bottom));
@@ -157,49 +169,54 @@
 
 /* ---------- Browser surfaces ---------- */
 
-html {
-  background: var(--ground);
-  scrollbar-color: var(--line-strong) transparent;
-  -webkit-text-size-adjust: 100%;
-}
+/* Element defaults sit in the base layer, under Tailwind's utilities: a
+   class on an element (text-muted on a link, a heading's colour) wins over
+   them, as everything else in the system does. */
+@layer base {
+  html {
+    background: var(--ground);
+    scrollbar-color: var(--line-strong) transparent;
+    -webkit-text-size-adjust: 100%;
+  }
 
-body {
-  margin: 0;
-  background: var(--ground);
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 1rem;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-  caret-color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: var(--text-lg);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    caret-color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
 
-::selection {
-  background: var(--accent);
-  color: var(--on-ink);
-}
+  ::selection {
+    background: var(--accent);
+    color: var(--on-ink);
+  }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
 
-a {
-  color: inherit;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-}
+  a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
 
-h1,
-h2,
-h3 {
-  color: var(--ink);
-  text-wrap: balance;
-}
+  h1,
+  h2,
+  h3 {
+    color: var(--ink);
+    text-wrap: balance;
+  }
 
-p {
-  text-wrap: pretty;
+  p {
+    text-wrap: pretty;
+  }
 }
 
 /* The original pill: a 1px gradient-ready border around a padded label. */
@@ -213,8 +230,8 @@ p {
   background: var(--surface);
   background-clip: padding-box;
   color: var(--ink);
-  font-weight: 700;
-  font-size: 0.875rem;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-md);
   box-shadow: 0 1px 2px oklch(91.6% 0.021 250 / 0.9);
   cursor: pointer;
   text-decoration: none;

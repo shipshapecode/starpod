@@ -382,19 +382,19 @@ const documentLinkTag =
   <div class="ep-body">
     <SectionBar label="Episode sections" sections={sections}>
       <BarPlay client:load episode={playerEpisode} />
-      <a class="ep-bar-title" href="#main">
-        <span class="ep-bar-number">{numberOf(episode)}</span>
-        <span class="ep-bar-name">{episode.title}</span>
+      <a class="ep-bar-title flex text-ink min-w-0 flex-col leading-tight no-underline max-sm:hidden" href="#main">
+        <span class="text-xs font-semibold tabular-nums text-muted">{numberOf(episode)}</span>
+        <span class="ep-bar-name truncate text-md font-bold">{episode.title}</span>
       </a>
     </SectionBar>
 
     <section
       aria-labelledby="notes-heading"
-      class="ep-section notes"
+      class="notes mb-[clamp(56px,7vw,96px)]"
       id="notes"
     >
       <h2 class="section-title ep-reveal" id="notes-heading">Show notes</h2>
-      <div class="ep-clamp-box">
+      <div class="ep-clamp-box relative">
         <div
           class="ep-clamp"
           data-clamped
@@ -419,11 +419,11 @@ const documentLinkTag =
       people.length > 0 && (
         <section
           aria-labelledby="people-heading"
-          class="ep-section"
+          class="mb-[clamp(56px,7vw,96px)]"
           id="people"
         >
           <h2 class="section-title ep-reveal" id="people-heading">
-            People <span class="section-count">{people.length}</span>
+            People <span class="text-md font-medium text-muted">{people.length}</span>
           </h2>
           <People episode={playerEpisode} people={people} />
         </section>
@@ -434,7 +434,7 @@ const documentLinkTag =
       sponsors.length > 0 && (
         <section
           aria-labelledby="sponsors-heading"
-          class="ep-section"
+          class="mb-[clamp(56px,7vw,96px)]"
           id="sponsors"
         >
           <h2 class="section-title ep-reveal" id="sponsors-heading">
@@ -452,7 +452,7 @@ const documentLinkTag =
 
     <section
       aria-labelledby="transcript-heading"
-      class="ep-section transcript-section"
+      class="transcript-section mb-[clamp(56px,7vw,96px)] max-w-transcript"
       id="transcript"
     >
       <h2 class="section-title ep-reveal" id="transcript-heading">
@@ -460,7 +460,7 @@ const documentLinkTag =
       </h2>
       {
         hasTranscript ? (
-          <div class="ep-clamp-box">
+          <div class="ep-clamp-box relative">
             <Schema
               item={{
                 '@context': 'https://schema.org',
@@ -523,7 +523,7 @@ const documentLinkTag =
 
     {
       hasOnward && (
-        <section aria-labelledby="more-heading" class="ep-section" id="more">
+        <section aria-labelledby="more-heading" class="mb-[clamp(56px,7vw,96px)]" id="more">
           <h2 class="section-title ep-reveal" id="more-heading">More episodes</h2>
           <Onward newer={newerCard} older={olderCard} related={related} />
         </section>

@@ -30,28 +30,35 @@ const pager = [
 
 {
   pager.length > 0 && (
-    <nav aria-label="Previous and next episode" class="ep-pager">
+    <nav
+      aria-label="Previous and next episode"
+      class="ep-pager mb-[clamp(32px,5vw,56px)] grid grid-cols-[repeat(auto-fit,minmax(min(100%,20rem),1fr))] gap-3"
+    >
       {pager.map((card) => (
         <a
-          class="ep-pager-link ep-reveal halo"
+          class={`ep-pager-link ep-reveal halo flex items-center gap-4 rounded-card border border-line bg-surface p-2 text-text no-underline ${card.label === 'Next' ? 'flex-row-reverse text-end' : ''}`}
           data-ep-card={dasherize(card.title)}
           data-props-for="pointer-local"
           href={card.href}
           rel={card.label === 'Next' ? 'next' : 'prev'}
         >
+          {/* The card's 28px corner, 8px in: the art's 20px. Every piece of
+              art holds a still Raised placeholder until it loads (nothing
+              runs on the many lazy images off screen), under a hairline
+              drawn just inside it, above the picture. */}
           <img
             alt=""
-            class="ep-card-art"
+            class="ep-card-art size-18 flex-none rounded-tile bg-raised object-cover outline-1 -outline-offset-1 outline-hairline"
             height="72"
             loading="lazy"
             src={card.art}
             width="72"
           />
-          <span class="ep-pager-text">
-            <span class="ep-pager-label">
+          <span class="flex min-w-0 flex-1 flex-col gap-1 px-1">
+            <span class="text-sm leading-4.5 font-medium text-muted tabular-nums">
               {card.label} · {card.number}
             </span>
-            <span class="ep-card-title">{card.title}</span>
+            <span class="ep-card-title font-display text-2xl leading-none font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
           </span>
         </a>
       ))}
@@ -61,31 +68,40 @@ const pager = [
 
 {
   related.length > 0 && (
-    <div class="ep-shelf-wrap">
-      <h3 class="ep-shelf-title ep-reveal">Related episodes</h3>
-      <ul aria-label="Related episodes" class="ep-shelf">
+    <div class="ep-shelf-wrap relative @container/ep-shelf">
+      <h3 class="ep-reveal mb-1 text-base leading-10 font-demibold">Related episodes</h3>
+      {/* The next card always peeks: so many whole cards and four tenths of
+          one, by the shelf's own width. 16px above and below so rings and
+          shadows are never cut. */}
+      <ul
+        aria-label="Related episodes"
+        class="ep-shelf -mx-gutter grid snap-x snap-mandatory auto-cols-[calc((100cqi-var(--ep-shown)*16px)/(var(--ep-shown)+0.4))] grid-flow-col scroll-px-gutter gap-4 overflow-x-auto overscroll-x-contain px-gutter py-4 [--ep-shown:2] @min-[560px]/ep-shelf:[--ep-shown:3] @min-[860px]/ep-shelf:[--ep-shown:4] @min-[1160px]/ep-shelf:[--ep-shown:5]"
+      >
         {related.map((card) => (
-          <li class="ep-shelf-item">
+          <li class="ep-shelf-item snap-start">
             <a
-              class="ep-card"
+              class="ep-card flex flex-col gap-1.5 text-text no-underline"
               data-ep-card={dasherize(card.title)}
               data-props-for="pointer-local"
               href={card.href}
             >
+              {/* Imagery leads; the facts sit 8px under it and 4px in. */}
               <img
                 alt=""
-                class="ep-card-art"
+                class="ep-card-art mb-0.5 block aspect-square h-auto w-full rounded-tile bg-raised object-cover outline-1 -outline-offset-1 outline-hairline"
                 height="320"
                 loading="lazy"
                 src={card.art}
                 width="320"
               />
-              <span class="ep-card-facts">
+              <span class="mx-1 text-sm leading-4.5 font-medium text-muted tabular-nums">
                 {card.number} · {formatDuration(card.duration)}
               </span>
-              <span class="ep-card-title">{card.title}</span>
+              <span class="ep-card-title mx-1 font-display text-2xl leading-none font-extrabold font-stretch-[78%] text-balance text-ink uppercase">{card.title}</span>
               {card.reason && (
-                <span class="ep-card-reason">
+                <span
+                  class={`ep-card-reason mx-1 inline-flex items-center gap-1.5 self-start rounded-full bg-accent-soft py-0.5 pr-2.5 text-xs leading-4 font-demibold text-accent-ink ${card.face ? 'pl-0.5' : 'pl-2.5'}`}
+                >
                   {card.face && <PersonFace size={20} src={card.face} />}
                   {card.reason}
                 </span>

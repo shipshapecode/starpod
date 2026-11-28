@@ -49,16 +49,6 @@
   }
 }
 
-/* The dock block holds the island's stations, the room the picture floats
-   in and the island itself, all fixed to the screen; it has no box of its
-   own, so it never blocks the page. */
-.dock {
-  /* The sidebar's own clock (rail.css), so the stations and the picture's
-     room follow it as it folds and unfolds. */
-  --rail-glide: calc(0.55s * var(--slomo)) var(--ease-out);
-  display: contents;
-}
-
 /* What is playing, as a colour, for the floating picture's glow: the live
    picture's while watching (published on the glow alone, publish.ts, so a
    change restyles one element), the artwork's while listening (on <html>).
@@ -81,11 +71,6 @@
    ===================================================================== */
 
 /* ---------- Stations ---------- */
-
-.island-home {
-  position: fixed;
-  pointer-events: none;
-}
 
 /* The pill sits low and central in the page column, clear of the sticky
    bars at the top of main (the explorer's toolbar, the episode bar). */
@@ -259,30 +244,11 @@
   --r: var(--r-tray);
   --art-w: 56px;
   --art-h: 56px;
+  /* Its glass (tinted by the playing artwork; the tint tweens on a change of
+     episode, as the demo's --hue does), grid and the rest are in Island.tsx.
+     Its position stays here: the anchored layout's [data-⚓️-to] would
+     otherwise make it absolute. */
   position: fixed;
-  z-index: 45;
-  display: grid;
-  align-items: center;
-  place-content: start;
-  overflow: clip;
-  border-radius: var(--r);
-  color: var(--ink);
-  /* Glass, tinted by the playing artwork; the tint tweens on a change of
-     episode, as the demo's --hue does. */
-  background: color-mix(
-    in oklch,
-    var(--live-img-accent, transparent) 16%,
-    color-mix(in oklch, var(--surface) 80%, transparent)
-  );
-  -webkit-backdrop-filter: blur(28px) saturate(1.5);
-  backdrop-filter: blur(28px) saturate(1.5);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in oklch, var(--ink) 11%, transparent),
-    0 30px 60px -30px oklch(8% 0.03 280 / 0.6);
-  cursor: pointer;
-  pointer-events: auto;
-  position-visibility: always;
-  view-transition-name: player-island;
   transition:
     --live-img-accent calc(1.2s * var(--slomo)) var(--ease-out),
     opacity calc(0.4s * var(--slomo)) var(--ease-out),
@@ -356,16 +322,6 @@
   }
 }
 
-.island-art {
-  --area: art;
-  --r: var(--r-thumb);
-  position: relative;
-  width: var(--art-w);
-  height: var(--art-h);
-  overflow: clip;
-  background: var(--media-ground);
-}
-
 /* A hairline over the picture, so light and dark art meet the glass alike. */
 .island-art::after {
   content: '';
@@ -377,19 +333,11 @@
   pointer-events: none;
 }
 
-.island-art[data-hot] {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
 /* The picture inside keeps its final size and is clipped by the part as the
-   part's box changes shape, so a 16:9 picture never squishes into a circle. */
-.island-art-in {
-  position: absolute;
-  inset: 0;
-}
-
-.island-art img,
+   part's box changes shape, so a 16:9 picture never squishes into a circle
+   (the art's own img takes the same in Island.tsx). The cell keeps its
+   class name bare: the engine moves the video into it, and tests read its
+   home by that name. */
 .player-cell-media,
 .island-art video {
   position: absolute;
@@ -404,80 +352,7 @@
   opacity: 0;
 }
 
-.island-title {
-  --area: title;
-  display: grid;
-  gap: 6px;
-  align-content: center;
-  min-width: 0;
-  width: var(--title-w, 170px);
-}
-
-.island-name {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-  cursor: pointer;
-}
-
-.island-name b {
-  overflow: hidden;
-  font: 650 var(--title-size, 14px) / 1.15 var(--font-display);
-  letter-spacing: -0.01em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.island-name span {
-  overflow: hidden;
-  color: var(--muted);
-  font: 500 12px/1.2 var(--font-ui);
-  font-variant-numeric: tabular-nums;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.island-name:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 6px;
-}
-
-.island-open {
-  display: none;
-  align-items: center;
-  gap: 6px;
-  width: max-content;
-  color: var(--muted);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.island-open {
-  transition: color var(--quick);
-}
-
-.island-open:hover {
-  color: var(--ink);
-}
-
 /* On-air bars: they run while the engine says playing and rest otherwise. */
-.island-eq {
-  --area: eq;
-  display: flex;
-  align-items: end;
-  gap: 3px;
-  width: 18px;
-  height: 16px;
-}
-
 .island-eq i {
   flex: 1;
   height: 100%;
@@ -507,14 +382,6 @@
   }
 }
 
-.island-scrub {
-  --area: scrub;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
 .island-scrub .scrubber {
   min-width: 0;
   /* Painted from the player's exact clock, not a re-rendered style. */
@@ -525,13 +392,7 @@
    on every tick. A flex item cannot keep a layout change to itself (the row
    lays it out), so each sits in a fixed box, and what changes is a contained
    block inside it: a tick lays out only that, never the island, the rail or
-   the anchored homes around them. */
-.island-track {
-  display: block;
-  flex: 1;
-  min-width: 0;
-}
-
+   the anchored homes around them (the times' boxes are in Island.tsx). */
 .island-track .scrubber {
   display: block;
   contain: strict;
@@ -553,7 +414,6 @@
 .island-track {
   --ship: 16px;
   --rocket: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.64211 11.1128C10.6315 10.9201 15.2706 9.53335 15.2886 7.88488C15.3065 6.23642 10.638 4.86161 4.64537 4.68182C4.48335 3.62107 3.97229 2.64461 3.19305 1.90691C2.4138 1.16921 1.41085 0.712354 0.342822 0.608639L0.358346 15.1865C1.42356 15.0801 2.42295 14.6218 3.19869 13.8841C3.97444 13.1464 4.48232 12.1713 4.64211 11.1128Z'/%3E%3C/svg%3E");
-  position: relative;
 }
 
 .island-track .scrubber::-webkit-slider-thumb {
@@ -676,111 +536,13 @@
   }
 }
 
-.dock-time {
-  display: block;
-  flex: none;
-  /* Fits "-9:59:59" in tabular figures. */
-  inline-size: 6.5ch;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
-}
-
-.dock-time > span {
-  display: block;
-  contain: strict;
-  block-size: 1lh;
-  white-space: nowrap;
-}
-
-.island-prev {
-  --area: prev;
-}
-
-.island-play {
-  --area: play;
-}
-
-.island-next {
-  --area: next;
-}
-
-.island-skip {
-  --area: skip;
-}
-
-:is(.island-prev, .island-play, .island-next, .island-skip) {
-  display: grid;
-  place-items: center;
-  width: var(--key, 40px);
-  height: var(--key, 40px);
-}
-
-.island-play {
-  --key: 40px;
-  width: var(--play, 40px);
-  height: var(--play, 40px);
-}
-
 .island-play .dock-play {
   width: 100%;
   height: 100%;
 }
 
-.island-tools {
-  --area: tools;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: max-content;
-}
-
-.island-station {
-  --area: station;
-  position: relative;
-  display: inline-flex;
-  width: max-content;
-  padding: 3px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  cursor: default;
-}
-
-.island-station label {
-  position: relative;
-  z-index: 1;
-  padding: 6px 12px;
-  border-radius: 999px;
-  color: var(--muted);
-  font: 600 12px/1 var(--font-ui);
-  white-space: nowrap;
-  cursor: pointer;
-  transition: color var(--quick);
-}
-
-/* The checked option is the anchor; one indicator glides to it. */
-.island-station label:has(:checked) {
-  anchor-name: --home-on;
-  color: var(--on-ink);
-}
-
-.island-station label:has(:focus-visible) {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.island-station input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.island-station-on {
-  border-radius: 999px;
-  background: var(--ink);
-}
-
+/* The home control: the checked option is the anchor, and one indicator
+   glides to it (Island.tsx). */
 @media (max-width: 1023px) {
   .island-station label[data-home='rail'] {
     display: none;
@@ -903,7 +665,7 @@
   grid-template:
     'station station station station station' 36px
     'art art art art art' var(--art-h)
-    'title title title title title' 64px
+    'title title title title title' auto
     'scrub scrub scrub scrub scrub' 28px
     'prev play next skip .' 64px
     'tools tools tools tools tools' 44px
@@ -929,7 +691,7 @@
     grid-template:
       'station station station station station . queue' 36px
       'art art art art art . queue' var(--art-h)
-      'title title title title title . queue' 72px
+      'title title title title title . queue' auto
       'scrub scrub scrub scrub scrub . queue' 28px
       'prev play next skip tools . queue' 64px
       '. . . . . . queue' auto
@@ -955,7 +717,7 @@
     grid-template:
       'station station station station station . queue' 36px
       'art art art art art . queue' var(--art-h)
-      'title title title title title . queue' 72px
+      'title title title title title . queue' auto
       'scrub scrub scrub scrub scrub . queue' 28px
       'prev play next skip . . queue' 64px
       'tools tools tools tools tools . queue' 44px
@@ -998,19 +760,7 @@
   }
 }
 
-/* Behind the card, the page steps back. */
-.player-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 44;
-  background: oklch(12% 0.02 280 / 0.5);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity calc(0.4s * var(--slomo)) var(--ease-out),
-    visibility 0s calc(0.4s * var(--slomo));
-}
-
+/* Behind the card, the page steps back (Island.tsx). */
 :root[data-island='card'] .player-scrim {
   z-index: 59;
   opacity: 1;
@@ -1035,11 +785,6 @@
    the card's home control gives way to its own way out: a grabber strip to
    swipe it down by and a close (Island.tsx renders both only on phones).
    Everything is a 44px target, and the transport is centred. */
-.island-grab,
-.island-close {
-  display: none;
-}
-
 :root[data-phone] .island-station label[data-home='pill'],
 :root[data-phone] [data-state='card'] .island-station {
   display: none;
@@ -1052,7 +797,7 @@
   grid-template:
     'top top top top top top' 44px
     'art art art art art art' var(--art-h)
-    'title title title title title title' 96px
+    'title title title title title title' auto
     'scrub scrub scrub scrub scrub scrub' 44px
     '. prev play next skip .' 64px
     'tools tools tools tools tools tools' 52px
@@ -1068,7 +813,7 @@
 /* Narrower than the tools' row (318px), they take two lines. */
 @media (max-width: 359px) {
   :root[data-phone] .island[data-state='card'] {
-    grid-template-rows: 44px var(--art-h) 96px 44px 64px 104px auto auto;
+    grid-template-rows: 44px var(--art-h) auto 44px 64px 104px auto auto;
   }
 
   :root[data-phone] [data-state='card'] .island-tools {
@@ -1150,13 +895,6 @@
   margin-top: -12px;
   touch-action: none;
   cursor: grab;
-}
-
-.island-grab i {
-  width: 40px;
-  height: 5px;
-  border-radius: 999px;
-  background: color-mix(in oklch, var(--ink) 28%, transparent);
 }
 
 :root[data-phone] [data-state='card'] .island-close {
@@ -1316,7 +1054,7 @@
   --art-w: 40px;
   --art-h: 40px;
   --title-w: auto;
-  --title-size: 13px;
+  --title-size: var(--text-sm);
   --key: 34px;
   padding: 10px;
   gap: 8px 6px;
@@ -1555,10 +1293,6 @@
 
 /* ---------- More: what a narrow dock folds away ---------- */
 
-.island-more-button {
-  anchor-name: --island-more;
-}
-
 .island-more-dots,
 .island:is([data-fit='fold'], [data-fit='lean'], [data-fit='tight']) .island-more-move {
   display: none;
@@ -1597,19 +1331,6 @@
   margin: 12px -6px 0 0;
 }
 
-.island-more-in {
-  position: relative;
-  display: grid;
-  justify-items: start;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-tray);
-  background: var(--surface);
-  color: var(--ink);
-  box-shadow: var(--shadow-float);
-}
-
 /* The caret points at the button, and turns when the popover flips below. */
 .island-more-in::after {
   content: '';
@@ -1631,34 +1352,6 @@
   }
 }
 
-.island-more-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.island-more-times {
-  display: flex;
-  gap: 8px;
-  margin: 0 0 0 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.island-more-next {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 280px;
-}
-
-.island-more-next span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* The popover's own radio group is not one of the island's parts: it is
    never parked, and it fills its checked option (no indicator to glide, and
    no anchor name to take from the dock's). */
@@ -1668,12 +1361,6 @@
   place-self: auto;
   opacity: 1;
   visibility: visible;
-}
-
-/* Its checked option is filled. */
-.island-more-pop .island-station label:has(:checked) {
-  anchor-name: none;
-  background: var(--ink);
 }
 
 /* Which rows show follows the dock's form. */
@@ -1704,13 +1391,6 @@
    the island's own areas: now playing exactly where the art is, Up next in
    the queue column, the shelf along the bottom. The covers are siblings at
    the end, filling a slot by name. */
-.island-queue {
-  --area: queue;
-  position: relative;
-  z-index: 1;
-  pointer-events: none;
-}
-
 /* Parked, nothing inside is styled, laid out or painted. */
 :is([data-state='pill'], [data-state='dock'], [data-state='rail']) .island-queue {
   content-visibility: hidden;
@@ -1721,30 +1401,6 @@
   display: grid;
   grid-template: subgrid / subgrid;
   align-self: stretch;
-}
-
-.board-title {
-  margin: 0 0 10px 4px;
-  color: var(--ink);
-  font: 650 14px/1.2 var(--font-ui);
-}
-
-.board-hint {
-  max-width: 62ch;
-  margin: -4px 0 12px 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  line-height: 1.4;
-}
-
-/* Read out, not shown. */
-.board-quiet {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
 }
 
 .slot {
@@ -1778,42 +1434,11 @@
   outline-color: var(--ink);
 }
 
-/* Up next and the shelf are trays inside the card: the card's radius minus
-   their inset, holding covers at the tile radius (and the small ones at the
-   thumb radius). */
-.board-next,
-.board-shelf {
-  min-width: 0;
-  padding: 12px;
-  border-radius: var(--r-tray);
-  background: color-mix(in oklch, var(--ink) 5%, transparent);
-}
-
-.board-next {
-  grid-area: queue;
-  align-self: start;
-}
-
+/* Up next and the shelf are trays inside the card (board.ts): the card's
+   radius minus their inset, holding covers at the tile radius (and the small
+   ones at the thumb radius). */
 .board-row .slot {
   border-radius: var(--r-thumb);
-}
-
-.board-next-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.board-row {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
-  align-items: center;
-  gap: 12px;
-  transition:
-    opacity calc(0.35s * var(--slomo)) var(--ease-out),
-    translate calc(0.35s * var(--slomo)) var(--ease-out);
 }
 
 @starting-style {
@@ -1829,79 +1454,11 @@
   }
 }
 
-.board-row-name {
-  overflow: hidden;
-  color: var(--text);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.board-row-remove {
-  display: none;
-}
-
 .board-row[data-drop] .board-row-name {
   color: var(--muted);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   /* A hint, not a title: it wraps rather than losing its end. */
   white-space: normal;
-}
-
-.board-shelf {
-  grid-area: shelf;
-}
-
-/* Imagery leads; its title and one unit of proof sit 8px under it, 4px in. */
-.shelf-cell {
-  display: grid;
-  align-content: start;
-  min-width: 0;
-}
-
-.shelf-cell-title {
-  display: -webkit-box;
-  overflow: hidden;
-  margin: 8px 4px 0;
-  color: var(--ink);
-  font: 600 13px/1.3 var(--font-ui);
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.shelf-cell-meta,
-.board-row-meta {
-  color: var(--muted);
-  font: 500 12px/1.3 var(--font-ui);
-  font-variant-numeric: tabular-nums;
-}
-
-.shelf-cell-meta {
-  margin: 2px 4px 0;
-}
-
-.board-row-text {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.board-shelf-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-  gap: 10px;
-}
-
-@media (min-width: 1024px) {
-  .board-shelf-grid {
-    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-    gap: 14px;
-  }
-}
-
-.board-tiles {
-  display: contents;
 }
 
 /* ---------- Covers ----------
@@ -1918,30 +1475,10 @@
   --flip-ey: var(--spring);
   --flip-ds: 0.5s;
   --flip-es: var(--ease-out);
-  z-index: 2;
-  cursor: grab;
-  pointer-events: auto;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  /* Off screen (scrolled out of the card), a cover costs nothing to render. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 96px auto 96px;
 }
 
 .tile[hidden] {
   display: none;
-}
-
-.tile-face {
-  --r: var(--r-tile);
-  --also: opacity calc(0.15s * var(--slomo)) ease;
-  position: absolute;
-  inset: 0;
-  overflow: clip;
-  background: var(--media-ground);
-  /* Covers barely float; only a held one has real elevation. */
-  box-shadow: 0 2px 8px color-mix(in oklch, var(--ink) 6%, transparent);
 }
 
 /* A cover that appears while the card is open (the shelf arriving after the
@@ -1994,24 +1531,6 @@
   }
 }
 
-.tile-hit {
-  position: absolute;
-  inset: 0;
-  padding: 0;
-  border: 0;
-  border-radius: inherit;
-  background: none;
-  cursor: inherit;
-}
-
-.tile-hit img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 /* The hairline over the art. */
 .tile-hit::after {
   content: '';
@@ -2022,71 +1541,14 @@
   pointer-events: none;
 }
 
-.tile-hit:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Its number, as a glass chip on the art. */
-/* The chip shows only on the shelf's covers (Up next and now playing hide
-   it), so it takes the shelf's size rather than the cover's: a cover is not
-   a size container, which would restyle every flying cover twice a frame. */
-.tile-chip {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: oklch(18% 0.02 280 / 0.5);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  color: oklch(98% 0 0);
-  font: 600 9px / 1.4 var(--font-ui);
-  font-variant-numeric: tabular-nums;
-}
-
-@media (min-width: 1024px) {
-  .tile-chip {
-    top: 8px;
-    left: 8px;
-    font-size: 10px;
-  }
-}
-
 /* Remove sits on a queued cover, out of sight until the cover is hovered or
    holds focus. */
-.tile-remove {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  display: none;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: oklch(18% 0.02 280 / 0.6);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  color: oklch(98% 0 0);
-  cursor: pointer;
-  opacity: 0;
-  transition:
-    opacity var(--quick),
-    background var(--quick);
-}
-
 .tile[data-queued] .tile-remove {
   display: grid;
 }
 
 .tile:is(:hover, :focus-within) .tile-remove {
   opacity: 1;
-}
-
-.tile-remove:hover {
-  background: oklch(18% 0.02 280 / 0.85);
 }
 
 .tile[data-queued] .tile-chip,
@@ -2108,7 +1570,7 @@
   --r: var(--r-tile);
   --also: opacity calc(0.3s * var(--slomo)) ease calc(0.6s * var(--slomo));
   opacity: 0;
-  box-shadow: 0 30px 60px -20px oklch(0% 0 0 / 0.8);
+  box-shadow: 0 30px 60px -20px color-mix(in oklch, var(--media-shade) 80%, transparent);
 }
 
 .tile[data-held] {
@@ -2117,7 +1579,7 @@
 }
 
 .tile[data-held] .tile-face {
-  box-shadow: 0 30px 60px -10px oklch(0% 0 0 / 0.85);
+  box-shadow: 0 30px 60px -10px color-mix(in oklch, var(--media-shade) 85%, transparent);
 }
 
 /* ---------- The picture ---------- */
@@ -2213,7 +1675,7 @@
   left: 0;
   width: 200%;
   height: 200%;
-  background: radial-gradient(closest-side, oklch(100% 0 0 / 0.16), transparent);
+  background: radial-gradient(closest-side, color-mix(in oklch, var(--on-media) 16%, transparent), transparent);
   opacity: 0;
   translate: calc((var(--live-local-pointer-x-ratio) - 1) * 50%)
     calc((var(--live-local-pointer-y-ratio) - 1) * 50%);
@@ -2248,11 +1710,11 @@
   cursor: grabbing;
   box-shadow:
     var(--shadow-float),
-    0 40px 80px -24px oklch(10% 0.04 280 / 0.6);
+    0 40px 80px -24px color-mix(in oklch, var(--media-shade) 60%, transparent);
 }
 
 .player-media[data-station='stage'] .player-media-box {
-  --r: var(--radius-lg);
+  --r: var(--radius-frame);
   box-shadow: var(--shadow-soft);
 }
 
@@ -2540,27 +2002,8 @@
   align-self: start;
 }
 
-.pip-bar-in {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  height: 100%;
-  padding: 0 4px 0 12px;
-  box-sizing: border-box;
-  border-radius: 999px;
-  background: var(--surface);
-  box-shadow: var(--shadow-soft);
-}
-
-/* The floating picture's progress, along the foot of its bar. */
-.pip-bar-light {
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 3px;
-}
-
+/* The bar's caret (its box, and the progress along its foot, are in
+   Island.tsx). */
 .pip-bar-in::after {
   content: '';
   position: absolute;
@@ -2579,22 +2022,6 @@
     bottom: auto;
     border-radius: 2px 0 0;
   }
-}
-
-.pip-title {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  color: var(--ink);
-  font-size: 0.75rem;
-  font-weight: 650;
-  text-decoration: none;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pip-title:hover {
-  text-decoration: underline;
 }
 
 /* Phones float the picture only when asked. When they do, its bar's controls

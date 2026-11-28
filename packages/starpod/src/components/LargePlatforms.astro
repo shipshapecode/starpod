@@ -29,10 +29,10 @@ const entries = [
     entries.map((entry) => (
       <li>
         <a
-          class="halo text-ink border-line inline-flex items-center gap-2.5 rounded-full border py-2.5 pr-5 pl-4 text-[0.9375rem] font-semibold no-underline"
+          class="halo text-ink border-line inline-flex items-center gap-2.5 rounded-full border py-2.5 pr-5 pl-4 text-base font-semibold no-underline"
           href={entry.href}
         >
-          <span aria-hidden="true" class="flex size-[18px] items-center [&>svg]:size-full">
+          <span aria-hidden="true" class="flex size-4.5 items-center [&>svg]:size-full">
             <Fragment set:html={entry.icon} />
           </span>
           {entry.label}

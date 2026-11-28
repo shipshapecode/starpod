@@ -1587,7 +1587,7 @@ export function startExplorer() {
           const item = document.createElement('li');
           item.dataset.speaksAs = name;
           item.innerHTML =
-            '<a class="person-chip"><span class="person-face" style="--person-size: 32px"><img alt="" decoding="async" height="32" width="32"></span><span class="xp-person"><span class="xp-person-name"></span><span class="person-fact"></span></span></a>';
+            '<a class="person-chip"><span class="person-face" style="--person-size: 32px"><img alt="" decoding="async" height="32" width="32"></span><span class="xp-person grid"><span class="xp-person-name"></span><span class="person-fact"></span></span></a>';
           item.querySelector('a')!.href = `/#guest=${encodeURIComponent(id)}`;
           item.querySelector('img')!.src = photo;
           item.querySelector('.xp-person-name')!.textContent = name;

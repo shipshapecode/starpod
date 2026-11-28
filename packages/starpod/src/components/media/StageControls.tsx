@@ -71,7 +71,10 @@ export default function StageControls({ episode, part }: Props) {
 
   if (part === 'overlay') {
     return (
-      <span class="stage-overlay" ref={anchor}>
+      <span
+        class="pointer-events-none absolute inset-0 z-3 flex items-end justify-start gap-3 p-[clamp(14px,2.5vw,28px)]"
+        ref={anchor}
+      >
         <PlayToggle
           class="stage-play"
           episode={episode}
@@ -81,7 +84,7 @@ export default function StageControls({ episode, part }: Props) {
           size={30}
         />
         {!isCurrent && resumeAt > 0 && (
-          <span class="stage-resume">Resume at {formatClock(resumeAt)}</span>
+          <span class="rounded-full bg-media-glass px-3 py-[0.35rem] text-sm font-demibold text-on-media backdrop-blur-sm">Resume at {formatClock(resumeAt)}</span>
         )}
       </span>
     );
@@ -90,7 +93,7 @@ export default function StageControls({ episode, part }: Props) {
   const queued = queue.value.some((item) => item.id === episode.id);
 
   return (
-    <div class="stage-actions">
+    <div class="stage-actions flex flex-wrap items-center gap-3">
       <button class="button-primary" onClick={() => playEpisode(episode)} type="button">
         <PlayGlyph playing={playing} size={18} />
         <span>

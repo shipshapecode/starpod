@@ -7,8 +7,8 @@ type Status =
   | { state: 'error'; message: string };
 
 const FIELD =
-  'block w-full rounded-(--r-thumb) border border-line bg-surface px-4 py-3 text-ink placeholder:text-muted outline-none! transition-[border-color,box-shadow] duration-200 focus:border-accent focus:ring-4 focus:ring-accent-soft';
-const LABEL = 'text-ink mb-2 block text-sm font-semibold';
+  'block w-full rounded-thumb border border-line bg-surface px-4 py-3 text-ink placeholder:text-muted outline-none! transition-[border-color,box-shadow] duration-200 focus:border-accent focus:ring-4 focus:ring-accent-soft';
+const LABEL = 'text-ink mb-2 block text-md leading-5 font-semibold';
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>({ state: 'idle' });
@@ -45,10 +45,10 @@ export default function ContactForm() {
   if (status.state === 'sent') {
     return (
       <div
-        class="border-line bg-surface max-w-xl rounded-(--r-card) border p-6"
+        class="border-line bg-surface max-w-xl rounded-card border p-6"
         role="status"
       >
-        <p class="text-ink m-0 text-lg font-bold">Message sent</p>
+        <p class="text-ink m-0 text-2xl leading-7 font-bold">Message sent</p>
         <p class="text-text mt-1 mb-0">{status.message}</p>
       </div>
     );
@@ -94,14 +94,14 @@ export default function ContactForm() {
       </div>
 
       {status.state === 'error' && (
-        <p class="text-ink border-line m-0 rounded-(--r-row) border px-4 py-3 text-sm" role="alert">
+        <p class="text-ink border-line m-0 rounded-row border px-4 py-3 text-md leading-5" role="alert">
           {status.message}
         </p>
       )}
 
       <div>
         <button
-          class="button-primary ep-send w-full justify-center disabled:cursor-progress disabled:opacity-70 sm:w-auto"
+          class="button-secondary ep-send w-full justify-center disabled:cursor-progress disabled:opacity-70 sm:w-auto"
           disabled={sending}
           type="submit"
         >

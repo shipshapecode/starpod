@@ -19,8 +19,8 @@
 :root {
   /* The sticky toolbar sits under the top bar below desktop. */
   --xp-stick: calc(var(--topbar-h) + env(safe-area-inset-top));
-  --xp-glass: oklch(15% 0.02 280 / 0.78);
-  --xp-on-glass: oklch(97% 0.005 280);
+  --xp-glass: color-mix(in oklch, var(--media-shade) 78%, transparent);
+  --xp-on-glass: var(--on-media);
 }
 
 @media (min-width: 1024px) {
@@ -48,26 +48,6 @@
     (var(--live-local-pointer-y-ratio, 0.5) - 0.5) *
       var(--live-local-pointer-inside, 0)
   );
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    'media'
-    'meta';
-  gap: 20px clamp(24px, 4vw, 56px);
-  align-items: center;
-  margin-bottom: clamp(40px, 6vw, 72px);
-  isolation: isolate;
-}
-
-@media (min-width: 900px) {
-  .xp-hero {
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-    grid-template-areas: 'media meta';
-  }
-}
-
-.xp-hero-meta {
-  grid-area: meta;
 }
 
 /* A phone on its side: the picture beside its words, as on a wide screen,
@@ -102,66 +82,9 @@
   }
 }
 
-/* Light from the artwork itself (prop-for-that img-color), cast away from
-   the pointer as if the cursor were the sun. Only a translate moves. */
-.xp-hero-glow {
-  grid-area: media;
-  z-index: -1;
-  aspect-ratio: 16 / 9;
-  scale: 1.15;
-  background: radial-gradient(
-    closest-side,
-    color-mix(
-      in oklch,
-      var(--live-img-accent, transparent) var(--xp-glow, 45%),
-      transparent
-    ),
-    transparent
-  );
-  translate: calc(var(--px) * -56px) calc(var(--py) * -40px + 16px);
-  transition: translate 700ms var(--ease-out);
-  pointer-events: none;
-}
-
-.xp-hero-media {
-  grid-area: media;
-  position: relative;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--r-card);
-  overflow: hidden;
-  background: var(--media-ground);
-  box-shadow: var(--shadow-soft);
-  isolation: isolate;
-  transform-origin: 50% 0;
-}
-
-.xp-hero-ambient {
-  position: absolute;
-  inset: -12%;
-  background: var(--art) center / cover;
-  filter: blur(48px) saturate(1.35) brightness(0.55);
-  transform: scale(1.1);
-}
-
-.xp-hero-art {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  height: 78%;
-  width: auto;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: var(--r-tile);
-  /* The hairline: light and dark art meet the page with the same edge. */
-  outline: 1px solid var(--hairline);
-  outline-offset: -1px;
-  box-shadow: var(--shadow-float);
-  /* The artwork leans toward the pointer, a little: depth, not a tilt. */
-  translate: calc(-50% + var(--px) * 18px) calc(-50% + var(--py) * 12px);
-  transition:
-    scale 700ms var(--ease-out),
-    translate 500ms var(--ease-out);
-}
+/* The hero's glow (light from the artwork, cast away from the pointer),
+   picture, ambient wash and artwork (hairline-edged, leaning toward the
+   pointer) style themselves in Hero.astro. */
 
 /* The house ring, lit on the rim nearest the pointer. */
 .xp-hero-media::after {
@@ -195,30 +118,10 @@
 }
 
 /* The playing episode follows the media from CSS (prop-for-that media on
-   <html>): progress along the picture, levels that stop when it pauses. */
-.xp-hero-progress {
-  position: absolute;
-  inset: auto 0 0;
-  z-index: 3;
-  height: 3px;
-  background: linear-gradient(90deg, var(--glow-b), var(--glow-a));
-  transform-origin: 0 50%;
-  scale: 0 1;
-  /* The media clock ticks four times a second; glide between ticks. */
-  transition: scale 250ms linear;
-}
-
+   <html>): progress along the picture (its bar, gliding between the media
+   clock's ticks, is in Hero.astro), levels that stop when it pauses. */
 .xp-hero[data-current] .xp-hero-progress {
   scale: var(--live-progress, 0) 1;
-}
-
-.xp-onair {
-  display: none;
-  align-items: flex-end;
-  gap: 2px;
-  height: 0.7rem;
-  margin-right: 0.4rem;
-  vertical-align: -1px;
 }
 
 .xp-hero[data-current] .xp-onair {
@@ -230,11 +133,6 @@
 
 /* Each bar takes its own tempo and phase from its place in the row. */
 .xp-onair > span {
-  width: 2.5px;
-  height: 100%;
-  border-radius: 1px;
-  background: currentColor;
-  transform-origin: 50% 100%;
   animation: xp-onair 760ms ease-in-out infinite alternate;
   animation-duration: calc(760ms - (sibling-index() - 1) * 110ms);
   animation-delay: calc((sibling-index() - 1) * -215ms);
@@ -272,63 +170,8 @@
   scale: 1.04;
 }
 
-.xp-hero-kind {
-  position: absolute;
-  top: clamp(12px, 2vw, 20px);
-  left: clamp(12px, 2vw, 20px);
-}
-
-.xp-hero-play {
-  position: absolute;
-  bottom: clamp(14px, 2.5vw, 28px);
-  left: clamp(14px, 2.5vw, 28px);
-  z-index: 2;
-}
-
-.xp-hero-eyebrow {
-  margin: 0 0 0.6rem;
-  color: var(--accent-ink);
-  font-size: 0.8125rem;
-  font-weight: 650;
-}
-
-.xp-hero-title {
-  margin: 0 0 0.85rem;
-  max-width: 18ch;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 1.2rem + 2.6vw, 3.6rem);
-  font-stretch: 72%;
-  font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-}
-
-.xp-hero-title a {
-  text-decoration: none;
-  transition: color 300ms var(--ease-out);
-}
-
-@media (hover: hover) {
-  .xp-hero-title a:hover {
-    color: var(--voice-0);
-  }
-}
-
 .xp-hero[data-current] .xp-hero-title {
   color: var(--voice-0);
-}
-
-.xp-hero-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.2rem 1rem;
-  margin: 0 0 1rem;
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
 }
 
 /* One unit, in sentence case: "Ep 260 · Nov 12, 2026 · 1 hr 13 min".
@@ -344,41 +187,6 @@
   display: inline-block;
   width: 1rem;
   text-align: center;
-}
-
-.xp-hero-desc {
-  max-width: 58ch;
-  margin: 0 0 1.25rem;
-  color: var(--text);
-  font-size: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.xp-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 20px;
-}
-
-.xp-hero-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--accent-ink);
-  font-weight: 650;
-  text-decoration: none;
-}
-
-.xp-hero-link svg {
-  transition: translate 300ms var(--ease-spring);
-}
-
-.xp-hero-link:hover svg {
-  translate: 3px -3px;
 }
 
 /* As the archive takes over, the hero recedes with the scroll. */
@@ -425,13 +233,9 @@
   }
 }
 
-.xp-person {
-  display: grid;
-}
-
 .xp-person .person-fact {
-  font-size: 0.75rem;
-  line-height: 1rem;
+  font-size: var(--text-xs);
+  line-height: --spacing(4);
 }
 
 /* ---------- Glass chips over media ----------
@@ -447,9 +251,9 @@
   border-radius: 999px;
   background: var(--xp-glass);
   color: var(--xp-on-glass);
-  font-size: 0.6875rem;
-  font-weight: 650;
-  line-height: 1.3;
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-demibold);
+  line-height: var(--leading-snug);
   font-variant-numeric: tabular-nums;
 }
 
@@ -459,50 +263,10 @@
   container: xp / inline-size;
 }
 
-.xp-heading {
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.75rem);
-  font-stretch: 72%;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  line-height: 1.15;
-  text-transform: uppercase;
-}
-
-.xp-heading span {
-  color: var(--muted);
-  font-family: var(--font-ui);
-  font-size: 0.9rem;
-  font-stretch: 100%;
-  font-weight: 500;
-}
-
 /* ---------- The toolbar: sticks, and knows when it's stuck ---------- */
 
-.xp-bar {
-  position: sticky;
-  top: var(--xp-stick);
-  z-index: 20;
-  margin: 0 calc(var(--gutter) * -1) 22px;
-  container: xp-bar / scroll-state;
-}
-
-.xp-bar-in {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 12px var(--gutter);
-  background: color-mix(in oklch, var(--ground) 88%, transparent);
-  backdrop-filter: blur(14px) saturate(1.4);
-  transition:
-    background-color 300ms var(--ease-out),
-    box-shadow 300ms var(--ease-out);
-}
-
+/* The bar and its form (sticky, a scroll-state container; a blurred
+   ground where scroll state is missing) style themselves in Toolbar.astro. */
 @supports (container-type: scroll-state) {
   .xp-bar-in {
     background-color: transparent;
@@ -513,10 +277,10 @@
   @container xp-bar scroll-state(stuck: top) {
     .xp-bar-in {
       background-color: color-mix(in oklch, var(--ground) 86%, transparent);
-      backdrop-filter: blur(14px) saturate(1.4);
+      backdrop-filter: blur(var(--blur-glass)) saturate(1.4);
       box-shadow:
         0 1px 0 var(--line),
-        0 16px 32px -28px oklch(10% 0.03 280 / 0.6);
+        0 16px 32px -28px color-mix(in oklch, var(--media-shade) 60%, transparent);
     }
   }
 
@@ -558,16 +322,6 @@
       }
     }
   }
-}
-
-.xp-bar-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 10px;
-  /* As wide as the toolbar, never its field's natural width: on a 320px
-     phone the field gives way to the views beside it. */
-  min-width: 0;
 }
 
 /* On a phone the toolbar takes the top bar's place: as it arrives at the
@@ -658,60 +412,8 @@
   }
 }
 
-.xp-search {
-  display: flex;
-  flex: 1 1 10rem;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  height: 40px;
-  padding: 0 16px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--surface);
-  color: var(--muted);
-  transition:
-    border-color var(--quick),
-    box-shadow var(--quick);
-}
-
-.xp-search:focus-within {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft);
-}
-
-.xp-search input {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.9375rem;
-  outline: none;
-}
-
-.xp-search input::placeholder {
-  color: var(--muted);
-}
-
-/* On a touch screen the field is 16px type at least: iOS zooms the page
-   into any smaller field it focuses. */
-@media (pointer: coarse) {
-  .xp-search input {
-    font-size: max(1rem, 16px);
-  }
-}
-
-.xp-count {
-  flex: none;
-  color: var(--muted);
-  font-size: 0.8125rem;
-  white-space: nowrap;
-}
+/* (The field is 16px type at least on a touch screen, in its markup: iOS
+   zooms the page into any smaller field it focuses.) */
 
 /* Narrow: the count is a number (filtered, only the number shown), the
    view switch is icons. */
@@ -732,14 +434,9 @@
   }
 }
 
-.xp-count b {
-  color: var(--ink);
-  font-weight: 700;
-}
-
-/* Pills that pick a value: sort, year, people, in progress. */
-.xp-pick,
-.xp-reset {
+/* Pills that pick a value: sort, year, people, in progress. (Reset, a
+   plain link-like pill, is styled in its markup.) */
+.xp-pick {
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -751,8 +448,8 @@
   background: var(--surface);
   color: var(--text);
   font: inherit;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   cursor: pointer;
   transition:
@@ -761,15 +458,9 @@
     color var(--quick);
 }
 
-@media (hover: hover) {
-  .xp-pick:not([data-on], [aria-pressed='true']):hover {
-    border-color: var(--ink);
-  }
-}
-
 .xp-pick b {
   color: var(--ink);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .xp-pick svg {
@@ -791,37 +482,11 @@
   color: var(--on-ink);
 }
 
-.xp-filter {
-  position: relative;
-  display: inline-flex;
-  flex: none;
-}
-
 .xp-pick[data-on] {
   padding-inline-end: 38px;
 }
 
 .xp-pick[data-on] .xp-chevron {
-  display: none;
-}
-
-.xp-unset {
-  position: absolute;
-  inset-block: 8px;
-  inset-inline-end: 8px;
-  display: grid;
-  place-items: center;
-  width: 24px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: color-mix(in oklch, var(--on-ink) 16%, transparent);
-  color: var(--on-ink);
-  cursor: pointer;
-  transition: background-color var(--quick);
-}
-
-.xp-unset[hidden] {
   display: none;
 }
 
@@ -838,17 +503,6 @@
     position: absolute;
     inset: -10px;
   }
-}
-
-@media (hover: hover) {
-  .xp-unset:hover {
-    background: color-mix(in oklch, var(--on-ink) 30%, transparent);
-  }
-}
-
-.xp-unset:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 /* The With chip wears the chosen person's face (the shared identity, at
@@ -879,22 +533,6 @@
   [popovertarget='xp-people']
   .xp-chevron {
   rotate: 180deg;
-}
-
-.xp-sort {
-  margin-left: auto;
-}
-
-.xp-reset {
-  border-color: transparent;
-  background: none;
-  color: var(--accent-ink);
-  font-weight: 650;
-}
-
-.xp-reset:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
 }
 
 /* Chips that come and go (In progress, Reset) arrive in the row's order. */
@@ -983,8 +621,8 @@
   padding: 0 0.9rem;
   border-radius: 999px;
   color: var(--muted);
-  font-size: 0.8125rem;
-  font-weight: 650;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-demibold);
   white-space: nowrap;
   cursor: pointer;
   transition: color var(--quick);
@@ -1059,21 +697,9 @@
   }
 }
 
-/* ---------- The chip row scrolls sideways, and says so ---------- */
-
-.xp-chips {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: -6px calc(var(--gutter) * -1);
-  padding: 6px var(--gutter);
-  /* A chip scrolled into view (a filter just set) keeps the gutter. */
-  scroll-padding-inline: var(--gutter);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  container: xp-chips / scroll-state;
-}
+/* ---------- The chip row scrolls sideways, and says so ----------
+   (Its row, scroller and scroll-state container are in its markup; a chip
+   scrolled into view keeps the gutter.) */
 
 .xp-chips::before,
 .xp-chips::after {
@@ -1115,40 +741,8 @@
 
 /* ---------- Menus: anchored popovers that know which way they flipped ---------- */
 
-.xp-menu {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--text);
-  overflow: visible;
-}
-
-.xp-menu-in {
-  position: relative;
-  min-width: 240px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background: var(--surface);
-  box-shadow: var(--shadow-float);
-  transform-origin: 34px 0;
-  transition:
-    opacity calc(200ms * var(--slomo)) var(--ease-out),
-    scale calc(360ms * var(--slomo)) var(--ease-spring),
-    translate calc(360ms * var(--slomo)) var(--ease-out);
-}
-
-.xp-menu-list {
-  max-height: min(420px, 62dvh);
-  min-inline-size: 0;
-  margin: 0;
-  /* 28px corners, 12px in: the rows round at 16px. */
-  padding: 12px;
-  border: 0;
-  border-radius: inherit;
-  overflow: auto;
-  overscroll-behavior: contain;
-}
+/* (The menus, their boxes, scrolling lists and titles style themselves in
+   Toolbar.astro: 28px corners, 12px in, so the rows round at 16px.) */
 
 @starting-style {
   .xp-menu:popover-open .xp-menu-in {
@@ -1156,15 +750,6 @@
     scale: 0.94;
     translate: 0 -8px;
   }
-}
-
-.xp-menu-title {
-  float: left;
-  width: 100%;
-  padding: 4px 12px 6px;
-  color: var(--muted);
-  font-size: 0.8125rem;
-  font-weight: 600;
 }
 
 .xp-option {
@@ -1176,8 +761,8 @@
   padding: 0 12px;
   border-radius: var(--r-row);
   color: var(--ink);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
   transition: background-color var(--quick);
 }
@@ -1218,9 +803,9 @@
 
 .xp-option small {
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .xp-option:hover {
@@ -1374,9 +959,9 @@
   --xp-cell: calc(
     (var(--xp-w) - (var(--xp-cols) - 1) * var(--xp-gap-x)) / var(--xp-cols)
   );
-  --xp-facts-lh: calc(0.8125rem * 1.3);
-  --xp-title-lh: calc(var(--xp-title-size) * 1.02);
-  --xp-desc-lh: calc(0.9375rem * 1.5);
+  --xp-facts-lh: calc(var(--text-sm) * var(--leading-snug));
+  --xp-title-lh: calc(var(--xp-title-size) * var(--leading-none));
+  --xp-desc-lh: calc(var(--text-base) * var(--leading-normal));
   --xp-text-h: calc(var(--xp-facts-lh) + 0.3rem + 3 * var(--xp-title-lh));
   display: grid;
   grid-template-columns: repeat(var(--xp-cols), minmax(0, 1fr));
@@ -1535,12 +1120,7 @@
 
 /* The artwork's cell: never transformed, so it keeps its square when the
    artwork leaves for the close-up and is never the box that artwork is
-   placed against. */
-.xp-art-box {
-  grid-area: art;
-  min-width: 0;
-  aspect-ratio: 1;
-}
+   placed against. (Its square is in its markup.) */
 
 /* Under the pointer the artwork grows: a flat scale, from its centre,
    eased both ways (a tile by 6%, a list row's thumb by 12%, so both read).
@@ -1720,7 +1300,7 @@
    while the close-up is open, and the card in or leaving it. */
 .xp[data-open] .xp-card[data-depth] .xp-face,
 .xp-card:is([data-on], [data-swap]) .xp-face {
-  box-shadow: 0 14px 22px -16px oklch(0% 0 0 / 0.5);
+  box-shadow: 0 14px 22px -16px color-mix(in oklch, var(--media-shade) 50%, transparent);
 }
 
 .xp-card:is([data-on], [data-swap]) .xp-face {
@@ -1792,9 +1372,9 @@
   inset: 0 -100%;
   background: linear-gradient(
     90deg,
-    oklch(100% 0 0 / 0) 40%,
-    oklch(100% 0 0 / 0.09) 50%,
-    oklch(100% 0 0 / 0) 60%
+    transparent 40%,
+    color-mix(in oklch, var(--on-media) 9%, transparent) 50%,
+    transparent 60%
   );
   opacity: 0;
   transition: opacity 300ms var(--ease-out);
@@ -1830,12 +1410,6 @@
   }
 }
 
-.xp-chip-kind {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-}
-
 /* The kind's glyph and the "More" chevron are painted from a mask in this
    sheet, once, rather than an inline icon in each of the 261 cards. */
 .xp-chip-kind::before,
@@ -1860,12 +1434,6 @@
   --xp-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
 }
 
-.xp-chip-length {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-}
-
 /* How far the visitor got: their saved place, or live for the episode
    that's loaded. */
 .xp-progress {
@@ -1888,7 +1456,7 @@
    with its number and kind printed on it. */
 .xp-back {
   rotate: y 180deg;
-  box-shadow: 0 60px 70px -40px oklch(0% 0 0 / 0.6);
+  box-shadow: 0 60px 70px -40px color-mix(in oklch, var(--media-shade) 60%, transparent);
   /* Out of 3D it would paint over the front, mirrored. */
   visibility: hidden;
 }
@@ -1902,13 +1470,13 @@
   background:
     radial-gradient(
       circle at 0 0,
-      oklch(10% 0.02 280 / 0.55),
-      oklch(10% 0.02 280 / 0) 55%
+      color-mix(in oklch, var(--media-shade) 55%, transparent),
+      transparent 55%
     ),
     linear-gradient(
       to top,
-      oklch(10% 0.02 280 / 0.5),
-      oklch(10% 0.02 280 / 0) 40%
+      color-mix(in oklch, var(--media-shade) 50%, transparent),
+      transparent 40%
     );
 }
 
@@ -1916,13 +1484,13 @@
   position: absolute;
   top: 5%;
   left: 7%;
-  color: oklch(100% 0 0 / 0.86);
+  color: color-mix(in oklch, var(--on-media) 86%, transparent);
   font-family: var(--font-display);
   /* In proportion to the box (as is everything on the back), so the card
      flying home is the open card made smaller, number and all. */
   font-size: 20cqi;
   font-stretch: 72%;
-  font-weight: 800;
+  font-weight: var(--font-weight-extrabold);
   line-height: 0.8;
   letter-spacing: -0.02em;
 }
@@ -1931,11 +1499,11 @@
   position: absolute;
   right: 6%;
   bottom: 6%;
-  color: oklch(100% 0 0 / 0.9);
+  color: color-mix(in oklch, var(--on-media) 90%, transparent);
   font-size: var(--xp-tag-size, 2.8cqi);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .xp-play {
@@ -1994,21 +1562,11 @@
   margin: 0 0 0.3rem;
   overflow: hidden;
   color: var(--muted);
-  font-size: 0.8125rem;
+  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  line-height: 1.3;
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-snug);
   white-space: nowrap;
-}
-
-.xp-number {
-  color: var(--ink);
-  font-weight: 650;
-}
-
-.xp-facts-kind {
-  color: var(--accent-ink);
-  font-weight: 650;
 }
 
 .xp-facts-length,
@@ -2026,8 +1584,8 @@
   font-family: var(--font-display);
   font-size: var(--xp-title-size);
   font-stretch: 78%;
-  font-weight: 800;
-  line-height: 1.02;
+  font-weight: var(--font-weight-extrabold);
+  line-height: var(--leading-none);
   text-transform: uppercase;
 }
 
@@ -2113,41 +1671,10 @@
   min-width: 0;
 }
 
-.xp-desc {
-  margin: 0;
-  color: var(--text);
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
 /* "More" only where the description is actually cut off (prop-for-that
    truncated, written on the detail). It sits over the end of the last
-   line, so a row's height never depends on it. */
-.xp-more {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  display: none;
-  align-items: center;
-  gap: 2px;
-  padding-left: 2.5rem;
-  /* It fades into the row, lit or not (--xp-lit, below). */
-  background: linear-gradient(
-    to right,
-    transparent,
-    color-mix(in oklch, var(--raised) calc(var(--xp-lit) * 100%), var(--ground))
-      2rem
-  );
-  transition: --xp-lit calc(240ms * var(--slomo)) ease;
-  color: var(--accent-ink);
-  font-size: 0.8125rem;
-  font-weight: 650;
-  line-height: var(--xp-desc-lh);
-}
+   line, so a row's height never depends on it, and fades into the row,
+   lit or not (--xp-lit, below): its markup. */
 
 @container style(--live-truncated-y: 1) {
   .xp-more {
@@ -2155,9 +1682,7 @@
   }
 }
 
-.xp-people,
-.xp-resume,
-.xp-actions {
+.xp-people {
   display: none;
 }
 
@@ -2494,24 +2019,7 @@
   min-height: 420px;
 }
 
-/* Light from the open artwork (prop-for-that img-color), behind it. */
-.xp-cu-glow {
-  grid-area: art;
-  z-index: -1;
-  align-self: center;
-  aspect-ratio: 1;
-  scale: 1.25;
-  background: radial-gradient(
-    closest-side,
-    color-mix(
-      in oklch,
-      var(--live-img-accent, transparent) var(--xp-glow, 40%),
-      transparent
-    ),
-    transparent
-  );
-  pointer-events: none;
-}
+/* (Light from the open artwork, behind it, is the glow in its markup.) */
 
 /* The close-up floats toward you, so its slot leaves room for the
    perspective. */
@@ -2552,7 +2060,7 @@
 .xp-cu-facts,
 .xp-card[data-on] .xp-facts {
   flex-wrap: wrap;
-  font-size: 0.875rem;
+  font-size: var(--text-md);
   letter-spacing: 0.02em;
   white-space: normal;
 }
@@ -2574,7 +2082,7 @@
   );
   font-size: var(--xp-cu-title-size);
   line-height: 0.96;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-snug);
 }
 
 .xp-cu-detail {
@@ -2746,7 +2254,7 @@
 }
 
 :is(.xp-card[data-on], .xp-fading-detail) .xp-desc {
-  max-width: 62ch;
+  max-width: var(--container-lead);
   margin-bottom: 1.1rem;
   -webkit-line-clamp: unset;
 }
@@ -2837,37 +2345,15 @@
   }
 }
 
-.xp-resume {
-  margin: 0 0 1rem;
-  color: var(--accent-ink);
-  font-size: 0.875rem;
-  font-weight: 650;
-}
-
-.xp-actions {
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 6px;
-}
-
 .xp-actions .button-secondary {
   padding: 0.6rem 1.1rem;
-  font-size: 0.875rem;
-}
-
-.xp-queue svg {
-  flex: none;
+  font-size: var(--text-md);
 }
 
 .xp-queue[aria-pressed='true'] {
   border-color: transparent;
   background: var(--accent-soft);
   color: var(--accent-ink);
-}
-
-.xp-close {
-  margin-left: auto;
 }
 
 /* ---------- The filmstrip: every other card, small, leaning back ---------- */
@@ -3036,12 +2522,13 @@
   /* Three lines of description, a line to resume from (when there is
      one), and the row of actions. */
   .xp-closeup {
-    --xp-cu-body-h: calc(3 * 0.9375rem * 1.5 + 12px + 44px);
+    --xp-cu-body-h: calc(3 * var(--text-base) * var(--leading-normal) + 12px + 44px);
   }
 
   .xp-closeup[data-resume] {
     --xp-cu-body-h: calc(
-      3 * 0.9375rem * 1.5 + 12px + 0.875rem * 1.4 + 8px + 44px
+      3 * var(--text-base) * var(--leading-normal) + 12px +
+        var(--text-md) * var(--leading-normal) + 8px + 44px
     );
   }
 
@@ -3127,7 +2614,7 @@
     flex: none;
     margin: 0 0 8px;
     overflow: hidden;
-    line-height: 1.4;
+    line-height: var(--leading-normal);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -3379,23 +2866,4 @@
   }
 }
 
-/* ---------- Nothing matches ---------- */
-
-.xp-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 0 3rem;
-  color: var(--text);
-  text-align: center;
-}
-
-.xp-empty[hidden] {
-  display: none;
-}
-
-.xp-empty p {
-  margin: 0;
-  max-width: 40ch;
-}
+/* (Nothing matches: its column is in EpisodeList.astro.) */

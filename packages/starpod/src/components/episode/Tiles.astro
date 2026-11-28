@@ -12,22 +12,30 @@ export interface Props {
 const { items, label } = Astro.props;
 ---
 
-<ul aria-label={label} class="ep-tiles">
+<ul
+  aria-label={label}
+  class="ep-tiles grid w-full grid-cols-4 gap-3 max-sm:auto-cols-[44%] max-sm:grid-flow-col max-sm:grid-cols-none max-sm:snap-x max-sm:snap-mandatory max-sm:overflow-x-auto max-sm:overscroll-x-contain max-sm:[scrollbar-width:none] max-sm:*:snap-start"
+>
   {
     items.map((item) => (
       <li>
-        <a class="ep-tile" href={item.href}>
-          <span class="ep-tile-art">
+        <a
+          class="ep-tile group/tile flex flex-col gap-2 text-ink no-underline focus-visible:outline-none"
+          href={item.href}
+        >
+          {/* Focus rings the art, on its own corners. */}
+          <span class="ep-tile-art relative block aspect-square overflow-clip rounded-tile bg-surface group-focus-visible/tile:outline-2 group-focus-visible/tile:outline-offset-3 group-focus-visible/tile:outline-accent">
             <img
               alt=""
+              class="block size-full object-cover"
               height="320"
               loading="lazy"
               src={item.art}
               width="320"
             />
-            <span class="ep-tile-chip">{item.number}</span>
+            <span class="absolute top-2 left-2 z-1 rounded-full bg-media-shade/50 px-2 py-[3px] text-xs leading-4 font-demibold text-on-media tabular-nums backdrop-blur-sm backdrop-saturate-140">{item.number}</span>
           </span>
-          <span class="ep-tile-title">{item.title}</span>
+          <span class="line-clamp-2 px-1 text-md leading-5 font-semibold">{item.title}</span>
         </a>
       </li>
     ))

@@ -1,0 +1,206 @@
+/*
+  Utilities and variants for the modern CSS that Tailwind 4.3 doesn't ship
+  (it has masks, starting:, open: for :popover-open, subgrid, container
+  size queries and the rest built in). Each is a line or two, so they live
+  here instead of in a dependency. Where a plugin already settled on names,
+  these follow them, credited per section (all MIT).
+*/
+
+/* ---------- Anchor positioning ----------
+   Names after @toolwind/anchors (MIT, (c) Brandon McConnell,
+   https://github.com/toolwind/anchors). The layout's structural anchoring
+   stays on anchored-auto-layout's data-⚓️-* attributes; these are for
+   one-off positioning. Anchor names are dashed idents, so they go in
+   brackets: anchor-name-[--rail-hl], anchor-[--rail-hl]. Anything with a
+   calc() or a fallback stays an arbitrary value or CSS, and @position-try
+   rules stay CSS. */
+@theme inline {
+  --try-flip-block: flip-block;
+  --try-flip-inline: flip-inline;
+  --try-flip-all: flip-block, flip-inline, flip-block flip-inline;
+}
+
+@utility anchor-name-* {
+  anchor-name: --value([*]);
+}
+
+@utility anchor-scope-* {
+  anchor-scope: --value([*]);
+}
+
+/* position-anchor */
+@utility anchor-* {
+  position-anchor: --value([*]);
+}
+
+@utility top-anchor-* {
+  top: anchor(--value('top', 'bottom', 'center'));
+  top: anchor(--value([*]));
+}
+
+@utility bottom-anchor-* {
+  bottom: anchor(--value('top', 'bottom', 'center'));
+  bottom: anchor(--value([*]));
+}
+
+@utility left-anchor-* {
+  left: anchor(--value('left', 'right', 'center'));
+  left: anchor(--value([*]));
+}
+
+@utility right-anchor-* {
+  right: anchor(--value('left', 'right', 'center'));
+  right: anchor(--value([*]));
+}
+
+@utility w-anchor {
+  width: anchor-size(width);
+}
+
+@utility h-anchor {
+  height: anchor-size(height);
+}
+
+/* position-try-fallbacks: try-flip-block, try-[flip-block,--rail-fly-fit] */
+@utility try-* {
+  position-try-fallbacks: --value(--try-*, [*]);
+}
+
+@utility anchor-visible {
+  position-visibility: anchors-visible;
+}
+
+/* An anchored box its children can query (the variants below). */
+@utility container-anchored {
+  container-type: anchored;
+}
+
+@custom-variant anchored-flip-block {
+  @container anchored(fallback: flip-block) {
+    @slot;
+  }
+}
+
+@custom-variant anchored-flip-inline {
+  @container anchored(fallback: flip-inline) {
+    @slot;
+  }
+}
+
+/* ---------- Scroll-driven animation ----------
+   After adamplesnik/tailwindcss-scroll-driven-animations and
+   midudev/tailwind-animations (both MIT). The timeline is !important
+   because the animate-* shorthand resets animation-timeline. */
+@utility timeline-view {
+  animation-timeline: view() !important;
+}
+
+@utility timeline-scroll {
+  animation-timeline: scroll() !important;
+}
+
+@utility timeline-* {
+  animation-timeline: --value([*]) !important;
+}
+
+@utility view-timeline-* {
+  view-timeline-name: --value([*]);
+}
+
+@utility scroll-timeline-* {
+  scroll-timeline-name: --value([*]);
+}
+
+@utility timeline-scope-* {
+  timeline-scope: --value([*]);
+}
+
+@utility animate-range-* {
+  animation-range: --value([*]);
+}
+
+@utility scroll-target-group {
+  scroll-target-group: auto;
+}
+
+@custom-variant target-current (&:target-current);
+
+/* ---------- View transitions ----------
+   The ::view-transition-* rules hang off the root and stay CSS. */
+@utility vt-name-* {
+  view-transition-name: --value([*]);
+}
+
+@utility vt-class-* {
+  view-transition-class: --value([*]);
+}
+
+/* ---------- Staggers from tree counting ----------
+   Each item a step later than the one before: stagger-40 is 40ms apart. */
+@utility stagger-* {
+  animation-delay: calc((sibling-index() - 1) * --value(integer) * 1ms);
+}
+
+@utility stagger-transition-* {
+  transition-delay: calc((sibling-index() - 1) * --value(integer) * 1ms);
+}
+
+/* ---------- Queries ----------
+   Scroll state, and the prop-for-that states several places read (other
+   style queries take an arbitrary variant:
+   [@container_style(--x:1)]:…). */
+@custom-variant stuck-top {
+  @container scroll-state(stuck: top) {
+    @slot;
+  }
+}
+
+@custom-variant live-paused {
+  @container style(--live-paused: 1) {
+    @slot;
+  }
+}
+
+@custom-variant live-playing {
+  @container style(--live-paused: 0) {
+    @slot;
+  }
+}
+
+@custom-variant truncated {
+  @container style(--live-truncated: 1) {
+    @slot;
+  }
+}
+
+@custom-variant not-truncated {
+  @container style(--live-truncated: 0) {
+    @slot;
+  }
+}
+
+/* ---------- Rendering ---------- */
+@utility content-visibility-auto {
+  content-visibility: auto;
+}
+
+@utility contain-intrinsic-* {
+  contain-intrinsic-size: --value([*]);
+}
+
+@utility overflow-clip-margin-* {
+  overflow-clip-margin: --spacing(--value(integer));
+  overflow-clip-margin: --value([length]);
+}
+
+@utility reading-flow-* {
+  reading-flow: --value(
+    'normal',
+    'grid-rows',
+    'grid-columns',
+    'grid-order',
+    'flex-visual',
+    'flex-flow',
+    'source-order'
+  );
+}

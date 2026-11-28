@@ -41,7 +41,11 @@ const cards = guests.length ? guests : people;
 const hosts = guests.length ? people.filter((person) => !person.guest) : [];
 ---
 
-<ul class="ep-people" data-ep-people data-episode={JSON.stringify(episode)}>
+<ul
+  class="grid grid-flow-dense grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-3"
+  data-ep-people
+  data-episode={JSON.stringify(episode)}
+>
   {
     cards.map((person) => {
       const panel = `ep-person-${person.id}`;
@@ -50,8 +54,8 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
       const who = (
         <>
           <PersonFace size={64} src={person.src} />
-          <span class="ep-person-text">
-            <span class="ep-person-name">{person.name}</span>
+          <span class="flex min-w-0 flex-col gap-0.5">
+            <span class="truncate text-xl leading-5.5 font-demibold text-ink max-sm:line-clamp-2 max-sm:whitespace-normal">{person.name}</span>
             <span class="person-fact">{person.fact}</span>
             {person.share !== undefined && (
               <span class="sr-only">
@@ -64,7 +68,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
       );
       return (
         <li
-          class="ep-person ep-reveal PropFLIP fix-kids"
+          class="ep-person ep-reveal PropFLIP fix-kids data-open:col-span-full"
           data-ep-person
           data-props-for="pointer-local"
           data-share={person.share !== undefined ? '' : undefined}
@@ -76,25 +80,30 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
               : undefined
           }
         >
-          <div class="ep-person-head">
+          {/* Phones: the name may take two lines, and the trailing stat
+              drops under the text so it never squeezes them. */}
+          <div class="ep-person-head relative grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 py-4 pr-5 pl-4 max-sm:grid-cols-[minmax(0,1fr)_auto] max-sm:gap-y-2">
             {opens ? (
               <button
                 aria-controls={panel}
                 aria-expanded="false"
-                class="ep-person-who"
+                class="ep-person-who flex min-w-0 cursor-pointer items-center gap-3.5 text-start outline-none"
                 type="button"
               >
                 {who}
               </button>
             ) : (
-              <div class="ep-person-who">{who}</div>
+              <div class="ep-person-who flex min-w-0 items-center gap-3.5 text-start">{who}</div>
             )}
+            {/* A trailing stat: a seek chip to someone's first line, or
+                their tally (hidden on phones when the fact line above
+                already gives it). */}
             {person.firstLine !== undefined ? (
-              <span class="ep-person-stat">
+              <span class="relative z-1 flex flex-col items-end gap-1 text-xs leading-4 font-semibold text-muted max-sm:col-1 max-sm:row-2 max-sm:ms-19.5 max-sm:flex-row max-sm:items-center max-sm:gap-2 max-sm:justify-self-start">
                 <span aria-hidden="true">First speaks</span>
                 <button
                   aria-label={`First speaks at ${chipLabel(person.firstLine)}`}
-                  class="ep-chip"
+                  class="ep-chip inline-flex h-8 cursor-pointer items-center rounded-full bg-accent-soft px-3 text-sm font-demibold whitespace-nowrap text-accent-ink tabular-nums transition-colors hover:bg-[color-mix(in_oklch,var(--accent)_24%,var(--accent-soft))]"
                   data-seek={person.firstLine}
                   type="button"
                 >
@@ -103,7 +112,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
               </span>
             ) : (
               <span
-                class="ep-chip ep-chip-quiet"
+                class="ep-chip inline-flex h-8 items-center rounded-full bg-raised px-3 text-sm font-demibold whitespace-nowrap text-muted tabular-nums transition-colors max-sm:col-1 max-sm:row-2 max-sm:ms-19.5 max-sm:justify-self-start max-sm:data-counted:hidden"
                 data-counted={person.counted ? '' : undefined}
               >
                 {person.count} {person.count === 1 ? 'ep' : 'eps'}
@@ -112,7 +121,7 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
             {opens && (
               <svg
                 aria-hidden="true"
-                class="ep-person-caret"
+                class="flex-none text-muted transition-[rotate] duration-[calc(480ms*var(--slomo))] ease-spring in-data-open:rotate-180 max-sm:col-2 max-sm:row-1"
                 fill="none"
                 height="16"
                 viewBox="0 0 16 16"
@@ -128,8 +137,16 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
               </svg>
             )}
           </div>
+          {/* Open: their other episodes as art, in a tray 4px in from the
+              card (the card's 28px corner, the tray's 24px, the tiles'
+              20px), then the way on to all of them. On phones the tray
+              scrolls sideways and the next tile peeks. */}
           {opens && (
-            <div class="ep-person-more" hidden id={panel}>
+            <div
+              class="ep-person-more mx-1 mb-1 grid justify-items-start gap-3 rounded-tray bg-raised px-1 pt-1 pb-3"
+              hidden
+              id={panel}
+            >
               <Tiles
                 items={person.others}
                 label={`Other episodes with ${person.name}`}
@@ -151,8 +168,8 @@ const hosts = guests.length ? people.filter((person) => !person.guest) : [];
 
 {
   hosts.length > 0 && (
-    <p class="ep-hosted">
-      <span class="ep-hosted-label">Hosted by</span>
+    <p class="ep-hosted mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+      <span class="text-sm font-semibold text-muted">Hosted by</span>
       {hosts.map((host) => (
         <a
           class="person-chip"

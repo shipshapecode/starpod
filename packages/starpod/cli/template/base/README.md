@@ -34,10 +34,13 @@ Pass options as the second argument to `starpod()` in `astro.config.mjs`:
   [Turso](https://turso.tech) (see `.env.example`). When off, those sections
   simply don't render.
 - `components: { Hosts: './src/components/MyHosts.astro' }` — replace built-in
-  components with your own. Overridable: Dots, EpisodeList, Hosts, InfoCard,
-  LargePlatforms, NotFoundContent, Platforms, ShowArtwork.
+  components with your own. Overridable: Breadcrumbs, EpisodeList, Hosts,
+  InfoCard, LargePlatforms, NotFoundContent, Platforms, ShowArtwork.
 - `customCss: ['./src/styles/theme.css']` — stylesheets loaded after the
-  built-in styles, for theming via CSS custom properties.
+  built-in styles. Set the theme's CSS variables there (`--accent`,
+  `--font-ui`, `--r-card`, `--text-sm` and the rest) to restyle the site;
+  the built-in CSS and the Tailwind utilities both read them. See Theming in
+  the Starpod README for the full list.
 
 ## Custom pages
 

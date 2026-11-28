@@ -40,14 +40,14 @@ function Completion({ text, query }: { text: string; query: string }) {
   }
   const at = text.toLowerCase().indexOf(typed.toLowerCase());
   if (at < 0) {
-    return <b>{text}</b>;
+    return <b class="font-bold">{text}</b>;
   }
   const end = at + typed.length;
   return (
     <>
-      {at > 0 && <b>{text.slice(0, at)}</b>}
+      {at > 0 && <b class="font-bold">{text.slice(0, at)}</b>}
       {text.slice(at, end)}
-      {end < text.length && <b>{text.slice(end)}</b>}
+      {end < text.length && <b class="font-bold">{text.slice(end)}</b>}
     </>
   );
 }
@@ -315,7 +315,7 @@ export default function SearchDialog({
   return (
     <dialog
       ref={dialogRef}
-      class="sp-pal"
+      class="sp-pal fixed inset-0 m-0 size-full max-h-none max-w-none border-0 bg-transparent px-4 pt-[max(10vh,env(safe-area-inset-top))] pb-0 text-text open:flex open:flex-col open:items-center"
       data-state="from"
       onClick={handleBackdropClick}
       onCancel={(e) => {
@@ -325,15 +325,15 @@ export default function SearchDialog({
       aria-modal="true"
       aria-label="Search episodes"
     >
-      <div ref={boxRef} class="sp-box PropFLIP fix-kids">
+      <div ref={boxRef} class="sp-box PropFLIP fix-kids w-full max-w-xl overflow-clip bg-surface shadow-float outline-1 -outline-offset-1 outline-line [--r:20px]">
         <div class="sp-in">
           <i
             aria-hidden="true"
-            class="sp-light"
+            class="sp-light pointer-events-none absolute inset-0 -z-1 bg-[radial-gradient(16rem_circle_at_calc(var(--live-local-pointer-x-ratio)*100%)_calc(var(--live-local-pointer-y-ratio)*100%),color-mix(in_oklch,var(--glow-a)_14%,transparent),transparent_70%)] opacity-(--live-local-pointer-inside) [transition:opacity_calc(0.3s*var(--slomo))_ease]"
             data-props-for="pointer-local"
           />
           {/* Search Input */}
-          <div class="sp-field">
+          <div class="sp-field flex items-center border-b border-line px-3 transition-[border-color] duration-200 ease-out focus-within:border-accent">
             <span
               class="search-icon text-muted h-5 w-5 shrink-0"
               aria-hidden="true"
@@ -341,7 +341,7 @@ export default function SearchDialog({
             <input
               ref={inputRef}
               type="text"
-              class="text-ink placeholder-muted flex-1 border-none bg-transparent px-3 py-4 outline-none! focus:ring-0"
+              class="text-ink placeholder-muted min-w-0 flex-1 border-none bg-transparent px-3 py-4 outline-none! focus:ring-0"
               placeholder="Search episodes..."
               value={query}
               onInput={onInput}
@@ -359,12 +359,12 @@ export default function SearchDialog({
                 items[selectedIndex] && optionId(items[selectedIndex])
               }
             />
-            <kbd class="sp-esc text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs sm:inline-flex">
-              <span class="text-xs">ESC</span>
+            <kbd class="sp-esc text-text bg-raised border-line hidden items-center gap-1 rounded border px-2 py-1 text-xs leading-4 sm:inline-flex pointer-coarse:hidden">
+              <span class="text-xs leading-4">ESC</span>
             </kbd>
             {/* On touch, where there is no Escape key to show. */}
             <button
-              class="sp-cancel"
+              class="sp-cancel hidden pointer-coarse:-me-2 pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:flex-none pointer-coarse:cursor-pointer pointer-coarse:items-center pointer-coarse:rounded-thumb pointer-coarse:border-0 pointer-coarse:bg-transparent pointer-coarse:px-2 pointer-coarse:text-base pointer-coarse:font-semibold pointer-coarse:text-accent-ink"
               onClick={() => (isSearchOpen.value = false)}
               type="button"
             >
@@ -376,7 +376,7 @@ export default function SearchDialog({
           <div
             ref={resultsRef}
             id="search-results"
-            class="sp-results"
+            class="sp-results relative h-[min(20rem,46dvh)] overflow-y-auto overscroll-contain p-2"
             role="listbox"
             aria-label="Results"
           >
@@ -398,7 +398,7 @@ export default function SearchDialog({
                   return (
                     <Fragment key={item.key}>
                       {caption && (
-                        <p aria-hidden="true" class="sp-group">
+                        <p aria-hidden="true" class="sp-group mx-2 mt-1.5 mb-1 not-nth-2:mt-3 text-xs font-semibold text-muted">
                           {caption}
                         </p>
                       )}
@@ -411,8 +411,8 @@ export default function SearchDialog({
                           // Whole class strings: the Tailwind Prettier plugin
                           // trims the space a template would join them by.
                           item.kind === 'person'
-                            ? 'sp-row PropFLIP sp-person'
-                            : 'sp-row PropFLIP'
+                            ? 'sp-row PropFLIP sp-person relative z-1 box-border flex min-h-11 cursor-pointer items-center gap-3 p-2 py-1 text-inherit no-underline decoration-auto [--r:var(--r-tile)]'
+                            : 'sp-row PropFLIP relative z-1 flex cursor-pointer items-center gap-3 p-2 text-inherit no-underline decoration-auto [--r:var(--r-tile)]'
                         }
                         role="option"
                         aria-selected={selected}
@@ -439,8 +439,8 @@ export default function SearchDialog({
                                 width="32"
                               />
                             </span>
-                            <span class="sp-text">
-                              <span class="sp-name">
+                            <span class="grid min-w-0 flex-1 gap-0.5">
+                              <span class="sp-name min-w-0 truncate text-md leading-4.5 font-medium text-ink">
                                 <Completion
                                   query={query}
                                   text={item.person.label}
@@ -458,32 +458,32 @@ export default function SearchDialog({
                           <>
                             <img
                               alt=""
-                              class="sp-thumb"
+                              class="sp-thumb size-10 flex-none rounded-thumb object-cover outline-1 -outline-offset-1 outline-hairline"
                               height="40"
                               loading="lazy"
                               src={item.episode.episodeThumbnail}
                               width="40"
                             />
-                            <span class="sp-text">
-                              <span class="sp-head">
-                                <span class="sp-num">
+                            <span class="grid min-w-0 flex-1 gap-0.5">
+                              <span class="flex min-w-0 items-baseline gap-2">
+                                <span class="text-xs font-medium text-muted">
                                   #{item.episode.episodeNumber}
                                 </span>
-                                <span class="sp-title">
+                                <span class="sp-title truncate text-md font-medium text-ink max-sm:line-clamp-2 max-sm:whitespace-normal">
                                   <Completion
                                     query={query}
                                     text={item.episode.title}
                                   />
                                 </span>
                               </span>
-                              <span class="sp-desc">
+                              <span class="truncate text-xs text-text">
                                 {item.episode.description}
                               </span>
                             </span>
                           </>
                         )}
                         {selected && (
-                          <kbd class="text-text bg-surface border-line hidden items-center rounded border px-2 py-1 text-xs sm:inline-flex">
+                          <kbd class="text-text bg-surface border-line hidden items-center rounded border px-2 py-1 text-xs leading-4 sm:inline-flex">
                             ↵
                           </kbd>
                         )}
@@ -496,7 +496,7 @@ export default function SearchDialog({
           </div>
 
           {/* Footer */}
-          <div class="border-line text-text flex items-center justify-between border-t px-4 py-2 text-xs">
+          <div class="border-line text-text flex items-center justify-between border-t px-4 py-2 text-xs leading-4">
             <div class="flex items-center gap-4">
               <span class="hidden items-center gap-1 sm:inline-flex">
                 <kbd class="bg-raised border-line rounded border px-1.5 py-0.5">

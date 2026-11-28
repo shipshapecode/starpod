@@ -69,16 +69,18 @@ const cast = await Promise.all(
 );
 ---
 
+<!-- Islands that are direct stage children take part in its grid
+     ([&>astro-island]:contents). -->
 <section
   aria-labelledby={titleId}
-  class="stage"
+  class="stage mb-[clamp(40px,6vw,80px)] grid grid-cols-[minmax(0,1fr)] gap-5 [grid-template-areas:'frame'_'meta'_'script'] [&>astro-island]:contents"
   data-has-video={episode.video ? '' : undefined}
   data-split={split ? '' : undefined}
   data-stage
   data-variant={variant}
 >
   <div class="stage-side">
-  <div class="stage-room">
+  <div class="stage-room relative min-w-0 [grid-area:frame]">
   <div aria-hidden="true" class="stage-light" style={`--art: url("${art}")`}>
     <canvas
       class="stage-light-canvas"
@@ -88,11 +90,16 @@ const cast = await Promise.all(
       width="32"
     ></canvas>
   </div>
-  <div class="stage-frame PropFLIP" data-stage-frame>
-    <div aria-hidden="true" class="stage-ambient" style={`--art: url("${art}")`}></div>
+  <div class="stage-frame PropFLIP relative isolate aspect-video overflow-hidden bg-media-ground shadow-soft" data-stage-frame>
+    <!-- The artwork, at home on its own colour field: the fallback stage for
+         audio-only episodes and for anyone choosing to listen. -->
+    <div
+      aria-hidden="true"
+      class="absolute inset-[-12%] bg-(image:--art) bg-cover bg-center [filter:blur(48px)_saturate(1.35)_brightness(0.55)] [transform:scale(1.1)]"
+      style={`--art: url("${art}")`}></div>
     <img
       alt={`${episode.title} - episode art`}
-      class="stage-art"
+      class="stage-art absolute top-1/2 left-1/2 aspect-square h-[74%] w-auto rounded-[calc(var(--radius-frame)-2px)] object-cover shadow-float -translate-1/2 [transition:scale_700ms_var(--ease-out),opacity_500ms_var(--ease-out)]"
       decoding="async"
       fetchpriority="high"
       height="960"
@@ -100,43 +107,45 @@ const cast = await Promise.all(
       style={`view-transition-name: vt-art-${dasherize(episode.title)}`}
       width="960"
     />
-    <div class="stage-slot" data-episode-id={episode.id} data-media-slot></div>
+    <div class="stage-slot absolute inset-0 z-1" data-episode-id={episode.id} data-media-slot></div>
     <StageControls client:load episode={playable} part="overlay" />
   </div>
   </div>
 
-  <div class="stage-meta">
+  <div class="stage-meta min-w-0 [grid-area:meta]">
     <Heading
-      class="stage-title"
+      class="stage-title mb-3 max-w-title font-display text-[length:clamp(1.75rem,1.1rem+2.4vw,3.25rem)] leading-none font-bold tracking-tight"
       id={titleId}
       style={`view-transition-name: vt-${dasherize(episode.title)}`}
     >
       {episode.title}
     </Heading>
-    <p class="stage-facts">
+    <p
+      class="stage-facts mb-4 flex flex-wrap items-center gap-x-4 gap-y-[0.3rem] overflow-hidden text-md text-muted"
+    >
       <span>{episode.episodeNumber === 'Bonus' ? 'Bonus' : `Episode ${episode.episodeNumber}`}</span>
       <time datetime={date.toISOString()}>
         {date.toLocaleDateString('en-us', { month: 'short', day: 'numeric', year: 'numeric' })}
       </time>
       <span>{formatDuration(episode.duration)}</span>
-      <span class="stage-kind">
+      <span class="stage-kind inline-flex items-center gap-[0.35rem] font-demibold text-accent-ink">
         {episode.video ? <VideoIcon size={15} /> : <HeadphonesIcon size={15} />}
         {episode.video ? 'Video' : 'Audio'}
       </span>
     </p>
     {
       cast.length > 0 && (
-        <ul aria-label="Creators and guests" class="cast">
+        <ul aria-label="Creators and guests" class="cast mb-5 hidden flex-wrap gap-x-5.5 gap-y-2.5">
           {cast.map((person) => (
             <li
-              class="cast-member"
+              class="cast-member flex items-center gap-2.5"
               data-speaks-as={person.speaksAs}
               data-voice={person.voice ?? 'none'}
             >
               <PersonFace src={person.src} />
-              <span class="flex flex-col leading-tight">
+              <span class="flex flex-col leading-snug">
                 <span class="cast-name text-ink font-semibold">{person.name}</span>
-                <span class="text-muted text-xs font-semibold">
+                <span class="text-muted text-xs leading-4 font-semibold">
                   {person.guest ? 'Guest' : 'Host'}
                 </span>
               </span>
@@ -146,11 +155,11 @@ const cast = await Promise.all(
       )
     }
     <Sponsors sponsors={sponsors} />
-    <p class="stage-desc">{episode.description}</p>
+    <p class="stage-desc mb-5 max-w-lead text-xl text-text">{episode.description}</p>
     <StageControls client:load episode={playable} part="actions" />
     {
       variant === 'feature' && (
-        <a class="link-on" href={`/${episode.episodeSlug}`}>
+        <a class="link-on mt-[1.1rem] inline-flex items-center gap-[0.35rem] font-demibold no-underline" href={`/${episode.episodeSlug}`}>
           Show notes and transcript
           <ArrowOutIcon size={16} />
         </a>
@@ -175,7 +184,7 @@ const cast = await Promise.all(
     )
   }
 
-  <div class="stage-script" id={scriptId}>
+  <div class="stage-script min-w-0 [grid-area:script]" id={scriptId}>
     {
       split && (
         <div

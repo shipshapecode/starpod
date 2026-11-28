@@ -88,7 +88,10 @@ export const RailIcon = (p: IconProps) => (
   <Svg {...p}>
     <rect height="15" rx="2.5" width="17" x="3.5" y="4.5" />
     <path d="M9.5 4.5v15" />
-    <path class="rail-chevron" d="m15.5 10-2 2 2 2" />
+    <path
+      class="rail-chevron lg:origin-center lg:transform-fill lg:[transition:rotate_calc(0.6s*var(--slomo))_var(--ease-spring)]"
+      d="m15.5 10-2 2 2 2"
+    />
   </Svg>
 );
 

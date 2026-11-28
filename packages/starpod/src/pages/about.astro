@@ -123,6 +123,18 @@ const together =
           .map(tile)
       )
     : [];
+
+// The photo's lower third fades into the poster's ground (.ab-host-photo's
+// ::after); a hairline sits just inside it, above the picture.
+const hostPhoto =
+  'block size-full rounded-t-card object-cover object-[center_30%] outline-1 -outline-offset-1 outline-hairline';
+
+// The name in the host's voice: voice 0 condensed Archivo, voice 1 Young
+// Serif, anyone else the plain grotesque.
+const voiceName: Record<number, string> = {
+  0: 'font-voice-0 font-heavy font-stretch-[72%] uppercase',
+  1: 'font-voice-1 font-normal'
+};
 ---
 
 <Layout title="About">
@@ -139,46 +151,73 @@ const together =
     <section aria-labelledby="hosts-heading" class="mt-16 lg:mt-20">
       <h2 class="section-title" id="hosts-heading">Meet the hosts</h2>
 
-      <ul class="ab-hosts">
+      {/* Each poster is a subgrid of six rows (photo, name, stats, bio,
+          episodes, links), so side by side the bios, episodes and links
+          line up even when one host's bio runs longer. Posters are at
+          least 320px and as many fit across as will, so two hosts on a wide
+          screen sit at a comfortable size beside an empty column rather than
+          stretching, and three or more fill the row. The list's row gap is
+          the posters' own 12px (a subgrid's rows share it), and each poster's
+          margin makes up the 24px between stacked posters. */}
+      <ul class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))] gap-x-6 gap-y-3">
         {
           posters.map((host) => (
-            <li class="ab-host ep-reveal" data-voice={host.voice}>
+            <li
+              class="ab-host ep-reveal row-span-6 mb-3 grid grid-cols-1 grid-rows-subgrid overflow-clip rounded-card bg-(--ab-ground) pb-6"
+              data-voice={host.voice}
+            >
               <div
-                class="ab-host-photo"
+                class="ab-host-photo relative row-start-1 aspect-[4/3]"
                 data-props-for="img-color"
                 data-props-to=".ab-host"
               >
                 {host.photo ? (
-                  <Image alt="" src={host.photo} width={720} />
+                  <Image alt="" class={hostPhoto} src={host.photo} width={720} />
                 ) : (
-                  <img alt="" height={540} src={avatar} width={720} />
+                  <img
+                    alt=""
+                    class={hostPhoto}
+                    height={540}
+                    src={avatar}
+                    width={720}
+                  />
                 )}
               </div>
 
-              <div class="ab-host-body">
-                <h3 class="ab-host-name">{host.name}</h3>
-                {host.stats && <p class="person-fact">{host.stats}</p>}
-                {host.bio && <p class="ab-host-bio">{host.bio}</p>}
+              {/* Over the photo's faded foot, and sized to the poster (the
+                  wrapper is the container: on the poster itself, containment
+                  would stop it being a subgrid), so the longest one-word name
+                  still fits on one line. */}
+              <div class="@container relative row-start-2 mx-6 -mt-10">
+                <h3
+                  class={`m-0 text-[min(2.5rem,100cqi/8.5)] leading-none text-[var(--person-ring,var(--ink))] ${voiceName[host.voice ?? -1] ?? 'font-extrabold'}`}
+                >
+                  {host.name}
+                </h3>
+              </div>
+              {host.stats && <p class="person-fact row-start-3 mx-6">{host.stats}</p>}
+              {host.bio && <p class="row-start-4 mx-6 max-w-bio text-text">{host.bio}</p>}
 
-                {together.length === 0 && host.recent.length > 0 && (
-                  <div class="ab-host-tray">
-                    <Tiles
-                      items={host.recent}
-                      label={`Latest episodes with ${host.name}`}
-                    />
-                    {host.id && (
-                      <a
-                        aria-label={`All ${host.count} episodes with ${host.name}`}
-                        class="ep-pill"
-                        href={`/#guest=${encodeURIComponent(host.id)}`}
-                      >
-                        All {host.count}
-                        <ArrowOutIcon size={14} />
-                      </a>
-                    )}
-                  </div>
-                )}
-                {together.length > 0 && host.id && (
+              {together.length === 0 && host.recent.length > 0 && (
+                <div class="ab-host-tray row-start-5 mx-6 box-border grid justify-items-start gap-3 self-start rounded-tray bg-surface/72 px-1 pt-1 pb-3">
+                  <Tiles
+                    items={host.recent}
+                    label={`Latest episodes with ${host.name}`}
+                  />
+                  {host.id && (
+                    <a
+                      aria-label={`All ${host.count} episodes with ${host.name}`}
+                      class="ep-pill"
+                      href={`/#guest=${encodeURIComponent(host.id)}`}
+                    >
+                      All {host.count}
+                      <ArrowOutIcon size={14} />
+                    </a>
+                  )}
+                </div>
+              )}
+              {together.length > 0 && host.id && (
+                <div class="row-start-5 mx-6">
                   <a
                     aria-label={`All ${host.count} episodes with ${host.name}`}
                     class="ep-pill"
@@ -187,26 +226,26 @@ const together =
                     All {host.count}
                     <ArrowOutIcon size={14} />
                   </a>
-                )}
+                </div>
+              )}
 
-                {linksFor(host).length > 0 && (
-                  <ul class="ab-host-links">
-                    {linksFor(host).map(({ href, Icon, label }) => (
-                      <li>
-                        <a
-                          class="ep-pill"
-                          href={href}
-                          rel="noopener"
-                          target="_blank"
-                        >
-                          <Icon size={16} />
-                          {label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+              {linksFor(host).length > 0 && (
+                <ul class="ab-host-links row-start-6 mx-6 mt-1 flex flex-wrap gap-2 self-start">
+                  {linksFor(host).map(({ href, Icon, label }) => (
+                    <li>
+                      <a
+                        class="ep-pill"
+                        href={href}
+                        rel="noopener"
+                        target="_blank"
+                      >
+                        <Icon size={16} />
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))
         }
@@ -214,8 +253,8 @@ const together =
 
       {
         together.length > 0 && (
-          <div class="ab-latest ep-reveal">
-            <h3 class="ab-latest-title">Latest episodes</h3>
+          <div class="ep-reveal mt-8">
+            <h3 class="mb-3 text-base leading-5 font-demibold">Latest episodes</h3>
             <Tiles items={together} label="Latest episodes with the hosts" />
           </div>
         )

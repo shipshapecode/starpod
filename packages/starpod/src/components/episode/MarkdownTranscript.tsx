@@ -41,7 +41,7 @@ export default function MarkdownTranscript({
 
   return (
     <article
-      class="transcript"
+      class="transcript text-xl leading-relaxed wrap-anywhere text-text"
       data-clamped
       data-props-for="truncated"
       data-props-to=".transcript-section"

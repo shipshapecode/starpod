@@ -46,6 +46,7 @@
     .btn,
     .button-secondary,
     .text-button,
+    .ep-pill,
     .medium-switch
   ) {
   --halo: 0;
@@ -58,6 +59,7 @@
     .btn,
     .button-secondary,
     .text-button,
+    .ep-pill,
     .medium-switch
   )::after {
   content: '';
@@ -87,6 +89,7 @@
     .btn,
     .button-secondary,
     .text-button,
+    .ep-pill,
     .medium-switch
   ):is(:focus-visible, [data-flash]) {
   --halo: 100;
@@ -115,8 +118,8 @@
 }
 
 .stage-play {
-  --fill-a: oklch(98% 0.005 285);
-  --fill-b: oklch(98% 0.005 285);
+  --fill-a: var(--on-media);
+  --fill-b: var(--on-media);
 }
 
 [data-episode-row][data-current] .row-play {
@@ -211,13 +214,45 @@
   --icon-b: var(--glow-b);
 }
 
+/* An outlined control's icon fades into the gradient with its outline. At
+   rest it keeps the colour it would have had (currentColor, so the icon's
+   own colour, e.g. a muted chevron). */
+:where(.halo, .btn, .button-secondary, .text-button, .ep-pill) {
+  --icon-a: currentColor;
+  --icon-b: currentColor;
+}
+
+:where(.halo, .btn, .button-secondary, .text-button, .ep-pill) svg {
+  stroke: var(--icon-paint, currentColor);
+}
+
+:where(.halo, .btn, .button-secondary, .text-button, .ep-pill)
+  svg
+  :is([fill='currentColor'], text) {
+  fill: var(--icon-paint, currentColor);
+}
+
+:where(.halo, .btn, .button-secondary, .text-button, .ep-pill):is(
+    :focus-visible,
+    [data-flash]
+  ) {
+  --icon-a: var(--glow-a);
+  --icon-b: var(--glow-b);
+}
+
 /* Pointer hover, for real pointers only: touch keeps :hover after a tap. */
 @media (hover: hover) {
+  :where(.halo, .btn, .button-secondary, .text-button, .ep-pill):hover {
+    --icon-a: var(--glow-a);
+    --icon-b: var(--glow-b);
+  }
+
   :where(
       .halo,
     .btn,
     .button-secondary,
     .text-button,
+    .ep-pill,
     .medium-switch
     ):hover {
     --halo: 100;

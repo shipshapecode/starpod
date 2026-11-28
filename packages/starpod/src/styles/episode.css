@@ -91,21 +91,11 @@
   view-timeline-inset: var(--ep-stick) 0px;
 }
 
-.ep-section {
-  margin-bottom: clamp(56px, 7vw, 96px);
-}
-
 /* ---------- The bar ---------- */
 
 .ep-bar {
-  position: sticky;
-  top: var(--ep-stick);
-  /* In the page's flow it sits under the dock (45): at scroll 0 it can fall
-     right where the dock floats, and must not cover the dock's controls. */
-  z-index: 44;
   container: ep-bar / scroll-state;
   interpolate-size: allow-keywords;
-  margin: 0 calc(var(--gutter) * -1) clamp(32px, 5vw, 56px);
 }
 
 /* Once stuck at the top it lifts over the flying picture (46), so a
@@ -131,50 +121,26 @@
   }
 }
 
-.ep-bar-row {
-  display: flex;
-  align-items: center;
-  height: var(--ep-bar-h);
-  padding: 0 var(--gutter);
-  box-sizing: border-box;
-  border-block: 1px solid var(--line);
-  transition:
-    background-color 300ms var(--ease-out),
-    border-color 300ms var(--ease-out);
-}
-
 /* Docked: the bar takes the top bar's glass. Browsers that can't tell
    when it is docked always give it the glass. */
 @container ep-bar scroll-state(stuck: top) {
   .ep-bar-row {
     border-top-color: transparent;
     background: color-mix(in oklch, var(--ground) 86%, transparent);
-    backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(var(--blur-glass)) saturate(1.4);
   }
 }
 
 @supports not (container-type: scroll-state) {
   .ep-bar-row {
     background: color-mix(in oklch, var(--ground) 86%, transparent);
-    backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(var(--blur-glass)) saturate(1.4);
   }
 }
 
 /* The episode itself: play and title. It only arrives once the stage has
    scrolled away (the bar docks), growing in from nothing so the section
    links slide over to make room, and leaves the same way. */
-.ep-bar-id {
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  max-width: min(40%, 30rem);
-  margin-inline-end: 16px;
-  overflow: clip;
-  overflow-clip-margin: 6px;
-}
-
 @supports (animation-trigger: --ep-docked play-forwards) {
   .ep-bar-id {
     animation-name: ep-bar-arrive;
@@ -235,12 +201,6 @@
 }
 
 .ep-bar-ring {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
   /* Playback fills the ring, read from the media clock on the ring itself
      (BarPlay binds it only while this episode is loaded): exact progress
      about four times a second, drawn as it comes. A tween between ticks
@@ -266,15 +226,7 @@
 .ep-bar-play {
   --fill-a: var(--ink);
   --fill-b: var(--ink);
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: 999px;
   background: linear-gradient(to right, var(--fill-a), var(--fill-b));
-  color: var(--on-ink);
-  cursor: pointer;
   transition:
     --fill-a 300ms var(--ease-out),
     --fill-b 300ms var(--ease-out),
@@ -288,14 +240,11 @@
   color: var(--on-glow);
 }
 
-.ep-bar-play:active {
-  scale: 0.92;
-}
-
 /* Touch: the disc stays 40px, and its button answers a 44px square. The
-   episode's clip grows to take it in (WebKit has no overflow-clip-margin)
-   without moving anything: 2px above and below, and 4px before the disc,
-   since on phones nothing follows the disc and the clip ends at it. */
+   episode's clip (.ep-bar-id's pointer-coarse: classes) grows to take it in
+   (WebKit has no overflow-clip-margin) without moving anything: 2px above
+   and below, and 4px before the disc, since on phones nothing follows the
+   disc and the clip ends at it. */
 @media (pointer: coarse) {
   .ep-bar-play::after {
     content: '';
@@ -304,58 +253,10 @@
     inset-inline: -7px -3px;
     border-radius: 999px;
   }
-
-  .ep-bar-id {
-    margin-block: -2px;
-    margin-inline-start: -4px;
-    padding-block: 2px;
-    padding-inline-start: 4px;
-  }
-}
-
-.ep-bar-title {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  color: var(--ink);
-  line-height: 1.2;
-  text-decoration: none;
-}
-
-.ep-bar-number {
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-
-.ep-bar-name {
-  overflow: hidden;
-  font-size: 0.875rem;
-  font-weight: 700;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@media (max-width: 639px) {
-  .ep-bar-title {
-    display: none;
-  }
 }
 
 /* Reading progress along the bar's lower edge: how far through the page
    below the stage you are, on a view timeline. Shown once docked. */
-.ep-bar-read {
-  position: absolute;
-  inset: auto 0 -1px;
-  height: 2px;
-  background: var(--line-strong);
-  opacity: 0;
-  scale: 0 1;
-  transform-origin: left;
-  transition: opacity 300ms var(--ease-out);
-}
-
 @supports (animation-timeline: view()) {
   .ep-bar-read {
     animation: ep-read linear both;
@@ -381,27 +282,12 @@
 /* The links scroll sideways when they don't fit; edges fade only on the
    side there is more to see (scroll-state queries). */
 .ep-nav {
-  position: relative;
-  flex: 1;
-  min-width: 0;
   container: ep-nav / scroll-state;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
   scrollbar-width: none;
 }
 
 .ep-nav::-webkit-scrollbar {
   display: none;
-}
-
-.ep-nav ol {
-  display: flex;
-  gap: 2px;
-  width: max-content;
-  margin: 0;
-  padding: 4px 0;
-  list-style: none;
-  scroll-target-group: auto;
 }
 
 .ep-nav ol::before,
@@ -440,34 +326,9 @@
   }
 }
 
-.ep-nav a {
-  position: relative;
-  z-index: 1;
-  display: block;
-  padding: 0.45rem 0.85rem;
-  border-radius: 999px;
-  color: var(--muted);
-  font-size: 0.875rem;
-  font-weight: 650;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color 300ms var(--ease-out);
-}
-
-@media (hover: hover) {
-  .ep-nav a:hover {
-    color: var(--ink);
-  }
-}
-
 /* You are here: the browser tracks the current section (scroll-target-group)
-   and the link for it becomes the anchor. One indicator glides between
-   links on that anchor; nothing is measured. */
-.ep-nav a:target-current {
-  anchor-name: --ep-here;
-  color: var(--accent-ink);
-}
-
+   and the link for it (target-current:) becomes the anchor. One indicator
+   glides between links on that anchor; nothing is measured. */
 @supports not (scroll-target-group: auto) {
   .ep-nav a[aria-current] {
     anchor-name: --ep-here;
@@ -493,12 +354,6 @@
 /* Touch: each link is a 44px-tall target, and the pill under the current
    one keeps its size. */
 @media (pointer: coarse) {
-  .ep-nav a {
-    display: flex;
-    align-items: center;
-    min-height: 44px;
-  }
-
   .ep-nav-here {
     top: calc(anchor(top) + 4px);
     height: calc(anchor-size(height) - 8px);
@@ -639,12 +494,6 @@
   }
 }
 
-/* Portraits and art hold a still placeholder until they load: nothing runs
-   on the many lazy images still off screen. */
-.ep-card-art {
-  background: var(--raised);
-}
-
 /* ---------- People ---------- */
 
 /* Guests lead in cards (the hosts do when there are no guests), and the
@@ -652,15 +501,6 @@
    name, the line that says something, and a trailing stat; along its lower
    edge, when the transcript names them, how much of the talking is theirs.
    The person's identity itself (ring, fact line, chip) is people.css. */
-.ep-people {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 25rem), 1fr));
-  grid-auto-flow: dense;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 
 /* Each card is a PropFLIP box: opening one re-flows the grid and every card
    flips from where it was; its children un-squish (fix-kids). */
@@ -677,10 +517,6 @@
      over its neighbours mid-flight. The margin keeps focus rings whole. */
   overflow: clip;
   overflow-clip-margin: 5px;
-}
-
-.ep-person[data-open] {
-  grid-column: 1 / -1;
 }
 
 /* Their share of the talking: a 4px bar in their voice along the card's
@@ -710,36 +546,9 @@
     auto;
 }
 
-.ep-person-head {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 20px 16px 16px;
-}
-
-.ep-person-who {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: start;
-}
-
 /* A card that opens opens from anywhere on it: the button's hit area
    stretches over the whole head (the seek chip sits above it). Hover tints
    it; nothing moves. */
-button.ep-person-who {
-  cursor: pointer;
-  outline: none;
-}
-
 button.ep-person-who::after {
   content: '';
   position: absolute;
@@ -760,191 +569,6 @@ button.ep-person-who:focus-visible::after {
   outline-offset: -2px;
 }
 
-.ep-person-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.ep-person-name {
-  overflow: hidden;
-  color: var(--ink);
-  font-size: 1.0625rem;
-  font-weight: 650;
-  line-height: 1.375rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Phones: the name may take two lines, and the trailing stat drops under
-   the text so it never squeezes them. */
-@media (max-width: 639px) {
-  .ep-person-name {
-    display: -webkit-box;
-    white-space: normal;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
-  .ep-person-head {
-    grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 8px;
-  }
-
-  .ep-person-head > :is(.ep-chip, .ep-person-stat) {
-    grid-row: 2;
-    grid-column: 1;
-    justify-self: start;
-    margin-inline-start: 78px;
-  }
-
-  .ep-person-head > .ep-person-stat {
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* A tally the fact line above already gives would only repeat it. */
-  .ep-person-head > .ep-chip-quiet[data-counted] {
-    display: none;
-  }
-
-  .ep-person-caret {
-    grid-row: 1;
-    grid-column: 2;
-  }
-}
-
-.ep-person-stat {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1rem;
-}
-
-/* A trailing stat: a seek chip to someone's first line, or their tally. */
-.ep-chip {
-  display: inline-flex;
-  align-items: center;
-  height: 32px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent-ink);
-  font: inherit;
-  font-size: 0.8125rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 650;
-  white-space: nowrap;
-  transition: background-color var(--quick);
-}
-
-button.ep-chip {
-  cursor: pointer;
-}
-
-@media (hover: hover) {
-  button.ep-chip:hover {
-    background: color-mix(in oklch, var(--accent) 24%, var(--accent-soft));
-  }
-}
-
-.ep-chip-quiet {
-  background: var(--raised);
-  color: var(--muted);
-}
-
-.ep-person-caret {
-  flex: none;
-  color: var(--muted);
-  transition: rotate calc(480ms * var(--slomo)) var(--ease-spring);
-}
-
-[data-open] .ep-person-caret {
-  rotate: 180deg;
-}
-
-/* Open: their other episodes as art, in a tray 4px in from the card (the
-   card's 28px corner, the tray's 24px, the tiles' 20px), then the way on to
-   all of them. On phones the tray scrolls sideways and the next tile peeks. */
-.ep-person-more {
-  display: grid;
-  justify-items: start;
-  gap: 12px;
-  margin: 0 4px 4px;
-  padding: 4px 4px 12px;
-  border-radius: var(--r-tray);
-  background: var(--raised);
-}
-
-.ep-tiles {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (max-width: 639px) {
-  .ep-tiles {
-    grid-template-columns: none;
-    grid-auto-columns: 44%;
-    grid-auto-flow: column;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-
-  .ep-tiles > li {
-    scroll-snap-align: start;
-  }
-}
-
-.ep-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: var(--ink);
-  text-decoration: none;
-}
-
-/* Focus rings the art, on its own corners. */
-.ep-tile:focus-visible {
-  outline: none;
-}
-
-.ep-tile:focus-visible .ep-tile-art {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-.ep-tile-art {
-  position: relative;
-  display: block;
-  aspect-ratio: 1;
-  overflow: clip;
-  border-radius: var(--r-tile);
-  background: var(--surface);
-}
-
-.ep-tile-art img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 /* The hairline over the art, which also takes the hover tint. */
 .ep-tile-art::after {
   content: '';
@@ -963,33 +587,6 @@ button.ep-chip {
   }
 }
 
-.ep-tile-chip {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 1;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: color-mix(in oklch, oklch(0% 0 0) 42%, transparent);
-  backdrop-filter: blur(10px) saturate(1.4);
-  color: oklch(100% 0 0);
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 650;
-  line-height: 1rem;
-}
-
-.ep-tile-title {
-  display: -webkit-box;
-  overflow: hidden;
-  padding-inline: 4px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
 .ep-pill {
   display: inline-flex;
   align-items: center;
@@ -998,36 +595,15 @@ button.ep-chip {
   margin-inline-start: 4px;
   padding: 0 14px;
   border-radius: 999px;
+  border: 1px solid var(--line-strong);
   background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--line-strong);
   color: var(--ink);
-  font-size: 0.8125rem;
-  font-weight: 650;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-demibold);
   text-decoration: none;
-  transition: box-shadow var(--quick);
-}
-
-@media (hover: hover) {
-  .ep-pill:hover {
-    box-shadow: inset 0 0 0 1px var(--ink);
-  }
 }
 
 /* With guests, the hosts in one line under them. */
-.ep-hosted {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 20px;
-  margin: 16px 0 0;
-}
-
-.ep-hosted-label {
-  color: var(--muted);
-  font-size: 0.8125rem;
-  font-weight: 600;
-}
-
 .ep-hosted .person-chip {
   transition: color var(--quick);
 }
@@ -1079,31 +655,10 @@ button.ep-chip {
 
 /* ---------- Sponsors ---------- */
 
-.ep-sponsors {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ep-sponsor {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 12px 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background-color: var(--surface);
-  color: var(--muted);
-  text-decoration: none;
-}
-
 /* A sponsor's logo sits on a white circle, wherever it appears. Logos drawn
    in ink stay dark on it in either theme. */
 .ep-logo {
-  --ink: oklch(22% 0.02 280);
+  --ink: var(--on-media-ink);
   position: relative;
   display: grid;
   flex: none;
@@ -1113,8 +668,8 @@ button.ep-chip {
   height: 40px;
   padding: 8px;
   border-radius: 50%;
-  background: oklch(100% 0 0);
-  box-shadow: inset 0 0 0 1px oklch(0% 0 0 / 10%);
+  background: var(--on-media);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--media-shade) 10%, transparent);
 }
 
 .ep-logo > svg {
@@ -1122,29 +677,17 @@ button.ep-chip {
   height: 100%;
 }
 
-.ep-sponsor-text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.ep-sponsor-name {
-  color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 650;
-  line-height: 1.25rem;
-}
-
 .ep-sponsor .ep-pill {
   flex: none;
   margin: 0;
 }
 
+/* Hovering the sponsor card draws its pill's outline (interactions.css). */
 @media (hover: hover) {
   .ep-sponsor:hover .ep-pill {
-    box-shadow: inset 0 0 0 1px var(--ink);
+    --halo: 100;
+    --icon-a: var(--glow-a);
+    --icon-b: var(--glow-b);
   }
 }
 
@@ -1158,10 +701,6 @@ button.ep-chip {
    in the flow would then leave it, moving everything below by its height
    (a section link that had just landed included). When nothing is cut off
    the button hides, which takes nothing out of the flow either. */
-.ep-clamp-box {
-  position: relative;
-}
-
 .ep-clamp[data-clamped] {
   max-height: 34rem;
   overflow: clip;
@@ -1172,10 +711,6 @@ button.ep-chip {
     oklch(0% 0 0) calc(24rem + (1 - var(--live-truncated, 1)) * 100rem),
     transparent 34rem
   );
-}
-
-.ep-more {
-  margin-top: 1.25rem;
 }
 
 .ep-more {
@@ -1298,8 +833,8 @@ button.ep-chip {
 .ep-turn-head strong {
   max-width: 100%;
   color: var(--ink);
-  font-size: 0.8125rem;
-  line-height: 1.2;
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
   overflow-wrap: break-word;
 }
 
@@ -1311,7 +846,7 @@ button.ep-chip {
     color: var(--voice-0);
     font-family: var(--font-voice-0);
     font-stretch: 72%;
-    font-weight: 850;
+    font-weight: var(--font-weight-heavy);
     text-transform: uppercase;
   }
 }
@@ -1320,7 +855,7 @@ button.ep-chip {
   .ep-turn-head strong {
     color: var(--voice-1);
     font-family: var(--font-voice-1);
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
   }
 }
 
@@ -1427,14 +962,7 @@ button.ep-chip {
   --also:
     opacity calc(200ms * var(--slomo)) var(--ease-out),
     translate calc(300ms * var(--slomo)) var(--ease-out);
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 20px 8px 8px;
-  border: 1px solid var(--line);
   border-radius: var(--r-card);
-  background: var(--surface);
   box-shadow: var(--shadow-float);
 }
 
@@ -1447,37 +975,6 @@ button.ep-chip {
   .ep-who:popover-open .ep-who-box {
     opacity: 0;
     translate: 0 4px;
-  }
-}
-
-.ep-who-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.ep-who-text strong {
-  color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 650;
-  line-height: 1.25rem;
-}
-
-.ep-who-caret {
-  position: absolute;
-  top: 100%;
-  left: 26px;
-  width: 14px;
-  height: 7px;
-  background: var(--surface);
-  clip-path: polygon(0 0, 100% 0, 50% 100%);
-}
-
-@container anchored(fallback: flip-block) {
-  .ep-who-caret {
-    top: auto;
-    bottom: 100%;
-    rotate: 180deg;
   }
 }
 
@@ -1518,8 +1015,8 @@ button.ep-chip {
   background: var(--ink);
   color: var(--on-ink);
   font: inherit;
-  font-size: 0.8125rem;
-  font-weight: 650;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-demibold);
   white-space: nowrap;
   box-shadow: var(--shadow-float);
   cursor: pointer;
@@ -1577,173 +1074,21 @@ button.ep-chip {
 
 /* ---------- Onward ---------- */
 
-.ep-pager {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-  gap: 12px;
-  margin-bottom: clamp(32px, 5vw, 56px);
-}
-
-.ep-pager-link {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 8px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-card);
-  background-color: var(--surface);
-  color: var(--text);
-  text-decoration: none;
-}
-
-.ep-pager-link[rel='next'] {
-  flex-direction: row-reverse;
-  text-align: end;
-}
-
-/* The card's 28px corner, 8px in: the art's 20px. */
-.ep-pager-link .ep-card-art {
-  flex: none;
-  width: 72px;
-  height: 72px;
-  border-radius: var(--r-tile);
-  object-fit: cover;
-}
-
-/* The hairline over every piece of art: an outline drawn just inside it,
-   above the picture. */
-.ep-card-art {
-  outline: 1px solid var(--hairline);
-  outline-offset: -1px;
-}
-
-.ep-pager-text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  padding-inline: 4px;
-}
-
-.ep-pager-label,
-.ep-card-facts {
-  color: var(--muted);
-  font-size: 0.8125rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  line-height: 1.125rem;
-}
-
-.ep-card-title {
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-stretch: 78%;
-  font-weight: 800;
-  line-height: 1.02;
-  text-transform: uppercase;
-  text-wrap: balance;
-}
-
 /* The shelf: a snap carousel. Native carousel buttons and markers where the
    browser has them; a plain sideways scroll everywhere else. */
-.ep-shelf-wrap {
-  position: relative;
-  container: ep-shelf / inline-size;
-}
-
-.ep-shelf-title {
-  margin: 0 0 4px;
-  color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 650;
-  line-height: 40px;
-}
-
-/* The next card always peeks: so many whole cards and four tenths of one,
-   by the shelf's own width. 16px above and below so rings and shadows are
-   never cut. */
 .ep-shelf {
-  --ep-shown: 2;
-  display: grid;
-  grid-auto-columns: calc(
-    (100cqi - var(--ep-shown) * 16px) / (var(--ep-shown) + 0.4)
-  );
-  grid-auto-flow: column;
-  gap: 16px;
-  margin: 0 calc(var(--gutter) * -1);
-  padding: 16px var(--gutter);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-padding-inline: var(--gutter);
-  scroll-snap-type: x mandatory;
   scroll-marker-group: after;
-  list-style: none;
-}
-
-@container ep-shelf (width >= 560px) {
-  .ep-shelf {
-    --ep-shown: 3;
-  }
-}
-
-@container ep-shelf (width >= 860px) {
-  .ep-shelf {
-    --ep-shown: 4;
-  }
-}
-
-@container ep-shelf (width >= 1160px) {
-  .ep-shelf {
-    --ep-shown: 5;
-  }
 }
 
 .ep-shelf-item {
   container: ep-card / scroll-state;
-  scroll-snap-align: start;
-}
-
-/* Imagery leads; the facts sit 8px under it and 4px in. */
-.ep-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: var(--text);
-  text-decoration: none;
-}
-
-.ep-card > :not(.ep-card-art) {
-  margin-inline: 4px;
 }
 
 .ep-card .ep-card-art {
-  display: block;
-  width: 100%;
-  height: auto;
-  margin-bottom: 2px;
-  aspect-ratio: 1;
-  border-radius: var(--r-tile);
-  object-fit: cover;
   transition:
     scale calc(480ms * var(--slomo)) var(--ease-spring),
     opacity calc(320ms * var(--slomo)) var(--ease-out),
     transform 240ms var(--ease-out);
-}
-
-.ep-card-reason {
-  display: inline-flex;
-  align-self: flex-start;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 10px 2px 2px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent-ink);
-  font-size: 0.75rem;
-  font-weight: 650;
-  line-height: 1rem;
 }
 
 .ep-card-reason .person-face {
@@ -1753,10 +1098,6 @@ button.ep-chip {
 
 .ep-card-reason .person-face::before {
   inset: 1px;
-}
-
-.ep-card-reason:not(:has(.person-face)) {
-  padding-inline-start: 10px;
 }
 
 /* The card the shelf rests on leads; the rest sit back a little. */
@@ -1784,7 +1125,7 @@ button.ep-chip {
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: 1.1rem;
+  font-size: var(--text-xl);
   cursor: pointer;
   transition:
     opacity 200ms var(--ease-out),
@@ -1837,52 +1178,16 @@ button.ep-chip {
    the host's voice, what they have done on the show, the bio, their two
    latest episodes and the way to all of them, and their links. Until the
    colour arrives the poster is plain Surface. */
-.ab-hosts {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 24px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 1024px) {
-  .ab-hosts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 .ab-host {
   --ab-ground: color-mix(
     in oklch,
     var(--live-img, transparent) 20%,
     var(--surface)
   );
-  display: flex;
-  flex-direction: column;
-  overflow: clip;
-  border-radius: var(--r-card);
-  background: var(--ab-ground);
   box-shadow:
     inset 0 0 0 1px var(--line),
     0 2px 8px color-mix(in oklch, var(--ink) 6%, transparent);
   transition: --ab-ground 600ms var(--ease-out);
-}
-
-.ab-host-photo {
-  position: relative;
-  aspect-ratio: 4 / 3;
-}
-
-.ab-host-photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: var(--r-card) var(--r-card) 0 0;
-  outline: 1px solid var(--hairline);
-  outline-offset: -1px;
-  object-fit: cover;
-  object-position: center 30%;
 }
 
 .ab-host-photo::after {
@@ -1893,54 +1198,8 @@ button.ep-chip {
   pointer-events: none;
 }
 
-.ab-host-body {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  margin-top: -28px;
-  padding: 0 24px 24px;
-}
-
-.ab-host-name {
-  margin: 0;
-  color: var(--person-ring, var(--ink));
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  font-weight: 800;
-  line-height: 1;
-}
-
-[data-voice='0'] > .ab-host-body > .ab-host-name {
-  font-family: var(--font-voice-0);
-  font-stretch: 72%;
-  font-weight: 850;
-  text-transform: uppercase;
-}
-
-[data-voice='1'] > .ab-host-body > .ab-host-name {
-  font-family: var(--font-voice-1);
-  font-weight: 400;
-}
-
-.ab-host-bio {
-  max-width: 48ch;
-  margin: 0;
-  color: var(--text);
-}
-
-/* Their two latest episodes, in a tray (24px, 4px in: 20px tiles). */
-.ab-host-tray {
-  display: grid;
-  justify-items: start;
-  gap: 12px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 4px 4px 12px;
-  border-radius: var(--r-tray);
-  background: color-mix(in oklch, var(--surface) 72%, transparent);
-}
-
+/* Their two latest episodes, in a tray (24px, 4px in: 20px tiles), two
+   across even on phones. */
 .ab-host-tray .ep-tiles {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-flow: row;
@@ -1949,28 +1208,7 @@ button.ep-chip {
 
 /* The hosts' latest episodes together, once, when every poster's tray
    would have shown the same ones. */
-.ab-latest {
-  margin-top: 32px;
-}
-
-.ab-latest-title {
-  margin: 0 0 12px;
-  color: var(--ink);
-  font-size: 0.9375rem;
-  font-weight: 650;
-  line-height: 1.25rem;
-}
-
-.ab-host-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 4px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ab-host-links .ep-pill {
+.ab-host .ep-pill {
   margin: 0;
 }
 
@@ -1993,7 +1231,8 @@ button.ep-chip {
   }
 }
 
-.ep-send::after {
+/* ::before, since ::after is the outline (interactions.css). */
+.ep-send::before {
   content: '';
   position: absolute;
   inset: auto 1.25rem 6px;
@@ -2157,8 +1396,8 @@ button.ep-chip {
     background: none;
     color: var(--muted);
     font: inherit;
-    font-size: 0.8125rem;
-    font-weight: 650;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-demibold);
     cursor: pointer;
     transition: color 300ms var(--ease-out);
   }

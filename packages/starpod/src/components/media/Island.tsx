@@ -393,8 +393,8 @@ function PipBar({ episode, href }: { episode: PlayableEpisode; href: string }) {
       : 'Close artwork';
   return (
     <div class="pip-bar">
-      <div class="pip-bar-in">
-        <a class="pip-title" href={href} title={episode.title}>
+      <div class="pip-bar-in relative box-border flex h-full items-center gap-0.5 rounded-full bg-surface py-0 pr-1 pl-3 shadow-soft">
+        <a class="pip-title min-w-0 flex-1 truncate text-xs font-demibold text-ink no-underline decoration-auto hover:underline" href={href} title={episode.title}>
           {episode.title}
         </a>
         <button
@@ -442,7 +442,7 @@ function PipBar({ episode, href }: { episode: PlayableEpisode; href: string }) {
         >
           <CloseIcon size={15} />
         </button>
-        <i aria-hidden="true" class="pip-bar-light" data-props-for="media-clock" />
+        <i aria-hidden="true" class="pip-bar-light absolute right-3 bottom-[3px] left-3" data-props-for="media-clock" />
       </div>
     </div>
   );
@@ -461,22 +461,27 @@ function Stations({ popover = false }: { popover?: boolean }) {
   return (
     <div
       aria-label="Player home"
-      class={popover ? 'island-station' : 'island-station PropFLIP'}
+      class={`island-station relative inline-flex w-max cursor-default border border-line p-[3px] [--area:station] ${popover ? 'rounded-full' : 'PropFLIP [--r:999px]'}`}
       role="radiogroup"
       {...(popover ? {} : { 'data-⚓️-scope-name': '--home-on' })}
     >
       {!popover && (
         <i
           aria-hidden="true"
-          class="island-station-on"
+          class="island-station-on rounded-full bg-ink"
           {...{ 'data-⚓️-to': '--home-on', 'data-⚓️-fill': '', 'data-⚓️-transition': 'glide' }}
         />
       )}
       {ISLAND_HOMES.map((home, i) => (
-        <label data-home={home} key={home}>
+        <label
+          class={`relative z-1 cursor-pointer rounded-full px-3 py-1.5 font-ui text-xs leading-none font-semibold normal-nums whitespace-nowrap text-muted transition-colors has-checked:text-on-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent ${popover ? 'has-checked:bg-ink' : 'has-checked:anchor-name-[--home-on]'}`}
+          data-home={home}
+          key={home}
+        >
           <input
             aria-keyshortcuts={String(i + 1)}
             checked={at === home}
+            class="pointer-events-none absolute opacity-0"
             name={popover ? 'island-home-more' : 'island-home'}
             onChange={() => go(home)}
             type="radio"
@@ -493,12 +498,15 @@ function SpeedButton() {
   return (
     <button
       aria-label={`Playback speed ${playbackRate.value}×, change`}
-      class="text-button island-speed"
-      data-props-for="pointer-local"
+      class="icon-button island-speed"
       onClick={() => setRate(RATES[(RATES.indexOf(playbackRate.value) + 1) % RATES.length]!)}
       type="button"
     >
-      {playbackRate.value}×
+      {/* Painted like the icons beside it: --icon-a/--icon-b fade into the
+          gradient on hover and focus (interactions.css). */}
+      <span class="bg-linear-to-b from-(--icon-a) to-(--icon-b) bg-clip-text text-sm font-demibold text-transparent tabular-nums">
+        {playbackRate.value}×
+      </span>
     </button>
   );
 }
@@ -559,7 +567,7 @@ function More({ docked, episode, following }: { docked: boolean; episode: Playab
     <div class="island-more PropFLIP">
       <button
         aria-label="Move player"
-        class="icon-button island-more-button"
+        class="icon-button island-more-button anchor-name-[--island-more]"
         popovertarget="island-more"
         title="Move player"
         type="button"
@@ -568,23 +576,23 @@ function More({ docked, episode, following }: { docked: boolean; episode: Playab
         <MoreIcon class="island-more-dots" size={20} />
       </button>
       <div class="island-more-pop" id="island-more" popover="auto">
-        <div class="island-more-in">
-          <p class="island-more-times">
+        <div class="island-more-in relative grid justify-items-start gap-3 rounded-tray border border-hairline bg-surface p-3 text-ink shadow-float">
+          <p class="island-more-times m-0 ml-1 gap-2 text-xs text-muted tabular-nums">
             <span>{elapsed}</span>
             <span>{remaining}</span>
           </p>
           <Stations popover />
-          <div class="island-more-row island-more-sound">
+          <div class="island-more-row island-more-sound items-center gap-1.5">
             <SpeedButton />
             <MuteButton />
           </div>
-          <div class="island-more-row island-more-picture">
+          <div class="island-more-row island-more-picture items-center gap-1.5">
             {episode.video && <MediumSwitch compact />}
             <PipButton docked={docked} />
           </div>
-          <button class="text-button island-more-next" disabled={!following} onClick={() => following && playEpisode(following)} type="button">
+          <button class="text-button island-more-next max-w-70 items-center gap-2" disabled={!following} onClick={() => following && playEpisode(following)} type="button">
             <NextIcon size={18} />
-            <span>{next}</span>
+            <span class="truncate">{next}</span>
           </button>
         </div>
       </div>
@@ -825,8 +833,10 @@ export default function Island() {
   const watching = activeMedium.value === 'watch';
   const name = (
     <>
-      <b>{episode.title}</b>
-      <span>
+      <b class="truncate font-display text-[length:var(--title-size,14px)] leading-tight font-demibold tracking-snug normal-nums">
+        {episode.title}
+      </b>
+      <span class="truncate font-ui text-xs leading-tight font-medium text-muted tabular-nums">
         {episode.episodeNumber !== 'Bonus' ? `Ep ${episode.episodeNumber}` : 'Bonus'}
         {' · '}
         {watching ? 'Watching' : 'Listening'}
@@ -849,11 +859,14 @@ export default function Island() {
   return (
     <>
       {barHost ? createPortal(bar, barHost) : bar}
-      <div aria-hidden="true" class="player-scrim" onClick={() => go(islandBack.value)} />
+      <div
+        aria-hidden="true"
+        class="player-scrim invisible fixed inset-0 z-44 bg-media-shade/50 opacity-0 [transition:opacity_calc(0.4s*var(--slomo))_var(--ease-out),visibility_0s_calc(0.4s*var(--slomo))]"
+        onClick={() => go(islandBack.value)} />
       <section
         aria-label={at === 'card' ? `Now playing: ${episode.title}` : 'Player'}
         aria-modal={at === 'card' ? 'true' : undefined}
-        class="island dock-controls"
+        class="island dock-controls pointer-events-auto z-45 grid cursor-pointer place-content-start items-center overflow-clip rounded-(--r) bg-[color-mix(in_oklch,var(--live-img-accent,transparent)_16%,color-mix(in_oklch,var(--surface)_80%,transparent))] text-ink shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--ink)_11%,transparent),0_30px_60px_-30px_color-mix(in_oklch,var(--media-shade)_60%,transparent)] backdrop-blur-haze backdrop-saturate-150 vt-name-[player-island] [position-visibility:always]"
         data-medium={activeMedium.value}
         data-state={at}
         id="player"
@@ -866,12 +879,12 @@ export default function Island() {
             a close, standing in for the home control (phones offer only the
             dock and the card). Other screens never render them. */}
         {phone && (
-          <div aria-hidden="true" class="island-grab" ref={grab}>
-            <i />
+          <div aria-hidden="true" class="island-grab hidden" ref={grab}>
+            <i class="h-[5px] w-10 rounded-full bg-ink/28" />
           </div>
         )}
         {phone && (
-          <div class="island-close PropFLIP">
+          <div class="island-close PropFLIP hidden">
             <button
               aria-label="Close the now-playing card"
               class="icon-button"
@@ -884,13 +897,17 @@ export default function Island() {
           </div>
         )}
 
-        <div class="island-art PropFLIP fix-kids" data-pip-zone="dock">
-          <div class="island-art-in">
+        <div
+          class="island-art PropFLIP fix-kids relative h-(--art-h) w-(--art-w) overflow-clip bg-media-ground [--area:art] [--r:var(--r-thumb)] data-hot:outline-2 data-hot:outline-offset-2 data-hot:outline-accent"
+          data-pip-zone="dock"
+        >
+          <div class="absolute inset-0">
             {/* The artwork's palette, for the whole page to take its accent
                 from (--live-img, --live-img-accent, … on <html>; once per episode). */}
             {episode.image && (
               <img
                 alt=""
+                class="absolute inset-0 block size-full object-cover"
                 crossOrigin="anonymous"
                 data-props-for="img-color"
                 data-props-to="html"
@@ -903,13 +920,13 @@ export default function Island() {
           </div>
         </div>
 
-        <div class="island-title PropFLIP">
+        <div class="island-title PropFLIP grid w-(--title-w,170px) min-w-0 content-center gap-1.5 [--area:title]">
           {anchorPositioning.value ? (
             <button
               aria-controls="player"
               aria-expanded={at === 'card'}
               aria-label={`${episode.title}. ${at === 'card' ? 'Close' : 'Open'} the now-playing card`}
-              class="island-name"
+              class="island-name grid min-w-0 cursor-pointer gap-1 border-0 bg-transparent p-0 text-start text-inherit [font:inherit] focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent"
               onClick={toggleCard}
               type="button"
             >
@@ -917,39 +934,42 @@ export default function Island() {
             </button>
           ) : (
             // No card to open without anchor positioning: the name goes to its episode.
-            <a class="island-name" href={href}>
+            <a class="island-name grid min-w-0 cursor-pointer gap-1 border-0 bg-transparent p-0 text-start text-inherit [font:inherit] focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-accent" href={href}>
               {name}
             </a>
           )}
-          <a class="island-open" href={href}>
+          <a
+            class="island-open hidden w-max items-center gap-1.5 text-sm font-semibold text-muted no-underline decoration-auto transition-colors hover:text-ink"
+            href={href}
+          >
             Open the episode
             <ArrowOutIcon size={14} />
           </a>
           <i aria-hidden="true" class="island-light" data-props-for="media-clock" />
         </div>
 
-        <div aria-hidden="true" class="island-eq PropFLIP">
+        <div aria-hidden="true" class="island-eq PropFLIP flex h-4 w-4.5 items-end gap-[3px] [--area:eq]">
           <i />
           <i />
           <i />
           <i />
         </div>
 
-        <div class="island-scrub PropFLIP" data-props-for="media-clock">
-          <span class="dock-time">
-            <span>{elapsed}</span>
+        <div class="island-scrub PropFLIP flex min-w-0 items-center gap-2 [--area:scrub]" data-props-for="media-clock">
+          <span class="dock-time block w-[6.5ch] flex-none text-center text-xs tabular-nums text-muted">
+            <span class="block h-lh whitespace-nowrap contain-strict">{elapsed}</span>
           </span>
-          <span class="island-track">
+          <span class="island-track relative block min-w-0 flex-1">
             <LiveScrubber episode={episode} />
           </span>
-          <span class="dock-time">
-            <span>{remaining}</span>
+          <span class="dock-time block w-[6.5ch] flex-none text-center text-xs tabular-nums text-muted">
+            <span class="block h-lh whitespace-nowrap contain-strict">{remaining}</span>
           </span>
         </div>
 
         {/* Each control sits in its own part: the part flies, the control
             inside keeps its own press and hover transitions. */}
-        <div class="island-prev PropFLIP">
+        <div class="island-prev PropFLIP grid size-[var(--key,40px)] place-items-center [--area:prev]">
           <button
             aria-keyshortcuts="J"
             aria-label="Back 15 seconds"
@@ -962,10 +982,10 @@ export default function Island() {
             <BackIcon size={22} />
           </button>
         </div>
-        <div class="island-play PropFLIP">
+        <div class="island-play PropFLIP grid size-[var(--play,40px)] place-items-center [--area:play] [--key:40px]">
           <PlayToggle class="dock-play" shortcut size={20} />
         </div>
-        <div class="island-next PropFLIP">
+        <div class="island-next PropFLIP grid size-[var(--key,40px)] place-items-center [--area:next]">
           <button
             aria-keyshortcuts="L"
             aria-label="Forward 30 seconds"
@@ -978,7 +998,7 @@ export default function Island() {
             <ForwardIcon size={22} />
           </button>
         </div>
-        <div class="island-skip PropFLIP">
+        <div class="island-skip PropFLIP grid size-[var(--key,40px)] place-items-center [--area:skip]">
           <button
             aria-label={skipLabel(following)}
             class="icon-button"
@@ -991,7 +1011,7 @@ export default function Island() {
           </button>
         </div>
 
-        <div class="island-tools PropFLIP">
+        <div class="island-tools PropFLIP flex w-max items-center gap-1.5 [--area:tools]">
           {episode.video && <MediumSwitch compact shortcut />}
           <SpeedButton />
           <MuteButton />
@@ -1002,7 +1022,7 @@ export default function Island() {
 
         <More docked={docked} episode={episode} following={following} />
 
-        <div class="island-queue PropFLIP" ref={queueHost} {...{ 'data-⚓️-scope': 'all' }} />
+        <div class="island-queue PropFLIP pointer-events-none relative z-1 [--area:queue]" ref={queueHost} {...{ 'data-⚓️-scope': 'all' }} />
       </section>
     </>
   );

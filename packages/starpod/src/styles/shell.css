@@ -1,39 +1,10 @@
 /* ---------- App shell: rail, top bar, main, tab bar, dock, sheets ---------- */
 
-.skip-link {
-  position: fixed;
-  top: 8px;
-  left: 8px;
-  z-index: 100;
-  padding: 0.6rem 1rem;
-  border-radius: var(--radius);
-  background: var(--ink);
-  color: var(--on-ink);
-  translate: 0 -200%;
-  transition: translate 200ms var(--ease-out);
-}
-
-.skip-link:focus {
-  translate: 0 0;
-}
-
+/* The colour stays here: the global `a { color: inherit }` would beat a utility. */
 /* The player is there only while an episode is loaded (the island renders
    nothing before), so its skip link waits for one. */
 :root:is(:not([data-episode]), [data-episode='']) .skip-link[href='#player'] {
   display: none;
-}
-
-.app {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-content: start;
-  min-height: 100dvh;
-}
-
-@media (min-width: 1024px) {
-  .app {
-    grid-template-columns: var(--rail-w) minmax(0, 1fr);
-  }
 }
 
 /* Rail (desktop): everything a visitor came for, always on screen. */
@@ -67,62 +38,6 @@
   flex-shrink: 0;
 }
 
-.rail-title {
-  margin: 0;
-  color: var(--ink);
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-}
-
-.rail-title a {
-  text-decoration: none;
-}
-
-.rail-blurb {
-  margin: -0.6rem 0 0;
-  color: var(--muted);
-  font-size: 0.875rem;
-  line-height: 1.45;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.search-trigger {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--ground);
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: color 200ms var(--ease-out);
-}
-
-@media (hover: hover) {
-  .search-trigger:hover {
-    color: var(--text);
-  }
-}
-
-.search-trigger kbd {
-  margin-left: auto;
-  padding: 0.1rem 0.4rem;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  font: inherit;
-  font-size: 0.75rem;
-}
-
 .rail-nav,
 .sheet-nav {
   display: flex;
@@ -138,7 +53,7 @@
   padding: 0.55rem 0.7rem;
   border-radius: var(--radius);
   color: var(--text);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-decoration: none;
   transition:
     background 200ms var(--ease-out),
@@ -167,15 +82,11 @@
   color: var(--accent-ink);
 }
 
-.rail-follow {
-  margin-top: auto;
-}
-
 .rail-label {
   margin: 0 0 0.6rem;
   color: var(--muted);
-  font-size: 0.75rem;
-  font-weight: 650;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-demibold);
   letter-spacing: 0.04em;
 }
 
@@ -217,91 +128,13 @@
   clip: rect(0, 0, 0, 0);
 }
 
-/* Top bar (phones, tablets, foldables). */
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 30;
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: var(--topbar-h);
-  padding: 0 var(--gutter);
-  padding-top: env(safe-area-inset-top);
-  box-sizing: content-box;
-  background: color-mix(in oklch, var(--ground) 86%, transparent);
-  backdrop-filter: blur(14px) saturate(1.4);
-  border-bottom: 1px solid var(--line);
-}
-
-.topbar-show {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  color: var(--ink);
-  font-weight: 700;
-}
-
-.topbar-art {
-  flex: none;
-  width: 36px;
-}
-
+/* A site's own artwork, kept to the bar's corner radius. */
 .topbar-show :is(.tilt-body, img) {
   border-radius: 8px;
 }
 
-.topbar-title {
-  overflow: hidden;
-  text-decoration: none;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.topbar-follow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-  padding: 0.5rem 0.9rem;
-  border: 0;
-  border-radius: 999px;
-  background: var(--ink);
-  color: var(--on-ink);
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-/* Main column. */
-.main {
-  min-width: 0;
-  /* Stage light may spill past the column; it never scrolls the page. */
-  overflow-x: clip;
-  padding: var(--gutter) var(--gutter) calc(var(--dock-h) + var(--tabbar-h) + 48px);
-}
-
-@media (min-width: 1024px) {
-  .main {
-    grid-column: 2;
-    padding-bottom: calc(var(--dock-h) + 64px);
-  }
-}
-
-.main-page {
-  max-width: 1280px;
-}
-
 .main:has(.stage[data-variant='page']) .crumbs {
   display: none;
-}
-
-.crumbs {
-  margin-bottom: 1.25rem;
-  font-size: 0.8125rem;
 }
 
 /* On touch a crumb's link is 44px tall, its line where it was. */
@@ -320,32 +153,12 @@
   margin: 0 0 1.25rem;
   font-family: var(--font-display);
   font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.75rem);
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  line-height: 1.15;
-}
-
-.section-count {
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--tracking-snug);
+  line-height: var(--leading-tight);
 }
 
 /* Tab bar (phones, tablets). */
-.tabbar {
-  position: fixed;
-  inset: auto 0 0;
-  z-index: 40;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  height: var(--tabbar-h);
-  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom)
-    env(safe-area-inset-left);
-  box-sizing: border-box;
-  background: var(--surface);
-  border-top: 1px solid var(--line);
-}
-
 .tabbar > a,
 .tabbar > button,
 .tabbar astro-island > button {
@@ -360,8 +173,8 @@
   background: none;
   color: var(--muted);
   font: inherit;
-  font-size: 0.6875rem;
-  font-weight: 650;
+  font-size: var(--text-2xs);
+  font-weight: var(--font-weight-demibold);
   text-decoration: none;
   cursor: pointer;
 }
@@ -424,14 +237,8 @@
   .tabbar astro-island > button {
     flex-direction: row;
     gap: 8px;
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
   }
-}
-
-/* The 404's art keeps to its column. */
-.four-zero-four svg {
-  max-width: 100%;
-  height: auto;
 }
 
 /* The 404's helpful links: on touch, 44px pills in a wrapping row. */
@@ -486,14 +293,7 @@
 }
 
 .sheet::backdrop {
-  background: oklch(10% 0.02 280 / 0.45);
-}
-
-.sheet-title {
-  margin: 0 0 1rem;
-  color: var(--ink);
-  font-size: 1.05rem;
-  font-weight: 700;
+  background: color-mix(in oklch, var(--media-shade) 50%, transparent);
 }
 
 .sheet .platforms {
@@ -515,8 +315,8 @@
   height: auto;
   overflow: visible;
   clip: auto;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-semibold);
 }
 
 .sheet-nav {
@@ -547,8 +347,8 @@
   background: none;
   color: var(--text);
   font: inherit;
-  font-size: 0.8125rem;
-  font-weight: 650;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-demibold);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition:
@@ -649,16 +449,6 @@
 
 /* ---------- Medium switch ---------- */
 
-.medium-switch {
-  position: relative;
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 3px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--ground);
-}
-
 .medium-option {
   position: relative;
   z-index: 1;
@@ -672,8 +462,8 @@
   background: none;
   color: var(--muted);
   font: inherit;
-  font-size: 0.875rem;
-  font-weight: 650;
+  font-size: var(--text-md);
+  font-weight: var(--font-weight-demibold);
   cursor: pointer;
   transition: color 300ms var(--ease-out);
 }
@@ -682,22 +472,13 @@
   color: var(--on-ink);
 }
 
-.medium-thumb {
-  position: absolute;
-  inset: 3px auto 3px 3px;
-  width: calc(50% - 3px);
-  border-radius: 999px;
-  background: var(--ink);
-  transition: translate 520ms var(--ease-spring);
-}
-
 .medium-switch:has(.medium-option:last-of-type[aria-checked='true']) .medium-thumb {
   translate: 100% 0;
 }
 
 .medium-switch[data-compact] .medium-option {
   padding: 0.3rem 0.65rem;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
 }
 
 /* ---------- Buttons ---------- */
@@ -710,8 +491,8 @@
   padding: 0.75rem 1.25rem;
   border-radius: 999px;
   font: inherit;
-  font-size: 0.9375rem;
-  font-weight: 700;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-bold);
   text-decoration: none;
   cursor: pointer;
   transition: transform 300ms var(--ease-spring);
@@ -884,62 +665,6 @@
   .onair i:nth-child(3) {
     scale: 1 0.75;
   }
-}
-
-/* ---------- Scrubber preview ---------- */
-
-.scrub-preview {
-  position: fixed;
-  top: var(--top, 100vh);
-  left: var(--x, 50vw);
-  z-index: 60;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  box-sizing: border-box;
-  width: max-content;
-  max-width: min(320px, calc(100vw - 24px));
-  padding: 10px 13px 11px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface);
-  box-shadow: var(--shadow-float);
-  opacity: 0;
-  scale: 0.94;
-  transform-origin: 50% 100%;
-  translate: -50% calc(-100% - 14px);
-  pointer-events: none;
-  transition:
-    opacity 160ms var(--ease-out),
-    scale 240ms var(--ease-out);
-}
-
-.scrub-preview[data-open] {
-  opacity: 1;
-  scale: 1;
-}
-
-.scrub-preview-time {
-  color: var(--accent-ink);
-  font-size: 0.75rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.scrub-preview-name {
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.scrub-preview-line {
-  display: -webkit-box;
-  overflow: hidden;
-  color: var(--ink);
-  font-size: 0.875rem;
-  line-height: 1.35;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  text-wrap: pretty;
 }
 
 /* ---------- Page transitions ---------- */
