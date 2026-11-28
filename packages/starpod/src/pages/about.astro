@@ -153,10 +153,13 @@ const voiceName: Record<number, string> = {
 
       {/* Each poster is a subgrid of six rows (photo, name, stats, bio,
           episodes, links), so side by side the bios, episodes and links
-          line up even when one host's bio runs longer. The list's row gap is
+          line up even when one host's bio runs longer. Posters are at
+          least 320px and as many fit across as will, so two hosts on a wide
+          screen sit at a comfortable size beside an empty column rather than
+          stretching, and three or more fill the row. The list's row gap is
           the posters' own 12px (a subgrid's rows share it), and each poster's
           margin makes up the 24px between stacked posters. */}
-      <ul class="grid grid-cols-1 gap-x-6 gap-y-3 lg:grid-cols-2">
+      <ul class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))] gap-x-6 gap-y-3">
         {
           posters.map((host) => (
             <li
@@ -164,7 +167,7 @@ const voiceName: Record<number, string> = {
               data-voice={host.voice}
             >
               <div
-                class="ab-host-photo relative row-start-1 aspect-[4/3] max-h-75 w-full"
+                class="ab-host-photo relative row-start-1 aspect-[4/3]"
                 data-props-for="img-color"
                 data-props-to=".ab-host"
               >
